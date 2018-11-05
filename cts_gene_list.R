@@ -2,22 +2,21 @@
 #1. raw expression file or jobid_filtered_expression.txt
 #2. jobid_blocks.conds.txt
 #3. jobid_blocks.gene.txt
-
+#4. cell label
 #output:
 #1. jobid_gene_name.txt
 #2. jobid_CT_ClusterIndex_bic.txt
 
 library(tidyverse)
 library(rlist)
-
 args <- commandArgs(TRUE)
 expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
-
-# expFile <- "1103_filtered_expression.txt"
-# jobid <- 1103
-# label_file <- "1103_cell_label.txt"
+getwd()
+# expFile <- "20181103_filtered_expression.txt"
+# jobid <- 20181103
+# label_file <- "20181103_cell_label.txt"
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
@@ -64,18 +63,49 @@ pv <- apply(conds_file,1,get_pvalue)
 
 
 
+get_pvalue_df <- function(lis,num){
+  result <- lis$pvalue
+  ct <- lis$cell_type
+  for (i in ct) {
+    if(i == num){
+      return(result)
+    }
+  }
+  return (1)
+}
+
 
 get_bic_in_ct <- function(lis,num){
+  pval <- lis$pvalue
   result <- lis$cell_type
   for (i in result) {
-    if(i == num){
+    if(i == num && pval <= pvalue_thres){
       return (1)
     }
   }
   return (0)
 }
-#j=2
+
+#j=3
 for (j in 1:count_cluster) {
+pvalue_thres <- 10
+uniq_li <- unlist(sapply(pv, get_bic_in_ct,num=j))
+uniq_bic <- gene_file[which(uniq_li==1),]%>%
+  t%>%
+  as.vector()%>%
+  unique()%>%
+  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
+
+uniq_bic <- gene_file[which(uniq_li==1),]%>%
+  t%>%
+  as.vector()%>%
+  table()%>%
+  as.data.frame()%>%
+  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
+
+
+pvalue_df <- unlist(sapply(pv, get_pvalue_df,num=j))
+pvalue_thres <- as.numeric(quantile(pvalue_df[pvalue_df <1], 0.05)) # 0.1 for 10% quantile )
 
 li <- unlist(sapply(pv, get_bic_in_ct,num=j))
 gene_bic <- gene_file[which(li==1),]%>%
