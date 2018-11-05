@@ -1,3 +1,6 @@
+#######  Calculate ARI score if user provide their cell label ##########
+
+
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id

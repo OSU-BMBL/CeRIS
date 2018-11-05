@@ -1,3 +1,12 @@
+#Generate gene list by 
+#1. raw expression file or jobid_filtered_expression.txt
+#2. jobid_blocks.conds.txt
+#3. jobid_blocks.gene.txt
+
+#output:
+#1. jobid_gene_name.txt
+#2. jobid_CT_ClusterIndex_bic.txt
+
 library(tidyverse)
 library(rlist)
 

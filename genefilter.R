@@ -1,8 +1,8 @@
-
 ####### preprocessing expression matrix based on SC3 ##########
+
 library(data.table)
 #removes genes/transcripts that are either expressed (expression value > 2) in less than X% of cells (rare genes/transcripts) 
-#or expressed (expression value > 0) in at least (100 â€? X)% of cells (ubiquitous genes/transcripts). 
+#or expressed (expression value > 0) in at least (100 ??? X)% of cells (ubiquitous genes/transcripts). 
 #By default, X is set at 6.
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename

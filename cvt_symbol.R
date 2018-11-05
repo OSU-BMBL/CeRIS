@@ -1,3 +1,6 @@
+#######  Convert gene name -> Ensembl gene id ##########
+#######  Create a folder by filename, inside folder create each module by clusters  ##########
+
 #source("https://bioconductor.org/biocLite.R"); 
 #biocLite("ensembldb") 
 #biocLite("EnsDb.Hsapiens.v86")
