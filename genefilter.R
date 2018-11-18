@@ -8,28 +8,28 @@ args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
 delim <- args[3] #delimiter
-# srcFile = "C:/Users/flyku/Desktop/test_yan.csv"
+# srcFile = "C:/Users/flyku/Desktop/Yan_expression.csv"
 # srcFile = "/home/www/html/iris3/program/test_yan.csv";
 # outFile <- "1103"
 # delim <- ","
 
 #yan.test <- read.csv("Goolam_cell_label.csv",header=T,sep=",",check.names = FALSE, row.names = 1)
-
+getwd()
 yan.test <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = 1)
-
 
 nrare <- ncol(yan.test) * 0.06
 nubi <- ncol(yan.test) * 0.94
-rare_ubi <- data.frame()
 new_yan <- data.frame()
-for (i in 1:nrow(yan.test)){
-  if(length(which(yan.test[i,]>2)) < nrare | length(which(yan.test[i,]==0)) > nubi) {
-    rare_ubi <- rbind(rare_ubi,subset(yan.test[i,]))
-  }
-  else {
-    new_yan <- rbind(new_yan,subset(yan.test[i,]))
+filter_func <- function(this){
+  if(length(which(this>2)) >= nrare && length(which(this==0)) <= nubi){
+    return (1)
+  } else {
+    return (0)
   }
 }
+
+new_yan_index <- as.vector(apply(yan.test, 1, filter_func))
+new_yan <- yan.test[which(new_yan_index == 1),]
 
 new_yan <- log1p(new_yan)
 filter_num <- nrow(yan.test)-nrow(new_yan)

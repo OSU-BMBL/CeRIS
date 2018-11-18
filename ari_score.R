@@ -7,7 +7,8 @@ outFile <- args[2] # user job id
 delim_array <- c("\t"," ",",") # 1-tab, 2-space, 3-comma
 delim <- delim_array[as.numeric(args[3])] #delimiter
 #delim <- args[3]
-# srcFile = "1103_sc3_label.txt"
+#setwd("C:/Users/flyku/Desktop/iris3")
+# srcFile = "2018111445745_sc3_cluster.txt"
 # outFile <- "1103"
 # delim <- "\t"
 
@@ -39,7 +40,7 @@ sc3_cluster <- srcLabel
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-user_label_file <- read.delim("test_user_label.txt",header=T,sep=get.delim(filename),check.names = FALSE)
+user_label_file <- read.delim("test_user_label.txt",header=T,sep="\t",check.names = FALSE)
 
 user_label_index <- which(colnames(user_label_file) ==  "label")
 user_cellname_index <- which(colnames(user_label_file) ==  "cell_name")
