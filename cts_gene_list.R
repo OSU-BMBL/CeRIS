@@ -14,9 +14,9 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# expFile <- "20181103_filtered_expression.txt"
-# jobid <- 20181103
-# label_file <- "20181103_cell_label.txt"
+# expFile <- "2018111413246_filtered_expression.txt"
+# jobid <- 2018111413246
+# label_file <- "2018111413246_cell_label.txt"
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
@@ -114,6 +114,8 @@ gene_bic <- gene_file[which(li==1),]%>%
 
 gene_bic[] <- lapply(gene_bic, as.character)
 gene_bic <- data.frame(lapply(gene_bic, function(x) {gsub("_.", "", x)}))
+
+if(length(gene_bic) > 0) {
 colnames(gene_bic) <- paste0("bic",which(li==1))
 
 gene_name <- read.table(paste(jobid,"_gene_name.txt",sep = ""),header = F,stringsAsFactors = F)
@@ -132,10 +134,10 @@ for (i in 1:ncol(gene_bic)) {
 }
 ncol(gene_overlap)
 colnames(gene_overlap) <- c("geneid",colnames(gene_bic))
-gene_overlap[,"weight"] <- rowSums(gene_overlap[,-1])
+gene_overlap[,"weight"] <- rowSums(as.data.frame(gene_overlap[,-1]))
 
 write.table(gene_bic,paste(jobid,"_CT_",j,"_bic.txt",sep = ""),sep="\t",row.names = F,col.names = T,na = "",quote = F)
 #write.table(gene_overlap,paste("gene_overlap",j,".txt",sep = ""),row.names = F,col.names = T,quote = F)
-
+}
 }
 
