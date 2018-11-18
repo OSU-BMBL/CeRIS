@@ -1,24 +1,24 @@
 #######  Convert gene name -> Ensembl gene id ##########
 #######  Create a folder by filename, inside folder create each module by clusters  ##########
 
-#source("https://bioconductor.org/biocLite.R"); 
-#biocLite("ensembldb") 
-#biocLite("EnsDb.Hsapiens.v86")
-#biocLite("EnsDb.Mmusculus.v79")
-GenomicFeatures
-biocLite("GenomicAlignments")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#  install.packages("BiocManager")
+#BiocManager::install("GenomicAlignments", version = "3.8")
+#BiocManager::install("ensembldb", version = "3.8")
+#BiocManager::install("EnsDb.Hsapiens.v86", version = "3.8")
+library(GenomicAlignments)
 library(ensembldb)
 library(EnsDb.Hsapiens.v86)
 #setwd("C:/Users/flyku/Desktop/iris3")
-getwd()
-args <- commandArgs(TRUE)
-srcFile <- args[1]
-srcFile <- "20181103_CT_3_bic.txt"
-#setwd("D:/Users/flyku/Documents/IRIS3-R/")
-genes <- read.table(srcFile,header = T,sep = "\t");
 
-this <- genes[,1]
-i=1
+
+args <- commandArgs(TRUE)
+srcDir <- args[1]
+setwd(srcDir)
+getwd()
+#srcDir <-  getwd()
+srcFile <- list.files(srcDir,pattern = "*_bic.txt")
+#setwd("D:/Users/flyku/Documents/IRIS3-R/")
 
 get_row_num <- function (this){
   num = 0
@@ -30,24 +30,25 @@ get_row_num <- function (this){
   return (num)
 }
 
-# res <- as.data.frame(apply(genes, 2, get_row_num))
-# boxplot(res[,1])
-# summary(res[,1])
 
-filename <- gsub("\\.txt","",srcFile)
-dir.create(file.path(getwd(), filename), showWarnings = FALSE)
-setwd(file.path(getwd(), filename))
-new_bic <- data.frame()
-
+generate_seq_file <- function(filename){
+  genes <- read.table(filename,header = T,sep = "\t");
+  new_dir <- paste(srcDir,"/",gsub(".txt", "", filename,".txt"),sep="")
+  dir.create(new_dir)
   for (i in 1:ncol(genes)) {
     name <- colnames(genes)[i]
-    result <- genes(EnsDb.Hsapiens.v86, filter=list(GenenameFilter(genes[,i]),GeneIdFilter("ENSG", "startsWith")), 
+    result <- genes(EnsDb.Hsapiens.v86, filter=list(GenenameFilter(as.character(genes[,i])),GeneIdFilter("ENSG", "startsWith")), 
                     return.type="data.frame", columns=c("gene_id"))
-    if(nrow(result>4)){
+    if(nrow(result)>4){
       tmp <- as.data.frame(result[,1])
       colnames(tmp) <- paste("bic",i,sep = "")
-      write.table(tmp, paste(colnames(tmp),".txt",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
+      write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
     }
   }
+}
+
   
-  
+
+apply(as.data.frame(srcFile), 1, generate_seq_file)
+
+
