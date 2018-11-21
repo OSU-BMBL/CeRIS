@@ -4,15 +4,14 @@
 #2. BBC motif cluster
 #output: regulon
 
-
 args <- commandArgs(TRUE)
 srcDir <- args[1]
 setwd(srcDir)
 getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
-alldir <- grep("*_bic",alldir,value=T)
-short_dir <- grep("*_bic",list.dirs(path = workdir,full.names = F),value=T) 
+alldir <- grep("*_bic$",alldir,value=T)
+short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 
 i=j=k=m=1
 for (i in 1:length(alldir)) {
@@ -38,9 +37,12 @@ for (i in 1:length(alldir)) {
   
 }
 
-regulon_all_files <- list.files(path = workdir,pattern = "*.regulon.txt")
+regulon_all_files <- list.files(path = workdir,pattern = "*bic.regulon.txt")
 # get complex regulon from all regulons
 combined_regulon <- data.frame()
+i=2
+j=1
+max_column <- 0
 for (i in 1:length(regulon_all_files)) {
   res <- paste(short_dir[i],".regulon.gene.txt",sep="")
   res_final <- paste(short_dir[i],".complex.regulon.txt",sep="")
@@ -52,6 +54,9 @@ for (i in 1:length(regulon_all_files)) {
   all_genes <- all_genes[all_genes!=""]
   for (j in 1:length(all_genes)) {
     belong_regulon <- sort(which(combined_regulon[,-1]==all_genes[j],arr.ind = TRUE)[,1])
+    if(length(belong_regulon) > max_column){
+      max_column <- length(belong_regulon)
+    }
     tmp <- data.frame(all_genes[j],t(as.data.frame(belong_regulon)))
     cat(paste(all_genes[j],"\t",sep = ""),file=res,append = T)
     cat(belong_regulon,file=res,append = T,sep = "\t")
@@ -59,7 +64,7 @@ for (i in 1:length(regulon_all_files)) {
   }
   idx<-vector()
   tmp_final <- data.frame()
-  sorted_res <- read.table(res,fill = T,header = F)
+  sorted_res <- read.table(res,col.names = paste0("V",seq_len(max_column+1)),header = F,fill = T,comment.char = "")
   tmp_res <- tmp_idx<- character()
   index <- unique(sorted_res[,-1])
   for (j in 1:nrow(sorted_res)) {
@@ -71,11 +76,13 @@ for (i in 1:length(regulon_all_files)) {
     tmp <- paste(index[j,],sep = ",",collapse = ",")
     tmp_idx <- as.character(index[j,])
     tmp_idx <- tmp_idx[!(tmp_idx=="NA")]
-    tmp_gene <- as.character(sorted_res[which(tmp==tmp_res),1])
-    cat(tmp_gene,file=res_final,append = T,sep = "\t")
-    cat("\t",file=res_final,append = T)
-    cat(tmp_idx,file=res_final,append = T,sep = "\t")
-    cat("\n",file=res_final,append = T)
+    if(length(tmp_idx) !=0){
+      tmp_gene <- as.character(sorted_res[which(tmp==tmp_res),1])
+      cat(tmp_gene,file=res_final,append = T,sep = "\t")
+      cat("\t",file=res_final,append = T)
+      cat(tmp_idx,file=res_final,append = T,sep = "\t")
+      cat("\n",file=res_final,append = T)
+    }
   }
 }
 
