@@ -11,7 +11,7 @@ setwd(srcDir)
 getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
-alldir <- grep("*_bic",alldir,value=T)
+alldir <- grep(".+_bic$",alldir,value=T)
 
 
 convert_motif <- function(filepath){
