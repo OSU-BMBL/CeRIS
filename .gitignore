@@ -4,3 +4,6 @@
 .Ruserdata
 *.txt
 *.closures
+*.MC
+*.similarity
+*.pdf
