@@ -1,108 +1,54 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
+
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-114510016-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!--====== USEFULL META ======-->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
 
-  gtag('config', 'UA-114510016-1');
-  
-</script>
-		<title>IRIS3</title>
-		<meta name="keywords" content="GeneQC">
-		<meta name="description" content="GeneQC: Gene expression level Quality Control">
-		<meta name="viewport" content="initial-scale=1.0,user-scalable=no">
-		<link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--====== TITLE TAG ======-->
+    <title>IRIS3</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+    <!--====== FAVICON ICON =======-->
+    <link rel="shortcut icon" type="image/ico" href="assest/img/favicon.png" />
+
+    <!--====== STYLESHEETS ======-->
 		<link href="css/heroic-features.css" rel="stylesheet">
-		<link rel="stylesheet" href="static/css/jquery.datatable/jquery.dataTables.css" />
-		<link rel="stylesheet" href="static/css/jquery.datatable/jquery.dataTables_themeroller.css" />
-		<link rel="stylesheet" href="static/css/jquery.datatable/jquery.dataTables.min.css" />
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-	
-    <script type="text/javascript" src="static/js/jquery.js"></script>
-    <script type="text/javascript" src="static/js/jquery-ui.js"></script>
-    <script type="text/javascript" src="static/js/jquery.corner.js"></script>
-    <script type="text/javascript" src="static/js/jquery.qtip.js"></script>
-    <script type="text/javascript" src="static/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" src="static/js/jquery.dataTables.FixedHeader.js"></script>
-    <script type="text/javascript" src="static/js/jquery.dataTables.ColVis.js"></script>
-	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		
 
-<script type="text/javascript">
-    jQuery(function ($) {
-        $("#files").shieldUpload();
-    });
-</script>
-<script type="text/javascript">
-  var _paq = _paq || [];
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//bmbl.sdstate.edu/DMINDA2/piwik/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '2']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
+    <link href="assest/css/plugins.css" rel="stylesheet">
+    <link href="assest/css/theme.css" rel="stylesheet">
+    <link href="assest/css/icons.css" rel="stylesheet">
 
+    <!--====== MAIN STYLESHEETS ======-->
+    <link href="style.css" rel="stylesheet">
+    <link href="assest/css/responsive.css" rel="stylesheet">
+
+    <script src="assest/js/vendor/modernizr-2.8.3.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+		
 	</head>
 
   </head>
-<header id="header" class="clearfix">
-    <div class="container">
-        <div class="col-group">
-            <div class="site-name ">
-                
-            </div>
-        </div>
-    </div>
 
-
-</header>
-  <body>
-    <div class="corner" id="pane">
-
+  <body data-spy="scroll" data-target=".mainmenu-area" data-offset="90">
+	
+ 
       {{block name="head"}}
       
       {{/block}}
-      
-      <div id="main">
-	  	    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="/iris3/index.php">IRIS3</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/iris3/index.php">Home
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/iris3/submit.php">Submit</a>
-            </li>
-            <!--<li class="nav-item">
-              <a class="nav-link" href="/iris3/intro.php">Introduction</a>
-            </li>-->
-            <li class="nav-item">
-              <a class="nav-link" href="/iris3/tutorial.php">Tutorial</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+
+
+  
       {{block name="main"}}
       {{/block}}
       </div>
@@ -110,17 +56,30 @@
     </div>
 
     {{block name="foot"}}
-    <footer class="footer">
-		<div class="container">
-		<p class="m-0 text-center text">© 2018 <a href="https://www.sdstate.edu/bioinformatics-and-mathematical-biosciences-lab">BMBL</a> |
-		All rights reserved.</p><p class="m-0 text-center text"><a href="mailto:qin.ma@sdstate.edu" title="qin.ma@sdstate.edu">Contact us: qin.ma@sdstate.edu</a>  </p>
-		</div>
-      <!-- /.container -->
+    <footer class="footer-area sky-gray-bg relative">
+        <div class="footer-bottom-area white">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <div class="footer-copyright text-center wow fadeIn">
+                            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --><p class="m-0 text-center text">© <script>document.write(new Date().getFullYear());</script> <a href="https://www.sdstate.edu/bioinformatics-and-mathematical-biosciences-lab">BMBL</a> |
+ All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p><p class="m-0 text-center text"><a href="mailto:qin.ma@sdstate.edu" title="qin.ma@sdstate.edu">Contact us: qin.ma@sdstate.edu</a>  </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </footer>
     {{/block}}
     
     <script type="text/javascript">
-      var _gaq = _gaq || [];
+      $(document).ready(function() {
+    $('#example').DataTable( {
+        "order": [[ 3, "desc" ]]
+    } );
+} );
+	  var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-8700754-6']);
       _gaq.push(['_trackPageview']);
     
@@ -132,3 +91,32 @@
     </script>
   </body>
 </html>
+	<!--====== SCRIPTS JS ======-->
+    <script src="assest/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="assest/js/vendor/bootstrap.min.js"></script>
+
+    <!--====== PLUGINS JS ======-->
+    <script src="assest/js/vendor/jquery.easing.1.3.js"></script>
+    <script src="assest/js/vendor/jquery-migrate-1.2.1.min.js"></script>
+    <script src="assest/js/vendor/jquery.appear.js"></script>
+    <script src="assest/js/owl.carousel.min.js"></script>
+    <script src="assest/js/stellar.js"></script>
+    <script src="assest/js/waypoints.min.js"></script>
+    <script src="assest/js/jquery.counterup.min.js"></script>
+    <script src="assest/js/wow.min.js"></script>
+    <script src="assest/js/jquery-modal-video.min.js"></script>
+    <script src="assest/js/stellarnav.min.js"></script>
+    <script src="assest/js/placeholdem.min.js"></script>
+    <script src="assest/js/contact-form.js"></script>
+    <script src="assest/js/jquery.ajaxchimp.js"></script>
+    <script src="assest/js/jquery.sticky.js"></script>
+
+    <!--===== ACTIVE JS=====-->
+    <script src="assest/js/main.js"></script>
+	
+	<script>   $(document).ready(function () {
+  $('#motiftable').DataTable({
+	"order": [[ 2, "asc" ]]
+  });
+  $('.dataTables_length').addClass('bs-select');
+});</script>

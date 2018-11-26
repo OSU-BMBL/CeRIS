@@ -19,11 +19,11 @@
     });
   });
    $('.panel-collapse').on('show.bs.collapse', function () {
-    $(this).siblings('.panel-heading').addClass('active');
+    $(this).siblings('.panel-collapse-heading').addClass('active');
   });
 
   $('.panel-collapse').on('hide.bs.collapse', function () {
-    $(this).siblings('.panel-heading').removeClass('active');
+    $(this).siblings('.panel-collapse-heading').removeClass('active');
   });
   
 </script>
@@ -59,8 +59,9 @@ $(document).ready(function () {
 
 </head>
 {{block name="main"}}
-    <main role="main">
+
 <main role="main" class="container">
+
       <!--<div class="starter-template">-->
          <form method="POST" action="{{$URL}}" encType="multipart/form-data" id="needs-validation">
           <h2 class="text-center">Job Submission</h2>
@@ -72,19 +73,14 @@ $(document).ready(function () {
                   <label class="form-check-label" for="expfile">Upload gene expression file:</label>
                 </div>
                 <div class="col-sm-5">
-                  <input type="file" class="form-control-file" id="expfile" name="files" >
+                  <input type="file" class="form-control-file" id="expfile" name="expfile" >
                 
-
 				</div>
             </div>
             <div class="form-group row">
 				 <div class="form-check col-sm-3 ">
                   <input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="0">
                   <label class="form-check-label" for="allowstorage"> &nbsp;&nbsp;&nbsp;&nbsp;Allow data storage in our database</label>
-                </div>
-                <div class="form-check col-sm-3 ">
-                  <input class="form-check-input" type="checkbox" name="radiotarget" id="autotarget" value="option2">
-                  <label class="form-check-label" for="autotarget"> &nbsp;&nbsp;&nbsp;&nbsp;Use the example data</label>
                 </div>
             </div>
 			<!--<div class="form-group row">
@@ -124,7 +120,7 @@ $(document).ready(function () {
       <div class="bs-example">
     <div class="panel-group" id="accordion">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-collapse-heading">
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">Gene filtering options</a>
                 </h4>
@@ -165,7 +161,7 @@ $(document).ready(function () {
 <div class="bs-example2">
     <div class="panel-group" id="accordion2">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-collapse-heading">
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion2" href="#collapseThree2">Biclustering options</a>
                 </h4>
@@ -218,7 +214,7 @@ $(document).ready(function () {
 <div class="bs-example3">
     <div class="panel-group" id="accordion3">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-collapse-heading">
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree3">Cell type prediction options</a>
                 </h4>
@@ -248,7 +244,7 @@ $(document).ready(function () {
 <div class="bs-example4">
     <div class="panel-group" id="accordion4">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-collapse-heading">
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree4">CTS-regulon prediction options</a>
                 </h4>
@@ -279,7 +275,7 @@ $(document).ready(function () {
           
           <hr>
         <div class="form-group">
-          <button type="submit" class="btn btn-primary" id="btn_submit">Submit</button>
+          <button type="submit" class="btn btn-primary" name="submit" value="submit">Submit</button>
 		  <a class="btn btn-info" href="/iris3/results.php?jobid=20181004132017f" role="button">Example output</a>
         </div>
         
