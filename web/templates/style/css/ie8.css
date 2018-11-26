@@ -1,0 +1,41 @@
+#footer .form-container .loading {
+	width: 110px;
+	height: 400px;
+}
+#footer .forms fieldset .text-input {
+	width: 110px;
+	height: 30px;
+}
+#footer .forms label {
+	padding-top:6px;
+}
+
+.menu ul li a {padding: 21px 30px 19px;}
+
+
+.forms fieldset .text-input, #footer .forms fieldset .text-input {
+	height: 22px;
+	padding: 8px 10px 0;
+}
+
+ul.flickr {
+	margin-top: -15px;
+	display: block;
+	overflow: hidden;
+}
+
+ul.flickr li {
+	margin: 0 9px -3px 0;
+	padding: 0;
+}
+
+ul.flickr li a {
+	margin: 0;
+	padding: 0;
+}
+
+ul.flickr li a img {
+	margin: 0;
+	padding: 0;
+	display: block;
+}

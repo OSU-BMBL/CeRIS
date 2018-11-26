@@ -1,0 +1,32 @@
+#footer .form-container {
+	position: relative;
+	width: 197px;
+	margin-left: -15px;
+}
+
+#footer .form-container .loading {
+	width: 100px;
+}
+#footer .forms fieldset .text-input {
+	width: 110px;
+}
+#footer .forms label {
+	padding-top:6px;
+}
+
+.menu ul li a {padding: 21px 30px 19px;}
+
+.forms fieldset .text-input, #footer .forms fieldset .text-input {
+	height: 22px;
+	padding: 8px 10px 0;
+}
+
+ul.latest-posts li em.month {
+	line-height: 10px;
+	margin-top: 5px;
+}
+
+ul.flickr li {
+	display: inline;
+	margin: 0 12px 12px 0;
+}
