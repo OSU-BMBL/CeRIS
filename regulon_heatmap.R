@@ -176,4 +176,4 @@ rownames(heatmap_rowlabel) <- rownames(heat_matrix)
 pheatmap(as.matrix(heat_matrix),color = colorRampPalette(brewer.pal(n = 7, name = "YlOrRd"))(100),
          cluster_cols = F, cluster_rows = F,annotation = heatmap_collabel,
          row_annotation = heatmap_rowlabel,row_annotation_legend =F)
-
+write.table(heat_matrix,"heat_matrix.txt",quote = F,sep = "\t")
