@@ -1,0 +1,74 @@
+a {
+	color: #4dab96;
+}
+a:hover {
+	color: #ab4d63;
+}
+h1, h2, h3, h4, h5, h6 {
+	color: #4dab96;
+}
+.lite1 {
+	color: #4dab96;
+}
+.lite2 {
+	border-bottom: 1px dotted #4dab96;
+}
+a.button {
+	background-color: #4dab96;
+	color: #fff;
+	-webkit-transition:all 200ms ease-in;
+	-o-transition:all 200ms ease-in;
+	-moz-transition:all 200ms ease-in;
+}
+a.button:hover {
+	color: #fff;
+	background-color: #ab4d63;
+}
+ul.latest-posts li a:hover {
+	color: #ab4d63;
+}
+.menu ul li a.active {
+	color: #4dab96;
+}
+.menu ul li a.selected {
+	color: #4dab96;
+}
+.menu ul li a:hover {
+	color: #4dab96;
+}
+.forms fieldset .btn-submit, #footer .forms fieldset .btn-submit {
+	background-color: #4dab96;
+	color: #fff;
+	-webkit-transition:all 200ms ease-in;
+	-o-transition:all 200ms ease-in;
+	-moz-transition:all 200ms ease-in;
+}
+.forms fieldset .btn-submit:hover, #footer .forms fieldset .btn-submit:hover {
+	background-color: #ab4d63;
+}
+#filtering-nav li.active a {
+	color: #ab4d63;
+}
+.post-meta a:hover, .tags a:hover {
+	color: #ab4d63;
+}
+.tag-list ul li a:hover {
+	color: #ab4d63;
+}
+.cat-list ul li a:hover {
+	color: #ab4d63;
+}
+h2.trigger.active {
+	color: #4dab96;
+}
+h2.trigger:hover {
+	color: #4dab96;
+}
+ul.tabs li a:hover {
+	color: #4dab96;
+}
+ul.tabs li.active a {
+	border: 1px solid #4dab96;
+	color: #fff;
+	background-color: #4dab96;
+}
