@@ -51,31 +51,41 @@ $(document).ready(function () {
 
 </head>
 {{block name="main"}}
-
-
     <main role="main">
 
       <!-- Main jumbotron for a primary marketing message or call to action -->
-
-      <div class="container">
-        <!-- Example row of columns -->
-		<hr>
-		<div>
-          <h2 class="text-center">IRIS3 Tutorial</h2>
-		  <a target="_blank"  href="https://help.plot.ly/tutorials/#statistical">Plot.ly charts example</a><br>
-		  <a target="_blank"  href="http://circos.ca/guide/tables/">Circos table example</a><br>
-		  
-		  <a target="_blank"  href="http://circos.ca/intro/published_images/">Published Circos images</a><br>
-		  <a target="_blank"  href="https://www.semanticscholar.org/paper/MetViz-%3A-an-online-visualization-tool-for-regulons-Vasanth/42dbf425f22201c72c9544d09dab45c4e68c5bac/figure/4">MetViz : an online visualization tool for regulons , genes and gene ontology</a><br>
-		  <a target="_blank"  href="http://www.prodonet.tu-bs.de/">ProdoNet: identification and visualization of prokaryotic gene regulatory and metabolic networks</a><br>
-        </div>
+<main role="main" class="container">
 
 
-        <hr>
+            <hr>
+            <h2 class="text-center">IRIS3 news</h2>
+            <div class = "bootstrap-iso">
+					<br/>
+					&nbsp;&nbsp;&nbsp;11/4/2018<br/><br/>
+					<p>
+						We update this server regularly so we can make it better for you. This version includes several bug fixes and performance improvements.
+					</p>
+					<hr/>
+					
+					
+					&nbsp;&nbsp;&nbsp;10/17/2018<br/><br/>
+					<p>
+						This server has been upgraded to version 1.0
+					</p>
+					<hr/>
+				</div>
+			</div>
+			<hr>
 
-      </div> <!--<img src="http://circos.ca/guide/tables/img/guide-table.png"> /container -->
+            
+        
+
+        
+
+     
 
     </main>
+
 
 
 
