@@ -7,6 +7,7 @@ library(EnsDb.Hsapiens.v86)
 library(magic)
 library(Matrix)
 library(reshape2)
+library(rlist)
 args <- commandArgs(TRUE)
 
 srcDir <- args[1]
@@ -40,8 +41,10 @@ colnames(heat_matrix) <- colnames(exp_file)
 #final_matrix  <- matrix()
 
 i=j=1
+combine_regulon_label<-list()
 #index_gene_name<-index_cell_type <- vector()
 regulon_gene <- data.frame()
+regulon_label_index <- 1
 for (i in 1:length(all_regulon)) {
   heat_matrix <- data.frame(matrix(ncol = ncol(exp_file), nrow = 0))
   colnames(heat_matrix) <- colnames(exp_file)
@@ -54,8 +57,7 @@ for (i in 1:length(all_regulon)) {
   #For each regulon.txt, convert ENSG -> gene name
   regulon_file <- t(regulon_file)
   for (j in 1:ncol(regulon_file)) {
-    
-    
+    regulon_idx <- colnames(regulon_file)[j]
     regulon_genename <- genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(as.character(regulon_file[,j]))), 
                               return.type="data.frame", columns=c("gene_name"))[,1] 
     for (k in 1:length(regulon_genename)) {
@@ -71,14 +73,21 @@ for (i in 1:length(all_regulon)) {
     regulon_heat_matrix <- rbind(category,regulon_heat_matrix)
     ct_index <- gsub(".*_CT_","",short_dir[i])
     ct_index <- as.numeric(gsub("_bic","",ct_index))
+    regulon_label <- paste("CT",ct_index,"Regulon",j,": ",sep = "")
     ct_colnames <- label_file[which(label_file[,2]==ct_index),1]
     regulon_heat_matrix <- regulon_heat_matrix[,colnames(regulon_heat_matrix) %in% ct_colnames]
     rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
     rownames(regulon_heat_matrix)[1] <- ""
     colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
     write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
-    
+    #save regulon label to one list
+    tmp_label_name <- as.character(regulon_file[,j])
+    tmp_label_name <- tmp_label_name[tmp_label_name!=""]
+    combine_regulon_label<-list.append(combine_regulon_label,tmp_label_name)
+    names(combine_regulon_label)[regulon_label_index] <- regulon_label
+    regulon_label_index <- regulon_label_index + 1
   }
+  
   regulon_file <- t(regulon_file)
   regulon_file[regulon_file==""] <- NA
 
@@ -92,6 +101,14 @@ category <- paste("Cell Type:",label_file[,2],sep = " ")
 
 heat_matrix <- rbind(category,heat_matrix)
 rownames(heat_matrix)[1] <- ""
-rownames(heat_matrix)[-1] <- paste("Genes:",rownames(heat_matrix)[-1],sep = " ")
-colnames(heat_matrix) <- paste("Cells:",colnames(heat_matrix),sep = " ")
+
+for(i in length(combine_regulon_label):1){
+  regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[i]),(rownames(heat_matrix) %in% unlist(combine_regulon_label[i]) )*1,sep = ""),stringsAsFactors=F)
+  regulon_label_col[1,1] <- ""
+  heat_matrix <- cbind(regulon_label_col,heat_matrix)
+}
+colnames(heat_matrix)[1:length(combine_regulon_label)] <- ""
+#rownames(heat_matrix)[-1] <- paste("Gene:",rownames(heat_matrix)[-1],sep = " ")
+#colnames(heat_matrix) <- paste("Cell:",colnames(heat_matrix),sep = " ")
+
 write.table(heat_matrix,"2018111413246_heatmap_matrix.txt",quote = F,sep = "\t", col.names=NA)
