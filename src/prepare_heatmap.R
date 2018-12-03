@@ -63,7 +63,7 @@ for (i in 1:length(all_regulon)) {
     for (k in 1:length(regulon_genename)) {
       regulon_file[k,j] <- regulon_genename[k]
     }
-    cat(paste(j,"\t",sep = ""),file=res,sep = "\t",append = T)
+    cat(paste(j,"\t",sep = ""),file=res,sep = "",append = T)
     cat(paste(regulon_genename,"\t",sep = ""),file=res,append = T)
     cat("\n",file=res,append = T)
     regulon_heat_matrix_filename <- paste(short_dir[i],".regulon",j,".heatmap.txt",sep="")

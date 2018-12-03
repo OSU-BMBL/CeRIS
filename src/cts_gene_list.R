@@ -14,9 +14,9 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# expFile <- "2018111413246_filtered_expression.txt"
-# jobid <- 2018111413246
-# label_file <- "2018111413246_cell_label.txt"
+# expFile <- "20181124190953_filtered_expression.txt"
+# jobid <- 20181124190953
+# label_file <- "20181124190953_cell_label.txt"
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
@@ -38,6 +38,7 @@ write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names
 
 count_cluster <- length(levels(as.factor(cell_label$label)))
 
+df=conds_file[1,]
 get_pvalue <- function(df){
   count_cluster <- length(levels(as.factor(cell_label$label)))
   tmp_pvalue <- 0
@@ -74,7 +75,9 @@ get_pvalue_df <- function(lis,num){
   return (1)
 }
 
-
+#test get_bic_in_ct
+#lis=pv[[5]]
+#num=2
 get_bic_in_ct <- function(lis,num){
   pval <- lis$pvalue
   result <- lis$cell_type
@@ -86,15 +89,16 @@ get_bic_in_ct <- function(lis,num){
   return (0)
 }
 
-#j=3
+#i=1;j=2
 for (j in 1:count_cluster) {
 pvalue_thres <- 10
+length(conds_file[1,])
 uniq_li <- unlist(sapply(pv, get_bic_in_ct,num=j))
-uniq_bic <- gene_file[which(uniq_li==1),]%>%
-  t%>%
-  as.vector()%>%
-  unique()%>%
-  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
+#uniq_bic <- gene_file[which(uniq_li==1),]%>%
+#  t%>%
+#  as.vector()%>%
+#  unique()%>%
+#  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
 
 uniq_bic <- gene_file[which(uniq_li==1),]%>%
   t%>%
@@ -105,7 +109,7 @@ uniq_bic <- gene_file[which(uniq_li==1),]%>%
 
 
 pvalue_df <- unlist(sapply(pv, get_pvalue_df,num=j))
-pvalue_thres <- as.numeric(quantile(pvalue_df[pvalue_df <1], 0.05)) # 0.1 for 10% quantile )
+pvalue_thres <- as.numeric(quantile(pvalue_df[pvalue_df <1], 0.05)) # 0.05 for 5% quantile )
 
 li <- unlist(sapply(pv, get_bic_in_ct,num=j))
 gene_bic <- gene_file[which(li==1),]%>%
