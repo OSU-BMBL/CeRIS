@@ -23,7 +23,7 @@
                 <div class="welcome-area">
                     <div class="container">
                         <div class="row flex-v-center">
-                            <div class="col-md-8 col-lg-7 col-sm-12 col-xs-12">
+                            <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
                                 <div class="welcome-text">
                                     <h1>IRIS3</h1>
                                     <p>Integrated Cell-type-specific Regulon Inference from Single-cell RNA-Seq</p>
@@ -33,6 +33,12 @@
                                             <button type="submit"><i class="fa fa-search"></i></button>
                                         </form>
                                     </div>
+                                </div>
+                            </div>
+							 <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                                <div class="welcome-text">
+                                 <a href="assest/img/pipeline_for_web.png" target="_blank"><img src="assest/img/pipeline_for_web.png" style="margin:auto;display:block"></a>
+                                               
                                 </div>
                             </div>
                         </div>
