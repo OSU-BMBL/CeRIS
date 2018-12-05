@@ -8,8 +8,8 @@ delim_array <- c("\t"," ",",") # 1-tab, 2-space, 3-comma
 delim <- delim_array[as.numeric(args[3])] #delimiter
 #delim <- args[3]
 #setwd("C:/Users/flyku/Desktop/iris3")
-# srcFile = "2018111445745_sc3_cluster.txt"
-# outFile <- "1103"
+# srcFile = "20181124190953_sc3_label.txt"
+# outFile <- "20181124190953"
 # delim <- "\t"
 
 #install.packages("NMF")
@@ -40,7 +40,7 @@ sc3_cluster <- srcLabel
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-user_label_file <- read.delim("test_user_label.txt",header=T,sep="\t",check.names = FALSE)
+user_label_file <- read.delim("20181124190953_cell_label.txt",header=T,sep="\t",check.names = FALSE)
 
 user_label_index <- which(colnames(user_label_file) ==  "label")
 user_cellname_index <- which(colnames(user_label_file) ==  "cell_name")
@@ -70,9 +70,9 @@ clustering_ARI <- igraph::compare(as.factor(target$cluster),as.factor(target$lab
 clustering_RI <-adjustedRand(as.numeric(target$cluster),as.numeric(target$label),  randMethod = "Rand")  # calculate Rand Index
 clustering_JI <-adjustedRand(as.numeric(target$cluster),as.numeric(target$label),  randMethod = "Jaccard")  # calculate Jaccard
 clustering_FMI <-adjustedRand(as.numeric(target$cluster),as.numeric(target$label),  randMethod = "FM")  # calculate Fowlkes Mallows Index
-clustering_F1_Score <- F1_Score(as.factor(target$cluster),as.factor(target$label))
-clustering_Precision <- Precision(as.factor(target$cluster),as.factor(target$label))
-clustering_Recall <- Recall(as.factor(target$cluster),as.factor(target$label))
+#clustering_F1_Score <- F1_Score(as.numeric(target$cluster),as.numeric(target$label))
+#clustering_Precision <- Precision(as.factor(target$cluster),as.factor(target$label))
+#clustering_Recall <- Recall(as.factor(target$cluster),as.factor(target$label))
 clustering_Accuracy <- Accuracy(as.numeric(target$cluster),as.numeric(target$label))
 #clustering_sensitivity <- sensitivity(as.numeric(target$cluster),as.numeric(target$label))
 #clustering_specificity <- specificity(as.numeric(target$cluster),as.numeric(target$label))
@@ -87,7 +87,7 @@ write.table(res, paste(outFile,"_sc3_cluster_evaluation.txt",sep = ""),sep = "\t
 
 
 
-
+?F1_Score
 
 # step2 change label names
 user_label$label <- sub("^", "L", user_label$label )
