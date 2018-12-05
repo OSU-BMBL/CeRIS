@@ -14,9 +14,9 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# expFile <- "2018111413246_filtered_expression.txt"
-# jobid <- 2018111413246
-# label_file <- "2018111413246_cell_label.txt"
+# expFile <- "20181124190953_filtered_expression.txt"
+# jobid <- 20181124190953
+# label_file <- "20181124190953_cell_label.txt"
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
@@ -38,6 +38,8 @@ write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names
 
 count_cluster <- length(levels(as.factor(cell_label$label)))
 
+#test
+#df=conds_file[1,]
 get_pvalue <- function(df){
   count_cluster <- length(levels(as.factor(cell_label$label)))
   tmp_pvalue <- 0
@@ -49,14 +51,16 @@ get_pvalue <- function(df){
     m=length(A)
     n=nrow(cell_label)-m
     x=length(A[(A%in%B)])
-    k=length(na.omit(unlist(df)))
+    k=length(na.omit(unlist(df)))-1
     tmp_pvalue <- 1 - phyper(x,m,n,k)
     result_pvalue[i] <- tmp_pvalue
   }
-  min_pvalue <- min(result_pvalue)
-  min_i <- which(min_pvalue==result_pvalue)
   
-  return (list(pvalue=min_pvalue,cell_type=min_i))
+  #min_pvalue <- min(result_pvalue)
+  #min_i <- which(min_pvalue==result_pvalue)
+  
+  #return (list(pvalue=min_pvalue,cell_type=min_i))
+  return (list(pvalue=result_pvalue,cell_type=seq(1:count_cluster)))
 }
 
 pv <- apply(conds_file,1,get_pvalue)
@@ -68,47 +72,52 @@ get_pvalue_df <- function(lis,num){
   ct <- lis$cell_type
   for (i in ct) {
     if(i == num){
-      return(result)
+      return(result[i])
     }
   }
-  return (1)
 }
 
-
+#test get_bic_in_ct
+#lis=pv[[1]]
+#num=2
 get_bic_in_ct <- function(lis,num){
   pval <- lis$pvalue
   result <- lis$cell_type
   for (i in result) {
-    if(i == num && pval <= pvalue_thres){
-      return (1)
+    if(i == num && pval[i] <= pvalue_thres){
+      return (pval[i])
     }
   }
-  return (0)
 }
 
-#j=3
+#i=1;j=2
 for (j in 1:count_cluster) {
-pvalue_thres <- 10
-uniq_li <- unlist(sapply(pv, get_bic_in_ct,num=j))
-uniq_bic <- gene_file[which(uniq_li==1),]%>%
-  t%>%
-  as.vector()%>%
-  unique()%>%
-  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
+pvalue_thres <- 0.05
+uniq_li <- sapply(pv, get_bic_in_ct,num=j)
+#uniq_bic <- gene_file[which(uniq_li==1),]%>%
+#  t%>%
+#  as.vector()%>%
+#  unique()%>%
+#  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
 
-uniq_bic <- gene_file[which(uniq_li==1),]%>%
+names(uniq_li) <- seq_along(uniq_li) #preserve index of the non-null values
+uniq_li <- compact(uniq_li)
+
+uniq_bic <- gene_file[names(li),]%>%
   t%>%
   as.vector()%>%
   table()%>%
   as.data.frame()%>%
   write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
 
-
 pvalue_df <- unlist(sapply(pv, get_pvalue_df,num=j))
-pvalue_thres <- as.numeric(quantile(pvalue_df[pvalue_df <1], 0.05)) # 0.1 for 10% quantile )
+#pvalue_thres <- as.numeric(quantile(pvalue_df[pvalue_df <1], 0.05)) # 0.05 for 5% quantile )
 
-li <- unlist(sapply(pv, get_bic_in_ct,num=j))
-gene_bic <- gene_file[which(li==1),]%>%
+li <- sapply(pv, get_bic_in_ct,num=j)
+names(li) <- seq_along(li) #preserve index of the non-null values
+li <- compact(li)
+
+gene_bic <- gene_file[names(li),]%>%
   t%>%
   as.data.frame()
 
@@ -116,7 +125,7 @@ gene_bic[] <- lapply(gene_bic, as.character)
 gene_bic <- data.frame(lapply(gene_bic, function(x) {gsub("_.", "", x)}))
 
 if(length(gene_bic) > 0) {
-colnames(gene_bic) <- paste0("bic",which(li==1))
+colnames(gene_bic) <- paste0("bic",names(li))
 
 gene_name <- read.table(paste(jobid,"_gene_name.txt",sep = ""),header = F,stringsAsFactors = F)
 

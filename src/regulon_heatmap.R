@@ -1,8 +1,6 @@
 #######  Read all motif result, convert to input for BBC ##########
 # remove all empty files before this
 
-
-BiocManager::install("COMPASS", version = "3.8")
 library(GenomicAlignments)
 library(ensembldb)
 library(EnsDb.Hsapiens.v86)
@@ -156,7 +154,12 @@ for (i in 1:length(all_regulon)) {
 #multiplot(p4, cols=1)
 
 
-heatmap_collabel <- subset(label_file, label_file[,1] %in% colnames(heat_matrix))
+#select predicted CT as column
+#heatmap_collabel <- subset(label_file, label_file[,1] %in% colnames(heat_matrix))
+
+#select all cells as column
+heatmap_collabel <- label_file
+
 rownames(heatmap_collabel) <- heatmap_collabel[,1]
 heatmap_collabel[,1] <- NULL
 colnames(heatmap_collabel) <- "CellType"
