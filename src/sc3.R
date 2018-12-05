@@ -31,10 +31,10 @@ label_file <- args[3] # user label or empty string
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 exp_data<- read.delim(expFile,check.names = FALSE, header=TRUE,row.names = 1)
-if (!label_file){
+if (label_file !=0){
   cell_info <- read.delim(label_file,header=TRUE,row.names = 1)
 } else {
-  
+  cell_info <- colnames(exp_data)
 }
 
 # create a SingleCellExperiment object
@@ -59,5 +59,5 @@ sce <- sc3_calc_consens(sce)
 
 a <- as.data.frame(colData(sce))
 a <- cbind(rownames(a),a[,ncol(a)])
-colnames(a) <- c("cell_name","cluster")
+colnames(a) <- c("cell_name","label")
 write.table(a,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
