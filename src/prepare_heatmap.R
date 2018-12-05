@@ -17,10 +17,10 @@ getwd()
 setwd("D:/Users/flyku/Documents/IRIS3-R/data")
 workdir <- getwd()
 all_regulon <- list.files(path = workdir,pattern = "._bic.regulon.txt$")
-exp_file <- read.table("2018111445745_raw_expression.txt",stringsAsFactors = F,header = T,check.names = F)
-label_file <- read.table("2018111413246_cell_label.txt",stringsAsFactors = F,header = T,check.names = F)
+exp_file <- read.table("20181124190953_raw_expression.txt",stringsAsFactors = F,header = T,check.names = F)
+label_file <- read.table("20181124190953_cell_label.txt",stringsAsFactors = F,header = T,check.names = F)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
-
+exp_file <- log1p(exp_file)
 i=j=k=1
 generate_name <- function(df){
   genes <- regulon_file
@@ -102,13 +102,21 @@ category <- paste("Cell Type:",label_file[,2],sep = " ")
 heat_matrix <- rbind(category,heat_matrix)
 rownames(heat_matrix)[1] <- ""
 
-for(i in length(combine_regulon_label):1){
-  regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[i]),(rownames(heat_matrix) %in% unlist(combine_regulon_label[i]) )*1,sep = ""),stringsAsFactors=F)
-  regulon_label_col[1,1] <- ""
-  heat_matrix <- cbind(regulon_label_col,heat_matrix)
+#i=j=1 
+for(i in 1: length(unique(label_file[,2]))){
+  k=0
+  file_heat_matrix <- heat_matrix
+  for (j in length(combine_regulon_label):1) {
+    if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
+      regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
+      regulon_label_col[1,1] <- ""
+      file_heat_matrix <- cbind(regulon_label_col,file_heat_matrix)
+      k <- k + 1
+    }
+  }
+  colnames(file_heat_matrix)[1:k] <- ""
+  write.table(file_heat_matrix,paste("ct",i,".heatmap.txt",sep = ""),quote = F,sep = "\t", col.names=NA)
 }
-colnames(heat_matrix)[1:length(combine_regulon_label)] <- ""
 #rownames(heat_matrix)[-1] <- paste("Gene:",rownames(heat_matrix)[-1],sep = " ")
 #colnames(heat_matrix) <- paste("Cell:",colnames(heat_matrix),sep = " ")
 
-write.table(heat_matrix,"2018111413246_heatmap_matrix.txt",quote = F,sep = "\t", col.names=NA)
