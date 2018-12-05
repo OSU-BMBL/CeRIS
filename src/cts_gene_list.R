@@ -18,7 +18,7 @@ getwd()
 # jobid <- 20181124190953
 # label_file <- "20181124190953_cell_label.txt"
 
-#setwd("C:/Users/flyku/Desktop/iris3")
+#setwd("C:/Users/flyku/Desktop/iris3/data")
 conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
 gene_file <- read_delim(paste(jobid,"_blocks.gene.txt",sep = ""),delim=" ",col_names = F)[,-1]
 
@@ -103,7 +103,7 @@ uniq_li <- sapply(pv, get_bic_in_ct,num=j)
 names(uniq_li) <- seq_along(uniq_li) #preserve index of the non-null values
 uniq_li <- compact(uniq_li)
 
-uniq_bic <- gene_file[names(li),]%>%
+uniq_bic <- gene_file[names(uniq_li),]%>%
   t%>%
   as.vector()%>%
   table()%>%
