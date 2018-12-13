@@ -10,3 +10,5 @@
 *.png
 *.json
 prepare_promoter.pl
+*.fa
+*.fasta
