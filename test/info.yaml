@@ -1,0 +1,16 @@
+---
+status: Done
+email: jinyu.yang@sdstate.edu
+minin: 10
+maxin: 12
+numout: 10
+st: 0.9
+sn: 0.4
+bf: true
+bn: 10
+style: 1
+workdir: >
+  /home/www/html/iris3/data/20181124190953
+jobid: 20181124190953
+BASE: /home/www/html/bobro2
+big: 0
