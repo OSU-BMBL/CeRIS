@@ -20,7 +20,7 @@ all_regulon <- list.files(path = workdir,pattern = "._bic.regulon.txt$")
 exp_file <- read.table("20181124190953_raw_expression.txt",stringsAsFactors = F,header = T,check.names = F)
 label_file <- read.table("20181124190953_cell_label.txt",stringsAsFactors = F,header = T,check.names = F)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
-exp_file <- log1p(exp_file)
+#exp_file <- log1p(exp_file)
 i=j=k=1
 generate_name <- function(df){
   genes <- regulon_file
@@ -103,19 +103,28 @@ heat_matrix <- rbind(category,heat_matrix)
 rownames(heat_matrix)[1] <- ""
 
 #i=j=1 
+# get CT#-regulon1-# heat matrix
 for(i in 1: length(unique(label_file[,2]))){
+  gene_row <- character()
+  for (m in length(combine_regulon_label):1) {
+    if(i == as.numeric(strsplit(names(combine_regulon_label[m]), "\\D+")[[1]][-1])[1]){
+      gene_row <- append(gene_row,as.character(unlist(combine_regulon_label[m])))
+    }
+  }
   k=0
-  file_heat_matrix <- heat_matrix
+  file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),]
   for (j in length(combine_regulon_label):1) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
-      regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
-      regulon_label_col[1,1] <- ""
+      regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(file_heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
+      #print(regulon_label_col)
+      #regulon_label_col[1,1] <- ""
       file_heat_matrix <- cbind(regulon_label_col,file_heat_matrix)
       k <- k + 1
     }
   }
   colnames(file_heat_matrix)[1:k] <- ""
   write.table(file_heat_matrix,paste("ct",i,".heatmap.txt",sep = ""),quote = F,sep = "\t", col.names=NA)
+  file_heat_matrix <- data.frame()
 }
 #rownames(heat_matrix)[-1] <- paste("Gene:",rownames(heat_matrix)[-1],sep = " ")
 #colnames(heat_matrix) <- paste("Cell:",colnames(heat_matrix),sep = " ")
