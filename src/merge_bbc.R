@@ -3,7 +3,7 @@
 #1. Motif-Genes table from prepare_bbc.R
 #2. BBC motif cluster
 #output: regulon
-
+library(seqinr)
 args <- commandArgs(TRUE)
 srcDir <- args[1]
 setwd(srcDir)
@@ -14,20 +14,32 @@ alldir <- grep("*_bic$",alldir,value=T)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 
 i=j=k=m=1
+k= motif_num[1]
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
   cat("",file=res)
   cluster_filename <- paste("./bg.BBC/bg.",short_dir[i],".bbc.txt.MC",sep="")
   motif_filename <- paste(short_dir[i],".motifgene.txt",sep="")
+  sequence_filename <- paste(short_dir[i],".bbc.txt",sep="")
   motif_file <- read.table(motif_filename,sep = "\t",header = T)
   cluster_file <- read.table(cluster_filename,sep = "\t",header = T)
-  
+  sequence_file <- read.fasta(sequence_filename,as.string = T)
+
   for (j in 1:max(cluster_file[,2])) {
     motif_num <- as.character(cluster_file[which(cluster_file[,2] == j),1])
+    sequence_out_name <- paste("ct",i,"motif",j,".fa",sep = "")
+    sequence_info <- character()
     genes_num <- vector()
+    idx <- 1
     for (k in motif_num) {
       genes_num <- c(genes_num,which(as.character(motif_file[,1]) == k))
+      sequence_info_tmp <-as.character(sequence_file[names(sequence_file) %in% motif_num][idx])
+      idx <- idx + 1
+      sequence_info_tmp <- gsub('(?=(?:.{14})+$)', "\n", sequence_info_tmp, perl = TRUE)
+      sequence_info <- paste(sequence_info,sequence_info_tmp,sep = "")
     }
+    write.table(sequence_info,sequence_out_name,col.names = F,row.names = F,quote = F)
+    
     genes <- motif_file[genes_num,2]
     genes <- as.character(genes[!duplicated(genes)])
     cat(paste(j,"\t",sep = ""),file=res,append = T)
