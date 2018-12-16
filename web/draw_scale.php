@@ -73,12 +73,12 @@ for($i=0; $i<$ScaleLen-5; $i+=$GridUnit) {
          if($start> $end)
              {$key=$dondown[(int)$motifs[$id]['motifs'][$j]['id']-1];
              	ImageFilledRectangle($im,$x+$start*$GridUnit/$MinLabel,$y+$key*15,$x+$end*$GridUnit/$MinLabel,$y+15+$key*15,$motif_color);
-              ImageString($im,6,$x+$start/$MinLabel*$GridUnit+2,$y+$key*15,$motifs[$id]['motifs'][$j]['name'],$line_color);
+             # ImageString($im,6,$x+$start/$MinLabel*$GridUnit+2,$y+$key*15,$motifs[$id]['motifs'][$j]['name'],$line_color);
              }
          else
              {$key=$donup[(int)$motifs[$id]['motifs'][$j]['id']-1];
              	ImageFilledRectangle($im,$x+$start*$GridUnit/$MinLabel,$y-$key*15,$x+$end*$GridUnit/$MinLabel,$y-15-$key*15,$motif_color);
-              ImageString($im,6,$x+$end/$MinLabel*$GridUnit+2,$y-15-$key*15,$motifs[$id]['motifs'][$j]['name'],$line_color);
+              #ImageString($im,6,$x+$end/$MinLabel*$GridUnit+2,$y-15-$key*15,$motifs[$id]['motifs'][$j]['name'],$line_color);
              }
       
      
