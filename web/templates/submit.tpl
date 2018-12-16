@@ -13,40 +13,25 @@ form div.fieldWrapper label { min-width: 5%; }
            placement : 'top'
        });
    $('.dropdown-toggle').dropdown();
-	$("div#dropzone_exp").dropzone({ 
-	url: "upload.php",
-	dictDefaultMessage: "Drag or drop your file here, or click to browse and upload it.",
-	maxFiles: 1,
-	maxfilesexceeded: function(file) {
-        this.removeAllFiles();
-        this.addFile(file);
-    }
-	});
    });
-          function displayForm(c) {
-        if (c.value == "1") {
-
-            document.getElementById("upload_label").style.visibility = 'hidden';
-        } else if (c.value == "2") {
-
-            document.getElementById("upload_label").style.visibility = 'visible';
-        } else {}
-    }
-
+   
+   
 </script>
 <main role="main" class="container">
    <hr>
    <!--<div class="starter-template">-->
    <form method="POST" action="{{$URL}}" encType="multipart/form-data" id="needs-validation">
       <h2 class="text-center">Job Submission</h2>
-	  <form action="upload.php" class="dropzone"></form>                            
+	                              
       <div class="form-group row">
          <div class="form-check col-sm-3 ">
-            <label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A normal gene expression file with genes as rows and cells as columns. Users should normalize and filter the data before the submission. Accept both txt and csv format. "> </span></label> <a style="padding:0px;" class="btn btn-link" href="/iris3/program/Yan_expression.csv" role="button">Download example expression file</a>
+            <label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A normal gene expression file with genes as rows and cells as columns. Users should normalize and filter the data before the submission. Accept both txt and csv format. "> </span></label>
          </div>
-         <div class="col-sm-12">
-		 <div id="dropzone_exp"  class="dropzone border-grey rounded dz-clickable" style="background-image: url(assest/img/expression_table.png); background-size: 100% 100%;margin:20px 0;border:1px solid #c9c9c9;border-radius:.25rem!important">
-</form>
+         <div class="col-sm-2">
+            <input type="file" class="form-control-file" id="expfile" name="expfile" >
+         </div>
+         <div class="col-sm-5">
+            <a class="btn btn-link" href="/iris3/program/Yan_expression.csv" role="button">Example expression file</a>
          </div>
       </div>
 
@@ -196,20 +181,24 @@ form div.fieldWrapper label { min-width: 5%; }
                   <h4 class="font-italic text-left">CTS-bicluster inference <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from SC3 or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
                   <div class="row">
                      <div class="form-check col-sm-4 ">
-                        <input type="radio" value="1" id="enable_sc3" name="customRadioInline4" class="custom-control-input" checked="" onClick="displayForm(this)">
+                        <input type="radio" id="customRadioInline4" name="customRadioInline4" class="custom-control-input" checked="">
                         <label class="custom-control-label" for="customRadioInline4">SC3 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span></label>
                      </div>
                      <div class="col-sm-2">
-                        <input type="radio" value="2" id="enable_labelfile" name="customRadioInline4" class="custom-control-input" onClick="displayForm(this)">
+                        <input type="radio" id="enable_labelfile" name="customRadioInline4" class="custom-control-input">
                         <label class="custom-control-label" for="customRadioInline5" onchange="document.getElementById('labelfile').disabled = !this.checked;">Your cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="User's uploaded ground truth cell labels, either numbers or factors."> </span></label>
                      </div>
-					 <div id="upload_label" style="visibility:hidden">
-					 <div class="form-group row">
+					 					       <div class="form-group row">
          <div class="form-check col-sm-3 ">
             <label class="form-check-label" for="cellinfo">Upload cell label<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A table contains cell infomation. The file should includes a cell names in the first column match with the expression file, and the second column indicating the cell clusters. Cell clusters are used in two ways: (i) assess the cell-type prediction results from SC3, and (ii) assign Cell-type-specific (complex) regulons. If no cell label file uploaded, the pipeline will automatically use the predicted clusters from SC3 for the following regulon predictions. Accept both txt and csv format."> </span></label>
-         <input type="file" class="form-control-file" id="labelfile" name="labelfile" ><a class="btn btn-link" href="/iris3/program/Yan_cell_label.csv" role="button">Download example cell label file</a></div>
-
-      </div></div>
+         </div>
+         <div class="col-sm-2">
+            <input type="file" class="form-control-file" id="labelfile" name="labelfile" >
+         </div>
+         <div class="col-sm-5">
+            <a class="btn btn-link" href="/iris3/program/Yan_cell_label.csv" role="button">Download example cell label file</a>
+         </div>
+      </div>
                   </div>
                   <br>
                   <h4 class="font-italic text-left">CTS-(complex)-regulon prediction <span class="glyphicon glyphicon-question-sign" data-html="true" data-toggle="tooltip" data-original-title="Regulon: a group of genes that controlled by the same regulatory gene.<br>
@@ -304,7 +293,5 @@ CTS-complex-regulon: Non-overlapped group of genes that controlled by the same m
    </form>
    <!--</div>-->
    <hr>
-       <script src='assest/js/dropzone.js'></script>
-<link href="assest/css/dropzone.css" type="text/css" rel="stylesheet" />
 </main>
 {{/block}}

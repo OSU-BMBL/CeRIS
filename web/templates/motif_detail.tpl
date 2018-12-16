@@ -68,18 +68,18 @@
         <div class="container">
             <br/>
             <div class="flatPanel panel panel-default">
-                <div class="flatPanel panel-heading"><strong>Job ID: 20181124190953</strong></div>
+                <div class="flatPanel panel-heading"><strong>Job ID: 20160821183643</strong></div>
                 <div class="panel-body">
   <form id="frm1" name="form">
       <div class="section2">
        <table class = "display cell-border compact" id="datat" >
          <thead>
             <tr>
-               <th style="text-align:center;">Motif logo</th>
-               <th style="text-align:center;">Length</th>
-               <th style="text-align:center;">Pvalue</th> 
-               <th style="text-align:center;">Number</th>              
-               <th style="text-align:center;">Motifs</th>
+               <th>Motif logo</th>
+               <th>Length</th>
+               <th>Pvalue</th> 
+               <th>Number</th>              
+               <th>Motifs</th>
               
              </tr> 
         </thead>
@@ -102,7 +102,7 @@
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].MotifPvalue}}</td>
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].Motifnumber}}</td> 
                 <td align="left" >   <br/>
-                                  <div style="width:550px;height:150px;overflow:scroll;">
+                                  <div style="width:450px;height:150px;overflow:scroll;">
                                   <table>
 	                                 <tr>
 	                                      <td>Seq</td>
@@ -110,27 +110,27 @@
 	                                      <td>Motif</td>
 	                                      <td>End</td>
 	                                      <td>Score</td>
-	                                      <td>Gene</td>
+	                                      <td>Info</td>
 	                                 </tr>
 	                                
                                   {{section name=sec2 loop=$ann[sec1].Motifs}}
                                         {{if $ann[sec1].Motifs[sec2].red==1}}
-                                          <tr >
+                                          <tr style="background-color:#FA6B04;">
                                          <td>{{$ann[sec1].Motifs[sec2].Seq}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].start}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Motif}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].end}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Score}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$ann[sec1].Motifs[sec2].Info}}" style="font-size:14px; display: inline-block;">{{$ann[sec1].Motifs[sec2].Info}}&nbsp;</a></td>
+                                         <td>{{$ann[sec1].Motifs[sec2].Info}}</td>
                                          </tr>
                                          {{else}}
-                                           <tr>
+                                           <tr style="background-color:#FAB904;">
                                          <td>{{$ann[sec1].Motifs[sec2].Seq}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].start}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Motif}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].end}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Score}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$ann[sec1].Motifs[sec2].Info}}" style="font-size:14px; display: inline-block;">{{$ann[sec1].Motifs[sec2].Info}}&nbsp;</a></td>
+                                         <td>{{$ann[sec1].Motifs[sec2].Info}}</td>
                                          </tr>
                                          {{/if}}
                                    {{/section}}
@@ -159,7 +159,7 @@
        </tbody>
       </table>
 	  <br/>
-      <div class = "title_whole"><strong style = "position : relative;">Motif Matrix Format</strong></div>
+      <div class = "title_whole"><strong style = "position : relative; top : 5px;">Motif Matrix Format</strong></div>
       <textarea  style="position:relative; width:99%; height:400px; border-top-left-radius : 0px; border-top-right-radius : 0px;">{{$matrix}}</textarea> 
 
       </div>

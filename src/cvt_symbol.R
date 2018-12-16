@@ -6,9 +6,13 @@
 #BiocManager::install("GenomicAlignments", version = "3.8")
 #BiocManager::install("ensembldb", version = "3.8")
 #BiocManager::install("EnsDb.Hsapiens.v86", version = "3.8")
+#BiocManager::install("EnsDb.Mmusculus.v79", version = "3.8")
+
+
 library(GenomicAlignments)
 library(ensembldb)
 library(EnsDb.Hsapiens.v86)
+library(EnsDb.Mmusculus.v79)
 #setwd("C:/Users/flyku/Desktop/iris3")
 
 
