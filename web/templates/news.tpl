@@ -61,41 +61,21 @@ $(document).ready(function () {
             <h2 class="text-center">IRIS3 news</h2>
             <div class = "bootstrap-iso">
 					<br/>
-					<h3>[0.0.4] - 12/13/2018<br/><br/></h3>
-					<h4>Added</h4>
-					<a href="https://www.dropzonejs.com/" target="_blank"> DragZone</a>, a drag and drop widget for uploading expression data.
-					<h4>Changed</h4>
+					&nbsp;&nbsp;&nbsp;11/4/2018<br/><br/>
 					<p>
-					  Advanced options layout on <a href="http://bmbl.sdstate.edu/iris3/submit.php" target="_blank"> Submit</a> page.
-					</p>
-					<hr/>
-					<h3>[0.0.3] - 12/09/2018<br/><br/></h3>
-					<h4>Added</h4>
-					<p>
-						<a href="http://meme-suite.org/tools/meme" target="_blank"> MEME</a> for an optinal back-end DNA motif identification program.
-					</p>
-					<hr/>
-					<h3>[0.0.2] - 11/04/2018<br/><br/></h3>
-					<h4>Added</h4>
-					<p>
-						<a href="https://clustergrammer.readthedocs.io/" target="_blank"> Clustergrammer</a>, a interactive web-based tool for visualizing heatmaps for result visualization.
-					</p>
-					<p>
-						<a href="http://bmbl.sdstate.edu/iris3/assest/img/iris3_pipeline.png" target="_blank"> Pipeline overview</a> on homepage.
-					</p>
-					<p>
-						<a href="http://bmbl.sdstate.edu/iris3/tutorial.php" target="_blank"> Tutorial</a>,<a href="http://bmbl.sdstate.edu/iris3/faq.php" target="_blank"> FAQ</a>, <a href="http://bmbl.sdstate.edu/iris3/contact.php" target="_blank">Contact</a>, <a href="https://groups.google.com/forum/#!forum/iris3-discussion-board" target="_blank">Forum</a> sections.
+						We update this server regularly so we can make it better for you. This version includes several bug fixes and performance improvements.
 					</p>
 					<hr/>
 					
-					<h3>[0.0.1] - 10/17/2018<br/><br/></h3>
-					<h4>Added</h4>
+					
+					&nbsp;&nbsp;&nbsp;10/17/2018<br/><br/>
 					<p>
-						The website is now hosting under  <a href="https://www.sdstate.edu/agronomy-horticulture-plant-science/bioinformatics-and-mathematical-biosciences-lab" target="_blank">bmbl.sdstate.edu</a> domain.
+						This server has been upgraded to version 1.0
 					</p>
 					<hr/>
 				</div>
 			</div>
+			<hr>
 
             
         

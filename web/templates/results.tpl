@@ -268,13 +268,13 @@
                                     <h3>CTS Cell-Gene-Regulon Heatmap</h3>
 									     <ul class="nav nav-tabs" id="myTab" role="tablist">
                                                             <li class="nav-item active">
-                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#main_CT1" json="data/{{$jobid}}/ct1.json" root="#container-id-11" role="tab" aria-controls="home" aria-selected="true">Cell Type1</a>
+                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#main_CT1" json="data/{{$jobid}}/11.json" root="#container-id-11" role="tab" aria-controls="home" aria-selected="true">Cell Type1</a>
                                                             </li>
                                                             <li class="nav-item">
-                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#main_CT2" json="data/{{$jobid}}/ct2.json" root="#container-id-12" role="tab" aria-controls="profile" aria-selected="false">Cell Type2</a>
+                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#main_CT2" json="data/{{$jobid}}/12.json" root="#container-id-12" role="tab" aria-controls="profile" aria-selected="false">Cell Type2</a>
                                                             </li>
                                                             <li class="nav-item">
-                                                                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#main_CT3" json="data/{{$jobid}}/ct3.json" root="#container-id-13" role="tab" aria-controls="contact" aria-selected="false">Cell Type3</a>
+                                                                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#main_CT3" json="13.json" root="#container-id-13" role="tab" aria-controls="contact" aria-selected="false">Cell Type3</a>
                                                             </li>
                                                         </ul>
                                                         <div class="tab-content" id="myTabContent">
@@ -282,8 +282,8 @@
 																<div class="flatPanel panel panel-default">
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=ct1.json" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=ct1.json">Open in new tab
+																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=11.json" target="_blank">
+                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=11.json">Open in new tab
                                                                         </button>
                                                                     </a>
 																				<div id="heatmap">
@@ -296,8 +296,8 @@
 																<div class="flatPanel panel panel-default">
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=ct2.json" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=t2.json">Open in new tab
+																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=12.json" target="_blank">
+                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=12.json">Open in new tab
                                                                         </button>
                                                                     </a>
 																				<div id="heatmap">
@@ -471,7 +471,7 @@
                                                                             <td style="width:260px">
                                                                                 <div class="col-sm-12">
                                                                                     <span style="font-size:14pt;">Regulon-{{$regulon_result[sec1][0]}}</span><br>
-																					<span><a href="motif_detail.php?jobid=20181124190953&id=1" target="_blank"><img src="data/{{$jobid}}/20181124190953Motif-1.png" style="margin:auto;display:block"></a></span>
+																					<span><a href="motif_detail.php?jobid=20160821183643f&id=1" target="_blank"><img src="data/{{$jobid}}/logo.png" style="margin:auto;display:block"></a></span>
                                                                                 </div>
                                                                             </td>
                                                                             <td>

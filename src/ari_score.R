@@ -40,7 +40,7 @@ sc3_cluster <- srcLabel
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-user_label_file <- read.delim("20181124190953_cell_label.txt",header=T,sep="\t",check.names = FALSE)
+user_label_file <- read.delim(srcLabel,header=T,sep="\t",check.names = FALSE)
 
 user_label_index <- which(colnames(user_label_file) ==  "label")
 user_cellname_index <- which(colnames(user_label_file) ==  "cell_name")
@@ -86,8 +86,6 @@ colnames(res) <- res_colname
 write.table(res, paste(outFile,"_sc3_cluster_evaluation.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 
 
-
-?F1_Score
 
 # step2 change label names
 user_label$label <- sub("^", "L", user_label$label )
