@@ -20,16 +20,16 @@ $done_file = "$DATAPATH/$jobid/done";
 
 if (file_exists($done_file)){
 	$status = "1";
-	$fp = fopen("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon_genename.txt", 'r');
+	$fp = fopen("$DATAPATH/$jobid/$jobid"."_CT_2_bic.regulon.txt", 'r');
  if ($fp){
- while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) if ($line) {$regulon_result[] = array_map('trim',$line);}
+ while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) if ($line) $regulon_result[] = $line;
  } else{
 	 die("Unable to open file");
  }
 fclose($fp);
 $i=0;
 $num=0;
- $fp = fopen("$DATAPATH/$jobid/$jobid"."_CT_1_bic.complex.regulon.txt", 'r');
+ $fp = fopen("$DATAPATH/$jobid/$jobid"."_CT_2_bic.complex.regulon.txt", 'r');
  if ($fp){
  while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
 	 if ($line){
