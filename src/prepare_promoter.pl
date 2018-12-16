@@ -6,7 +6,15 @@ use DBI;
 my $path = $ARGV[0];
 die "Please specify which directory to search" 
     unless -d $path;
+	
 
+    open(my $fh, '<', $path."/species.txt") or die "cannot open file $filename";
+    {
+        local $/;
+        $id = <$fh>;
+    }
+    close($fh);
+	
 opendir( my $DIR, $path );
 while ( my $entry = readdir $DIR ) {
     next unless -d $path . '/' . $entry;
@@ -37,7 +45,7 @@ while ( my $entry = readdir $DIR ) {
 	#chomp $row;
 	#$row = "ENSG00000211459";
 	$row =~ s/\R//g;
-	$str = "SELECT sequence FROM gene WHERE gene_id = '".$row."' AND species_id = '52'\n";
+	$str = "SELECT sequence FROM gene WHERE gene_id = '".$row."' AND species_id = '".$id."'\n";
 
 	$query = $myConnection->prepare($str);
 	$result = $query->execute();
