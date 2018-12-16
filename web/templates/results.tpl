@@ -259,6 +259,7 @@
                             </div>
                         </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
                     </div>
                     <div class="flatPanel panel panel-default">
                         <div class="panel-body">
@@ -319,6 +320,8 @@
 															</div>
                                 </div>
 =======
+=======
+>>>>>>> parent of 3a6d8ee... front-end update
                         <div class="panel panel-default panel-faq">
                             <div class="panel-heading">
                                 <a data-toggle="collapse" data-parent="#accordion-cat-1" href="#faq-cat-1-sub-2">
@@ -327,6 +330,7 @@
                                         <span class="pull-right"><i class="glyphicon glyphicon-plus"></i></span>
                                     </h4>
                                 </a>
+<<<<<<< HEAD
 >>>>>>> parent of 3a6d8ee... front-end update
                             </div>
                             <div id="faq-cat-2-sub-2" class="panel-collapse collapse">
@@ -638,6 +642,12 @@
                                     </div>
                                 </div>
 =======
+                                   </div>
+>>>>>>> parent of 3a6d8ee... front-end update
+=======
+                            </div>
+                            <div id="faq-cat-2-sub-2" class="panel-collapse collapse">
+                                <div class="panel-body">
                                    </div>
 >>>>>>> parent of 3a6d8ee... front-end update
                             </div>
