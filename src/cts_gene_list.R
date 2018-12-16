@@ -14,9 +14,10 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# expFile <- "20181124190953_filtered_expression.txt"
-# jobid <- 20181124190953
-# label_file <- "20181124190953_cell_label.txt"
+#setwd("D:/Users/flyku/Documents/IRIS3-data/")
+# expFile <- "2018121644842_filtered_expression.txt"
+# jobid <- 2018121644842
+# label_file <- "2018121644842_cell_label.txt"
 
 #setwd("C:/Users/flyku/Desktop/iris3/data")
 conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
@@ -78,8 +79,8 @@ get_pvalue_df <- function(lis,num){
 }
 
 #test get_bic_in_ct
-#lis=pv[[1]]
-#num=2
+#lis=pv[[2]]
+#num=4
 get_bic_in_ct <- function(lis,num){
   pval <- lis$pvalue
   result <- lis$cell_type
@@ -90,7 +91,7 @@ get_bic_in_ct <- function(lis,num){
   }
 }
 
-#i=1;j=2
+#i=1;j=4
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
 uniq_li <- sapply(pv, get_bic_in_ct,num=j)
