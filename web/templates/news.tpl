@@ -7,21 +7,8 @@
 {{block name="extra_js"}}
 
 <script type="text/javascript">
-  $J(function() {
-    $J('div.accordion').accordion();
-    $J('a#id_example').click(function () {
-      $J.ajax({
-        async : false, dataType : "json", url : "example_ajax.php",
-        success : function(data) {
-          $J('textarea#id_sequences').val(data);
-        }
-      });
-    });
-  });
+  
 </script>
-<!-- Piwik -->
-
-<!-- End Piwik Code -->
 {{/block}}
 <script>
 $(document).ready(function () {

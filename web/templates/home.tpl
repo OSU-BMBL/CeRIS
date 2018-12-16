@@ -25,6 +25,7 @@
                         <div class="row flex-v-center">
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                             <div class="col-md-7 col-lg-7 col-sm-7 col-xs-7">
 =======
                             <div class="col-md-8 col-lg-7 col-sm-12 col-xs-12">
@@ -32,6 +33,9 @@
 =======
                             <div class="col-md-8 col-lg-7 col-sm-12 col-xs-12">
 >>>>>>> parent of 3a6d8ee... front-end update
+=======
+                            <div class="col-md-7 col-lg-7 col-sm-7 col-xs-7">
+>>>>>>> parent of e69780d... 1
                                 <div class="welcome-text">
                                     <h1>IRIS3</h1>
                                     <p>Integrated Cell-type-specific Regulon Inference from Single-cell RNA-Seq</p>
@@ -45,16 +49,22 @@
                             </div>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of e69780d... 1
 							 <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
                                 <div class="welcome-text">
                                  <a href="assest/img/iris3_pipeline.png" target="_blank"><img src="assest/img/iris3_pipeline.png" style="height:500px;margin:auto;display:block"></a>
                                                
                                 </div>
                             </div>
+<<<<<<< HEAD
 =======
 >>>>>>> parent of 3a6d8ee... front-end update
 =======
 >>>>>>> parent of 3a6d8ee... front-end update
+=======
+>>>>>>> parent of e69780d... 1
                         </div>
                     </div>
                 </div>
