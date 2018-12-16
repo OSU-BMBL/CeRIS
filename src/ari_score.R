@@ -7,9 +7,9 @@ outFile <- args[2] # user job id
 delim_array <- c("\t"," ",",") # 1-tab, 2-space, 3-comma
 delim <- delim_array[as.numeric(args[3])] #delimiter
 #delim <- args[3]
-#setwd("C:/Users/flyku/Desktop/iris3")
-# srcFile = "20181124190953_sc3_label.txt"
-# outFile <- "20181124190953"
+#setwd("D:/Users/flyku/Documents/IRIS3-data/")
+# srcFile = "Zeisel_cell_label.csv"
+# outFile <- "2018121644842"
 # delim <- "\t"
 
 #install.packages("NMF")
@@ -20,7 +20,7 @@ delim <- delim_array[as.numeric(args[3])] #delimiter
 #install.packages("ROSE")
 #devtools::install_github("sachsmc/plotROC")
 #install.packages("networkD3")
-library(reader)
+#library(reader)
 library(plotROC)
 library("NMF")
 library("clues")
@@ -34,16 +34,17 @@ library(tidyr)
 library(gdata)
 library(data.table)
 
+srcLabel <- read.table(srcFile,header=T,sep=delim,check.names = FALSE)
 
 srcLabel <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
 sc3_cluster <- srcLabel
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-user_label_file <- read.delim("20181124190953_cell_label.txt",header=T,sep="\t",check.names = FALSE)
+user_label_file <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
 
-user_label_index <- which(colnames(user_label_file) ==  "label")
-user_cellname_index <- which(colnames(user_label_file) ==  "cell_name")
+user_label_index <- 2
+user_cellname_index <- 1
 user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,user_label_index])
 
 #test
@@ -55,8 +56,8 @@ levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
 colnames(sc3_cluster) <- c("cell_name","cluster")
 colnames(user_label) <- c("cell_name","label")
 
-#write.table(sc3_cluster, paste(outFile,"_sc3_cluster.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
-#write.table(user_label, paste(outFile,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+write.table(sc3_cluster, paste(outFile,"_sc3_cluster.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+write.table(user_label, paste(outFile,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 
 
 # sc3_cluster <- read.delim("123456_sc3_cluster.txt",header=T,sep=" ",check.names = FALSE)
@@ -77,17 +78,18 @@ clustering_Accuracy <- Accuracy(as.numeric(target$cluster),as.numeric(target$lab
 #clustering_sensitivity <- sensitivity(as.numeric(target$cluster),as.numeric(target$label))
 #clustering_specificity <- specificity(as.numeric(target$cluster),as.numeric(target$label))
 
-res <- cbind(clustering_ARI,clustering_RI,clustering_JI,clustering_FMI,clustering_F1_Score,
-             clustering_Accuracy,clustering_Precision,clustering_Recall,clustering_entropy,clustering_purity)
+
+#res <- cbind(clustering_ARI,clustering_RI,clustering_JI,clustering_FMI,clustering_F1_Score,
+#clustering_Accuracy,clustering_Precision,clustering_Recall,clustering_entropy,clustering_purity)
+
+#remove f1,precision,recall
+res <- cbind(clustering_ARI,clustering_RI,clustering_JI,clustering_FMI,
+             clustering_Accuracy,clustering_entropy,clustering_purity)
 
 res_colname <- colnames(res)
 res_colname <- gsub(".*\\_","",res_colname)
 colnames(res) <- res_colname
 write.table(res, paste(outFile,"_sc3_cluster_evaluation.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
-
-
-
-?F1_Score
 
 # step2 change label names
 user_label$label <- sub("^", "L", user_label$label )
