@@ -103,7 +103,8 @@ gene_result <- genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(as.character(r
                      return.type="data.frame", columns=c("gene_name"))[,1]
 heat_matrix <- subset(exp_file,rownames(exp_file) %in% gene_result)
 
-category <- paste("Cell Type:",label_file[,2],sep = " ")
+dict<- c("One","Two","Three","Four","Five","Six","Seven")
+category <- paste("CellType:",dict[label_file[,2]],sep = " ")
 
 heat_matrix <- rbind(category,heat_matrix)
 rownames(heat_matrix)[1] <- ""
@@ -119,6 +120,7 @@ for(i in 1: length(unique(label_file[,2]))){
   }
   k=0
   file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),]
+
   for (j in length(combine_regulon_label):1) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
       regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(file_heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
@@ -128,6 +130,9 @@ for(i in 1: length(unique(label_file[,2]))){
       k <- k + 1
     }
   }
+  file_heat_matrix <- rbind(category,file_heat_matrix)
+  rownames(file_heat_matrix)[1] <- ""
+  
   colnames(file_heat_matrix)[1:k] <- ""
   write.table(file_heat_matrix,paste("ct",i,".heatmap.txt",sep = ""),quote = F,sep = "\t", col.names=NA)
   file_heat_matrix <- data.frame()
