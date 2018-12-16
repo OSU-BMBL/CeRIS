@@ -6,19 +6,22 @@
 #BiocManager::install("GenomicAlignments", version = "3.8")
 #BiocManager::install("ensembldb", version = "3.8")
 #BiocManager::install("EnsDb.Hsapiens.v86", version = "3.8")
+#BiocManager::install("EnsDb.Mmusculus.v79", version = "3.8")
 library(GenomicAlignments)
 library(ensembldb)
 library(EnsDb.Hsapiens.v86)
+library(EnsDb.Mmusculus.v79)
 #setwd("C:/Users/flyku/Desktop/iris3")
-
-
 args <- commandArgs(TRUE)
 srcDir <- args[1]
+expName <- args[2]
 setwd(srcDir)
 getwd()
 #srcDir <-  getwd()
+#expName <- "2018121644842_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
-#setwd("D:/Users/flyku/Documents/IRIS3-R/")
+expFile <- read.table(expName,sep="\t",header = T)
+#setwd("D:/Users/flyku/Documents/IRIS3-data/")
 
 get_row_num <- function (this){
   num = 0
@@ -30,6 +33,19 @@ get_row_num <- function (this){
   return (num)
 }
 
+check_species <- function(expFile) {
+  result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSG", "startsWith")), 
+                               return.type="data.frame", columns=c("gene_id")))
+  result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSMUSG", "startsWith")), 
+                  return.type="data.frame", columns=c("gene_id")))
+  if(result_human > result_mouse){
+    return (list(EnsDb.Hsapiens.v86,"ENSG"))
+  } else {
+    return (list(EnsDb.Mmusculus.v79,"ENSMUSG"))
+  }
+}
+
+species <- check_species(expFile)
 
 generate_seq_file <- function(filename){
   genes <- read.table(filename,header = T,sep = "\t");
@@ -37,7 +53,7 @@ generate_seq_file <- function(filename){
   dir.create(new_dir)
   for (i in 1:ncol(genes)) {
     name <- colnames(genes)[i]
-    result <- genes(EnsDb.Hsapiens.v86, filter=list(GenenameFilter(as.character(genes[,i])),GeneIdFilter("ENSG", "startsWith")), 
+    result <- genes(species[[1]], filter=list(GeneNameFilter(as.character(genes[,i])),GeneIdFilter(species[[2]], "startsWith")), 
                     return.type="data.frame", columns=c("gene_id"))
     if(nrow(result)>4){
       tmp <- as.data.frame(result[,1])
@@ -47,7 +63,7 @@ generate_seq_file <- function(filename){
   }
 }
 
-  
+
 
 apply(as.data.frame(srcFile), 1, generate_seq_file)
 
