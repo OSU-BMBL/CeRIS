@@ -42,7 +42,7 @@ Version: 1.0
     #background: #ffffff none repeat scroll 0 0;
     #-webkit-box-shadow: 0 9px 9px 0 #c7c7c7;
     #box-shadow: 0 9px 9px 0 #c7c7c7;
-    margin-top: -100px;
+    margin-top: -50px;
     padding-top: 30px;
     position: relative;
     z-index: 1;
@@ -510,3 +510,21 @@ label.mt10.valid {
     background: #3ee792;
     color: #ffffff;
 }
+
+
+.row_slider_group {
+	opacity: 0 !important;
+}
+
+.col_slider_group{
+	opacity: 0 !important;
+}
+
+/*.opacity_slider_container{
+	opacity: 0 !important;
+}*
+.div_filters{
+	opacity: 0 !important;
+	
+}
+	
