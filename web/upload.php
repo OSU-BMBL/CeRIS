@@ -19,7 +19,6 @@ if (!empty($_FILES)) {
      
 } 
 $page = $_SERVER['PHP_SELF'];
-print_r("file uploaded")
 $smarty->assign('page', $page);
    	$smarty->assign('theData', $theData);
 	 $smarty->assign("download_flag", $download_flag);
