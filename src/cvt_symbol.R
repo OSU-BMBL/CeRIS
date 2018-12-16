@@ -39,8 +39,10 @@ check_species <- function(expFile) {
   result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSMUSG", "startsWith")), 
                   return.type="data.frame", columns=c("gene_id")))
   if(result_human > result_mouse){
+    write.table("52","species.txt",quote=F,col.names = F,row.names = F)
     return (list(EnsDb.Hsapiens.v86,"ENSG"))
   } else {
+    write.table("53","species.txt",quote=F,col.names = F,row.names = F)
     return (list(EnsDb.Mmusculus.v79,"ENSMUSG"))
   }
 }
