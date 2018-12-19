@@ -10,6 +10,7 @@ $from=$_GET['from'];
 $max=0;
 $select="Motif-1";
 $DATAPATH="/home/www/html/iris3/data";
+$TOOLPATH="/home/www/html/iris3/program/dminda";
    session_start();
    $info = Spyc::YAMLLoad("$DATAPATH/$jobid/info.yaml");
 $status=$info['status'];
@@ -447,10 +448,11 @@ if(file_exists($tempnam.".motifinfo")&&file_get_contents($tempnam.".motifinfo")!
    for($i=0;$i<count($annotation1);$i++)
    {
           if($annotation1[$i]['Motifid']==$id)
-          { #   $select= $annotation1[$i]['Motifname'];
-          	#   system("cat $DATAPATH/$jobid/$select |python $TOOLPATH/motif_tools/align2matrix.py > $DATAPATH/$jobid/$select.matrix");
-            # system("cat $DATAPATH/$jobid/$select | perl $TOOLPATH/motif_tools/align2uniprobe.pl > $DATAPATH/$jobid/$select.uniprobe");
-            # system("cat $DATAPATH/$jobid/$select.uniprobe | perl $TOOLPATH/motif_tools/uniprobe2meme > $DATAPATH/$jobid/$select.meme");
+          {    $select= $annotation1[$i]['Motifname'];
+				#print_r($select);
+          	   system("cat $DATAPATH/$jobid/$select |python $TOOLPATH/motif_tools/align2matrix.py > $DATAPATH/$jobid/$select.matrix");
+             system("cat $DATAPATH/$jobid/$select | perl $TOOLPATH/motif_tools/align2uniprobe.pl > $DATAPATH/$jobid/$select.uniprobe");
+             system("cat $DATAPATH/$jobid/$select.uniprobe | perl $TOOLPATH/motif_tools/uniprobe2meme > $DATAPATH/$jobid/$select.meme");
                 break;
           }
          
@@ -558,7 +560,7 @@ system("cat $DATAPATH/$jobid/output/$select.uniprobe | perl $TOOLPATH/motif_tool
                 'id'=>$annotation1[$i]['Motifs'][$z]['id'],
 	  	   			  );
 	  	   		
-	  	   			      // print_r($result);
+	  	   			       #print_r($result);
 	  	   			  array_push($show[(int)$annotation1[$i]['Motifs'][$z]['Seq']]['motifs'],$result);
                 //print_r();
 	  	   			}
@@ -638,7 +640,6 @@ for($i=1;$i<=count($show);$i++)
 	  	   }
 	  fclose($fp);
 	   }
-
 $smarty->assign('filename',$filename);
 $smarty->assign('jobid',$jobid);
 $status="Done";

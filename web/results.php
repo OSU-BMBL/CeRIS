@@ -27,26 +27,13 @@ if (file_exists($done_file)){
 	 die("Unable to open file");
  }
 fclose($fp);
+
 $i=0;
 $num=0;
- $fp = fopen("$DATAPATH/$jobid/$jobid"."_CT_1_bic.complex.regulon.txt", 'r');
+ $fp = fopen("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt", 'r');
  if ($fp){
  while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
-	 if ($line){
-
- $line1 = $line;
-foreach ($line as $key => $value) {
-    if (is_numeric($value) !== false) {
-		$cr_motif[$num][$i] = $value;
-        unset($line[$key]);
-		$i++;
-    }
-	
-}
-$i=0;
-$num++;
-$cr_gene[] = $line;
-}
+	 if ($line) {$regulon_id_result[] = array_map('trim',$line);}
  } else{
 	 die("Unable to open file");
  }
@@ -59,7 +46,7 @@ else {
 
 
 
-
+//print_r($regulon_result);
 //$encodedString = json_encode($annotation1);
  
 //Save the JSON string to a text file.
@@ -69,8 +56,7 @@ $smarty->assign('sy',$sy);
 $smarty->assign('status',$status);
 $smarty->assign('jobid',$jobid);
 $smarty->assign('regulon_result',$regulon_result);
-$smarty->assign('cr_gene',$cr_gene);
-$smarty->assign('cr_motif',$cr_motif);
+$smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('big',$big);
 $smarty->assign('annotation', $annotation1);
 $smarty->assign('LINKPATH', $LINKPATH);

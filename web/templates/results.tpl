@@ -14,6 +14,7 @@ $(document).ready(function () {
 	  var flag = [];
 	  	
 	  flag.push("#container-id-11")
+	  flag.push("#container-id-2")
 	  function arrayContains(needle, arrhaystack)
 		{
     return (arrhaystack.indexOf(needle) > -1);
@@ -83,11 +84,6 @@ console.log(flag)
 
                             </div>
                         </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> parent of e69780d... 1
                     </div>
                     <div class="flatPanel panel panel-default">
                         <div class="panel-body">
@@ -147,22 +143,6 @@ console.log(flag)
                                                             </div>																
 															</div>
                                 </div>
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 3a6d8ee... front-end update
-                        <div class="panel panel-default panel-faq">
-                            <div class="panel-heading">
-                                <a data-toggle="collapse" data-parent="#accordion-cat-1" href="#faq-cat-1-sub-2">
-                                    <h4 class="panel-title">
-                                        Regulon 2
-                                        <span class="pull-right"><i class="glyphicon glyphicon-plus"></i></span>
-                                    </h4>
-                                </a>
-<<<<<<< HEAD
->>>>>>> parent of 3a6d8ee... front-end update
-=======
->>>>>>> parent of e69780d... 1
                             </div>
                         </div>
                     </div>
@@ -294,8 +274,8 @@ console.log(flag)
 																<div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																		<a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-1
+																		<a href="/iris3/data/20181124190953/20181124190953_CT_1_bic.regulon_genename.txt" target="_blank">
+                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/20181124190953/20181124190953_CT_1_bic.regulon_genename.txt">Download CT-1
                                                                         </button>
                                                                     </a>
 																	<table id="motiftable" class="table table-striped table-bordered table-sm" cellpadding="0" cellspacing="0" width="100%">
@@ -317,11 +297,30 @@ console.log(flag)
                                                                             </td>
                                                                             <td>
 
-                                                                                <div style="height:100px; overflow-x: scroll;overflow-y: scroll;width:100%; font-size:14px;">
-																				Gene name: 
-                                                                                    {{section name=sec2 start=1 loop=$regulon_result[sec1]}}
-                                                                                    <a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[sec1][sec2]}}&nbsp;</a>{{/section}}
-																					<br>Gene ID:<br>Transcript: 
+                                                                                <div style="width:100%; font-size:14px;">
+																				<table class="table table-bordered">
+	                                 <tr>
+	                                      <td>Gene Symbol</td>
+	                                      <td>Gene ID</td>
+	                                      <td>Transcripts</td>
+	                                 </tr>
+	                                
+                                  {{section name=sec2 start=1 loop=$regulon_result[sec1]}}
+                                        
+                                          <tr >
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[sec1][sec2]}}&nbsp;</a></td>
+										 
+										 
+																					
+																					
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_id_result[sec1][sec3]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[sec1][sec2]}}&nbsp;</a></td>
+										 
+                                         <td>Transcripts ID</td>
+										 {{/section}}
+                                         </tr>
+                                   
+                                 </table>
+																					
 																					
                                                                                 </div>
 
@@ -482,18 +481,6 @@ console.log(flag)
                                         <div class="tab-pane fade" id="tab5default">Default 5</div>
                                     </div>
                                 </div>
-<<<<<<< HEAD
-=======
-                                   </div>
->>>>>>> parent of 3a6d8ee... front-end update
-=======
-                            </div>
-                            <div id="faq-cat-2-sub-2" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                   </div>
->>>>>>> parent of 3a6d8ee... front-end update
-=======
->>>>>>> parent of e69780d... 1
                             </div>
                         </div>
                     </div>

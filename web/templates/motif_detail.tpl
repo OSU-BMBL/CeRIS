@@ -72,7 +72,7 @@
                 <div class="panel-body">
   <form id="frm1" name="form">
       <div class="section2">
-       <table class = "display cell-border compact" id="datat" >
+       <table class="table table-bordered" id="datat" >
          <thead>
             <tr>
                <th style="text-align:center;">Motif logo</th>
@@ -102,8 +102,8 @@
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].MotifPvalue}}</td>
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].Motifnumber}}</td> 
                 <td align="left" >   <br/>
-                                  <div style="width:550px;height:150px;overflow:scroll;">
-                                  <table>
+                                  <div style="width:550px;">
+                                  <table class="table table-bordered">
 	                                 <tr>
 	                                      <td>Seq</td>
 	                                      <td>Start</td>
