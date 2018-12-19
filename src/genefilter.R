@@ -8,6 +8,9 @@ args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
 delim <- args[3] #delimiter
+if(delim == 'tab'){
+	delim <- '\t'
+}
 # srcFile = "C:/Users/flyku/Desktop/Yan_expression.csv"
 # srcFile = "/home/www/html/iris3/program/test_yan.csv";
 # outFile <- "1103"
