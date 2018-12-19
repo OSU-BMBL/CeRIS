@@ -31,10 +31,11 @@ label_file <- args[3] # user label or empty string
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 exp_data<- read.delim(expFile,check.names = FALSE, header=TRUE,row.names = 1)
-if (label_file !=0){
-  cell_info <- read.delim(label_file,header=TRUE,row.names = 1)
-} else {
+label_file
+if (label_file == 0 | label_file==1){
   cell_info <- colnames(exp_data)
+} else {
+  cell_info <- read.delim(label_file,header=TRUE,row.names = 1)
 }
 
 # create a SingleCellExperiment object

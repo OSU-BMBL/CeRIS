@@ -3,14 +3,16 @@
 
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
-outFile <- args[2] # user job id
-delim_array <- c("\t"," ",",") # 1-tab, 2-space, 3-comma
-delim <- delim_array[as.numeric(args[3])] #delimiter
+outFile <- args[2] # job id
+delim <- args[3] #delimiter
+if(delim == 'tab'){
+	delim <- '\t'
+}
 #delim <- args[3]
 #setwd("D:/Users/flyku/Documents/IRIS3-data/")
-# srcFile = "Zeisel_cell_label.csv"
-# outFile <- "2018121644842"
-# delim <- "\t"
+# srcFile = "Yan_cell_label.csv"
+# outFile <- "20181219122829"
+# delim <- ","
 
 #install.packages("NMF")
 #install.packages("clues")
@@ -34,10 +36,9 @@ library(tidyr)
 library(gdata)
 library(data.table)
 
-srcLabel <- read.table(srcFile,header=T,sep=delim,check.names = FALSE)
 
 srcLabel <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-sc3_cluster <- srcLabel
+sc3_cluster <- read.table(paste(outFile,"_sc3_label.txt",sep=""),header=T,sep='\t',check.names = FALSE)
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
@@ -56,7 +57,7 @@ levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
 colnames(sc3_cluster) <- c("cell_name","cluster")
 colnames(user_label) <- c("cell_name","label")
 
-write.table(sc3_cluster, paste(outFile,"_sc3_cluster.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+#write.table(sc3_cluster, paste(outFile,"_sc3_cluster.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 write.table(user_label, paste(outFile,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 
 
@@ -143,6 +144,7 @@ txttarget <- links[, .(total = sum(value)), by=c('target')]
 nodes[txttarget$target+1L, name := paste0(name, ' (', txttarget$total, ')')]
 
 # create sankey dengram use nodes and links
+
 sankeyNetwork(Links = links, Nodes = nodes,
               Source = "src", Target = "target",
               Value = "value", NodeID = "name",
