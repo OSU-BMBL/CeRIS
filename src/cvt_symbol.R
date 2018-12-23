@@ -17,12 +17,13 @@ srcDir <- args[1]
 expName <- args[2]
 setwd(srcDir)
 getwd()
+#setwd("D:/Users/flyku/Documents/IRIS3-R/data")
 #srcDir <-  getwd()
-#expName <- "2018121644842_filtered_expression.txt"
+#expName <- "20181124190953_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/")
 
+jobid <- gsub("_.*","",expName)
 get_row_num <- function (this){
   num = 0
   for (i in 1:length(this)) {
@@ -65,6 +66,10 @@ generate_seq_file <- function(filename){
   }
 }
 
+gene_name <- rownames(expFile)
+gene_df <- genes(species[[1]], filter=list(GeneNameFilter(as.character(gene_name)),GeneIdFilter(species[[2]], "startsWith")), 
+                return.type="data.frame", columns=c("gene_id"))
+write.table(gene_df,paste(jobid,"_gene_id_name.txt",sep=""),sep = "\t",quote = F,col.names = T,row.names = F)
 
 
 apply(as.data.frame(srcFile), 1, generate_seq_file)
