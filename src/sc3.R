@@ -22,20 +22,21 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- 0
 label_file <- args[3] # user label or empty string
-
-
+delimiter <- args[4] #delimiter
+###test
+# setwd("D:/Users/flyku/Documents/IRIS3-R/data")
 # expFile <- "1103_filtered_expression.txt"
 # jobid <- 1103
-# label_file <- "1103_cell_label.txt"
+# label_file <- "iris3_example_expression_label.csv" #set empty 
+# delimiter <- ","
 
 
-#setwd("C:/Users/flyku/Desktop/iris3")
 exp_data<- read.delim(expFile,check.names = FALSE, header=TRUE,row.names = 1)
 label_file
 if (label_file == 0 | label_file==1){
   cell_info <- colnames(exp_data)
 } else {
-  cell_info <- read.delim(label_file,header=TRUE,row.names = 1)
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
 }
 
 # create a SingleCellExperiment object
@@ -57,6 +58,10 @@ sce <- sc3_calc_dists(sce)
 sce <- sc3_calc_transfs(sce)
 sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
 sce <- sc3_calc_consens(sce)
+# get row data for section 5.2 Silhouette Plot
+# silh stores the bar width
+# modify k to the number of cluster
+silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
 
 a <- as.data.frame(colData(sce))
 a <- cbind(rownames(a),a[,ncol(a)])
