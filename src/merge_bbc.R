@@ -10,16 +10,17 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(srcDir)
 getwd()
-#setwd("D:/Users/flyku/Documents/IRIS3-R/data")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 #srcDir <- getwd()
-#jobid <-20181124190953 
-#motif_length <- 13
+#jobid <-2018122223516 
+#motif_length <- 12
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep("*_bic$",alldir,value=T)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
 #i=j=k=m=1
+count_num_regulon<-0
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
   res_symbol<- paste(short_dir[i],".regulon_gene_name.txt",sep="")
@@ -33,8 +34,8 @@ for (i in 1:length(alldir)) {
   sequence_file <- read.fasta(sequence_filename,as.string = T)
   cat("",file=res_symbol)
   regulon_idx <- 1
-  for (j in 1:max(cluster_file[,2])) {
-    motif_num <- as.character(cluster_file[which(cluster_file[,2] == j),1])
+  for (j in 1:max(cluster_file[,3])) {
+    motif_num <- as.character(cluster_file[which(cluster_file[,3] == j),1])
     sequence_out_name <- paste("ct",i,"motif",j,".fa",sep = "")
     sequence_info <- character()
     genes_num <- vector()
@@ -64,13 +65,18 @@ for (i in 1:length(alldir)) {
     cat("\n",file=res_symbol,append = T)
     regulon_idx <- regulon_idx + 1
   }
+  count_num_regulon <- count_num_regulon + regulon_idx
 }
+
+write(paste("total_ct,",as.character(length(alldir)),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("total_regulon,",as.character(count_num_regulon),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 regulon_file <- list.files(srcDir,pattern = "*.regulon.txt")
-i = regulon_file[1]
-for ( i in regulon_file){
-  read.table(i)
-  
-}
+
+#i = regulon_file[1]
+#for ( i in regulon_file){
+#  read.table(i)
+#  
+#}
 #regulon_all_files <- list.files(path = workdir,pattern = "*bic.regulon.txt")
 ## get complex regulon from all regulons
 #combined_regulon <- data.frame()
