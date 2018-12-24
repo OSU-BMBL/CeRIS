@@ -90,7 +90,7 @@ get_bic_in_ct <- function(lis,num){
     }
   }
 }
-
+total_bic <- 0
 #i=1;j=4
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
@@ -145,9 +145,10 @@ for (i in 1:ncol(gene_bic)) {
 ncol(gene_overlap)
 colnames(gene_overlap) <- c("geneid",colnames(gene_bic))
 gene_overlap[,"weight"] <- rowSums(as.data.frame(gene_overlap[,-1]))
-
+total_bic <- total_bic + ncol(gene_bic)
 write.table(gene_bic,paste(jobid,"_CT_",j,"_bic.txt",sep = ""),sep="\t",row.names = F,col.names = T,na = "",quote = F)
 #write.table(gene_overlap,paste("gene_overlap",j,".txt",sep = ""),row.names = F,col.names = T,quote = F)
 }
 }
-
+write(paste("total_label,",nrow(cell_label),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("total_bic,",total_bic,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
