@@ -16,3 +16,4 @@ prepare_promoter.pl
 =======
 *.json
 >>>>>>> parent of f228140... Update .gitignore
+*.zip
