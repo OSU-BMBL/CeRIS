@@ -25,7 +25,7 @@ label_file <- read.table(all_label,header = T)
 exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
 
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
-#exp_file <- log1p(exp_file) - log1p(rowMeans(exp_file))
+exp_file <- log1p(exp_file) - log1p(rowMeans(exp_file))
 
 i=j=k=1
 
@@ -63,8 +63,8 @@ for (i in 1:length(all_regulon)) {
     #rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
     rownames(regulon_heat_matrix)[1] <- ""
     #colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
-    write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
-    write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=F,row.names = F)
+    #write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
+    #write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=F,row.names = F)
     #save regulon label to one list
     combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
     names(combine_regulon_label)[regulon_label_index] <- regulon_label
@@ -101,6 +101,9 @@ for(i in 1: length(unique(label_file[,2]))){
       #regulon_label_col[1,1] <- ""
       file_heat_matrix <- cbind(regulon_label_col,file_heat_matrix)
       k <- k + 1
+      if(k>15){
+        break
+      }
     }
   }
   file_heat_matrix[1,1:k] <- ""
