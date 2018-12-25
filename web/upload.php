@@ -3,13 +3,7 @@ require("config/smarty.php");
 require("config/common.php");
 require("config/tools.php");
 
-$ds = DIRECTORY_SEPARATOR;  //1
- 
-$storeFolder = 'uploads';   //2
- 
 
-
-$folder_name = 'upload/';
 function detectDelimiter($fh)
 {
     $delimiters = ["\\t", ";", "|", ",", " "];
@@ -26,7 +20,10 @@ function detectDelimiter($fh)
 
     return $delimiter;
 }
-
+$json=$_POST['filename'];
+$fp = fopen("/home/www/html/iris3/data/2018122084151/upload_file_info.txt", 'w');
+fwrite($fp,"$json");
+fclose($fp);
 if(!empty($_FILES))
 {
  session_start();
@@ -61,11 +58,26 @@ if(!empty($_FILES))
  } else {
 	 $_SESSION['expfile'] = "test";
  }
-  	//$fp = fopen("$workdir/upload_file_info.txt", 'w');
-    //fwrite($fp,"$jobid"."$filetype\t$expfile\t$labelfile");
-    //fclose($fp);
+
  //echo $_POST[json_encode($response)]; 
   
+}else if ($json !=""){
+	$example= $_POST['filename'];
+	session_start();
+    $jobid = $_SESSION['jobid'];
+	if ($jobid == "") {
+	$jobid = date("YmdGis");
+    }else {}
+	$_SESSION['jobid'] = $jobid;
+	$workdir = "./data/$jobid/";
+	mkdir($workdir);
+	system("cp ./storage/iris3_example_expression_matrix.csv $workdir");
+	system("cp ./storage/iris3_example_expression_label.csv $workdir");
+	$expfile = 'iris3_example_expression_matrix.csv';
+	$_SESSION['expfile'] = $expfile;
+	$labelfile = 'iris3_example_expression_label.csv';
+	$_SESSION['labelfile'] = $labelfile;
+	
 }
 $page = $_SERVER['PHP_SELF'];
 $smarty->assign('jobid', $jobid);

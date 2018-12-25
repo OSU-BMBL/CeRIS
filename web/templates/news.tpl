@@ -48,7 +48,20 @@ $(document).ready(function () {
             <h2 class="text-center">IRIS3 news</h2>
             <div class = "bootstrap-iso">
 					<br/>
-					<h3>[0.0.4] - 12/13/2018<br/><br/></h3>
+					<h3>[0.0.6] - 12/23/2018<br/></h3>
+					<h4>Changed</h4>
+					<p>
+					  Page Layout, link and button color improvements.
+					  
+					</p>
+					<hr/>
+					<h3>[0.0.5] - 12/20/2018<br/></h3>
+					<h4>Changed</h4>
+					<p>
+					  Website load time has been optimized 40% based on the report from <a href="https://gtmetrix.com/" target="_blank"> GTmetrix</a> and <a href="https://developers.google.com/web/tools/lighthouse/" target="_blank"> Lighthouse</a>.
+					</p>
+					<hr/>
+					<h3>[0.0.4] - 12/13/2018<br/></h3>
 					<h4>Added</h4>
 					<a href="https://www.dropzonejs.com/" target="_blank"> DragZone</a>, a drag and drop widget for uploading expression data.
 					<h4>Changed</h4>
@@ -56,13 +69,13 @@ $(document).ready(function () {
 					  Advanced options layout on <a href="http://bmbl.sdstate.edu/iris3/submit.php" target="_blank"> Submit</a> page.
 					</p>
 					<hr/>
-					<h3>[0.0.3] - 12/09/2018<br/><br/></h3>
+					<h3>[0.0.3] - 12/09/2018<br/></h3>
 					<h4>Added</h4>
 					<p>
 						<a href="http://meme-suite.org/tools/meme" target="_blank"> MEME</a> for an optinal back-end DNA motif identification program.
 					</p>
 					<hr/>
-					<h3>[0.0.2] - 11/04/2018<br/><br/></h3>
+					<h3>[0.0.2] - 11/04/2018<br/></h3>
 					<h4>Added</h4>
 					<p>
 						<a href="https://clustergrammer.readthedocs.io/" target="_blank"> Clustergrammer</a>, a interactive web-based tool for visualizing heatmaps for result visualization.
@@ -75,7 +88,7 @@ $(document).ready(function () {
 					</p>
 					<hr/>
 					
-					<h3>[0.0.1] - 10/17/2018<br/><br/></h3>
+					<h3>[0.0.1] - 10/17/2018<br/></h3>
 					<h4>Added</h4>
 					<p>
 						The website is now hosting under  <a href="https://www.sdstate.edu/agronomy-horticulture-plant-science/bioinformatics-and-mathematical-biosciences-lab" target="_blank">bmbl.sdstate.edu</a> domain.

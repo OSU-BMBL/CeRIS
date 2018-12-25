@@ -28,16 +28,16 @@
                                     <h1>IRIS3</h1>
                                     <p>Integrated Cell-type-specific Regulon Inference from Single-cell RNA-Seq</p>
                                     <div class="home-button">
-                                        <form action="#">
-                                            <input type="search" name="search" id="search" placeholder="Search your job ID">
-                                            <button type="submit"><i class="fa fa-search"></i></button>
+                                        <form method="POST" action="{{$URL}}" encType="multipart/form-data" id="needs-validation">
+                                            <input type="text" name="jobid" id="jobid" placeholder="Search your job ID">
+                                            <button type="submit" name="submit" value="submit"><i class="fa fa-search"></i></button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
 							 <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
                                 <div class="welcome-text">
-                                 <a href="assest/img/iris3_pipeline.png" target="_blank"><img src="assest/img/iris3_pipeline.png" style="height:500px;margin:auto;display:block"></a>
+                                 <a href="assets/img/iris3_pipeline.png" target="_blank"><img src="assets/img/iris3_pipeline.webp" style="height:500px;margin:auto;display:block"></a>
                                                
                                 </div>
                             </div>
@@ -72,9 +72,10 @@
                         <!--<div class="box-icon features-box-icon">
                             <i class="fa fa-rocket"></i>
                         </div>-->
-                        <h3 class="box-title">News</h3>
-                                    <p>Posted: 11/04/2018</p>
-            <p>We update this server regularly so we can make it better for you. This version includes several bug fixes and performance improvements.</a></p>
+                        <h3 class="box-title">What's new</h3>
+                                    <p>Posted: 12/23/2018</p>
+						<p>Page Layout, link and button color improvements.</a></p>
+            <p><a class="enroll-button" href="/iris3/news.php" role="button">More changes</a></p>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-4 col-sm-6 col-xs-12">
@@ -88,13 +89,6 @@
         <!--WELCOME SLIDER AREA END-->
 
     </header>
-    <!--END TOP AREA-->
-
-    <!--FEATURES TOP AREA-->
-    
-
-    <!--FOOER AREA END-->
-
 
 
 

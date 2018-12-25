@@ -19,7 +19,6 @@ $smarty->assign('section', 'Homepage');
 			$size = sizeof($data_1);
 			$writetmp = "$d\t$size";
 			$myfile = file_put_contents('/home/www/html/iris3/data/20181219134153/email.txt', $writetmp.PHP_EOL , FILE_APPEND | LOCK_EX);
-
             $data_2 = $data_1;
         }
         rewind($fh);
@@ -49,19 +48,28 @@ function detectDelimiter($csvFile)
 if (isset($_POST['submit']))
 {
 	session_start();
-	$email = $_POST["id_email"];	
 	//$jobid = date("YmdGis");
 	$jobid = $_SESSION['jobid'];
 	$workdir = "./data/$jobid";
 	mkdir($workdir);
 	$if_allowSave = $_POST['allowstorage'];
 	$email = $_POST['email'];
+	$c_arg = '1.0';
+	$f_arg = '0.5';
+	$o_arg = '100';
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
-	
+	$bic_inference = $_POST['bicluster_inference'];
+	if($bic_inference=='1'){
+		$labelfile='';
+	}
+$fp = fopen("$workdir/info.txt", 'w');
+fwrite($fp,"$bic_inference");
+fclose($fp);
+		
 	system("touch $workdir/email.txt");
 	system("chmod 777 $workdir/email.txt");
 	$fp = fopen("$workdir/email.txt", 'w');
@@ -100,6 +108,8 @@ wd=/home/www/html/iris3/data/$jobid/
 exp_file=$expfile
 label_file=$labelfile
 jobid=$jobid
+motif_min_length=12
+motif_max_length=12
 Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim
 /home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
 for file in *blocks
@@ -110,18 +120,22 @@ for file in *blocks
 do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
-Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file\n
+Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label\n
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n 
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
-/home/www/html/iris3/program/get_motif.sh \$wd\n
+/home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length\n
+wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
 Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
-Rscript /home/www/html/iris3/program/merge_bbc.R \$wd\n
+Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
+Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid
+mkdir json
+/home/www/html/iris3/program/build_clustergrammar.sh \$wd
 touch done\n 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 
@@ -133,6 +147,8 @@ wd=/home/www/html/iris3/data/$jobid/
 exp_file=$expfile
 label_file=$labelfile
 jobid=$jobid
+motif_min_length=12
+motif_max_length=12
 Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim
 /home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
 for file in *blocks
@@ -149,13 +165,17 @@ Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
-/home/www/html/iris3/program/get_motif.sh \$wd\n
+/home/www/html/iris3/program/get_motif_15.sh \$wd \$motif_min_length \$motif_max_length\n
+wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
 Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
-Rscript /home/www/html/iris3/program/merge_bbc.R \$wd\n
+Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
+Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid
+mkdir json
+/home/www/html/iris3/program/build_clustergrammar.sh \$wd
 touch done\n 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 ");}

@@ -12,13 +12,26 @@
 $(document).ready(function () {
 
 	  var flag = [];
-	  	
-	  flag.push("#container-id-11")
-	  flag.push("#container-id-2")
+	  	make_clust_main('data/20181222151846/json/CT1.json','#container-id-1');
+	  //flag.push("#container-id-1")
+	  flag.push("#container-id-1-1")
 	  function arrayContains(needle, arrhaystack)
 		{
     return (arrhaystack.indexOf(needle) > -1);
 		}
+		
+$('a[tabtype="main"]').on('shown.bs.tab', function (e) {
+
+  var json_file = $(e.target).attr("json")
+  var root_id = $(e.target).attr("root")
+	if (!arrayContains(root_id,flag)){
+	make_clust_main(json_file,root_id);
+	flag.push(root_id)
+	//var element_group = document.getElementsByClassName('row_slider_group');
+	//for (i in element_group)
+	//	i.style.display='none';
+	}
+    });		
 		
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 console.log(flag)
@@ -26,16 +39,10 @@ console.log(flag)
   var root_id = $(e.target).attr("root")
   console.log(!arrayContains(root_id,flag))
 	if (!arrayContains(root_id,flag)){
-
 	make_clust(json_file,root_id);
-
 	flag.push(root_id)
-	//var element_group = document.getElementsByClassName('row_slider_group');
-	//for (i in element_group)
-	//	i.style.display='none';
 	}
     });
-	//flag.push("#container-id-11")
 
 
 });
@@ -47,7 +54,7 @@ console.log(flag)
         <div class="container">
             <br/>
             <div class="flatPanel panel panel-default">
-                <div class="flatPanel panel-heading"><strong>Job ID: 20181124190953</strong></div>
+                <div class="flatPanel panel-heading"><strong>Job ID: {{$jobid}}</strong></div>
                 <div class="panel-body">
 
                     {{if $status == "1"}}
@@ -58,28 +65,25 @@ console.log(flag)
                                     <p for="reportsList">Species: Human</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Cells: 90</p>
+                                    <p>Number of Cells: {{$total_label}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Genes: 20414</p>
+                                    <p>Number of Genes: {{$total_num}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Filtered Genes: 6783</p>
+                                    <p>Number of Filtered Genes: {{$filter_num}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Filtering Rate: 34%</p>
+                                    <p>Filtering Rate: {{$filter_rate*100}}%</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Predicted Cell Types: 6</p>
+                                    <p>Number of Predicted Cell Types: {{$total_ct}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Cell p: Yes</p>
+                                    <p>Total Biclusters: {{$total_bic}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Total Biclusters: 42</p>
-                                </div>
-                                <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Regulons: 33</p>
+                                    <p>Number of Regulons: {{$total_regulon}}</p>
                                 </div>
 
                             </div>
@@ -91,56 +95,39 @@ console.log(flag)
                                 <div class="form-group col-md-12 col-sm-12" style="height:100%">
                                     <h3>CTS Cell-Gene-Regulon Heatmap</h3>
 									     <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                                            <li class="nav-item active">
-                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#main_CT1" json="data/{{$jobid}}/ct1.json" root="#container-id-11" role="tab" aria-controls="home" aria-selected="true">Cell Type1</a>
+										                    <!--
+															<li class="nav-item">
+                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" tabtype="main" href="#main_CT2" json="data/{{$jobid}}/ct2.json" root="#container-id-12" role="tab" aria-controls="profile" aria-selected="false">Cell Type2</a>
                                                             </li>
                                                             <li class="nav-item">
-                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#main_CT2" json="data/{{$jobid}}/ct2.json" root="#container-id-12" role="tab" aria-controls="profile" aria-selected="false">Cell Type2</a>
+                                                                <a class="nav-link" id="contact-tab" data-toggle="tab" tabtype="main" href="#main_CT3" json="data/{{$jobid}}/ct3.json" root="#container-id-13" role="tab" aria-controls="contact" aria-selected="false">Cell Type3</a>
                                                             </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#main_CT3" json="data/{{$jobid}}/ct3.json" root="#container-id-13" role="tab" aria-controls="contact" aria-selected="false">Cell Type3</a>
+															-->
+															{{section name=ct_idx start=0 loop=$count_ct}}
+                                                            <li class="nav-item {{if {{$count_ct[ct_idx]}} eq '1'}}active{{/if}}">
+                                                                <a class="nav-link fade in {{if {{$count_ct[ct_idx]}} eq '0'}}active{{/if}}" id="home-tab" data-toggle="tab" tabtype="main" href="#main_CT{{$count_ct[ct_idx]}}" json="data/{{$jobid}}/json/CT{{$count_ct[ct_idx]}}.json" root="#container-id-{{$count_ct[ct_idx]}}" role="tab" aria-controls="home" aria-selected="true">CT{{$count_ct[ct_idx]}}</a>
                                                             </li>
+															{{/section}}
+															
+                                                            
                                                         </ul>
-                                                        <div class="tab-content" id="myTabContent">
-														<div class="tab-pane active" id="main_CT1" role="tabpanel">
+                                                        <div class="tab-content" id="myTabContent">	
+														{{section name=ct_idx start=0 loop=$count_ct}}														
+															<div class="tab-pane {{if {{$count_ct[ct_idx]}} eq '1'}}active{{/if}}" id="main_CT{{$count_ct[ct_idx]}}" role="tabpanel">
 																<div class="flatPanel panel panel-default">
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=ct1.json" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=ct1.json">Open in new tab
+																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$count_ct[ct_idx]}}.json" target="_blank">
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$count_ct[ct_idx]}}.json">Open in new tab
                                                                         </button>
                                                                     </a>
 																				<div id="heatmap">
-																						<div id='container-id-11' style="height:95%;max-height:95%;max-width:100%;display:block">
+																						<div id='container-id-{{$count_ct[ct_idx]}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
 																					</div></div></div></div></div>
 
                                                             </div>	
-															<div class="tab-pane " id="main_CT2" role="tabpanel">
-																<div class="flatPanel panel panel-default">
-																			<div class="row" style="">
-																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=ct2.json" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=t2.json">Open in new tab
-                                                                        </button>
-                                                                    </a>
-																				<div id="heatmap">
-																						<div id='container-id-12' style="height:95%;max-height:95%;max-width:100%;display:block">
-																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div>
-
-                                                            </div>	
-															<div class="tab-pane " id="main_CT3" role="tabpanel">
-																<div class="flatPanel panel panel-default">
-																			<div class="row" style="">
-																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			
-																				<div id="heatmap">
-																						<div id='container-id-13' style="height:95%;max-height:95%;max-width:100%;display:block">
-																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div>
-
-                                                            </div>																
+															{{/section}}														
 															</div>
                                 </div>
                             </div>
@@ -178,30 +165,28 @@ console.log(flag)
                                                 <tbody>
                                                     <tr>
                                                         <td><strong>Predicted Cell Type</strong></td>
-                                                        <td>1</td>
-                                                        <td>2</td>
-                                                        <td>3</td>
-                                                        <td>4</td>
-                                                        <td>5</td>
-                                                        <td>6</td>
-                                                        <td>7</td>
+														{{section name=ct_idx start=0 loop=$count_ct}}
+															<td>{{$count_ct[ct_idx]}}</td>
+                                                        {{/section}}
+                                                    </tr>
+													<tr>
+													    <td><strong>Number of Predicted Cell Types</strong></td>
+                                                        <td>22</td>
+														<td>8</td>
+														<td>24</td>
+														<td>14</td>
+														<td>16</td>
+														<td>6</td>
                                                     </tr>
                                                     <tr>
-                                                        <td><strong>Cell Number</strong></td>
-                                                        <td>3</td>
-                                                        <td>3</td>
-                                                        <td>6</td>
-                                                        <td>12</td>
-                                                        <td>20</td>
-                                                        <td>16</td>
-                                                        <td>30</td>
+                                                        <td><strong>Number of Predicted Regulons</strong></td>
+														{{section name=num_regulon_in_ct start=0 loop=$count_regulon_in_ct}}
+															<td>{{$count_regulon_in_ct[num_regulon_in_ct]}}</td>
+                                                        {{/section}}
                                                     </tr>
                                                 </tbody>
-                                                <!--Table body-->
                                             </table>
-                                            <!--Table-->
-                                            <table id="tablePreview" class="table">
-                                                <!--Table head-->
+                                            <!--<table id="tablePreview" class="table">
                                                 <thead>
                                                     <tr>
                                                         <th>ARI</th>
@@ -218,8 +203,6 @@ console.log(flag)
                                                         <th>MCC</th>
                                                     </tr>
                                                 </thead>
-                                                <!--Table head-->
-                                                <!--Table body-->
                                                 <tbody>
                                                     <tr>
                                                         <td>0.6549</td>
@@ -236,18 +219,16 @@ console.log(flag)
                                                         <td>0.5</td>
                                                     </tr>
                                                 </tbody>
-                                                <!--Table body-->
-                                            </table>
+                                            </table>-->
                                             <div class="CT-result-img">
                                                 <div class="col-sm-12">
                                                     <h3 style="text-align:center">Silhoutte Score</h3>
                                                     <a href="data/{{$jobid}}/img/01.png" target="_blank"><img src="data/{{$jobid}}/img/01.png" style="margin:auto;display:block"></a>
                                                 </div>
-                                                <div class="col-sm-12">
+                                                <!--<div class="col-sm-12">
                                                     <h3 style="text-align:center">Sankey Plot</h3>
                                                     <div id="myDiv"></div>
-                                                    <!--<a href="data/{{$jobid}}/img/02.png" target="_blank"><img src="data/{{$jobid}}/img/02.png" style="margin:auto;display:block"></a> -->
-                                                </div>
+                                                    </div>-->
 
                                             </div>
                                         </div>
@@ -258,24 +239,22 @@ console.log(flag)
                                                     <div class="col-md-11">
                                                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                                                             <li class="nav-item active">
-                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#CT1" json="data/{{$jobid}}/mult_view1.json" root="#container-id-2" role="tab" aria-controls="home" aria-selected="true">CT1</a>
+                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#regulon-ct1" json="data/{{$jobid}}/mult_view1.json" root="#container-id-2" role="tab" aria-controls="home" aria-selected="true">CT1</a>
                                                             </li>
+															{{section name=ct_idx start=1 loop=$count_ct}}
                                                             <li class="nav-item">
-                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#CT2" json="data/{{$jobid}}/mult_view2.json" root="#container-id-3" role="tab" aria-controls="profile" aria-selected="false">CT2</a>
+                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#regulon-ct{{$count_ct[ct_idx]}}" json="data/{{$jobid}}/mult_view2.json" root="#container-id-3" role="tab" aria-controls="profile" aria-selected="false">CT{{$count_ct[ct_idx]}}</a>
                                                             </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#CT3" json="data/{{$jobid}}/mult_view3.json" root="#container-id-4" role="tab" aria-controls="contact" aria-selected="false">CT3</a>
-                                                            </li>
+                                                            {{/section}}
                                                         </ul>
                                                         <div class="tab-content" id="myTabContent">
-                                                            <div class="tab-pane active" id="CT1" role="tabpanel">
-
-																
+														 {{foreach from=$regulon_result item=label1 key=sec0}}
+                                                            <div class="tab-pane {{if $sec0 eq '0'}}active{{/if}}" id="regulon-ct{{$sec0+1}}" role="tabpanel">
 																<div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																		<a href="/iris3/data/20181124190953/20181124190953_CT_1_bic.regulon_genename.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/20181124190953/20181124190953_CT_1_bic.regulon_genename.txt">Download CT-1
+																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt" target="_blank">
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt">Download CT-{{$sec0+1}}
                                                                         </button>
                                                                     </a>
 																	<table id="motiftable" class="table table-striped table-bordered table-sm" cellpadding="0" cellspacing="0" width="100%">
@@ -287,12 +266,17 @@ console.log(flag)
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        {{section name=sec1 loop=$regulon_result}}
+                                                                        {{section name=sec1 loop=$regulon_result[$sec0]}}
                                                                         <tr>
-                                                                            <td style="width:260px">
+                                                                            <td style="width:300px">
                                                                                 <div class="col-sm-12">
-                                                                                    <span style="font-size:14pt;">Regulon-{{$regulon_result[sec1][0]}}</span><br>
+                                                                                    <span style="font-size:14pt;">CT{{$sec0+1}}S-R{{$regulon_result[$sec0][sec1][0]}}</span><br>
 																					<span><a href="motif_detail.php?jobid=20181124190953&id=1" target="_blank"><img src="data/{{$jobid}}/20181124190953Motif-1.png" style="margin:auto;display:block"></a></span>
+																					
+									 <button class="btn btn-light"> <a href="data/20181124190953/tomtom/ct1motif1/JASPAR/tomtom.html" target="_blank"><span class="glyphicon glyphicon-link"></span>JASPAR</a>
+									</button>
+                       <button class="btn btn-light"> <a href="data/20181124190953/tomtom/ct1motif1/HOCOMOCO/tomtom.html" target="_blank"><span class="glyphicon glyphicon-link"></span>HOCOMOCO</a>
+									</button>
                                                                                 </div>
                                                                             </td>
                                                                             <td>
@@ -302,34 +286,32 @@ console.log(flag)
 	                                 <tr>
 	                                      <td>Gene Symbol</td>
 	                                      <td>Gene ID</td>
-	                                      <td>Transcripts</td>
+	                                     
 	                                 </tr>
 	                                
-                                  {{section name=sec2 start=1 loop=$regulon_result[sec1]}}
+                                  {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
                                         
                                           <tr >
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[sec1][sec2]}}&nbsp;</a></td>
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
 										 
 										 
 																					
 																					
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_id_result[sec1][sec3]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[sec1][sec2]}}&nbsp;</a></td>
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
 										 
-                                         <td>Transcripts ID</td>
 										 {{/section}}
                                          </tr>
                                    
                                  </table>
 																					
-																					
-                                                                                </div>
+																				</div>
 
                                                                             </td>
                                                                         </tr>
 																		<tr >
 																		<td colspan=2>
 																						<div id="heatmap">
-																						<div id='container-id-2' style="height:95%;max-height:95%;max-width:100%;display:block">
+																						<div id='container-id-{{$sec0}}-1' style="max-width:100%;display:block">
 																						<h1 class='wait_message'>Loading heatmap ...</h1>
 																					</div></div>
 																					</td>
@@ -340,90 +322,18 @@ console.log(flag)
                                                                 </table>
 
 																					
-																					</div></div></div>
+																	</div></div></div>
 
                                                             </div>
-															<div class="tab-pane " id="CT2" role="tabpanel">
-
-																
-
-																<div class="flatPanel panel panel-default">
-																			<div class="row" >
-																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																		<a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-1
-                                                                        </button>
-                                                                    </a>
-																	<table id="motiftable" class="table table-striped table-bordered table-sm" cellpadding="0" cellspacing="0" width="100%">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Regulon</th>
-                                                                            <th>Gene</th>
-
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {{section name=sec1 loop=$regulon_result}}
-                                                                        <tr>
-                                                                            <td style="width:260px">
-                                                                                <div class="col-sm-12">
-                                                                                    <span style="font-size:14pt;">Regulon-{{$regulon_result[sec1][0]}}</span><br>
-																					<span style="font-size:14pt;">MotifLogo</span>
-                                                                                </div>
-                                                                            </td>
-                                                                            <td>
-
-                                                                                <div style="height:100px; overflow-x: scroll;overflow-y: scroll;width:100%; font-size:14px;">
-																				<!--Gene name: 
-                                                                                    {{section name=sec2 start=1 loop=$regulon_result[sec1]}}
-                                                                                    <a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[sec1][sec2]}}&nbsp;</a>{{/section}}
-																					<br>Gene ID:<br>Transcript: -->
-																					
-                                                                                </div>
-
-                                                                            </td>
-                                                                        </tr>
-																		<tr >
-																		<td colspan=2>
-																						<div id="heatmap">
-																						<div id='container-id-3' style="height:95%;max-height:95%;max-width:100%;display:block">
-																						<h1 class='wait_message'>Loading heatmap ...</h1>
-																					</div></div>
-																					</td>
-																		</tr>
-
-                                                                        {{/section}}
-                                                                    </tbody>
-                                                                </table>
-
-																					
-																					</div></div></div>
-
-                                                            </div>		
-															<div class="tab-pane " id="CT3" role="tabpanel">
+															
+                                                           {{/foreach}}
                                                                     
-																
-																<div class="flatPanel panel panel-default">
-																			<div class="row" style="">
-																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-1
-                                                                        </button>
-                                                                    </a>
-																				<div id="heatmap">
-																						<div id='container-id-4' style="height:95%;max-height:95%;max-width:100%;display:block">
-																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div>
-
                                                             </div>		
-                                                            
-															
-															
 															
 <!--                                                             <div class="tab-pane fade" id="CT2" role="tabpanel" aria-labelledby="profile-tab">
                                                                 <div class="result" border="1">
                                                                     <a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-2
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-2
                                                                         </button>
                                                                     </a>
                                                                 </div>
@@ -434,7 +344,7 @@ console.log(flag)
                                                             <div class="tab-pane fade" id="CT3" role="tabpanel" aria-labelledby="contact-tab">
                                                                 <div class="result" border="1">
                                                                     <a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-3
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-3
                                                                         </button>
                                                                     </a>
                                                                 </div>
@@ -456,23 +366,23 @@ console.log(flag)
                                             <div class="container">
                                                 <div class="row">
                                                     <div class="col-12 col-md-12">
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Download All Files
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Download All Files
                                                         </button>
                                                     </div>
                                                     <br>
                                                     <br>
                                                     <div class="col-12 col-md-12">
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Filtered Expression Matrix
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Filtered Expression Matrix
                                                         </button>
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Bicluster Matrices
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Bicluster Matrices
                                                         </button>
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">CTS-Biclusters
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">CTS-Biclusters
                                                         </button>
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Cell type prediction
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Cell type prediction
                                                         </button>
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">CTS-Regulon
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">CTS-Regulon
                                                         </button>
-                                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Final Report
+                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Final Report
                                                         </button>
                                                     </div>
                                                 </div>
@@ -483,6 +393,11 @@ console.log(flag)
                                 </div>
                             </div>
                         </div>
+                    </div>
+					
+					{{elseif $status==="404"}}
+					<div style="text-align: left;">
+                        <p>Job ID nout found</p>
                     </div>
                     {{else}} {{block name="meta"}}
                     <META HTTP-EQUIV="REFRESH" CONTENT="15"> {{/block}}
@@ -496,9 +411,7 @@ console.log(flag)
                             <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>15</b> seconds.
                             <br/> Link:&nbsp
                             <a href="{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}">http://http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
-                        <strong>We recommend you to cite the following papers:</strong>
-                        <p>paper 1</p>
-                        <p>paper 2</p>
+
                     </div>
                     {{/if}}
                 </div>
@@ -506,19 +419,19 @@ console.log(flag)
         </div>
     </div>
     <!-- Required JS Libraries -->
-    <script src="assest/js/d3.js"></script>
-    <script src="assest/js/underscore-min.js"></script>
+    <script src="assets/js/d3.js"></script>
+    <script src="assets/js/underscore-min.js"></script>
 
     <!-- Clustergrammer JS -->
-    <script src='assest/js/clustergrammer.js'></script>
+    <script src='assets/js/clustergrammer.js'></script>
 
     <!-- optional modules -->
-    <script src='assest/js/Enrichrgram.js'></script>
-    <script src='assest/js/hzome_functions.js'></script>
-    <script src='assest/js/send_to_Enrichr.js'></script>
+    <script src='assets/js/Enrichrgram.js'></script>
+    <script src='assets/js/hzome_functions.js'></script>
+    <script src='assets/js/send_to_Enrichr.js'></script>
 
     <!-- make clustergram -->
-    <script src='assest/js/load_clustergram.js'></script>
+    <script src='assets/js/load_clustergram.js'></script>
 
     <script>
         var data = {
