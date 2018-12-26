@@ -6,6 +6,7 @@
 #output:
 #1. jobid_gene_name.txt
 #2. jobid_CT_ClusterIndex_bic.txt
+
 library(tidyverse)
 library(rlist)
 args <- commandArgs(TRUE)
@@ -13,21 +14,16 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test2")
-# jobid <-2018122581354
-# expFile <- "2018122581354_filtered_expression.txt"
-# label_file <- "2018122581354_cell_label.txt"
-# label_file <- "iris3_example_expression_label.csv"
+#setwd("D:/Users/flyku/Documents/IRIS3-data/")
+# expFile <- "2018121644842_filtered_expression.txt"
+# jobid <- 2018121644842
+# label_file <- "2018121644842_cell_label.txt"
+
 #setwd("C:/Users/flyku/Desktop/iris3/data")
+conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
+gene_file <- read_delim(paste(jobid,"_blocks.gene.txt",sep = ""),delim=" ",col_names = F)[,-1]
 
-conds_file <- read.delim(paste(jobid,"_blocks.conds.txt",sep = ""),sep=" ",header = F)[,-1]
-gene_file <- read.delim(paste(jobid,"_blocks.gene.txt",sep = ""),sep=" ",header = F)[,-1]
-#conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
-#conds_file <- read_csv(paste(jobid,"_blocks.conds.txt",sep = ""),col_names = F)
-#gene_file <- read_delim(paste(jobid,"_blocks.gene.txt",sep = ""),delim=" ",col_names = F)[,-1]
-
-#cell_label <- read_delim("iris3_example_expression_label.csv",delim=",",col_names = T)
-cell_label <- read.table(label_file,sep="\t",header = T)
+cell_label <- read_delim(label_file,delim="\t",col_names = T)
 gene_expression <- read.table(expFile,sep="\t",header = T)
 gene_name <- rownames(gene_expression)
 write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names = F,col.names = F,quote = F)
@@ -95,7 +91,7 @@ get_bic_in_ct <- function(lis,num){
   }
 }
 total_bic <- 0
-#i=1;j=1
+#i=1;j=4
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
 uniq_li <- sapply(pv, get_bic_in_ct,num=j)
