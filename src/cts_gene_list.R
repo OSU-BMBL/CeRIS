@@ -36,7 +36,7 @@ write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names
 #  mutate(id=as.numeric(str_extract(id,"[0-9]+")))%>%
 #  select(conds,id)
   
-
+colnames(cell_label) <- c("cell","label")
 count_cluster <- length(levels(as.factor(cell_label$label)))
 
 #test
