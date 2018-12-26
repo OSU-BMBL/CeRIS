@@ -1,7 +1,7 @@
 $jobid = $ARGV[0];
 
 
-open CC,"/home/www/html/SeqTU_dev/data/".$jobid."/email.txt" or die "Can't open : $!";
+open CC,"/home/www/html/iris3/data/".$jobid."/email.txt" or die "Can't open : $!";
 $line_email = <CC>;
 chomp($line_email);
 close(CC);
@@ -27,7 +27,7 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 <tr>
 <td class='h1' style='padding: 5px 0 0 0;'><br />
 <div>
-<div><span>Your SeqTU job is done.<br /><br /></span><span>Your email: $line_email </span></div>
+<div><span>Your IRIS3 job is done.<br /><br /></span><span>Your email: $line_email </span></div>
 </div>
 </td>
 </tr>
@@ -74,10 +74,10 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 <table style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;' border='0' cellspacing='0' cellpadding='0'>
 <tbody>
 <tr>
-<td class='content-block' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><span>Copyright 2018 &copy; </span><a href='http://prod.sdstate.edu/agronomy-horticulture-and-plant-science/bioinformatics-and-mathematical-biosciences-lab' target='_blank' rel='noopener'>BMBL</a><span>, </span><a href='http://prod.sdstate.edu/' target='_blank' rel='noopener'>SDSU</a><span>. All rights reserved. </span></td>
+<td class='content-block' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><span>Copyright 2018 &copy; </span><a href='https://www.sdstate.edu/agronomy-horticulture-plant-science/bioinformatics-and-mathematical-biosciences-lab' target='_blank' rel='noopener'>BMBL</a><span>, </span><a href='http://prod.sdstate.edu/' target='_blank' rel='noopener'>SDSU</a><span>. All rights reserved. </span></td>
 </tr>
 <tr>
-<td class='content-block powered-by' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><a href='mailto:qin.ma\@sdstate.edu' title='qin.ma\@sdstate.edu'>Contact us: qin.ma\@sdstate.edu</a><span> </span></td>
+<td class='content-block powered-by' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><a href='mailto:bmbl.qinma\@gmail.com' title='bmbl.qinma\@gmail.com'>Contact us: bmbl.qinma\@gmail.com</a><span> </span></td>
 </tr>
 </tbody>
 </table>
@@ -93,4 +93,4 @@ open CA,">$message_file";
 print CA "$email_content";
 close CA;
 
-system("perl /home/www/html/iris3/program/sent_mail.pl $jobid $email $message_file");
+system("perl /home/www/html/iris3/program/send_email.pl $jobid $line_email $message_file");

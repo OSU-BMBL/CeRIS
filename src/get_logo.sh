@@ -15,7 +15,7 @@ do
     sleep 1
 	done
 	
-	perl /home/www/html/iris3/program/dminda/motif_tools/split_multifasta.pl -i $file -o $dir\/logo_tmp &
+	perl /home/www/html/iris3/program/dminda/motif_tools/split_multifasta.pl -i $file -o $dir\/logo &
 done
 wait
 
