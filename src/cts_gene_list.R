@@ -13,11 +13,10 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test2")
-# jobid <-2018122581354
-# expFile <- "2018122581354_filtered_expression.txt"
-# label_file <- "2018122581354_cell_label.txt"
-# label_file <- "iris3_example_expression_label.csv"
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test3")
+# jobid <-2018122612831
+# expFile <- "2018122612831_filtered_expression.txt"
+# label_file <- "2018122612831_cell_label.txt"
 #setwd("C:/Users/flyku/Desktop/iris3/data")
 
 conds_file <- read.delim(paste(jobid,"_blocks.conds.txt",sep = ""),sep=" ",header = F)[,-1]
@@ -25,7 +24,7 @@ gene_file <- read.delim(paste(jobid,"_blocks.gene.txt",sep = ""),sep=" ",header 
 #conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
 #conds_file <- read_csv(paste(jobid,"_blocks.conds.txt",sep = ""),col_names = F)
 #gene_file <- read_delim(paste(jobid,"_blocks.gene.txt",sep = ""),delim=" ",col_names = F)[,-1]
-
+conds_file <- conds_file[!apply(conds_file == "", 1, all),]
 #cell_label <- read_delim("iris3_example_expression_label.csv",delim=",",col_names = T)
 cell_label <- read.table(label_file,sep="\t",header = T)
 gene_expression <- read.table(expFile,sep="\t",header = T)
@@ -95,7 +94,7 @@ get_bic_in_ct <- function(lis,num){
   }
 }
 total_bic <- 0
-#i=1;j=1
+#i=1;j=3
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
 uniq_li <- sapply(pv, get_bic_in_ct,num=j)
@@ -106,7 +105,7 @@ uniq_li <- sapply(pv, get_bic_in_ct,num=j)
 #  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
 
 names(uniq_li) <- seq_along(uniq_li) #preserve index of the non-null values
-uniq_li <- compact(uniq_li)
+uniq_li <- compact(unlist(uniq_li))
 
 uniq_bic <- gene_file[names(uniq_li),]%>%
   t%>%
@@ -120,8 +119,7 @@ pvalue_df <- unlist(sapply(pv, get_pvalue_df,num=j))
 
 li <- sapply(pv, get_bic_in_ct,num=j)
 names(li) <- seq_along(li) #preserve index of the non-null values
-li <- compact(li)
-
+li <- compact(unlist(li))
 gene_bic <- gene_file[names(li),]%>%
   t%>%
   as.data.frame()
