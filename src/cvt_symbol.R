@@ -17,11 +17,10 @@ srcDir <- args[1]
 expName <- args[2]
 setwd(srcDir)
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test2")
-# jobid <-2018122581354
-# label_file <- "2018122581354_cell_label.txt"
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test3")
+# jobid <-2018122612831
 #  srcDir <-  getwd()
-#expName <- "2018122581354_filtered_expression.txt"
+#expName <- "2018122612831_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
 
