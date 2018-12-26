@@ -57,14 +57,14 @@ for (i in 1:length(all_regulon)) {
     
     ct_index <- gsub(".*_CT_","",short_dir[i])
     ct_index <- as.numeric(gsub("_bic","",ct_index))
-    regulon_label <- paste("CT",ct_index,"Regulon",name_idx,": ",sep = "")
+    regulon_label <- paste("CT",ct_index,"S-R",name_idx,": ",sep = "")
     ct_colnames <- label_file[which(label_file[,2]==ct_index),1]
     regulon_heat_matrix <- regulon_heat_matrix[,colnames(regulon_heat_matrix) %in% ct_colnames]
-    #rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
+    rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
     rownames(regulon_heat_matrix)[1] <- ""
-    #colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
-    #write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
-    #write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=F,row.names = F)
+    colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
+    write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
+    write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=F,row.names = F)
     #save regulon label to one list
     combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
     names(combine_regulon_label)[regulon_label_index] <- regulon_label
@@ -94,14 +94,15 @@ for(i in 1: length(unique(label_file[,2]))){
   gene_row <- unique(gene_row)
   file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),]
   file_heat_matrix <- rbind(category,file_heat_matrix)
-  for (j in length(combine_regulon_label):1) {
+  for (j in 1:length(combine_regulon_label)) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
       regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(file_heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
       #print(regulon_label_col)
       #regulon_label_col[1,1] <- ""
       file_heat_matrix <- cbind(regulon_label_col,file_heat_matrix)
       k <- k + 1
-      if(k>15){
+      if(k>=15){
+        #file_heat_matrix <- file_heat_matrix[,-15]
         break
       }
     }
