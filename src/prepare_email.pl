@@ -59,10 +59,8 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 </tr>
 </tbody>
 </table>
-<p>We also recommend you to cite the following papers:</p>
-<ul>
-<li><p>paper link 1</p></li>
-</ul>
+
+
 </td>
 </tr>
 </tbody>
