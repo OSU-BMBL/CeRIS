@@ -25,8 +25,8 @@ label_file <- args[3] # user label or empty string
 delimiter <- args[4] #delimiter
 ###test
 # setwd("D:/Users/flyku/Documents/IRIS3-R/data")
-# expFile <- "1103_filtered_expression.txt"
-# jobid <- 1103
+# expFile <- "2018122223516_filtered_expression.txt"
+# jobid <- 2018122223516
 # label_file <- "iris3_example_expression_label.csv" #set empty 
 # delimiter <- ","
 
@@ -62,6 +62,7 @@ sce <- sc3_calc_consens(sce)
 # silh stores the bar width
 # modify k to the number of cluster
 silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
+apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
 
 a <- as.data.frame(colData(sce))
 a <- cbind(rownames(a),a[,ncol(a)])
