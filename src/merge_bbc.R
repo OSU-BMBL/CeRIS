@@ -24,7 +24,9 @@ count_num_regulon<-0
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
   res_symbol<- paste(short_dir[i],".regulon_gene_name.txt",sep="")
+  res_motif<- paste(short_dir[i],".regulon_motif.txt",sep="")
   cat("",file=res)
+  this_ct <- i
   
   cluster_filename <- paste("./bg.BBC/bg.",short_dir[i],".bbc.txt.MC",sep="")
   motif_filename <- paste(short_dir[i],".motifgene.txt",sep="")
@@ -33,6 +35,7 @@ for (i in 1:length(alldir)) {
   cluster_file <- read.table(cluster_filename,sep = "\t",header = T)
   sequence_file <- read.fasta(sequence_filename,as.string = T)
   cat("",file=res_symbol)
+  cat("",file=res_motif)
   regulon_idx <- 1
   for (j in 1:max(cluster_file[,3])) {
     motif_num <- as.character(cluster_file[which(cluster_file[,3] == j),1])
@@ -40,7 +43,7 @@ for (i in 1:length(alldir)) {
     sequence_info <- character()
     genes_num <- vector()
     idx <- 1
-    #k= 'bic1.txt.fa.closures-4'
+    #k= 'bic1.txt.fa.closures-1'
     for (k in motif_num) {
       genes_num <- c(genes_num,which(as.character(motif_file[,1]) == k))
       sequence_info_tmp <-as.character(sequence_file[names(sequence_file) %in% motif_num][idx])
@@ -52,6 +55,12 @@ for (i in 1:length(alldir)) {
     #write.table(sequence_info,sequence_out_name,col.names = F,row.names = F,quote = F)
     
     genes <- motif_file[genes_num,2]
+    this_motifs <- motif_file[genes_num,1]
+    this_motifs <- as.character(this_motifs[!duplicated(this_motifs)])
+    this_bic <- gsub("bic","",this_motifs[1])
+    this_bic <- gsub(".txt.fa.*","",this_bic)
+    this_id <- gsub(".*closures-","",this_motifs[1])
+    
     genes <- as.character(genes[!duplicated(genes)])
     if(length(genes) > 100) {
       next
@@ -59,6 +68,12 @@ for (i in 1:length(alldir)) {
     cat(paste(regulon_idx,"\t",sep = ""),file=res,append = T)
     cat(genes,file=res,sep = "\t",append = T)
     cat("\n",file=res,append = T)
+    
+    cat(paste(regulon_idx,"\t",sep = ""),file=res_motif,append = T)
+    cat(paste(this_ct,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
+    cat(paste(this_bic,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
+    cat(paste(this_id,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
+    cat("\n",file=res_motif,append = T)
     
     cat(paste(regulon_idx,"\t",sep = ""),file=res_symbol,append = T)
     cat(as.character(gene_id_name[which(gene_id_name[,1] %in% genes),2]),file=res_symbol,sep = "\t",append = T)
