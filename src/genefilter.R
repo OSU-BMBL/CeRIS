@@ -8,6 +8,7 @@ args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
 delim <- args[3] #delimiter
+is_filter <- args[4] #1 for enable filter
 if(delim == 'tab'){
 	delim <- '\t'
 }
@@ -32,7 +33,12 @@ filter_func <- function(this){
 }
 
 new_yan_index <- as.vector(apply(yan.test, 1, filter_func))
-new_yan <- yan.test[which(new_yan_index == 1),]
+if(is_filter == '1'){
+  new_yan <- yan.test[which(new_yan_index == 1),]
+} else{
+  new_yan <- yan.test
+}
+
 
 new_yan <- log1p(new_yan)
 filter_num <- nrow(yan.test)-nrow(new_yan)
