@@ -6,7 +6,7 @@ require("config/smarty.php");
 
 $smarty->caching = true;
 $smarty->assign('section', 'Homepage');
-
+session_start();
 /*function detectDelimiter($fh)
 {
     $delimiters = [",", ";", "|", "tab", " "];
@@ -63,11 +63,18 @@ if (isset($_POST['submit']))
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
 	$bic_inference = $_POST['bicluster_inference'];
-	if($bic_inference=='1'){
-		$labelfile='';
+	$len = strlen($labelfile);
+	if($bic_inference=='1' && strlen($labelfile) > 0){#have label use sc3
+		$label_use_sc3 = '1';
+	} else if ($bic_inference=='2' && strlen($labelfile) > 0){ # have label use label
+		$label_use_sc3 = '2';
+	} else { #no label use sc3
+		$label_use_sc3 = '0';
 	}
+	
+	
 $fp = fopen("$workdir/info.txt", 'w');
-fwrite($fp,"$bic_inference");
+fwrite($fp,"$bic_inference\t$len\t$labelfile");
 fclose($fp);
 		
 	system("touch $workdir/email.txt");
@@ -101,7 +108,7 @@ fclose($fp);
     system("cp $workdir2$expfile /home/www/html/iris3/storage");
 }
 
-	if ($labelfile){
+if ($labelfile){
 fwrite($fp,"#!/bin/bash\n 
 #User uploaded cell label
 wd=/home/www/html/iris3/data/$jobid/
@@ -120,8 +127,8 @@ for file in *blocks
 do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
-Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label\n
-Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label
+Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label \n
+Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n 
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
@@ -136,6 +143,10 @@ Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length
 Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid
 mkdir json
 /home/www/html/iris3/program/build_clustergrammar.sh \$wd
+mkdir tomtom\n
+mkdir logo_tmp\n
+mkdir logo\n
+/home/www/html/iris3/program/get_logo.sh \$wd
 touch done\n 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 
@@ -176,8 +187,12 @@ Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
 Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid
 mkdir json
 /home/www/html/iris3/program/build_clustergrammar.sh \$wd
-touch done\n 
+mkdir tomtom\n
+mkdir logo_tmp\n
+mkdir logo\n
+/home/www/html/iris3/program/get_logo.sh \$wd
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
+touch done\n 
 ");}
 	fclose($fp);
 	session_destroy();

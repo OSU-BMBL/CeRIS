@@ -29,7 +29,7 @@ Version: 1.0
 
 .slide-bg-one {
     /*background: rgba(255, 255, 255, 1)  scroll center center / cover;*/
-	background: rgba(0, 0, 0, 0) url("assest/img/bg.png") scroll center center / cover;
+	background: rgba(0, 0, 0, 0) url("assets/img/bg.webp") scroll center center / cover;
 }
 
 
@@ -49,7 +49,7 @@ Version: 1.0
 }
 
 .features-box-icon {
-    background: #d3ffea none repeat scroll 0 0;
+    background: #00AA90 none repeat scroll 0 0;
     border-radius: 5px;
     color: #31dc89;
     height: 70px;
@@ -64,7 +64,7 @@ Version: 1.0
 ----------------------------------*/
 
 .fun-fact-area .area-bg {
-    background: rgba(0, 0, 0, 0) url("assest/img/fact-bg.jpg") no-repeat scroll center center / cover;
+    background: rgba(0, 0, 0, 0) url("assets/img/fact-bg.jpg") no-repeat scroll center center / cover;
 }
 
 .fun-fact-area .area-bg::after {
@@ -84,9 +84,9 @@ Version: 1.0
 }
 
 a.enroll-button {
-    background: #d3ffea none repeat scroll 0 0;
+    background: #00AA90 none repeat scroll 0 0;
     border-radius: 50px;
-    color: black;
+    color: #fff;
     padding: 10px 15px;
     text-transform: capitalize;
 }
@@ -440,7 +440,7 @@ a.enroll-button:hover {
 }
 
 .subscriber-form button {
-    background: #d3ffea none repeat scroll 0 0;
+    background: #00AA90 none repeat scroll 0 0;
     border: 0 none;
     border-radius: 0 50px 50px 0;
     color: #171932;
@@ -520,11 +520,5 @@ label.mt10.valid {
 	opacity: 0 !important;
 }
 
-/*.opacity_slider_container{
-	opacity: 0 !important;
-}*
-.div_filters{
-	opacity: 0 !important;
-	
-}
+
 	

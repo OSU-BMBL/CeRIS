@@ -10,7 +10,6 @@ $log1="";
 $log2="";
 $log="";
 $status="";
-session_start();
 #$info = Spyc::YAMLLoad("$DATAPATH/$jobid/info.yaml");
 $status= $info['status'];
 
@@ -31,6 +30,11 @@ foreach (glob("$DATAPATH/$jobid/*_bic.regulon_gene_name.txt") as $file) {
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon.txt") as $file) {
 	
   $regulon_id_file[] = $file;
+}
+
+foreach (glob("$DATAPATH/$jobid/*_bic.regulon_motif.txt") as $file) {
+	
+  $regulon_motif_file[] = $file;
 }
 
 $count_ct = range(1,count($regulon_gene_name_file));
@@ -55,6 +59,8 @@ if ($info_file) {
 			$total_ct = $split_line[1];
 		} else if($split_line[0] == "total_regulon"){
 			$total_regulon = $split_line[1];
+		} else if($split_line[0] == "is_evaluation"){
+			$is_evaluation = $split_line[1];
 		}
     }
 
@@ -64,6 +70,51 @@ if ($info_file) {
     // error opening the file.
 } 
 
+$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
+if ($sankey_file) {
+	$sankey_nodes = $sankey_src = $sankey_target = $sankey_value = array(); 
+    while (($line = fgets($sankey_file)) !== false) {
+        $split_line = explode (",", $line);
+		$split_line[1] = preg_replace( "/\r|\n/", "", $split_line[1] );
+		if($split_line[0] == "src"){
+			array_push($sankey_src,$split_line[1]);
+		} else if($split_line[0] == "target"){
+			array_push($sankey_target,$split_line[1]);
+		} else if($split_line[0] == "value"){
+			array_push($sankey_value,$split_line[1]);
+		} else if($split_line[0] == "nodes"){
+			array_push($sankey_nodes,$split_line[1]);
+		}
+    }
+    fclose($sankey_file);
+	$sankey_src = json_encode($sankey_src);
+	$sankey_target = json_encode($sankey_target);
+	$sankey_value = json_encode($sankey_value);
+	$sankey_nodes = json_encode($sankey_nodes);
+} else {
+	print_r("Info file not found");
+    // error opening the file.
+} 
+$count_silh = 1;
+$silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
+if ($silh_file) {
+	$silh_trace = $silh_x = $silh_y  = array(); 
+    while (($line = fgets($silh_file)) !== false) {
+        $split_line = explode (",", $line);
+		$split_line[2] = preg_replace( "/\r|\n/", "", $split_line[2] );
+		array_push($silh_trace,$split_line[0]);
+		array_push($silh_x,$count_silh);
+		array_push($silh_y,$split_line[2]);
+		$count_silh++;
+    }
+    fclose($silh_file);
+	$silh_trace = json_encode($silh_trace);
+	$silh_x = json_encode($silh_x);
+	$silh_y = json_encode($silh_y);
+} else {
+	print_r("Info file not found");
+    // error opening the file.
+} 
 foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 	
 	$status = "1";
@@ -82,6 +133,7 @@ foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 	fclose($fp);
 	
 	}
+	
 foreach ($regulon_id_file as $key=>$this_regulon_id_file){
 	
 	$status = "1";
@@ -95,7 +147,20 @@ foreach ($regulon_id_file as $key=>$this_regulon_id_file){
 	}
 	fclose($fp);
 	}
+	
+foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
+	
+	$status = "1";
 
+	$fp = fopen("$this_regulon_motif_file", 'r');
+	if ($fp){
+	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
+		if ($line) {$regulon_motif_result[$key][] = array_map('trim',$line);}
+	} else{
+		die("Unable to open file");
+	}
+	fclose($fp);
+	}
 
 }else if (!file_exists($tempnam)) {
 	$status= "404";
@@ -126,9 +191,17 @@ $smarty->assign('jobid',$jobid);
 $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
 $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
+$smarty->assign('regulon_motif_result',$regulon_motif_result);
 $smarty->assign('big',$big);
 $smarty->assign('annotation', $annotation1);
 $smarty->assign('LINKPATH', $LINKPATH);
+$smarty->assign('silh_trace',$silh_trace);
+$smarty->assign('silh_y',$silh_y);
+$smarty->assign('silh_x',$silh_x);
+$smarty->assign('sankey_src',$sankey_src);
+$smarty->assign('sankey_target',$sankey_target);
+$smarty->assign('sankey_value', $sankey_value);
+$smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->display('results.tpl');
 
 ?>
