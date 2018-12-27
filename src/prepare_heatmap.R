@@ -28,7 +28,7 @@ short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T)
 exp_file <- log1p(exp_file) - log1p(rowMeans(exp_file))
 
 i=j=k=1
-
+#i=4
 
 combine_regulon_label<-list()
 
@@ -47,7 +47,7 @@ for (i in 1:length(all_regulon)) {
     
     regulon_gene_name <- as.character(unlist(regulon_file[j,]))
     regulon_gene_name <- regulon_gene_name[regulon_gene_name!=""]
-    if(length(regulon_gene_name)>100){
+    if(length(regulon_gene_name)>100 | length(regulon_gene_name) <1){
       next
     }
     
@@ -64,7 +64,6 @@ for (i in 1:length(all_regulon)) {
     rownames(regulon_heat_matrix)[1] <- ""
     colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
     write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
-    write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=F,row.names = F)
     #save regulon label to one list
     combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
     names(combine_regulon_label)[regulon_label_index] <- regulon_label
@@ -85,10 +84,24 @@ rownames(heat_matrix)[1] <- ""
 # get CT#-regulon1-# heat matrix
 for(i in 1: length(unique(label_file[,2]))){
   gene_row <- character()
+  this_total_regulon <- 0
   for (m in length(combine_regulon_label):1) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[m]), "\\D+")[[1]][-1])[1]){
-      gene_row <- append(gene_row,as.character(unlist(combine_regulon_label[m])))
+      
+      this_regulon_num <- as.numeric(strsplit(names(combine_regulon_label[m]), "\\D+")[[1]][-1])[2]
+      if (this_regulon_num > this_total_regulon) {
+        this_total_regulon <- this_regulon_num
+      }
     }
+  }
+  if (this_total_regulon >=15) {
+    max_show <- 15
+  } else {
+    max_show <- this_total_regulon
+  }
+  for (j in 1:max_show) {
+    this_regulon_name <- paste("CT",i,"S-R",j,": ",sep = "")
+    gene_row <- append(gene_row,as.character(unlist(combine_regulon_label[which(names(combine_regulon_label) == this_regulon_name)])))
   }
   k=0
   gene_row <- unique(gene_row)
