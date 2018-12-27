@@ -93,7 +93,7 @@ get_bic_in_ct <- function(lis,num){
     }
   }
 }
-total_bic <- 0
+total_bic <- nrow(conds_file)-1
 #i=1;j=3
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
