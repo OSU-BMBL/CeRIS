@@ -62,23 +62,28 @@ for (i in 1:length(alldir)) {
     this_id <- gsub(".*closures-","",this_motifs[1])
     
     genes <- as.character(genes[!duplicated(genes)])
-    if(length(genes) > 100) {
+    if(length(genes) > 100 | length(genes)<=1) {
       next
     }
-    cat(paste(regulon_idx,"\t",sep = ""),file=res,append = T)
-    cat(genes,file=res,sep = "\t",append = T)
-    cat("\n",file=res,append = T)
     
-    cat(paste(regulon_idx,"\t",sep = ""),file=res_motif,append = T)
+    regulon_idx_label <- paste("CT",i,"S-R",regulon_idx,sep = "")
+    cat(paste(regulon_idx_label,"\t",sep = ""),file=res_motif,append = T)
     cat(paste(this_ct,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
     cat(paste(this_bic,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
     cat(paste(this_id,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
     cat("\n",file=res_motif,append = T)
     
-    cat(paste(regulon_idx,"\t",sep = ""),file=res_symbol,append = T)
+    cat(paste(regulon_idx_label,"\t",sep = ""),file=res_symbol,append = T)
     cat(as.character(gene_id_name[which(gene_id_name[,1] %in% genes),2]),file=res_symbol,sep = "\t",append = T)
     cat("\n",file=res_symbol,append = T)
+    
+    cat(paste(regulon_idx_label,"\t",sep = ""),file=res,append = T)
+    cat(as.character(gene_id_name[which(gene_id_name[,1] %in% genes),1]),file=res,sep = "\t",append = T)
+    cat("\n",file=res,append = T)
+    
+    
     regulon_idx <- regulon_idx + 1
+    
   }
   count_num_regulon <- count_num_regulon + regulon_idx
 }
