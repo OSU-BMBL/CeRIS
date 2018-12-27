@@ -64,8 +64,8 @@ sce <- sc3_calc_consens(sce)
 # modify k to the number of cluster
 silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
 #silh[,2] = seq(1:nrow(silh))
-silh[,2] =  cell_info
-silh_out <- cbind(silh[,1],cell_info,silh[,3])
+silh[,2] =  cell_info[,1]
+silh_out <- cbind(silh[,1],silh[,2],silh[,3])
 silh_out <- silh_out[order(silh[,1]),]
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
 #apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
