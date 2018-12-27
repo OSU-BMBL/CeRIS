@@ -33,14 +33,13 @@ do
     sleep 1
 	done
 	
-	#echo $(basename $file);
-	 perl /home/www/html/iris3/program/dminda/motif_tools/align2uniprobe.pl $file | perl /home/www/html/iris3/program/dminda/motif_tools/uniprobe2meme > $file.meme &
-mkdir tomtom/$(basename $file)
-mkdir tomtom/$(basename $file)/HOCOMOCO
-mkdir tomtom/$(basename $file)/JASPAR
-/home/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename $file)/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /home/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /home/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &
+	perl /home/www/html/iris3/program/dminda/motif_tools/align2uniprobe.pl $file | perl /home/www/html/iris3/program/dminda/motif_tools/uniprobe2meme > $file.meme &
+#mkdir tomtom/$(basename $file)
+#mkdir tomtom/$(basename $file)/HOCOMOCO
+#mkdir tomtom/$(basename $file)/JASPAR
+#/home/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename $file)/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /home/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /home/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme 
 
-/home/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename $file)/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /home/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /home/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme &
+#/home/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename $file)/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /home/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /home/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme 
 tail -n +2 $file > $file.logo.fa &
 perl /home/www/html/bobro2/program/script/weblogo/seqlogo -F PNG -a -n -Y -k 1 -c  -f $file.logo.fa > $file.png &
 
