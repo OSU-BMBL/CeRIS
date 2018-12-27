@@ -147,7 +147,7 @@ for (i in 1:ncol(gene_bic)) {
 ncol(gene_overlap)
 colnames(gene_overlap) <- c("geneid",colnames(gene_bic))
 gene_overlap[,"weight"] <- rowSums(as.data.frame(gene_overlap[,-1]))
-total_bic <- total_bic + ncol(gene_bic)
+#total_bic <- total_bic + ncol(gene_bic) #total gene modules
 write.table(gene_bic,paste(jobid,"_CT_",j,"_bic.txt",sep = ""),sep="\t",row.names = F,col.names = T,na = "",quote = F)
 #write.table(gene_overlap,paste("gene_overlap",j,".txt",sep = ""),row.names = F,col.names = T,quote = F)
 }
