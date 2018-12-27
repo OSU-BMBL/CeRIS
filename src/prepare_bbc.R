@@ -5,7 +5,9 @@ library(stringr)
 library(tidyverse)
 
 args <- commandArgs(TRUE)
-
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+#srcDir <- getwd()
+#jobid <-2018122223516 
 srcDir <- args[1]
 setwd(srcDir)
 getwd()
@@ -13,7 +15,7 @@ workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
 
-
+#convert_motif(all_closure[1])
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
@@ -24,9 +26,9 @@ convert_motif <- function(filepath){
   close(motif_file)
   return(df)
 }
-i=1
-j=1
-  
+#i=1
+#j=1
+#info = "bic1.txt.fa.closures-1"  
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
@@ -47,7 +49,11 @@ for (i in 1:length(alldir)) {
     cat("", file=res)
     for (info in levels(combined_seq[,1])) {
       cat(paste(">",as.character(info),sep=""), file=res,sep="\n",append = T)
-      sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])
+      if (length(as.character(combined_seq[which(combined_seq[,1]== info),2])) >= 100) {
+        sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])[1:99]
+      } else {
+        sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])
+      }
       cat(sequence, file=res,sep="\n",append = T)
     }
   }
