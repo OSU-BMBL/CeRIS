@@ -25,7 +25,8 @@ label_file <- read.table(all_label,header = T)
 exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
 
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
-exp_file <- log1p(exp_file) - log1p(rowMeans(exp_file))
+exp_file <- log1p(exp_file)
+exp_file <- exp_file - rowMeans(exp_file)
 
 i=j=k=1
 #i=4
@@ -37,7 +38,7 @@ regulon_gene <- data.frame()
 regulon_label_index <- 1
 category <- paste("Cell Type:",paste("_",label_file[,2],"_",sep=""),sep = " ")
 for (i in 1:length(all_regulon)) {
-  regulon_file <- read.table(all_regulon[i],header = F,fill = T,row.names = 1)
+  regulon_file <- read.table(all_regulon[i],header = F,fill = T,row.names = NULL)[-1]
   gene <- as.character(sapply(regulon_file, as.character))
   gene <- unique(gene[gene!=""])
   regulon_gene <- rbind(regulon_gene,as.data.frame(gene))
