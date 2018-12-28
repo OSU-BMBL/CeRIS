@@ -19,7 +19,7 @@ alldir <- list.dirs(path = workdir)
 alldir <- grep("*_bic$",alldir,value=T)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
-#i=j=k=m=1
+#i=j=k=m=3
 count_num_regulon<-0
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
@@ -56,11 +56,12 @@ for (i in 1:length(alldir)) {
     
     genes <- motif_file[genes_num,2]
     this_motifs <- motif_file[genes_num,1]
-    this_motifs <- as.character(this_motifs[!duplicated(this_motifs)])
-    this_bic <- gsub("bic","",this_motifs[1])
+    #this_motifs <- as.character(this_motifs[!duplicated(this_motifs)])
+    this_bic <- gsub("bic","",this_motifs)
     this_bic <- gsub(".txt.fa.*","",this_bic)
-    this_id <- gsub(".*closures-","",this_motifs[1])
-    
+    this_id <- gsub(".*closures-","",this_motifs)
+    this_motif_label <- paste(this_ct,this_bic,this_id,sep = ",")
+    this_motif_label <- unique(this_motif_label)
     genes <- as.character(genes[!duplicated(genes)])
     if(length(genes) > 100 | length(genes)<=1) {
       next
@@ -68,9 +69,17 @@ for (i in 1:length(alldir)) {
     
     regulon_idx_label <- paste("CT",i,"S-R",regulon_idx,sep = "")
     cat(paste(regulon_idx_label,"\t",sep = ""),file=res_motif,append = T)
-    cat(paste(this_ct,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
-    cat(paste(this_bic,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
-    cat(paste(this_id,"\t",sep = ""),file=res_motif,sep = "\t",append = T)
+    this_combine_motif_label  <- paste(this_motif_label,"\t",sep = "")
+    if (length(this_combine_motif_label) > 1) {
+      this_last_label <- gsub("\t","",this_combine_motif_label[length(this_combine_motif_label)])
+      cat(this_combine_motif_label[-length(this_combine_motif_label)],file=res_motif,sep = "",append = T)
+      cat(this_last_label,file=res_motif,sep = "\t",append = T)
+      
+    } else{
+      this_last_label <- gsub("\t","",this_combine_motif_label[length(this_combine_motif_label)])
+      cat(this_last_label,file=res_motif,sep = "\t",append = T)
+    }
+
     cat("\n",file=res_motif,append = T)
     
     cat(paste(regulon_idx_label,"\t",sep = ""),file=res_symbol,append = T)
