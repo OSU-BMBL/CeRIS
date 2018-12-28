@@ -32,10 +32,8 @@ $(document).ready(function () {
     <!-- Required JS Libraries -->
     <script src="assets/js/d3.js"></script>
     <script src="assets/js/underscore-min.js"></script>
-
     <!-- Clustergrammer JS -->
     <script src='assets/js/clustergrammer.js'></script>
-
     <!-- optional modules -->
     <script src='assets/js/Enrichrgram.js'></script>
     <script src='assets/js/hzome_functions.js'></script>

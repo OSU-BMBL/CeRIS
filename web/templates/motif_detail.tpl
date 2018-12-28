@@ -68,7 +68,7 @@
         <div class="container">
             <br/>
             <div class="flatPanel panel panel-default">
-                <div class="flatPanel panel-heading"><strong>Job ID: 20181124190953</strong></div>
+                <div class="flatPanel panel-heading"><strong>Job ID: {{$jobid}}</strong></div>
                 <div class="panel-body">
   <form id="frm1" name="form">
       <div class="section2">
@@ -89,21 +89,17 @@
 			
                 <tr  align="middle">
                 <td>
-                {{$ann[sec1].Motifname}}
-                {{if $from == "ref"}}
-                  <img onerror="this.src='data/{{$jobid}}/{{$jobid}}{{$ann[sec1].Motifname}}.png'; "src="data/{{$jobid}}/output/{{$ann[sec1].Motifname}}.png"/>
-                 {{elseif $from == "mp3"}}
-                      <img onerror="this.src='data/{{$jobid}}/{{$ann[sec1].Motifname}}.png'; "src="data/{{$jobid}}/{{$ann[sec1].Motifname}}.png"/>
-                 {{else}}
-                <img onerror="this.src='data/{{$jobid}}/{{$jobid}}{{$ann[sec1].Motifname}}.png'; "src="data/{{$jobid}}/{{$jobid}}{{$ann[sec1].Motifname}}.png"/>
-                 {{/if}}
+                
+                
+                <img onerror="this.src='data/{{$jobid}}/logo/{{$ann[sec1].Motifname}}.fsa.png'; "src="data/{{$jobid}}/logo/{{$ann[sec1].Motifname}}.fsa.png"/>
+                 
                 </td>
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].Motiflength}}</td>
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].MotifPvalue}}</td>
                 <td><br/><br/><br/><br/><br/>{{$ann[sec1].Motifnumber}}</td> 
                 <td align="left" >   <br/>
-                                  <div style="width:550px;">
-                                  <table class="table table-bordered">
+                                  <div style="width:600px;">
+                                  <table class="table table-bordered" style="display: inline-block; overflow-y: scroll;max-height:400px;">
 	                                 <tr>
 	                                      <td>Seq</td>
 	                                      <td>Start</td>

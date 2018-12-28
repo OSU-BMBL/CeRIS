@@ -9,12 +9,16 @@
 <!-- OR an un-minified version is also available -->
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
 <script>
+var flag = [];
 $(document).ready(function () {
 
-	  var flag = [];
-	  	make_clust_main('data/20181222151846/json/CT1.json','#container-id-1');
+$("#to_enrichr").click(function (){
+                   get_gene_list(1,2);
+            });
+	  
+	  	make_clust_main('data/{{$jobid}}/json/CT1.json','#container-id-1');
 	  //flag.push("#container-id-1")
-	  flag.push("#container-id-1-1")
+	  flag.push("#container-id-1")
 	  function arrayContains(needle, arrhaystack)
 		{
     return (arrhaystack.indexOf(needle) > -1);
@@ -77,7 +81,7 @@ console.log(flag)
                                     <p>Filtering Rate: {{$filter_rate*100}}%</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Predicted Cell Types: {{$total_ct}}</p>
+                                    <p>Number of Cell Types: {{$total_ct}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Total Biclusters: {{$total_bic}}</p>
@@ -93,7 +97,7 @@ console.log(flag)
                         <div class="panel-body">
                             <div class="row" style="">
                                 <div class="form-group col-md-12 col-sm-12" style="height:100%">
-                                    <h3>CTS Cell-Gene-Regulon Heatmap</h3>
+                                    <strong>CTS Cell-Gene-Regulon Heatmap</strong>
 									     <ul class="nav nav-tabs" id="myTab" role="tablist">
 										                    <!--
 															<li class="nav-item">
@@ -160,8 +164,6 @@ console.log(flag)
                                                         <th></th>
                                                     </tr>
                                                 </thead>
-                                                <!--Table head-->
-                                                <!--Table body-->
                                                 <tbody>
                                                     <tr>
                                                         <td><strong>Predicted Cell Type</strong></td>
@@ -170,13 +172,14 @@ console.log(flag)
                                                         {{/section}}
                                                     </tr>
 													<tr>
-													    <td><strong>Number of Predicted Cell Types</strong></td>
-                                                        <td>22</td>
+													    <td><strong>Number of Predicted Cells</strong></td>
+                                                        <!--<td>22</td>
 														<td>8</td>
 														<td>24</td>
 														<td>14</td>
 														<td>16</td>
-														<td>6</td>
+														<td>6</td>-->
+														{{section name=clust loop=$silh_trace}}<td>{{count($silh_x[{{$silh_trace[clust]}}])}}</td> {{/section}}
                                                     </tr>
                                                     <tr>
                                                         <td><strong>Number of Predicted Regulons</strong></td>
@@ -222,17 +225,13 @@ console.log(flag)
                                             </table>-->
                                             <div class="CT-result-img">
                                                 <div class="col-sm-12">
-                                                    <h3 style="text-align:center">Silhoutte Score</h3>
-                                                    <a href="data/{{$jobid}}/img/01.png" target="_blank"><img src="data/{{$jobid}}/img/01.png" style="margin:auto;display:block"></a>
-                                                </div>
-                                                <!--<div class="col-sm-12">
-                                                    <h3 style="text-align:center">Sankey Plot</h3>
-                                                    <div id="myDiv"></div>
-                                                    </div>-->
-
-                                            </div>
-                                        </div>
-
+                                                    <div id="score_div"></div>
+												</div>
+                                                <div class="col-sm-12">
+                                                    <div id="sankey_div"></div>
+												</div>
+											</div>
+										</div>
                                         <div class="tab-pane fade" id="tab2default">
                                             <div class="container">
                                                 <div class="row">
@@ -257,64 +256,62 @@ console.log(flag)
                                                                         <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt">Download CT-{{$sec0+1}}
                                                                         </button>
                                                                     </a>
-																	<table id="motiftable" class="table table-striped table-bordered table-sm" cellpadding="0" cellspacing="0" width="100%">
+																	<table id="motiftable" class="table table-bordered" cellpadding="0" cellspacing="0" width="100%">
                                                                     <thead>
                                                                         <tr>
-                                                                            <th>Regulon</th>
-                                                                            <th>Gene</th>
-
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
-                                                                        <tr>
-                                                                            <td style="width:300px">
-                                                                                <div class="col-sm-12">
-                                                                                    <span style="font-size:14pt;">CT{{$sec0+1}}S-R{{$regulon_result[$sec0][sec1][0]}}</span><br>
-																					<span><a href="motif_detail.php?jobid=20181124190953&id=1" target="_blank"><img src="data/{{$jobid}}/20181124190953Motif-1.png" style="margin:auto;display:block"></a></span>
-																					
-									 <button class="btn btn-light"> <a href="data/20181124190953/tomtom/ct1motif1/JASPAR/tomtom.html" target="_blank"><span class="glyphicon glyphicon-link"></span>JASPAR</a>
-									</button>
-                       <button class="btn btn-light"> <a href="data/20181124190953/tomtom/ct1motif1/HOCOMOCO/tomtom.html" target="_blank"><span class="glyphicon glyphicon-link"></span>HOCOMOCO</a>
-									</button>
-                                                                                </div>
-                                                                            </td>
-                                                                            <td>
-
+																		<tr ><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
+																		
+                                                                        <tr >
+                                                                            <td style="display:inline-block; overflow-y: scroll;width:49%;max-height:400px;">
                                                                                 <div style="width:100%; font-size:14px;">
-																				<table class="table table-bordered">
-	                                 <tr>
-	                                      <td>Gene Symbol</td>
-	                                      <td>Gene ID</td>
-	                                     
-	                                 </tr>
+																				<table class="table table-bordered table-hover" >
+	                                 
 	                                
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
-                                        
                                           <tr >
+										  
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
-										 
-										 
-																					
-																					
+										 									
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
 										 
 										 {{/section}}
                                          </tr>
                                    
                                  </table>
-																					
-																				</div>
+											</div>										
+																				
 
                                                                             </td>
+																			<td style="witdh:49%;display:inline-block; overflow-y: auto;max-height:400px; border:none;" >
+																			
+                                                                                <div class="col-sm-12">
+																				{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
+																				
+																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
+																				
+																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="margin:auto;display:block"></a></span>
+																					
+									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
+									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  /><hr>
+                                                                                </div>
+																				{{/section}}
+                                                                            </td>
                                                                         </tr>
+																		<tr><td><button type="button" class="btn btn-submit" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="console.log('{{$regulon_result[$sec0][sec1][0]}}');$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push({{$regulon_result[$sec0][sec1][0]}});">Show Heatmap
+                                                        </button>&nbsp;<button type="button" id="to_enrichr" class="btn btn-submit" data-toggle="collapse"  >Send gene list to EnrichR
+                                                        </button></td></tr>
 																		<tr >
 																		<td colspan=2>
-																						<div id="heatmap">
-																						<div id='container-id-{{$sec0}}-1' style="max-width:100%;display:block">
+																		
+																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																						<h1 class='wait_message'>Loading heatmap ...</h1>
 																					</div></div>
-																					</td>
+																		</td>
 																		</tr>
 
                                                                         {{/section}}
@@ -328,39 +325,13 @@ console.log(flag)
 															
                                                            {{/foreach}}
                                                                     
-                                                            </div>		
-															
-<!--                                                             <div class="tab-pane fade" id="CT2" role="tabpanel" aria-labelledby="profile-tab">
-                                                                <div class="result" border="1">
-                                                                    <a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-2
-                                                                        </button>
-                                                                    </a>
-                                                                </div>
-                                                                <div id='container-id-3' style="height:95%;max-height:95%; max-width:100%">
-                                                                    <h1 class='wait_message'>Please wait ...</h1>
-                                                                </div>
                                                             </div>
-                                                            <div class="tab-pane fade" id="CT3" role="tabpanel" aria-labelledby="contact-tab">
-                                                                <div class="result" border="1">
-                                                                    <a href="/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/2018111445745/20181103_CT_1_bic.regulon.txt">Download CT-3
-                                                                        </button>
-                                                                    </a>
-                                                                </div>
-                                                                <hr />
-                                                                <div id='container-id-4' style="height:95%;max-height:95%; max-width:100%">
-                                                                    <h1 class='wait_message'>Please wait ...</h1>
-                                                                </div>
-
-                                                                
-                                                            </div> -->
                                                         </div>
 
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        
 
                                         <div class="tab-pane fade" id="tab3default">
                                             <div class="container">
@@ -394,7 +365,7 @@ console.log(flag)
                             </div>
                         </div>
                     </div>
-					
+					 </div>
 					{{elseif $status==="404"}}
 					<div style="text-align: left;">
                         <p>Job ID nout found</p>
@@ -410,7 +381,7 @@ console.log(flag)
                             <br> You can remember your jobid <font color="red"> <strong>{{$jobid}}</strong> </font>
                             <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>15</b> seconds.
                             <br/> Link:&nbsp
-                            <a href="{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}">http://http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
+                            <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
 
                     </div>
                     {{/if}}
@@ -419,7 +390,7 @@ console.log(flag)
         </div>
     </div>
     <!-- Required JS Libraries -->
-    <script src="assets/js/d3.js"></script>
+	<script src="assets/js/d3.js"></script>
     <script src="assets/js/underscore-min.js"></script>
 
     <!-- Clustergrammer JS -->
@@ -434,7 +405,7 @@ console.log(flag)
     <script src='assets/js/load_clustergram.js'></script>
 
     <script>
-        var data = {
+        var sankey_data = {
             type: "sankey",
             orientation: "h",
             node: {
@@ -444,27 +415,70 @@ console.log(flag)
                     color: "black",
                     width: 2
                 },
-                label: ["1", "2", "3", "4", "5", "6", "7", "C1", "C2", "C3", "C4", "C5", "C6", "C7"],
+                label: {{$sankey_nodes}},
                 color: 'RdBu'
             },
 
             link: {
-                source: [0, 1, 2, 3, 4, 4, 5, 5, 6, 6],
-                target: [9, 9, 9, 9, 11, 12, 10, 12, 7, 8],
-                value:  [3, 3, 6, 12, 16, 4, 14, 2, 22, 8]
+                source: {{$sankey_src}},
+                target: {{$sankey_target}},
+                value:  {{$sankey_value}}
             }
         }
 
-        var data = [data]
+        var sankey_data = [sankey_data]
 
-        var layout = {
+        var sankey_layout = {
+		title: "Sankey plot",
             font: {
                 size: 16
             }
         }
 
-        Plotly.react('myDiv', data, layout)
+{{section name=clust loop=$silh_trace}}
+var trace{{$silh_trace[clust]}} = {
+  x: [{{section name=idx loop=$silh_x[{{$silh_trace[clust]}}]}} "{{$silh_x[{{$silh_trace[clust]}}][idx]}}",{{/section}}],
+  y: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} "{{$silh_y[{{$silh_trace[clust]}}][idx]}}",{{/section}}],
+  name: '{{$silh_trace[clust]}}',
+  type: 'bar'
+};
 
+{{/section}}
+
+
+var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}];
+
+		var score_layout = {
+		barmode: 'group',
+		title: "Silhouette score",
+            font: {
+                size: 12
+            }
+        }
+		Plotly.react('score_div', score_data, score_layout);
+		
+        Plotly.react('sankey_div', sankey_data, sankey_layout)
+		
+	function get_gene_list(ct,regulon){
+	$.get("data/2018122223201/2018122223201_CT_1_bic.regulon_gene_name.txt",function(txt){
+        /*var lines = txt.split("\n");
+        for (var i = 0, len = lines.length; i < len; i++) {
+            lines[i][-1];
+        }*/
+		gene_list = ["PHF14", "RBM3", "MSL1", "PHF21A", "ARL10", "INSR", "JADE2",
+        "P2RX7", "LINC00662", "CCDC101", "PPM1B", "KANSL1L", "CRYZL1",
+        "ANAPC16", "TMCC1", "CDH8", "RBM11", "CNPY2", "HSPA1L", "CUL2",
+        "PLBD2", "LARP7", "TECPR2", "ZNF302", "CUX1", "MOB2", "CYTH2",
+        "SEC22C", "EIF4E3", "ROBO2", "ADAMTS9-AS2", "CXXC1", "LINC01314",
+        "ATF7", "ATP5F1"];
+		
+		 var enrichr_info = {list: gene_list, description: 'Clustergrammer gene-cluster list' , popup: true};
+
+          // defined globally - will improve
+          send_to_Enrichr(enrichr_info);
+    }); 
+	
+	}
 
 	function send_to_Enrichr(options) { // http://amp.pharm.mssm.edu/Enrichr/#help
     var defaultOptions = {
@@ -503,5 +517,6 @@ console.log(flag)
   document.body.removeChild(form);
 }
     </script>
+	<div class="push"></div>
 </main>
 {{/block}}

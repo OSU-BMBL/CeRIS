@@ -2,7 +2,6 @@
 	<script src="vendor/bootstrap/js/bootstrap-select.min.js"></script>
 <script>
 	$(document).ready(function() {
-	        $('#upload_label').hide();
 	        $('.selectpicker').selectpicker();
 	        $('#tooltip1').tooltip();
 	        $('[data-toggle="tooltip"]').tooltip({
@@ -47,6 +46,7 @@
 	                formData.append('filetype', 'dropzone_label');
 	            },
 	            success: function(file, response) {
+					$('#enable_labelfile').attr("disabled", false);
 	                response = JSON.parse(response);
 	                console.log(response);
 	                addTable(response);
@@ -55,7 +55,7 @@
 	        });
 	// Load Example
 	$('#load_exp').click(function(evt) {
-	console.log("click example exp")
+	$('#enable_labelfile').attr("disabled", false);
 	$('#submit_btn').attr("disabled", false);
 	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
@@ -77,8 +77,8 @@
 	})
 });
 	$('#load_label').click(function(evt) {
-	console.log("click example label")
 	$('#submit_btn').attr("disabled", false);
+	$('#enable_labelfile').attr("disabled", false);
 	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
@@ -99,146 +99,11 @@
         }
 	})
 });
-
-
 	    });
-	
-	    function displayForm(c) {
-	        if (c.value == "1") {
-	            $('#upload_label').hide();
-	            //document.getElementById("upload_label").style.visibility = 'hidden';
-	        } else if (c.value == "2") {
-	            $('#upload_label').show();
-	            //document.getElementById("upload_label").style.visibility = 'visible';
-	        } else {}
-	    }
-	
-
-
-
-	    $(document).on('click', '.remove_image', function() {
-	        var name = $(this).attr('id');
-	        $.ajax({
-	            url: "upload.php",
-	            method: "POST",
-	            data: {
-	                name: name
-	            },
-	            success: function(data) {
-	                list_image();
-	            }
-	        })
-	    });
-	
-	    function display_preview() {
-	        $.ajax({
-	            url: "upload.php",
-	            success: function(data) {
-	                $('#preview').html(data);
-	            }
-	        });
-	    }
-	
-	    var addTable = function(dataset) {
-	        alert("message successfully sent")
-	            // Save data
-	        $('#expression').val(JSON.stringify(dataset));
-	
-	        // Toggle Interfaces
-	        $('button[form="upload-expression-form"]').prop('disabled', false);
-	        $('button[form="upload-expression-form"]').toggleClass('black white bg-white bg-blue');
-	        $('#dropzone_exp').hide();
-	        //$('#formats').hide();
-	        addPreviewTable(dataset, true);
-	        $('#intro').html('The uploaded dataset contains <span class="highlight">' + dataset['columns'].length + ' samples</span> and <span class="highlight">' + dataset['index'].length + ' genes</span>. Check that the preview below is correct, then click Continue to proceed.')
-	    }
-	
-	    // Initialize Dropzone
-	
-	    function goBack() {
-	        window.history.back();
-	    }
-	
-	    // Tooltip and Popover
-	    $('[data-toggle="tooltip"]').tooltip();
-	    $('[data-toggle="popover"]').popover();
-	
-	    // Preview Table
-	    function addPreviewTable(response, metadata = true) {
-	
-	        // Define table
-	        var $table = $('<table>', {
-	            'class': 'table-striped w-100'
-	        }).append($('<thead>').append($('<tr>', {
-	            'class': 'very-small text-center border-grey border-left-0 border-right-0'
-	        }))).append($('<tbody>'));
-	
-	        // Add headers
-	        label = metadata ? 'Gene' : 'Sample'
-	        $table.find('tr').append($('<th>', {
-	            'class': 'px-2 py-1'
-	        }).html(label));
-	        $.each(response['columns'], function(i, col) {
-	            $table.find('tr').append($('<th>', {
-	                'class': 'px-2 py-1'
-	            }).html(col));
-	        })
-	
-	        // Get row number
-	        n = metadata ? 6 : response['index'].length
-	
-	        // Add rows
-	        for (i = 0; i < n; i++) {
-	            var $tr = $('<tr>').append($('<td>', {
-	                'class': 'bold text-center px-2 py-1'
-	            }).html(response['index'][i]));
-	            $.each(response['data'][i], function(i, val) {
-	                $tr.append($('<td>', {
-	                    'class': 'light text-center tiny'
-	                }).html(val));
-	            })
-	            $table.find('tbody').append($tr);
-	        }
-	
-	        // Add
-	        $('#loader').addClass('d-none');
-	        $('#preview').append($table).removeClass('d-none');
-	    }
-	
-	    // Serialize table
-	    function serializeTable($table) {
-	        // Initialize results
-	        var data = [];
-	
-	        // Loop through rows
-	        $table.find('tr').each(function(i, tr) {
-	
-	            // Get cells
-	            var cells = i === 0 ? $(tr).find('th') : $(tr).find('td');
-	
-	            // Get values
-	            var values = [];
-	            $.each(cells, function(i, cell) {
-	                var value = $(cell).find('input').length ? $(cell).find('input').val() : $(cell).html();
-	                values.push(value);
-	            })
-	
-	            // Append values
-	            data.push(values);
-	        })
-	
-	        // Return data
-	        return data
-	    }
-	
-	    // Array difference
-	    Array.prototype.diff = function(a) {
-	        return this.filter(function(i) {
-	            return a.indexOf(i) === -1;
-	        });
-	    };
+		
+		
 </script>
-<main role="main" class="container">
+<main role="main" class="container" style="min-height: calc(100vh - 182px);">
 	<hr>
 	<!--<div class="starter-template">-->
 	<form method="POST" action="{{$URL}}" encType="multipart/form-data" id="needs-validation">
@@ -276,8 +141,8 @@
 		</div>
 		<div class="form-group row">
 			<div class="form-check col-sm-12 ">
-				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="0" checked>
-				<label class="form-check-label" for="allowstorage">Enable gene filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are either expressed (expression value > 2) in less than 6% of cells or expressed (expression value > 0) in at least 96% of cells. The method was fully described in SC3 manuscript. The filtering will not affect the result of cell prediction nor the bicluster results, but only shorten the ruuning time."> </span>
+				<input class="form-check-input" type="checkbox" name="is_filter" id="is_filter" value="1" checked>
+				<label class="form-check-label" for="is_filter">Enable gene filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are either expressed (expression value > 2) in less than 6% of cells or expressed (expression value > 0) in at least 96% of cells. The method was fully described in SC3 manuscript. The filtering will not affect the result of cell prediction nor the bicluster results, but only shorten the ruuning time."> </span>
 				</label>
 			</div>
 		</div>
@@ -333,7 +198,6 @@
 									</div>
 									<div class="col-md-2">
 										<select class="selectpicker" name="f_arg" data-width="auto">
-											<option>0</option>
 											<option>0.1</option>
 											<option>0.2</option>
 											<option>0.3</option>
@@ -348,24 +212,10 @@
 									</div>
 								</div>
 							</div>
-							<h4 class="font-italic text-left">CTS-bicluster inference <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from SC3 or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
-							<div class="row">
-								<div class="form-check col-sm-4 ">
-									<input type="radio" value="1" id="enable_sc3" name="bicluster_inference" class="custom-control-input" checked="" onClick="displayForm(this)">
-									<label class="custom-control-label" for="enable_sc3">SC3 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
-									</label>
-								</div>
-								<div class="col-sm-2">
-									<input type="radio" value="2" id="enable_labelfile" name="bicluster_inference" class="custom-control-input" onClick="displayForm(this)">
-									<label class="custom-control-label" for="enable_labelfile" onchange="document.getElementById('labelfile').disabled = !this.checked;">Your cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="User's uploaded ground truth cell labels, either numbers or factors."> </span>
-									</label>
-								</div>
-								<div id="upload_label">
+							<h4 class="font-italic text-left">Upload cell label: (Optional) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A table contains cell infomation. The file should includes a cell names in the first column match with the expression file, and the second column indicating the cell clusters. Cell clusters are used in two ways: (i) assess the cell-type prediction results from SC3, and (ii) assign Cell-type-specific regulons. If no cell label file uploaded, the pipeline will automatically use the predicted clusters from SC3 for the following regulon predictions. Accept both txt and csv format."> </span></h4>
+							
+							<div id="upload_label">
 									<div class="form-group row">
-										<div class="form-check col-sm-1 ">
-											<label class="form-check-label" for="cellinfo">Upload cell label: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A table contains cell infomation. The file should includes a cell names in the first column match with the expression file, and the second column indicating the cell clusters. Cell clusters are used in two ways: (i) assess the cell-type prediction results from SC3, and (ii) assign Cell-type-specific (complex) regulons. If no cell label file uploaded, the pipeline will automatically use the predicted clusters from SC3 for the following regulon predictions. Accept both txt and csv format."> </span>
-											</label>
-										</div>
 										<div class="col-sm-4">
 											<div class="dropdown">
 												<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
@@ -382,7 +232,20 @@
 			<div id="preview_label"></div>
 										</div>
 									</div>
+							</div>
+							<h4 class="font-italic text-left">CTS-bicluster inference <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from SC3 or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
+							<div class="row">
+								<div class="form-check col-sm-4 ">
+									<input type="radio" value="1" id="enable_sc3" name="bicluster_inference" class="custom-control-input" checked="">
+									<label class="custom-control-label" for="enable_sc3">SC3 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
+									</label>
 								</div>
+								<div class="col-sm-4">
+									<input type="radio" value="2" id="enable_labelfile" name="bicluster_inference" disabled="true" class="custom-control-input">
+									<label class="custom-control-label" for="enable_labelfile">Your cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Enable this option by uploading your cell label file."> </span>
+									</label>
+								</div>
+								
 							</div>
 							<br>
 							<h4 class="font-italic text-left">CTS-regulon prediction <span class="glyphicon glyphicon-question-sign" data-html="true" data-toggle="tooltip" data-original-title="Regulon: a group of genes that controlled by the same regulatory gene.<br>
@@ -390,12 +253,12 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
  One regulon refers to multiple gene groups found in one bicluster under the same cell type."> </span></h4>
 							<div class="row">
 								<div class="form-check col-sm-4 ">
-									<input type="radio" id="motif_dminda" value="motif_dminda" name="motif_program" class="custom-control-input" checked="">
-									<label class="custom-control-label" for="motif_meme">DMINDA <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Our in-house motif prediction tool."> </span>
+									<input type="radio" id="motif_dminda" value="0" name="motif_program" class="custom-control-input" checked="">
+									<label class="custom-control-label" for="motif_dminda">DMINDA <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Our in-house motif prediction tool."> </span>
 									</label>
 								</div>
 								<div class="col-sm-2">
-									<input type="radio" id="motif_meme" value="motif_meme" name="motif_program" class="custom-control-input">
+									<input type="radio" id="motif_meme" value="1" name="motif_program" class="custom-control-input">
 									<label class="custom-control-label" for="motif_meme">MEME <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="We integrated the MEME command line version as an option for motif prediction. Default parameters are used. "> </span>
 									</label>
 								</div>
@@ -413,8 +276,10 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 		<hr>
 		<div class="form-group">
 			<button type="submit" id="submit_btn" disabled="true" class="btn btn-submit" name="submit" value="submit">Submit</button>
-			<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=20181222151846" style="color:white">Example output</a>
-			</button>
+			<!--<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=2018122630420#" style="color:white">Example output</a>
+			</button>-->
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2018122705958#';" />
+
 		</div>
 		<div class="form-group">
 			<p id="words" class="hidden text-danger">Your job is running, don't close the browser tab, waiting time could vary from minutes to hour.</p>

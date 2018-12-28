@@ -12,44 +12,21 @@
 " />
     <meta name="keywords" content="Cell-type-specific Regulon Single-cell RNA-Seq" />
 
-    <!--====== TITLE TAG ======-->
     <title>IRIS3</title>
-		<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	-->
     <script src="assets/js/vendor/jquery-1.12.4.min.js"></script>
     <script src="assets/js/vendor/bootstrap.min.js"></script>
-	
-    <!--====== PLUGINS JS ======-->
-    <!---->
-
-    
-    <!--<script src="assets/js/vendor/jquery.easing.1.3.js"></script>
-    <script src="assets/js/vendor/jquery-migrate-1.2.1.min.js"></script>
-    <script src="assets/js/vendor/jquery.appear.js"></script>
-	<script src="assets/js/stellar.js"></script>
-	    <script src="assets/js/owl.carousel.min.js"></script>
-		<script src="assets/js/waypoints.min.js"></script>
-		
-    <script src="assets/js/stellarnav.min.js"></script>
-	    
-    <script src="assets/js/placeholdem.min.js"></script>
-    <script src="assets/js/contact-form.js"></script>-->
     <script src="assets/js/wow.min.js"></script>
-
     <script src="assets/js/jquery.ajaxchimp.js"></script>
     <script src="assets/js/jquery.sticky.js"></script>
 
-    <!--===== ACTIVE JS=====	<script>$(document).ready(function () {
+    <!--<script>$(document).ready(function () {
   $('#motiftable').DataTable({
 	"order": [[ 2, "asc" ]]
   });
   $('.dataTables_length').addClass('bs-select');
 });  </script>-->
     <script src="assets/js/main.js"></script>
-		
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-
-
 
     <!--====== FAVICON ICON =======-->
 	
@@ -65,13 +42,12 @@
     <!--====== MAIN STYLESHEETS ======-->
     <link href="style.css" rel="stylesheet">
     <link href="assets/css/responsive.css" rel="stylesheet">
-	
     <script src="assets/js/vendor/modernizr-2.8.3.min.js"></script>
+
     <!--[if lt IE 9]>
         <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
-		
 	</head>
 <!-- 
 <div class="preeloader">
@@ -88,13 +64,13 @@
                 <nav class="navbar">
                     <div class="container">
                         <div class="navbar-header">
-                            <a class="navbar-brand" href="/iris3/index.php" style="color:white">IRIS3</a></a>
+                            <a class="navbar-brand" href="/iris3/index.php" style="color:white">IRIS3</a>
                         </div>
                         <div id="main-nav" class="stellarnav">
                             <ul id="nav" class="nav navbar-nav pull-right">
                                 <li><a href="/iris3/index.php">Home</a></li>
                                 <li><a href="/iris3/submit.php">Submit</a></li>
-                                <li><a href="/iris3/tutorial.php">Tutorial</a></li>
+                                <li><a href="/iris3/tutorial.php#1basics">Tutorial</a></li>
 								<li><a href="/iris3/news.php">What's new</a></li>
 								<li><a href="https://groups.google.com/forum/#!forum/iris3-discussion-board">Forum</a></li>
                             </ul>
@@ -116,7 +92,7 @@
 
 
     {{block name="foot"}}
-    <footer class="footer-area sky-gray-bg relative">
+    <footer class="footer-area sky-gray-bg">
         <div class="footer-bottom-area white">
             <div class="container">
                 <div class="row">
@@ -129,6 +105,12 @@
             </div>
         </div>
     </footer>
+	
+	<!--<footer class="footer">
+	<div class="footer-copyright text-center wow fadeIn">
+                            <p class="m-0 text-center text">© <script>document.write(new Date().getFullYear());</script> <a href="https://www.sdstate.edu/bioinformatics-and-mathematical-biosciences-lab">BMBL</a> | <a href="mailto:bmbl.qinma@gmail.com" title="bmbl.qinma@gmail.com">Contact us: bmbl.qinma@gmail.com</a>  </p>
+                        </div> -->
+	</footer>
     {{/block}}
     
     <script type="text/javascript">
