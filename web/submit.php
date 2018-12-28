@@ -78,9 +78,13 @@ if (isset($_POST['submit']))
 	}
 	
 	
-$fp = fopen("$workdir/info.txt", 'w');
-fwrite($fp,"$bic_inference\t$len\t$labelfile");
-fclose($fp);
+	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $label_file == ''){
+		
+		header("Location: results.php?jobid=2018122705958#");
+	}
+	
+	else {
+	
 		
 	system("touch $workdir/email.txt");
 	system("chmod 777 $workdir/email.txt");
@@ -92,8 +96,8 @@ fclose($fp);
 	
     fclose($fp);
 	//$fp = fopen("$workdir/info.txt", 'w');
-    //    fwrite($fp,"$jobid"."$rnaid\t$email");
-    //    fclose($fp);
+	//fwrite($fp,"$c_arg\t$f_arg\t$o_arg\t$motif_program\t$label_use_sc3\t$expfile\t$label_file\t");
+	//fclose($fp);
 	$workdir2 = "./data/$jobid/";
 	
 	#$delim = detectDelimiter($expfile);
@@ -141,7 +145,7 @@ perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
 wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
-Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program\n
+Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program \$motif_min_length\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
@@ -205,11 +209,15 @@ touch done\n
 	$fp = fopen("$workdir2/param.txt", 'w+');
 	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
 	fclose($fp);
-	system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
 	header("Location: results.php?jobid=$jobid");
+		
+		
+	}
+
 }else
 {
 	$smarty->display('submit.tpl');
