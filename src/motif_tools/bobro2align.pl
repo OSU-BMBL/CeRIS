@@ -25,7 +25,7 @@ my $path = $ARGV[0];
 
 #my $path = "/home/www/html/iris3/data/20181222151846"; 
 	my $out_name = "";
-	my $out_dir = $path."/motiflogo";
+	my $out_dir = $path."/logo_tmp/";
 	mkdir $out_dir;
 	my $align = "";
 opendir( my $DIR, $path );
@@ -71,7 +71,7 @@ while ( my $entry = readdir $DIR ) {
 				
 			  }
 			  
-			}	open(my $out, '>', $out_name."b2a") or die "Could not open file '$filename' $!";
+			}	open(my $out, '>', $out_dir.$out_name.".b2a") or die "Could not open file '$filename' $!";
 				print $out $align;
 				close $out;
 				$align = "";
