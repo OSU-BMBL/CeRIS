@@ -95,22 +95,30 @@ if ($sankey_file) {
 	print_r("Info file not found");
     // error opening the file.
 } 
-$count_silh = 1;
 $silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 if ($silh_file) {
-	$silh_trace = $silh_x = $silh_y  = array(); 
-    while (($line = fgets($silh_file)) !== false) {
+	$silh_trace = $silh_x = $silh_y  = $line_cell = $line_result = array(); 
+	
+	for ($i=1;$i <= count($regulon_gene_name_file);$i++){
+		$silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
+		$line_cell = $line_result = array(); 
+		while (($line = fgets($silh_file)) !== false) {
         $split_line = explode (",", $line);
 		$split_line[2] = preg_replace( "/\r|\n/", "", $split_line[2] );
-		array_push($silh_trace,$split_line[0]);
-		array_push($silh_x,$count_silh);
-		array_push($silh_y,$split_line[2]);
-		$count_silh++;
-    }
+			if($i == (int)$split_line[0]){
+				
+				array_push($line_cell, $split_line[1]);
+				array_push($line_result, $split_line[2]);
+			}
+		}
+		$silh_x[$i] = $line_cell;
+		$silh_y[$i] = $line_result;
+		array_push($silh_trace,$i);
+	}
     fclose($silh_file);
-	$silh_trace = json_encode($silh_trace);
-	$silh_x = json_encode($silh_x);
-	$silh_y = json_encode($silh_y);
+	#$silh_trace = json_encode($silh_trace);
+	#$silh_x = json_encode($silh_x);
+	#$silh_y = json_encode($silh_y);
 } else {
 	print_r("Info file not found");
     // error opening the file.
@@ -168,8 +176,16 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	$status = "0";
 	header("Refresh: 15;url='results.php?jobid=$jobid'");
 }
- 
-
+ /*
+foreach ($regulon_motif_result as $a1){
+	foreach ($a1 as $a2) {
+		foreach ($a2 as $a3){
+			print_r(explode(',',$a3));
+		}
+		
+	}
+	
+}*/
 
 
 //print_r($regulon_result);
