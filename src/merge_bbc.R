@@ -94,9 +94,9 @@ for (i in 1:length(alldir)) {
     regulon_idx <- regulon_idx + 1
     
   }
-  count_num_regulon <- count_num_regulon + regulon_idx
+  count_num_regulon <- count_num_regulon + regulon_idx 
 }
-
+count_num_regulon <- count_num_regulon - length(alldir)
 write(paste("total_ct,",as.character(length(alldir)),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_regulon,",as.character(count_num_regulon),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 regulon_file <- list.files(srcDir,pattern = "*.regulon.txt")
