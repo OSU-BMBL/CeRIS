@@ -238,11 +238,11 @@ console.log(flag)
                                                     <div class="col-md-11">
                                                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                                                             <li class="nav-item active">
-                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#regulon-ct1" json="data/{{$jobid}}/mult_view1.json" root="#container-id-2" role="tab" aria-controls="home" aria-selected="true">CT1</a>
+                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#regulon-ct1" json="data/{{$jobid}}/CT1.json" root="#container-id-2" role="tab" aria-controls="home" aria-selected="true">CT1</a>
                                                             </li>
 															{{section name=ct_idx start=1 loop=$count_ct}}
                                                             <li class="nav-item">
-                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#regulon-ct{{$count_ct[ct_idx]}}" json="data/{{$jobid}}/mult_view2.json" root="#container-id-3" role="tab" aria-controls="profile" aria-selected="false">CT{{$count_ct[ct_idx]}}</a>
+                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#regulon-ct{{$count_ct[ct_idx]}}" json="" root="#container-id-3" role="tab" aria-controls="profile" aria-selected="false">CT{{$count_ct[ct_idx]}}</a>
                                                             </li>
                                                             {{/section}}
                                                         </ul>
@@ -303,7 +303,7 @@ console.log(flag)
                                                                         </tr>
 																		<tr><td><button type="button" class="btn btn-submit" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="console.log('{{$regulon_result[$sec0][sec1][0]}}');$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Show Heatmap
                                                         </button><button style="display:none;" type="button" class="btn btn-submit" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
-                                                        </button>&nbsp;<button type="button" id="to_enrichr" class="btn btn-submit" data-toggle="collapse"  >Send gene list to EnrichR
+                                                        </button>&nbsp;<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to EnrichR
                                                         </button></td></tr>
 																		<tr >
 																		<td colspan=2>
@@ -460,21 +460,21 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		
         Plotly.react('sankey_div', sankey_data, sankey_layout)
 		
-	function get_gene_list(ct,regulon){
-	$.get("data/2018122223201/2018122223201_CT_1_bic.regulon_gene_name.txt",function(txt){
-        /*var lines = txt.split("\n");
-        for (var i = 0, len = lines.length; i < len; i++) {
-            lines[i][-1];
-        }*/
-		gene_list = ["PHF14", "RBM3", "MSL1", "PHF21A", "ARL10", "INSR", "JADE2",
-        "P2RX7", "LINC00662", "CCDC101", "PPM1B", "KANSL1L", "CRYZL1",
-        "ANAPC16", "TMCC1", "CDH8", "RBM11", "CNPY2", "HSPA1L", "CUL2",
-        "PLBD2", "LARP7", "TECPR2", "ZNF302", "CUX1", "MOB2", "CYTH2",
-        "SEC22C", "EIF4E3", "ROBO2", "ADAMTS9-AS2", "CXXC1", "LINC01314",
-        "ATF7", "ATP5F1"];
+	function get_gene_list(item){
+	match_id = $(item).attr("id").match(/\d+/gm);
+	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_name.txt';
+	
+	$.get(file_path,function(txt){
+        var lines = txt.split("\n");
+		gene_idx = match_id[1] - 1;
+		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n');
+		//
+		gene_list = lines[gene_idx].split("\t");
+		gene_list.shift();
 		
-		 var enrichr_info = {list: gene_list, description: 'Clustergrammer gene-cluster list' , popup: true};
-
+		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true};
+	
+		//console.log(enrichr_info);
           // defined globally - will improve
           send_to_Enrichr(enrichr_info);
     }); 
