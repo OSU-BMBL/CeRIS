@@ -7,7 +7,6 @@
 *.MC
 *.similarity
 *.pdf
-*.png
 <<<<<<< HEAD
 *.json
 prepare_promoter.pl
