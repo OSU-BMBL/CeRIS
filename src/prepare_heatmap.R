@@ -48,11 +48,11 @@ for (i in 1:length(all_regulon)) {
     
     regulon_gene_name <- as.character(unlist(regulon_file[j,]))
     regulon_gene_name <- regulon_gene_name[regulon_gene_name!=""]
-    if(length(regulon_gene_name)>100 | length(regulon_gene_name) <1){
+    if(length(regulon_gene_name)>100 | length(regulon_gene_name) <=1){
       next
     }
     
-    regulon_heat_matrix_filename <- paste("heatmap/",gsub("_bic","",short_dir[i]),"_regulon",name_idx,".heatmap.txt",sep="")
+    regulon_heat_matrix_filename <- paste("heatmap/CT",i,"S-R",name_idx,".heatmap.txt",sep="")
     regulon_heat_matrix <- subset(exp_file,rownames(exp_file) %in% regulon_gene_name)
     regulon_heat_matrix <- rbind(category,regulon_heat_matrix)
     
