@@ -1,0 +1,218 @@
+
+<!-- saved from url=(0068)http://amp.pharm.mssm.edu/Enrichr/templates/help/basics-content.html -->
+<html class="gr__amp_pharm_mssm_edu"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css" abt="234"></style></head><body data-gr-c-s-loaded="true"><div id="the-basics-content">
+	<h1>FAQ</h1>
+	<div class="qa">
+		<h3 class="question"><a id="Q1" style="color:black;">What are a regulon and CTS-regulon and why are they important?</a></h3>
+		<div class="answer">
+			<p>The term regulon was first introduced by Maas et al. in 1964, intended to name a maximal group of co-regulated genes, 
+			which may be scattered in a genome without apparent patterns in terms of their genomic locations. Based on that, for the 
+			first time, we define a CTS-regulon as a group of genes, receiving similar regulatory signals in a specific cell type, 
+			hence tend to have similar expression patterns and share conserved motifs in this cell type. A successful elucidation of 
+			CTS-regulons will substantially improve the identification of transcriptionally co-regulated gene modules, realistically 
+			allowing reliable prediction of global transcription regulation networks encoded in a specific cell type. </p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q2" style="color:black;">Why allow us to store your data?</a></h3>
+		<div class="answer">
+			<p>Our long-term goal is to build a cell-type-specific regulon atlas for diverse cell types across different species 
+			to uncover the heterogeneous regulatory mechanisms in different cell types. Your data could potentially help us set 
+			up the database, and all contributions will be acknowledged in our future work.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q3" style="color:black;">What is the hypergeometric test?</a></h3>
+		<div class="answer">
+			<p>__</p>
+			<br> <a href="equation"></a>
+			<p>P-value is the probability of seeing at least x number of cells out of the total n cells in the list annotated 
+			to a particular cell type, given the proportion of cells in the whole population that are annotated to that cell type. 
+			The smaller of the p-value is, the more significant the cell type associated with the bicluster.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q4" style="color:black;">How do DMINDA and MEME predict regulons?</a></h3>
+		<div class="answer">
+			<p>DMINDA (DNA motif identification and analyses) [link to web] is an integrated web server for DNA motif 
+			identification and analyses. The server provides a suite of cis-regulatory motif analysis functions on DNA 
+			sequences, which are important to elucidation of the mechanisms of transcriptional regulation: (i) de novo 
+			motif finding for a given set of promoter sequences along with statistical scores for the predicted motifs 
+			derived based on information extracted from a control set, (ii) scanning motif instances of a query motif in 
+			provided genomic sequences, (iii) motif comparison and clustering of identified motifs, and (iv) co-occurrence 
+			analyses of query motifs in given promoter sequences.</p>
+			<br>
+			<p>MEME suite [link to web]: The MEME Suite supports motif-based analysis of DNA, RNA and protein sequences. 
+			It provides motif discovery algorithms using both probabilistic and discrete models, which have complementary 
+			strengths. It also allows the discovery of motifs with arbitrary insertions and deletions (GLAM2). In addition 
+			to motif discovery, the MEME Suite provides tools for scanning sequences for matches to motifs (FIMO, MAST 
+			and GLAM2Scan), scanning for clusters of motifs (MCAST), comparing motifs to known motifs (Tomtom), finding 
+			preferred spacings between motifs (SpaMo), predicting the biological roles of motifs (GOMo), measuring the 
+			positional enrichment of sequences for known motifs (CentriMo), and analyzing ChIP-seq and other large datasets (MEME-ChIP).</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q5" style="color:black;">Why not using the TF name to represent the regulon or motif name?</a></h3>
+		<div class="answer">
+
+			<p>The query motif identified by IRIS3 or MEME may match to more than one target TFBS profiles in the 
+			motif databases from TOMTOM (see the following figure). Hence, it is not feasible to name the predicted 
+			motif or regulon by one TF name.</p>
+			<p>Therefore, the motif may not be unique, and two or more share the similarity may exist in one CTS-regulon.</p>
+			<img src="./assets/img/tutorial/4.Q5.png">
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q6" style="color:black;">How does IRIS3 define and interpret regulon names?</a></h3>
+		<div class="answer">
+			<p>For each CTS-regulon, its name is defined by the cell type number and the assigned regulons. For example: </p>
+			<img src="./assets/img/tutorial/4.Q6.png">
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q7" style="color:black;">How does IRIS3 rank regulons?</a></h3>
+		<div class="answer">
+			<p>Each regulon is a set of genes that correspond to the predicted motif based on the motif scanning and 
+			prediction (see <a href="#Q3"><u>FAQ 3</u></a> above). A group of motifs predicted by DMINDA is then be clustered into subgroups composed 
+			of similar motifs using the following algorithm, which is based on a maximum spanning tree (MST) representation 
+			of the candidate motifs. In this way, it is possible that more than one motif with similarities are assigned to 
+			one regulon and the genes are then the union of all motifs. A global P-value for the entire motif instances is 
+			calculated during motif scanning by summing up the possibility of at least k instances denoted in the motif. The 
+			most significant p-value is used as the CTS-regulon p-value. The system will then sort and name regulons based 
+			on the p-values from low to high.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q8" style="color:black;">How does IRIS3 perform normalization for CTS-regulon heatmaps?</a></h3>
+		<div class="answer">
+			<p>To better illustrate the expression value of the gene sets, we applied a <a href="https://f1000research.com/articles/5-2122/v1"><u>log-normalization</u></a> for heatmap interpretation:</p>
+			<img src="./assets/img/tutorial/4.Q8-1.png">
+			<br>
+			<br>
+			<br>
+			<br>
+			<p>Where, <b><i>VN<sub>i</sub></i></b> indicates the normalized value for gene <b><i>i</i></b>, <b><i>VE<sub>i</sub></i></b> 
+			indicates the expression value of gene <b><i>i</i></b>, and <b><i>n</i></b> is the number of total cells. The heatmap 
+			comparison of pre-normalized and normalized values are shown below.</p>
+			<img src="./assets/img/tutorial/4.Q8-2.png">
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+	<div class="qa">
+		<h3 class="question"><a id="Q9" style="color:black;">Why is my heatmap not showing up?</a></h3>
+		<div class="answer">
+			<p>The Clustergrammer is a real-time computing tool that generates the interactive heatmaps after open 
+			the webpage. Based on the complexity of the matrix (total number of genes in the CTS-regulons and the 
+			total number of cells of your data), the time various (normally less than 10 seconds). Please be patient 
+			while waiting for the displaying.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q10" style="color:black;">How is the performance of IRIS3?</a></h3>
+		<div class="answer">
+			<p>To evaluate the performance of IRIS3, we compared our regulons with the result predicted by the 
+			<a href="https://github.com/aertslab/SCENIC"><u>SCENIC pipeline</u></a>, using the example data. 
+			Default parameters were used for both tools.</p>
+			<img src="./assets/img/tutorial/4.Q10-1.png">
+			<p>As a result, <b>259 CTS-regulons</b>, out of 399 total regulons predicted by IRIS3, were found 
+			significantly (FDR adjusted p-value <0.05) enriched to at least one pathway (KEGG_2016 database) 
+			using the EnrichR package (1.0 version), giving rise to an <b>F-score of 0.631</b> (see the definition of F-score below). 
+			While, 672 regulons were identified by SCENIC following its manual. By removing low-confident-TF-annotated 
+			and less-than-two-gene regulons, 463 were left, and 184 were found significantly enrich the pathways. 
+			The F-score of SCENIC identified regulons was only 0.5465. </p>
+			<p>Meanwhile, it only takes IRIS3 <b>21 min</b> to predict CTS-regulons, 
+			which is about <b>31 times faster</b> than SCENIC (9.5 hours).</p>
+
+			<p><b>Note:</b> The harmonic mean of precision and recall were calculated to represent the performance 
+			of an algorithm on a given dataset and parameter setting, denoted as F-score:</p>
+			<img src="./assets/img/tutorial/4.Q10-2.png">
+			<img src="./assets/img/tutorial/4.Q10-3.png">
+			<img src="./assets/img/tutorial/4.Q10-4.png">
+		</div>
+		<div class="clear"></div>
+	</div>	
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q11" style="color:black;">How do I report errors?</a></h3>
+		<div class="answer">
+			<p>Please report any errors or comments on the <a href="https://groups.google.com/forum/#!forum/iris3-discussion-board"><u>
+			IRIS3 google group</u></a>, or directly email us at <u>bmbl.qinma@gmail.com</u>.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>	
+
+	<div class="qa">
+		<h3 class="question"><a id="Q12" style="color:black;">Where can I find the source code?</a></h3>
+		<div class="answer">
+			<p>The source code of IRIS3 can be accessed on GitHub at https://github.com/bmbl-qinma/iris3</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>	
+
+	<div class="qa">
+		<h3 class="question"><a id="Q13" style="color:black;">What are the future plans?</a></h3>
+		<div class="answer">
+			<ul>
+			<li>Build up a database of CTS-regulon atlas in diverse cell types of human, mouse and extend to other species.</li>
+			<br>
+			<li>Integrate more sequence analysis, including quality control, alignment, mapping, and normalization in the 
+			IRIS3 pipeline to generate the normalized expression data from FASTQ.</li>
+			<br>
+			<li>An in-development tool, BRIC (biclustering-based gene regulation and cell type prediction from single-cell 
+			RNA-Seq data), will be used to replace QUBIC to predict cell types and CTS regulons simultaneously. The BRIC is 
+			integrated with (1) a left truncated mixture Gaussian model for the accurate quantification of the sample-specific 
+			gene regulatory signals and (2) a dual-core algorithm for more precise biclusters identification.</li>
+			<br>
+			<li>A more powerful in-house deep learning pipeline, DESSO, will be added in IRIS3 as a replacement of DMINDA and 
+			MEME to analyze cell-type-specific ChIP-Seq data (integrate the Cistrome database) in support of more accurate regulon 
+			prediction. DESSO (<a href="https://www.biorxiv.org/content/biorxiv/early/2018/09/16/417378.full.pdf"><u>bioRxiv version</u></a>) is currently 
+			under review in Genome Research </li>
+			<br>
+			</ul>
+		</div>
+		<div class="clear"></div>
+	</div>	
+
+	<div class="qa">
+		<h3 class="question"><a id="Q14" style="color:black;">Brower compatibility of IRIS3.</a></h3>
+		<div class="answer">
+			<img src="./assets/img/tutorial/4.Q14.png">
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>			
+		</div>
+		<div class="clear"></div>
+	</div>		
+</div></body></html>

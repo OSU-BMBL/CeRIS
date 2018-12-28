@@ -1,0 +1,77 @@
+
+<!-- saved from url=(0068)http://amp.pharm.mssm.edu/Enrichr/templates/help/basics-content.html -->
+<html class="gr__amp_pharm_mssm_edu"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css" abt="234"></style></head><body data-gr-c-s-loaded="true"><div id="the-basics-content">
+	<h1>Example result illustration</h1>
+
+		<div class="answer">
+			<br>
+			<p>We applied IRIS3 on a single-cell RNA-seq dataset consisting of 90 human embryonic stem cells and 20,214 genes from 
+			<a href="https://www.nature.com/articles/nsmb.2660">Dr. Yan's study</a>. Default parameters (c=1, o=100, f=0.5) were used for QUBIC biclustering; 
+			cell types were predicted using SC3 and evaluated by comparing with the ground truth labels provided by the paper; CTS-regulons were predicted using 
+			DMINDA based on the result of SC3.</p>
+			<br>
+			<p>This tutorial will guide you the output page of IRIS3 in details.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+
+	<div class="qa">
+		<h3 class="question">General results</h3>
+		<div class="answer">
+			<img src="./assets/img/tutorial/4.Q6.png">
+			<p>On the top of the result page showing the general result information. The most compatible species is decided when 
+			match genes to the database. Currently, IRIS3 only support data from human and mouse, and more species will be 
+			available for analysis in the future. The number of cells and genes are counted based on the input expression matrix, 
+			and genes excluded by the optional filtering step are given (if the user chooses not to perform gene filtering 
+			step, "NA" will be shown for the "number of filtered genes" and "filtering rate"). Cell types are predicted by SC3 
+			and biclusters are identified by QUBIC. In all, the total number of CTS-regulons throughout all cell types are predicted by DMINDA.</p>
+			<br>
+			<p>A zip file, including the filtered expression matrix file, the SC3 cell type prediction list, the biclusters results, 
+			the CTS-regulon gene lists, can be downloaded by clicking the right top button.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">CTS Cell-Gene-Regulon Heatmap</h3>
+		<div class="answer">
+			<p>Following the general results, a CTS cell-gene-regulon heatmap is displayed to cover the gene distribution of 
+			CTS-regulons in each cell type and corresponding expression level across all cells. </p>
+			<br>
+			<ol  style="list-style-type:circle">
+			<li>Choose which cell type to display.</li>
+			<br>
+			<li>Show the detailed results and evaluations for the predicted cell types from SC3 in a new page.</li>
+			<p> a.	A table to show the number of cells and CTS-regulons predicted for each cell type.
+			<br>
+			<li>1.	Choose which cell type to display.</li>
+			<br>
+			<li>1.	Choose which cell type to display.</li>
+			<br>
+			<p><b>Three major parameters control the output biclusters in IRIS3:</b></p>
+			<p><b><i>a. Overlap level</i></b> controls the level (from 0 to 1) of overlaps between the to-be-identified biclusters. 
+			0 means no overlap and 1 indicates complete overlap. The default value is 0.5.</p>
+			<p><b><i>b. Consistency level</i></b> of two biclusters is defined as the minimum ratio between the number of identical 
+			nonzero integers in a column and the total number of rows in the submatrix. The default is 1.</p>
+			<p><b><i>c. Max biclusters</i></b> control the maximum number of to-be-identified biclusters. A more significant 
+			number of o may sufficiently increase the running time and induce noise as more fragile 
+			biclusters generated. The default value is 100.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">CTS-regulon details</h3>
+		<div class="answer">
+			<img src="./basics-content_files/step4.png">
+			<p>SC3 (single-cell consensus clustering) is a user-friendly tool for unsupervised clustering, 
+			which achieves high accuracy and robustness by combining multiple clustering solutions through 
+			a consensus approach. Generally, the distances between the cells are calculated using the Euclidean, 
+			Pearson and Spearman metrics to construct distance matrices. The pcaReduce and tSNE + k-means 
+			algorithm for dimension deduction and clustering. SC3 also computes a consensus matrix using 
+			the cluster-based similarity partitioning algorithm by averaging all similarity matrices of 
+			individual clusters.</p>
+			<br>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div></body></html>

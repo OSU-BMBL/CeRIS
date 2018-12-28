@@ -1,0 +1,124 @@
+
+<!-- saved from url=(0068)http://amp.pharm.mssm.edu/Enrichr/templates/help/basics-content.html -->
+<html class="gr__amp_pharm_mssm_edu"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css" abt="234"></style></head><body data-gr-c-s-loaded="true"><div id="the-basics-content">
+	<h1>The Basics of IRIS3</h1>
+	<div class="qa">
+		<h3 class="question">Pipeline Overview </h3>
+		<div class="answer">
+			
+			<img id="pipeline_img" src="./assets/img/tutorial/1.1.pipeline.png">
+			<br>
+			<p><b>IRIS3 (Integrated Cell-type-specific Regulon Inference Server from Single-cell RNA-Seq)</b> 
+			is an integrated web server for cell-type-specific (CTS) regulon prediction, through organically 
+			integrating gene module detection, cell type prediction, and cis-regulatory motif discovery. </p>
+			<p>In IRIS3, the CTS gene module detection is carried out by our in-house biclustering tool, 
+			<a href="https://www.ncbi.nlm.nih.gov/pubmed/19509312"><b>QUBIC</b></a> (cited > 181 times since 2010), 
+			and the motif discovery is supported by our in-house server, 
+			<a href="http://bmbl.sdstate.edu/DMINDA2/index.php"><b>DMINDA</b></a>  (11,226 visitors since 2016), 
+			and the most widely-used motif analyses and verification tool <a href="http://meme-suite.org/"><b>MEME suite</b></a>. 
+			The cell type prediction is performed by <a href="https://www.nature.com/articles/nmeth.4236"><b>SC3</b></a>, 
+			which was recognized as the state-of-the-art tool in this topic. </p>
+			<br>
+			<br>
+			<p><b>The unique features of IRIS3 include: </b></p>
+			<p>(i) It is the first-of-its-kind web server for CTS-regulon prediction in human and mouse; </p>
+			<p>(ii) It predicts more accurate regulons from single-cell RNA-seq data than SCENIC with a much efficient manner; </p>
+			<p>(iii) It is user-friendly to the users with limited programming skills with one-step job submission; </p>
+			<p>(iv) It provides comprehensive and informative result interpretations and visualizations using Clustergrammar.</p>
+			<br>			
+			<p><b>The overall pipeline includes six steps:</b></p>
+			<img src="./assets/img/tutorial/1.1.table.png">
+	
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">Step i: Pre-processing (Optional)</h3>
+		<div class="answer">
+			<p>Genes are filtered followed the same process used in SC3 with the default settings, 
+			that is, removes genes that are either with expression value >2 in less than 6% of cells 
+			or zero expressions in more than 96% of cells. </p>
+			<p>The filtering step will shorten the running time, without significantly affect any of the results of IRIS3.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">Step ii: Gene module detection</h3>
+		<div class="answer">
+			<p>The in-house biclustering tool, QUBIC [link], was designed to detect co-expressed gene modules from 
+			large-scale gene expression data. Biclustering extends the traditional clustering techniques by attempting 
+			to find (all) subgroups of genes with similar expression patterns under to-be-identified subsets of 
+			experimental conditions. QUBIC employs a combination of qualitative (or semi-quantitative) measures of gene 
+			expression data and a combinatorial optimization technique to predict gene modules effectively and efficiently. </p>
+			<br>
+			<p>Two unique features are addressed in QUBIC: <b>(1)</b> it can identify all statistically significant biclusters 
+			including biclusters with the so-called 'scaling patterns', a problem considered to be rather challenging; 
+			and <b>(2)</b> the algorithm solves such general biclustering problems very efficiently, capable of solving 
+			biclustering problems with tens of thousands of genes under up to thousands of conditions in a few minutes 
+			of the CPU time on a desktop computer. </p>
+			<br>
+			<p><b>Three major parameters control the output biclusters in IRIS3:</b></p>
+			<p><b><i>a. Overlap level</i></b> controls the level (from 0 to 1) of overlaps between the to-be-identified biclusters. 
+			0 means no overlap and 1 indicates complete overlap. The default value is 0.5.</p>
+			<p><b><i>b. Consistency level</i></b> of two biclusters is defined as the minimum ratio between the number of identical 
+			nonzero integers in a column and the total number of rows in the submatrix. The default is 1.</p>
+			<p><b><i>c. Max biclusters</i></b> control the maximum number of to-be-identified biclusters. A more significant 
+			number of o may sufficiently increase the running time and induce noise as more fragile 
+			biclusters generated. The default value is 100.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">Step iii: Cell type prediction</h3>
+		<div class="answer">
+			<p>SC3 (single-cell consensus clustering) is a user-friendly tool for unsupervised clustering, 
+			which achieves high accuracy and robustness by combining multiple clustering solutions through 
+			a consensus approach. Generally, the distances between the cells are calculated using the Euclidean, 
+			Pearson and Spearman metrics to construct distance matrices. The pcaReduce and tSNE + k-means 
+			algorithm for dimension deduction and clustering. SC3 also computes a consensus matrix using 
+			the cluster-based similarity partitioning algorithm by averaging all similarity matrices of 
+			individual clusters.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">Step iv: CTS-gene module assignment</h3>
+		<div class="answer">
+			<p>Based on the gene modules and cell types predicted from step ii and iii, respectively, 
+			the CTS-gene modules can be assigned by performing a cell enrichment analysis. The analysis 
+			uses the <a href=""> hypergeometric test</a> calculating the enrichment p-value to find the enriched cell 
+			types for each bicluster. Biclusters without any significant associations to any cell types are removed, 
+			and the rest are assigned to the cell type with the lowest significant p-value, as the CTS-gene modules.  </p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">Step v: CTS-regulon prediction</h3>
+		<div class="answer">
+			<p>For each cell type, the gene lists in CTS-gene modules from step iv are extracted and merged into 
+			one gene list. This merged gene list will then be used for regulon prediction using DMINDA and MEME 
+			suite. And thus, the outcome regulons in each cell type are defined as the CTS-regulons.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="qa">
+		<h3 class="question">Step vi: Analysis and visualization</h3>
+		<div class="answer">
+			<p>The predicted cell types (from step ii) are evaluated by calculating the silhouette score that 
+			measures how similar a cell is to its type compared to other clusters. If the ground truth cell 
+			types are provided by users, IRIS3 will also evaluate the predicted results using the adjusted rand 
+			index (ARI), FMI, JI, F-score, Accuracy, and NMI. A Sankey plot [example link here] can be generated
+			to show the conserveness and divergence of a two cell groups (ground truth versus SC3 prediction). 
+			The width of the arrows is shown proportionally to the flow quantity.</p>
+			<br>
+			<p>The CTS-regulons are evaluated by performing the enrichment analysis against different functional 
+			annotation databases to identify the enriched GO functionalities, biological pathways, etc. The enrichment 
+			test is performed by EnrichR [link]. The CTS-regulon visualization and corresponding gene expression pattern 
+			interpretation are supported by Clustergrammer [link], which is a powerful and user-friendly heatmap generator 
+			newly developed by the Ma'ayan Lab [link]. Details can be found here [link].</p>
+			<br>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div></body></html>
