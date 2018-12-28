@@ -10,7 +10,7 @@
 	        $('.dropdown-toggle').dropdown();
 	
 	        dropzone = $("#dropzone_exp").dropzone({
-	            dictDefaultMessage: "Drag or click to upload your gene expression file. <br> Accepted files: .txt,.csv,.tsv",
+	            dictDefaultMessage: "Drag or click to upload your gene expression file. <br> Accepted files: .txt,.csv,.tsv,",
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
 	            url: "upload.php",
 	            maxFiles: 1,
@@ -128,6 +128,7 @@
 			<div class="col-sm-12">
 				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table.webp); background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
 			<div id="loader_exp"></div>
+			<div id="hint_upload" style="font-weight: 200;">Note: We accept gene symbols as row identifiers, automated identifier conversion currently in development.</div>
 			<div id="preview_exp"></div>
 			</div>
 
@@ -166,7 +167,6 @@
 									</div>
 									<div class="col-md-2">
 										<select class="selectpicker" name="c_arg" data-width="auto">
-											<option>0.5</option>
 											<option>0.6</option>
 											<option>0.7</option>
 											<option>0.8</option>
