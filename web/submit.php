@@ -53,6 +53,10 @@ if (isset($_POST['submit']))
 	$workdir = "./data/$jobid";
 	mkdir($workdir);
 	$if_allowSave = $_POST['allowstorage'];
+	$is_filter = $_POST['is_filter'];
+	if($is_filter =="") {
+		$is_filter = '0';
+	}
 	$email = $_POST['email'];
 	$c_arg = '1.0';
 	$f_arg = '0.5';
@@ -60,6 +64,7 @@ if (isset($_POST['submit']))
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
+	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
 	$bic_inference = $_POST['bicluster_inference'];
@@ -117,7 +122,7 @@ label_file=$labelfile
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
-Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim
+Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_filter
 /home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
 for file in *blocks
 do
@@ -132,11 +137,11 @@ Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_lab
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n 
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
-/home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length\n
+/home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
-Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd\n
+Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
@@ -160,7 +165,7 @@ label_file=$labelfile
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
-Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim
+Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_filter
 /home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
 for file in *blocks
 do
@@ -176,11 +181,11 @@ Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
-/home/www/html/iris3/program/get_motif_15.sh \$wd \$motif_min_length \$motif_max_length\n
+/home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
-Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd\n
+Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
@@ -203,6 +208,7 @@ touch done\n
 	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
+	$smarty->assign('o_arg',$o_arg);
 	header("Location: results.php?jobid=$jobid");
 }else
 {
