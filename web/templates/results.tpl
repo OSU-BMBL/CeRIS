@@ -66,7 +66,7 @@ console.log(flag)
                         <div class="panel-body">
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Species: Human</p>
+                                    <p for="reportsList">Species: {{$species}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Number of Cells: {{$total_label}}</p>
@@ -276,7 +276,7 @@ console.log(flag)
 										  
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
 										 									
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
 										 
 										 {{/section}}
                                          </tr>
