@@ -5,19 +5,20 @@ library(magic)
 library(Matrix)
 library(reshape2)
 library(rlist)
+library(dplyr)
 args <- commandArgs(TRUE)
 
 srcDir <- args[1]
 jobid <- args[2]
+label_use_sc3 <- args[3]
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 #srcDir <- getwd()
 #jobid <-2018122223516 
-srcDir <- args[1]
-jobid <- args[2]
+#label_use_sc3 <- 1
 setwd(srcDir)
 getwd()
 workdir <- getwd()
-dir.create('heatmap')
+dir.create('heatmap',showWarnings = F)
 
 all_regulon <- list.files(path = workdir,pattern = "._bic.regulon_gene_name.txt$")
 all_label <- list.files(path = workdir,pattern = ".+cell_label.txt$")[1]
@@ -27,26 +28,39 @@ exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFact
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 exp_file <- log1p(exp_file)
 exp_file <- exp_file - rowMeans(exp_file)
-
+user_label_name <- read.table(paste(jobid,"_user_label_name.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
 i=j=k=1
-#i=4
+#i=2
+#j=19
 
 combine_regulon_label<-list()
 
 #index_gene_name<-index_cell_type <- vector()
 regulon_gene <- data.frame()
 regulon_label_index <- 1
-category <- paste("Cell Type:",paste("_",label_file[,2],"_",sep=""),sep = " ")
+gene <- character()
+if (label_use_sc3 == 0 | label_use_sc3 == 1 ) {
+  category <- paste("SC3 label:",paste("_",label_file[,2],"_",sep=""),sep = " ")
+} else {
+  category <- paste("User's label:",paste("_",as.character(unlist(user_label_name)),"_",sep=""),sep = " ")
+}
+
+
 for (i in 1:length(all_regulon)) {
-  regulon_file <- read.table(all_regulon[i],header = F,fill = T,row.names = NULL)[-1]
-  gene <- as.character(sapply(regulon_file, as.character))
+  regulon_file_obj <- file(all_regulon[i],"r")
+  regulon_file_line <- readLines(regulon_file_obj)
+  close(regulon_file_obj)
+  regulon_file <- strsplit(regulon_file_line,"\t")
+  for (regulon_row in regulon_file) {
+    tmp_gene <- regulon_row[-1]
+    gene <- c(gene,tmp_gene)
+  }
   gene <- unique(gene[gene!=""])
   regulon_gene <- rbind(regulon_gene,as.data.frame(gene))
   #For each regulon.txt, convert ENSG -> gene name
   name_idx <- 1
-  for (j in 1:nrow(regulon_file)) {
-    
-    regulon_gene_name <- as.character(unlist(regulon_file[j,]))
+  for (j in 1:length(regulon_file)) {
+    regulon_gene_name <- regulon_file[[j]][-1]
     regulon_gene_name <- regulon_gene_name[regulon_gene_name!=""]
     if(length(regulon_gene_name)>100 | length(regulon_gene_name) <=1){
       next
@@ -73,14 +87,11 @@ for (i in 1:length(all_regulon)) {
   }
 }
 regulon_gene<- unique(regulon_gene)
-category <- paste("Cell Type:",paste("_",label_file[,2],"_",sep=""),sep = " ")
-
 heat_matrix <- data.frame(matrix(ncol = ncol(exp_file), nrow = 0))
 heat_matrix <- subset(exp_file, rownames(exp_file) %in% as.character(regulon_gene[,1]))
-heat_matrix <- rbind(category,heat_matrix)
+
 heat_matrix <- heat_matrix[,order(heat_matrix[1,])]
-category <- as.character(heat_matrix[1,])
-rownames(heat_matrix)[1] <- ""
+
 #i=j=1 
 # get CT#-regulon1-# heat matrix
 for(i in 1: length(unique(label_file[,2]))){
@@ -107,7 +118,21 @@ for(i in 1: length(unique(label_file[,2]))){
   k=0
   gene_row <- unique(gene_row)
   file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),]
-  file_heat_matrix <- rbind(category,file_heat_matrix)
+  
+  if (label_use_sc3 == 0 ) {
+    category <- paste("SC3 label:",paste("_",label_file[,2],"_",sep=""),sep = " ")
+    file_heat_matrix <- rbind(category,file_heat_matrix)
+  } else if (label_use_sc3 == 1) {
+    category1 <- paste("SC3 label:",paste("_",label_file[,2],"_",sep=""),sep = " ")
+    category2 <- paste("User's label:",paste("_",as.character(unlist(user_label_name)),"_",sep=""),sep = " ")
+    file_heat_matrix <- rbind(category1,category2,file_heat_matrix)
+  } else {
+    category <- paste("User's label:",paste("_",as.character(unlist(user_label_name)),"_",sep=""),sep = " ")
+    file_heat_matrix <- rbind(category,file_heat_matrix)
+  }
+  
+  
+  
   for (j in 1:length(combine_regulon_label)) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
       regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(file_heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
@@ -121,10 +146,20 @@ for(i in 1: length(unique(label_file[,2]))){
       }
     }
   }
-  file_heat_matrix[1,1:k] <- ""
-  rownames(file_heat_matrix)[1] <- ""
-  colnames(file_heat_matrix)[1:k] <- ""
-  write.table(file_heat_matrix,paste("heatmap/CT",i,".heatmap.txt",sep = ""),quote = F,sep = "\t", col.names=NA)
+  file_heat_matrix<- tibble::rownames_to_column(file_heat_matrix, "rowname")
+  if (label_use_sc3 == 0 | label_use_sc3 == 2 ) {
+    file_heat_matrix[1,1:k+1] <- ""
+    file_heat_matrix[1,1] <- ""
+    colnames(file_heat_matrix)[1:k+1] <- ""
+    colnames(file_heat_matrix)[1] <- ""
+  } else {
+    file_heat_matrix[1:2,1:k+1] <- ""
+    file_heat_matrix[1:2,1] <- ""
+    colnames(file_heat_matrix)[1:k+1] <- ""
+    colnames(file_heat_matrix)[1] <- ""
+  }
+
+  write.table(file_heat_matrix,paste("heatmap/CT",i,".heatmap.txt",sep = ""),row.names = F,quote = F,sep = "\t", col.names=T)
   
 }
 #rownames(heat_matrix)[-1] <- paste("Gene:",rownames(heat_matrix)[-1],sep = " ")
