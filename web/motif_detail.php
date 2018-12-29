@@ -140,26 +140,27 @@ if(file_exists($tempnam)&& file_get_contents($tempnam)!="")
 	     $annotation1=array();
 	     $motifs=array();
 	  $scr="#!/usr/bin/env sh\ncd $TOOLPATH/weblogo-3.3\n";
-	  
+	   $total_idx = 0;
 	for($k=0;$k<$motif_count;$k++)
 	{	
+			
 			$n = 0;
 			while($n < $result[$k*4+1]){
 				
 			$motifs[$n]=array(
 						'red'=>1,
-						'Seq'=>$array[6*$n],
-						'start'=>$array[6*$n+1],
-						'end'=>$array[6*$n+2],
-						'Motif'=>$array[6*$n+3],
-						'Score'=>$array[6*$n+4],
-						'Info'=>$array[6*$n+5],
+						'Seq'=>$array[6*($n+$total_idx)],
+						'start'=>$array[6*($n+$total_idx)+1],
+						'end'=>$array[6*($n+$total_idx)+2],
+						'Motif'=>$array[6*($n+$total_idx)+3],
+						'Score'=>$array[6*($n+$total_idx)+4],
+						'Info'=>$array[6*($n+$total_idx)+5],
             //'seqlen'=>$lengthseq[($array[$n]-1)],
             );
 			
 			$n = $n + 1;
 			}
-		
+		$total_idx = $total_idx + $result[$k*4+1];
 	     
 	// fclose($fp);
 
@@ -210,8 +211,10 @@ if(file_exists($tempnam)&& file_get_contents($tempnam)!="")
 
    for($i=0;$i<count($annotation1);$i++)
    {
+	   
           if($annotation1[$i]['Motifid']==$id)
           {    
+	 
 				$this_motif_count =  count($annotation1[$i]['Motifs']);
 				$motif_align = array();
 				file_put_contents("$ct_path$motif_tmp_filename", ">$motif_tmp_filename".PHP_EOL);
