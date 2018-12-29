@@ -17,10 +17,10 @@ srcDir <- args[1]
 expName <- args[2]
 setwd(srcDir)
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_mergebbc")
-# jobid <-20181228231938
+# setwd("D:/Users/flyku/Documents/IRIS3-data/mouse_cts")
+# jobid <-2018122982734
 #  srcDir <-  getwd()
-#expName <- "20181228231938_filtered_expression.txt"
+#expName <- "2018122982734_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
 
@@ -54,13 +54,15 @@ check_species <- function(expFile) {
 species <- check_species(expFile)
 #filename <- as.data.frame(srcFile)[1,1]
 generate_seq_file <- function(filename){
+  print(filename)
   genes <- read.table(as.character(filename),header = T,sep = "\t");
   new_dir <- paste(srcDir,"/",gsub(".txt", "", filename,".txt"),sep="")
   dir.create(new_dir, showWarnings = FALSE)
-  #i=10
+  #i=21
   for (i in 1:ncol(genes)) {
     this_genes <- as.character(genes[,i])
     this_genes <- this_genes[!this_genes==""]
+    this_genes <- this_genes[!is.na(this_genes)]
     if(length(this_genes) > 0){
       name <- colnames(genes)[i]
       result <- genes(species[[1]], filter=list(GeneNameFilter(this_genes),GeneIdFilter(species[[2]], "startsWith")), 
