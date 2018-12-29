@@ -52,10 +52,14 @@ if (isset($_POST['submit']))
 	$jobid = $_SESSION['jobid'];
 	$workdir = "./data/$jobid";
 	mkdir($workdir);
+	
 	$if_allowSave = $_POST['allowstorage'];
 	$is_filter = $_POST['is_filter'];
 	if($is_filter =="") {
 		$is_filter = '0';
+	}
+	if($if_allowSave =="") {
+		$if_allowSave = '0';
 	}
 	$email = $_POST['email'];
 	$c_arg = '1.0';
@@ -66,8 +70,12 @@ if (isset($_POST['submit']))
 	$o_arg = $_POST['o_arg'];
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
+	$expfile = str_replace(" ", "_", $expfile);
 	$labelfile = $_SESSION['labelfile'];
 	$bic_inference = $_POST['bicluster_inference'];
+	if( $expfile!='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
+		$labelfile = "";
+	}
 	$len = strlen($labelfile);
 	if($bic_inference=='1' && strlen($labelfile) > 0){#have label use sc3
 		$label_use_sc3 = '1';
@@ -76,14 +84,16 @@ if (isset($_POST['submit']))
 	} else { #no label use sc3
 		$label_use_sc3 = '0';
 	}
+
 	
-	
-	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $label_file == ''){
+	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == '1'){
 		
 		header("Location: results.php?jobid=2018122705958#");
 	}
 	
 	else {
+
+	
 	
 		
 	system("touch $workdir/email.txt");
@@ -96,7 +106,7 @@ if (isset($_POST['submit']))
 	
     fclose($fp);
 	//$fp = fopen("$workdir/info.txt", 'w');
-	//fwrite($fp,"$c_arg\t$f_arg\t$o_arg\t$motif_program\t$label_use_sc3\t$expfile\t$label_file\t");
+	//fwrite($fp,"$c_arg\t$f_arg\t$o_arg\t$motif_program\t$label_use_sc3\t$expfile\t$labelfile\t");
 	//fclose($fp);
 	$workdir2 = "./data/$jobid/";
 	
@@ -112,12 +122,16 @@ if (isset($_POST['submit']))
 		if($delim_label=="\t"){
 		$delim_label = "tab";
 	}
+	$fp = fopen("$workdir/info.txt", 'w');
+	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_filter,$is_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
+	fclose($fp);
 	$fp = fopen("$workdir2/qsub.sh", 'w');
-	if($if_allowSave){
+	if($if_allowSave != '0'){
     system("cp $workdir2$expfile /home/www/html/iris3/storage");
-}
+	}
 
-if ($labelfile){
+	
+if ($labelfile != ''){
 fwrite($fp,"#!/bin/bash\n 
 #User uploaded cell label
 wd=/home/www/html/iris3/data/$jobid/
@@ -181,7 +195,7 @@ grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
 Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1\n
 label_file=\$jobid\_sc3_label.txt
-Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab
+Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
@@ -209,7 +223,7 @@ touch done\n
 	$fp = fopen("$workdir2/param.txt", 'w+');
 	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
 	fclose($fp);
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
