@@ -16,7 +16,7 @@ label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label,
 # srcFile = "iris3_example_expression_label.csv"
 # jobid <- "2018122223516"
 # delim <- ","
-# label_use_sc3 <- 2
+# label_use_sc3 <- 0
 
 #install.packages("NMF")
 #install.packages("clues")
@@ -67,16 +67,22 @@ if (label_use_sc3 == 2) {
   #write.table(user_label_file,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
   write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+  write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+  write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
 } else if (label_use_sc3 == 1){
   is_evaluation <- 'yes'
   write.table(sc3_cluster, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
   write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+  write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+  write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
 } else {
   is_evaluation <- 'no'
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
   write.table(sc3_cluster[,2], paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+  write(paste("provide_label,","0",sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+  write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
 }
 
@@ -100,8 +106,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   clustering_Accuracy <- Accuracy(as.numeric(target$cluster),as.numeric(target$label))
   #clustering_sensitivity <- sensitivity(as.numeric(target$cluster),as.numeric(target$label))
   #clustering_specificity <- specificity(as.numeric(target$cluster),as.numeric(target$label))
-  
-  
+
   #res <- cbind(clustering_ARI,clustering_RI,clustering_JI,clustering_FMI,clustering_F1_Score,
   #clustering_Accuracy,clustering_Precision,clustering_Recall,clustering_entropy,clustering_purity)
   
