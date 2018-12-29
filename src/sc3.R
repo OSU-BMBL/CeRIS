@@ -24,11 +24,11 @@ label_file <- 1
 label_file <- args[3] # user label or 1
 delimiter <- args[4] #delimiter
 ###test
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_jpg")
 # srcDir <- getwd()
-# jobid <-2018122223516 
-# expFile <- "2018122223516_filtered_expression.txt"
-# label_file <- "iris3_example_expression_label.csv" #set empty 
+# jobid <-20181229124519 
+# expFile <- "20181229124519_filtered_expression.txt"
+# label_file <- "Deng_cell_label_updated.csv" #set empty 
 # delimiter <- ","
 
 
@@ -38,6 +38,7 @@ if (label_file == 0 | label_file==1){
   cell_info <- colnames(exp_data)
 } else {
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
+  cell_info[,2] <- as.factor(cell_info[,2])
 }
 
 # create a SingleCellExperiment object
