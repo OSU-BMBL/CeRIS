@@ -117,7 +117,7 @@
                                          <td>{{$ann[sec1].Motifs[sec2].Motif}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].end}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Score}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$ann[sec1].Motifs[sec2].Info}}" style="font-size:14px; display: inline-block;">{{$ann[sec1].Motifs[sec2].Info}}&nbsp;</a></td>
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$ann[sec1].Motifs[sec2].Info}}" style="font-size:14px; display: inline-block;">{{$ann[sec1].Motifs[sec2].Info}}&nbsp;</a></td>
                                          </tr>
                                          {{else}}
                                            <tr>
@@ -126,7 +126,7 @@
                                          <td>{{$ann[sec1].Motifs[sec2].Motif}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].end}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Score}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$ann[sec1].Motifs[sec2].Info}}" style="font-size:14px; display: inline-block;">{{$ann[sec1].Motifs[sec2].Info}}&nbsp;</a></td>
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$ann[sec1].Motifs[sec2].Info}}" style="font-size:14px; display: inline-block;">{{$ann[sec1].Motifs[sec2].Info}}&nbsp;</a></td>
                                          </tr>
                                          {{/if}}
                                    {{/section}}
