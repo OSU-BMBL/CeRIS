@@ -19,9 +19,14 @@ setwd(srcDir)
 getwd()
 workdir <- getwd()
 dir.create('heatmap',showWarnings = F)
-
-all_regulon <- list.files(path = workdir,pattern = "._bic.regulon_gene_name.txt$")
-all_label <- list.files(path = workdir,pattern = ".+cell_label.txt$")[1]
+sort_dir <- function(dir) {
+  tmp <- sort(dir)
+  split <- strsplit(tmp, "_CT_") 
+  split <- as.numeric(sapply(split, function(x) x <- sub("_bic.*", "", x[2])))
+  return(tmp[order(split)])
+}
+all_regulon <- sort_dir(list.files(path = workdir,pattern = "._bic.regulon_gene_name.txt$"))
+all_label <- sort_dir(list.files(path = workdir,pattern = ".+cell_label.txt$")[1])
 label_file <- read.table(all_label,header = T)
 exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
 
@@ -127,11 +132,13 @@ for(i in 1: length(unique(label_file[,2]))){
     category2 <- paste("User's label:",paste("_",as.character(unlist(user_label_name)),"_",sep=""),sep = " ")
     file_heat_matrix <- rbind(category1,category2,file_heat_matrix)
   } else {
-    category <- paste("User's label:",paste("_",as.character(unlist(user_label_name)),"_",sep=""),sep = " ")
-    file_heat_matrix <- rbind(category,file_heat_matrix)
+    sc3_label <- read.table(paste(jobid,"_sc3_label.txt",sep=""),header = T)
+    category1 <- paste("User's label:",paste("_",as.character(unlist(user_label_name)),"_",sep=""),sep = " ")
+    category2 <- paste("SC3 label:",paste("_",sc3_label[,2],"_",sep=""),sep = " ")
+    file_heat_matrix <- rbind(category1,category2,file_heat_matrix)
   }
-  
-  
+
+  file_heat_matrix <- file_heat_matrix[,order(file_heat_matrix[1,])]
   
   for (j in 1:length(combine_regulon_label)) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
@@ -147,7 +154,7 @@ for(i in 1: length(unique(label_file[,2]))){
     }
   }
   file_heat_matrix<- tibble::rownames_to_column(file_heat_matrix, "rowname")
-  if (label_use_sc3 == 0 | label_use_sc3 == 2 ) {
+  if (label_use_sc3 == 0 ) {
     file_heat_matrix[1,1:k+1] <- ""
     file_heat_matrix[1,1] <- ""
     colnames(file_heat_matrix)[1:k+1] <- ""
