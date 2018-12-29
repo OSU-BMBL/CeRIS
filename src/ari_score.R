@@ -66,14 +66,18 @@ if (label_use_sc3 == 2) {
   is_evaluation <- 'yes'
   #write.table(user_label_file,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+  write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   
 } else if (label_use_sc3 == 1){
   is_evaluation <- 'yes'
   write.table(sc3_cluster, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+  write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   
 } else {
   is_evaluation <- 'no'
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+  write.table(sc3_cluster[,2], paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+  
 }
 
 write(paste("is_evaluation,",is_evaluation,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
@@ -93,6 +97,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   #clustering_Precision <- Precision(as.factor(target$cluster),as.factor(target$label))
   #clustering_Recall <- Recall(as.factor(target$cluster),as.factor(target$label))
   clustering_Accuracy <- Accuracy(as.numeric(target$cluster),as.numeric(target$label))
+  clustering_Accuracy <- Accuracy(as.numeric(target$cluster),as.numeric(target$label))
   #clustering_sensitivity <- sensitivity(as.numeric(target$cluster),as.numeric(target$label))
   #clustering_specificity <- specificity(as.numeric(target$cluster),as.numeric(target$label))
   
@@ -110,7 +115,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   write.table(format(t(res), digits=4), paste(jobid,"_sc3_cluster_evaluation.txt",sep = ""),sep = ",", row.names = T,col.names = F,quote = F)
   
   # step2 change label names
-  user_label$label <- sub("^", "User label:", user_label$label )
+  user_label$label <- sub("^", "User label:", user_label_name )
   sc3_cluster$cluster <- sub("^", "SC3 label:", sc3_cluster$cluster )
   
   # step3 rbind two labels to create node matrix
@@ -135,11 +140,13 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   
   # step5 create link matrix
   links <- as.data.frame(cbind(user_label$label,sc3_cluster$cluster))
+  #link_test<- links
+  #links<- link_test
   colnames(links) <- c("label","pred_label")
-  links <- unite(links, newcol, c(label, pred_label), remove=FALSE)
+  links <- unite(links, newcol, c(label, pred_label), remove=FALSE,sep = "^&")
   links <- aggregate(links$label~links$newcol, data=links, FUN=length)
   colnames(links) <- c("type","value")
-  links <- separate(data = links, col = type, into = c("type1", "type2"), sep = "\\_")
+  links <- separate(data = links, col = type, into = c("type1", "type2"), sep = "\\^&")
   i=1
   for (i in 1:nrow(links)) {
     idx <- which(colnames(table(user_label_name,user_label$label)) == as.character(links[i,1]))
