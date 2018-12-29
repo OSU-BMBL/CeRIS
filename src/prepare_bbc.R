@@ -18,7 +18,13 @@ getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
-
+sort_dir <- function(dir) {
+  tmp <- sort(dir)
+  split <- strsplit(tmp, "_CT_") 
+  split <- as.numeric(sapply(split, function(x) x <- sub("_bic.*", "", x[2])))
+  return(tmp[order(split)])
+}
+alldir <- sort_dir(alldir)
 #convert_motif(all_closure[1])
 convert_motif <- function(filepath){
   this_line <- data.frame()

@@ -14,13 +14,23 @@ getwd()
 #srcDir <- getwd()
 #jobid <-20181228231938 
 #motif_length <- 12
+sort_dir <- function(dir) {
+  tmp <- sort(dir)
+  split <- strsplit(tmp, "_CT_") 
+  split <- as.numeric(sapply(split, function(x) x <- sub("_bic.*", "", x[2])))
+  return(tmp[order(split)])
+  
+}
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep("*_bic$",alldir,value=T)
+alldir <- sort_dir(alldir)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
+short_dir<- sort_dir(short_dir)
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
 #i=1;j=7;k=m=3
 #
+
 count_num_regulon<-0
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
