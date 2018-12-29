@@ -10,16 +10,17 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(srcDir)
 getwd()
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_mergebbc")
 #srcDir <- getwd()
-#jobid <-2018122223516 
+#jobid <-20181228231938 
 #motif_length <- 12
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep("*_bic$",alldir,value=T)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
-#i=j=k=m=3
+#i=1;j=7;k=m=3
+#
 count_num_regulon<-0
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
