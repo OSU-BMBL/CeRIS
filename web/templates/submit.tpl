@@ -278,7 +278,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<button type="submit" id="submit_btn" disabled="true" class="btn btn-submit" name="submit" value="submit">Submit</button>
 			<!--<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=2018122630420#" style="color:white">Example output</a>
 			</button>-->
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2018122705958#';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2018122925343#';" />
 
 		</div>
 		<div class="form-group">
