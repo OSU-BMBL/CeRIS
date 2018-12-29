@@ -20,14 +20,14 @@ library(scater)
 args <- commandArgs(TRUE)
 expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
-label_file <- 0
+label_file <- 1
 label_file <- args[3] # user label or empty string
 delimiter <- args[4] #delimiter
 ###test
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_bbc")
 # srcDir <- getwd()
-# jobid <-2018122223516 
-# expFile <- "2018122223516_filtered_expression.txt"
+# jobid <-20181228171212 
+# expFile <- "20181228171212_filtered_expression.txt"
 # label_file <- "iris3_example_expression_label.csv" #set empty 
 # delimiter <- ","
 
@@ -64,7 +64,12 @@ sce <- sc3_calc_consens(sce)
 # modify k to the number of cluster
 silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
 #silh[,2] = seq(1:nrow(silh))
-silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
+if (label_file == 1){
+  silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
+} else {
+  silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
+}
+
 silh_out <- silh_out[order(silh[,1]),]
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
 #apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
