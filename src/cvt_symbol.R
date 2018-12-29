@@ -17,10 +17,10 @@ srcDir <- args[1]
 expName <- args[2]
 setwd(srcDir)
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test3")
-# jobid <-2018122612831
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_mouse_symbol")
+# jobid <-20181228115450
 #  srcDir <-  getwd()
-#expName <- "2018122612831_filtered_expression.txt"
+#expName <- "20181228115450_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
 
@@ -42,27 +42,31 @@ check_species <- function(expFile) {
                   return.type="data.frame", columns=c("gene_id")))
   if(result_human > result_mouse){
     write.table("52","species.txt",quote=F,col.names = F,row.names = F)
+    write("species,Human",file=paste(jobid,"_info.txt",sep=""),append=TRUE)
     return (list(EnsDb.Hsapiens.v86,"ENSG"))
   } else {
     write.table("53","species.txt",quote=F,col.names = F,row.names = F)
+    write("species,Mouse",file=paste(jobid,"_info.txt",sep=""),append=TRUE)
     return (list(EnsDb.Mmusculus.v79,"ENSMUSG"))
   }
 }
-
+#i=1
 species <- check_species(expFile)
-
+#filename <- as.data.frame(srcFile)[1,1]
 generate_seq_file <- function(filename){
-  genes <- read.table(filename,header = T,sep = "\t");
+  genes <- read.table(as.character(filename),header = T,sep = "\t");
   new_dir <- paste(srcDir,"/",gsub(".txt", "", filename,".txt"),sep="")
-  dir.create(new_dir)
+  dir.create(new_dir, showWarnings = FALSE)
   for (i in 1:ncol(genes)) {
-    name <- colnames(genes)[i]
-    result <- genes(species[[1]], filter=list(GeneNameFilter(as.character(genes[,i])),GeneIdFilter(species[[2]], "startsWith")), 
-                    return.type="data.frame", columns=c("gene_id"))
-    if(nrow(result)>4){
-      tmp <- as.data.frame(result[,1])
-      colnames(tmp) <- paste("bic",i,sep = "")
-      write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
+    if(length(genes[,i][!is.na(genes[,i])]) > 0){
+      name <- colnames(genes)[i]
+      result <- genes(species[[1]], filter=list(GeneNameFilter(as.character(genes[,i])),GeneIdFilter(species[[2]], "startsWith")), 
+                      return.type="data.frame", columns=c("gene_id"))
+      if(nrow(result)>4){
+        tmp <- as.data.frame(result[,1])
+        colnames(tmp) <- paste("bic",i,sep = "")
+        write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
+      }
     }
   }
 }
