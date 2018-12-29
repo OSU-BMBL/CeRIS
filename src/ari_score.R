@@ -107,8 +107,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   res_colname <- colnames(res)
   res_colname <- gsub(".*\\_","",res_colname)
   colnames(res) <- res_colname
-  t(res)
-  write.table(format(t(res), digits=4), paste(jobid,"_sc3_cluster_evaluation.txt",sep = ""),sep = ",", row.names = F,col.names = T,quote = F)
+  write.table(format(t(res), digits=4), paste(jobid,"_sc3_cluster_evaluation.txt",sep = ""),sep = ",", row.names = T,col.names = F,quote = F)
   
   # step2 change label names
   user_label$label <- sub("^", "User label:", user_label$label )
