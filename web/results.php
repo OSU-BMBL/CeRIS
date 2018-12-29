@@ -19,6 +19,54 @@ $done_file = "$DATAPATH/$jobid/done";
 
 $regulon_gene_name_file = array();
 $regulon_file = array();
+if (file_exists("$DATAPATH/$jobid/info.txt")){
+$param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
+	if ($param_file) {
+		while (($line = fgets($param_file)) !== false) {
+			$split_line = explode (",", $line);
+			if($split_line[0] == "c_arg"){
+				$c_arg = $split_line[1];
+			} else if($split_line[0] == "f_arg"){
+				$f_arg = $split_line[1];
+			} else if($split_line[0] == "o_arg"){
+				$o_arg = $split_line[1];
+			} else if($split_line[0] == "motif_program"){
+				if( $split_line[1] == 0) {
+					$motif_program = "DMINDA";
+				} else{
+					$motif_program = "MEME";
+				}
+			} else if($split_line[0] == "label_use_sc3"){
+				if( $split_line[1] == 0 || $split_line[1] == 1) {
+					$label_use_sc3 = "SC3";
+				} else{
+					$label_use_sc3 = "User's label";
+				}
+			} else if($split_line[0] == "expfile"){
+				$expfile_name = $split_line[1];
+			} else if($split_line[0] == "labelfile"){
+				$labelfile_name = $split_line[1];
+			} else if($split_line[0] == "is_filter"){
+				if( $split_line[1] == '0') {
+					$is_filter = "No";
+				} else{
+					$is_filter = "Yes";
+				}
+			} else if($split_line[0] == "if_allowSave"){
+				if( $split_line[1] == 0) {
+					$if_allowSave = "No";
+				} else{
+					$if_allowSave = "Yes";
+				}
+			}
+		}
+
+		fclose($param_file);
+	} else {
+		print_r("Info file not found");
+		// error opening the file.
+	} 
+}
 
 
 if (file_exists($done_file)){
@@ -61,6 +109,8 @@ if ($info_file) {
 			$total_regulon = $split_line[1];
 		} else if($split_line[0] == "is_evaluation"){
 			$is_evaluation = $split_line[1];
+		} else if($split_line[0] == "species"){
+			$species = $split_line[1];
 		}
     }
 
@@ -70,8 +120,11 @@ if ($info_file) {
     // error opening the file.
 } 
 
-$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
-if ($sankey_file) {
+
+
+if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
+	$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
+	if ($sankey_file) {
 	$sankey_nodes = $sankey_src = $sankey_target = $sankey_value = array(); 
     while (($line = fgets($sankey_file)) !== false) {
         $split_line = explode (",", $line);
@@ -95,6 +148,9 @@ if ($sankey_file) {
 	print_r("Info file not found");
     // error opening the file.
 } 
+}
+
+
 $silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 if ($silh_file) {
 	$silh_trace = $silh_x = $silh_y  = $line_cell = $line_result = array(); 
@@ -202,6 +258,7 @@ $smarty->assign('total_bic',$total_bic);
 $smarty->assign('total_ct',$total_ct);
 $smarty->assign('total_regulon',$total_regulon);
 $smarty->assign('count_ct',$count_ct);
+$smarty->assign('species',$species);
 $smarty->assign('status',$status);
 $smarty->assign('jobid',$jobid);
 $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
@@ -209,9 +266,19 @@ $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('regulon_motif_result',$regulon_motif_result);
 $smarty->assign('big',$big);
+$smarty->assign('c_arg',$c_arg);
+$smarty->assign('f_arg',$f_arg);
+$smarty->assign('o_arg',$o_arg);
+$smarty->assign('motif_program',$motif_program);
+$smarty->assign('label_use_sc3',$label_use_sc3);
+$smarty->assign('expfile_name',$expfile_name);
+$smarty->assign('labelfile_name',$labelfile_name);
+$smarty->assign('is_filter',$is_filter);
+$smarty->assign('if_allowSave',$if_allowSave);
 $smarty->assign('annotation', $annotation1);
 $smarty->assign('LINKPATH', $LINKPATH);
 $smarty->assign('silh_trace',$silh_trace);
+//print_r($silh_trace);
 $smarty->assign('silh_y',$silh_y);
 $smarty->assign('silh_x',$silh_x);
 $smarty->assign('sankey_src',$sankey_src);
