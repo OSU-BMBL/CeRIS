@@ -21,13 +21,13 @@ args <- commandArgs(TRUE)
 expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- 1
-label_file <- args[3] # user label or empty string
+label_file <- args[3] # user label or 1
 delimiter <- args[4] #delimiter
 ###test
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_bbc")
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 # srcDir <- getwd()
-# jobid <-20181228171212 
-# expFile <- "20181228171212_filtered_expression.txt"
+# jobid <-2018122223516 
+# expFile <- "2018122223516_filtered_expression.txt"
 # label_file <- "iris3_example_expression_label.csv" #set empty 
 # delimiter <- ","
 
@@ -66,10 +66,16 @@ silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
 #silh[,2] = seq(1:nrow(silh))
 if (label_file == 1){
   silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
+  png(file="saving_plot1.jpeg",width=800, height=800)
+  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
+  dev.off()
+  
 } else {
   silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
+  png(file="saving_plot1.jpeg",width=800, height=800)
+  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  dev.off()
 }
-
 silh_out <- silh_out[order(silh[,1]),]
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
 #apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
