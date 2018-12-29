@@ -52,54 +52,191 @@ console.log(flag)
 });
 </script>
 
-<main role="main" class="container">
+<main role="main" class="container" style="min-height: calc(100vh - 182px);">
     <div id="content">
  
         <div class="container">
             <br/>
-            <div class="flatPanel panel panel-default">
-                <div class="flatPanel panel-heading"><strong>Job ID: {{$jobid}}</strong></div>
+            <div class="flatPanel panel panel-default" >
+                <div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong><input style="float:right; "class="btn btn-submit" type="button" value="Download" onClick="javascript:location.href = '/iris3/results.php?jobid=2018122705958#';" /></div>
                 <div class="panel-body">
 
                     {{if $status == "1"}}
-                    <div class="flatPanel panel panel-default">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel with-nav-tabs panel-default">
+
+                                <div class="panel-heading">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a href="#tab1default" data-toggle="tab">General results</a></li>
+                                        <li><a href="#tab2default" data-toggle="tab">Cell Type Prediction</a></li>
+                                        <li><a href="#tab3default" data-toggle="tab">Parameters</a></li>
+                                    </ul>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="tab-content">
+									<div class="tab-pane fade in active" id="tab1default">
+                                            <div class="flatPanel panel panel-default">
                         <div class="panel-body">
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Species: {{$species}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Cells: {{$total_label}}</p>
+                                    <p>Number of cells: {{$total_label}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Genes: {{$total_num}}</p>
+                                    <p>Number of genes: {{$total_num}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Filtered Genes: {{$filter_num}}</p>
+                                    <p>Number of filtered genes: {{$filter_num}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Filtering Rate: {{$filter_rate*100}}%</p>
+                                    <p>Filtering ratio: {{$filter_rate*100}}%</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Cell Types: {{$total_ct}}</p>
+                                    <p>Number of provided cell types: {{$total_ct}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Total Biclusters: {{$total_bic}}</p>
+                                    <p>Total biclusters: {{$total_bic}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of Regulons: {{$total_regulon}}</p>
+                                    <p>Total CTS-Regulons: {{$total_regulon}}</p>
                                 </div>
+<!--Table-->
+                                            <table id="tablePreview" class="table">
+                                                <!--Table head-->
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>Predicted Cell Type</strong></td>
+														{{section name=ct_idx start=0 loop=$count_ct}}
+															<td>{{$count_ct[ct_idx]}}</td>
+                                                        {{/section}}
+                                                    </tr>
+													<tr>
+													    <td><strong>Number of Predicted Cells</strong></td>
+                                                        <!--<td>22</td>
+														<td>8</td>
+														<td>24</td>
+														<td>14</td>
+														<td>16</td>
+														<td>6</td>-->
+														{{section name=clust loop=$silh_trace}}<td>{{count($silh_x[{{$silh_trace[clust]}}])}}</td> {{/section}}
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Number of Predicted Regulons</strong></td>
+														{{section name=num_regulon_in_ct start=0 loop=$count_regulon_in_ct}}
+															<td>{{$count_regulon_in_ct[num_regulon_in_ct]}}</td>
+                                                        {{/section}}
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                            </div>
+                        </div>
+                    </div>
+
+                                            </div>
+                                        
+                                        <div class="tab-pane fade " id="tab2default">
+                                            
+                                            <!--<table id="tablePreview" class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ARI</th>
+                                                        <th>FMI</th>
+                                                        <th>JI</th>
+                                                        <th>F-score</th>
+                                                        <th>Purity</th>
+                                                        <th>Entropy</th>
+                                                        <th>NMI</th>
+                                                        <th>Acc</th>
+                                                        <th>FPR</th>
+                                                        <th>Precision</th>
+                                                        <th>Recall</th>
+                                                        <th>MCC</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>0.6549</td>
+                                                        <td>0.7631</td>
+                                                        <td>0.7422</td>
+                                                        <td>0.85</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                        <td>0.5</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>-->
+                                            <div class="CT-result-img">
+                                                <div class="col-sm-12">
+                                                    <div id="score_div"></div>
+												</div>
+                                                <div class="col-sm-12">
+                                                    <div id="sankey_div"></div>
+												</div>
+											</div>
+										</div>
+
+                                        <div class="tab-pane fade" id="tab3default">
+                                            <div class="flatPanel panel panel-default">
+                        <div class="panel-body">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Gene filtering: {{$is_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Max biclusters: {{$o_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Overlap rate: {{$f_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Uploaded files: {{$expfile_name}} {{$labelfile_name}}</p>
+                                </div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                </div>
+                                
 
                             </div>
                         </div>
                     </div>
-                    <div class="flatPanel panel panel-default">
+                                        </div>
+                                        <div class="tab-pane fade" id="tab5default">Default 5</div>
+                                    </div>
+                                </div>
+                            </div>
+                                            <div class="flatPanel panel panel-default">
                         <div class="panel-body">
                             <div class="row" style="">
                                 <div class="form-group col-md-12 col-sm-12" style="height:100%">
-                                    <strong>CTS Cell-Gene-Regulon Heatmap</strong>
+                                    
 									     <ul class="nav nav-tabs" id="myTab" role="tablist">
-										                    <!--
+										                   
+														   <!--
 															<li class="nav-item">
                                                                 <a class="nav-link" id="profile-tab" data-toggle="tab" tabtype="main" href="#main_CT2" json="data/{{$jobid}}/ct2.json" root="#container-id-12" role="tab" aria-controls="profile" aria-selected="false">Cell Type2</a>
                                                             </li>
@@ -123,6 +260,7 @@ console.log(flag)
 																<div class="flatPanel panel panel-default">
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
+																			<strong>CTS Cell-Gene-Regulon Heatmap for Cell Type {{$sec0+1}}</strong><br>
 																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
                                                                         <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json">Open in new tab
                                                                         </button>
@@ -210,163 +348,8 @@ console.log(flag)
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel with-nav-tabs panel-default">
-                                <div class="panel-heading">
-                                    <ul class="nav nav-tabs">
-                                        <li class="active"><a href="#tab1default" data-toggle="tab">Cell Type Prediction</a></li>
-                                        <li><a href="#tab2default" data-toggle="tab">CTS-Regulon</a></li>
-                                        <li><a href="#tab3default" data-toggle="tab">Downloads</a></li>
-                                    </ul>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="tab-content">
-                                        <div class="tab-pane fade in active" id="tab1default">
-                                            <!--Table-->
-                                            <table id="tablePreview" class="table">
-                                                <!--Table head-->
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td><strong>Predicted Cell Type</strong></td>
-														{{section name=ct_idx start=0 loop=$count_ct}}
-															<td>{{$count_ct[ct_idx]}}</td>
-                                                        {{/section}}
-                                                    </tr>
-													<tr>
-													    <td><strong>Number of Predicted Cells</strong></td>
-                                                        <!--<td>22</td>
-														<td>8</td>
-														<td>24</td>
-														<td>14</td>
-														<td>16</td>
-														<td>6</td>-->
-														{{section name=clust loop=$silh_trace}}<td>{{count($silh_x[{{$silh_trace[clust]}}])}}</td> {{/section}}
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Number of Predicted Regulons</strong></td>
-														{{section name=num_regulon_in_ct start=0 loop=$count_regulon_in_ct}}
-															<td>{{$count_regulon_in_ct[num_regulon_in_ct]}}</td>
-                                                        {{/section}}
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <!--<table id="tablePreview" class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>ARI</th>
-                                                        <th>FMI</th>
-                                                        <th>JI</th>
-                                                        <th>F-score</th>
-                                                        <th>Purity</th>
-                                                        <th>Entropy</th>
-                                                        <th>NMI</th>
-                                                        <th>Acc</th>
-                                                        <th>FPR</th>
-                                                        <th>Precision</th>
-                                                        <th>Recall</th>
-                                                        <th>MCC</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>0.6549</td>
-                                                        <td>0.7631</td>
-                                                        <td>0.7422</td>
-                                                        <td>0.85</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>-->
-                                            <div class="CT-result-img">
-                                                <div class="col-sm-12">
-                                                    <div id="score_div"></div>
-												</div>
-                                                <div class="col-sm-12">
-                                                    <div id="sankey_div"></div>
-												</div>
-											</div>
-										</div>
-                                        <div class="tab-pane fade" id="tab2default">
-                                            <div class="container">
-                                                <div class="row">
-                                                    <div class="col-md-11">
-                                                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                                            <li class="nav-item active">
-                                                                <a class="nav-link fade in active" id="home-tab" data-toggle="tab" href="#regulon-ct1" json="data/{{$jobid}}/CT1.json" root="#container-id-2" role="tab" aria-controls="home" aria-selected="true">CT1</a>
-                                                            </li>
-															{{section name=ct_idx start=1 loop=$count_ct}}
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#regulon-ct{{$count_ct[ct_idx]}}" json="" root="#container-id-3" role="tab" aria-controls="profile" aria-selected="false">CT{{$count_ct[ct_idx]}}</a>
-                                                            </li>
-                                                            {{/section}}
-                                                        </ul>
-                                                        <div class="tab-content" id="myTabContent">
-														 {{foreach from=$regulon_result item=label1 key=sec0}}
-                                                            <div class="tab-pane {{if $sec0 eq '0'}}active{{/if}}" id="regulon-ct{{$sec0+1}}" role="tabpanel">
-																
-
-                                                            </div>
-															
-                                                           {{/foreach}}
-                                                                    
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        
-
-                                        <div class="tab-pane fade" id="tab3default">
-                                            <div class="container">
-                                                <div class="row">
-                                                    <div class="col-12 col-md-12">
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Download All Files
-                                                        </button>
-                                                    </div>
-                                                    <br>
-                                                    <br>
-                                                    <div class="col-12 col-md-12">
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Filtered Expression Matrix
-                                                        </button>
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Bicluster Matrices
-                                                        </button>
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">CTS-Biclusters
-                                                        </button>
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Cell type prediction
-                                                        </button>
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">CTS-Regulon
-                                                        </button>
-                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="#{{$annotation[sec1].Motifname}}_gene">Final Report
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="tab5default">Default 5</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    
+						</div>
                     </div>
 					 </div>
 					{{elseif $status==="404"}}
@@ -377,7 +360,8 @@ console.log(flag)
                     <META HTTP-EQUIV="REFRESH" CONTENT="15"> {{/block}}
 
                     <div style="text-align: left;">
-                        <p>
+                        <div class="flatPanel panel panel-default">
+                        <div class="panel-body"><p>
 
                             <img src="static/images/busy.gif" />
                             <br /> Your request is received now.
@@ -385,7 +369,36 @@ console.log(flag)
                             <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>15</b> seconds.
                             <br/> Link:&nbsp
                             <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
+							
+							
+							<strong>Parameters:</strong><br>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Gene filtering: {{$is_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Max biclusters: {{$o_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Overlap rate: {{$f_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Uploaded files: {{$expfile_name}},{{$labelfile_name}}</p>
+                                </div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                </div>
+                                
 
+                            </div>
+                        </div>
+                    </div>
                     </div>
                     {{/if}}
                 </div>
