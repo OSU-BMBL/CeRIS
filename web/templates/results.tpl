@@ -54,7 +54,7 @@ console.log(flag)
 
 <main role="main" class="container">
     <div id="content">
-
+ 
         <div class="container">
             <br/>
             <div class="flatPanel panel panel-default">
@@ -108,6 +108,7 @@ console.log(flag)
                                                             </li>
 															-->
 															{{section name=ct_idx start=0 loop=$count_ct}}
+															
                                                             <li class="nav-item {{if {{$count_ct[ct_idx]}} eq '1'}}active{{/if}}">
                                                                 <a class="nav-link fade in {{if {{$count_ct[ct_idx]}} eq '0'}}active{{/if}}" id="home-tab" data-toggle="tab" tabtype="main" href="#main_CT{{$count_ct[ct_idx]}}" json="data/{{$jobid}}/json/CT{{$count_ct[ct_idx]}}.json" root="#container-id-{{$count_ct[ct_idx]}}" role="tab" aria-controls="home" aria-selected="true">CT{{$count_ct[ct_idx]}}</a>
                                                             </li>
@@ -116,22 +117,94 @@ console.log(flag)
                                                             
                                                         </ul>
                                                         <div class="tab-content" id="myTabContent">	
-														{{section name=ct_idx start=0 loop=$count_ct}}														
-															<div class="tab-pane {{if {{$count_ct[ct_idx]}} eq '1'}}active{{/if}}" id="main_CT{{$count_ct[ct_idx]}}" role="tabpanel">
+														{{section name=ct_idx start=0 loop=$count_ct}}	{{/section}}
+														{{foreach from=$regulon_result item=label1 key=sec0}}														
+															<div class="tab-pane {{if {{$sec0+1}} eq '1'}}active{{/if}}" id="main_CT{{$sec0+1}}" role="tabpanel">
 																<div class="flatPanel panel panel-default">
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$count_ct[ct_idx]}}.json" target="_blank">
-                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$count_ct[ct_idx]}}.json">Open in new tab
+																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json">Open in new tab
                                                                         </button>
                                                                     </a>
 																				<div id="heatmap">
-																						<div id='container-id-{{$count_ct[ct_idx]}}' style="height:95%;max-height:95%;max-width:100%;display:block">
+																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
 																					</div></div></div></div></div>
+<div class="flatPanel panel panel-default">
+																			<div class="row" >
+																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
+																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt" target="_blank">
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt">Download CT-{{$sec0+1}}
+                                                                        </button>
+                                                                    </a>
+																	<table id="motiftable" class="table table-bordered" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <thead>
+                                                                        <tr>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {{section name=sec1 loop=$regulon_result[$sec0]}}
+																		<tr ><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
+																		
+                                                                        <tr >
+                                                                            <td style="display:inline-block; overflow-y: scroll;width:49%;max-height:400px;">
+                                                                                <div style="width:100%; font-size:14px;">
+																				<table class="table table-bordered table-hover" >
+	                                 
+	                                
+                                  {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
+                                          <tr >
+										  
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
+										 									
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
+										 
+										 {{/section}}
+                                         </tr>
+                                   
+                                 </table>
+											</div>										
+																				
 
+                                                                            </td>
+																			<td style="witdh:49%;display:inline-block; overflow-y: auto;max-height:400px; border:none;" >
+																			
+                                                                                <div class="col-sm-12">
+																				{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
+																				
+																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
+																				
+																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="margin:auto;display:block"></a></span>
+																					
+									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
+									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  /><hr>
+                                                                                </div>
+																				{{/section}}
+                                                                            </td>
+                                                                        </tr>
+																		<tr><td><button type="button" class="btn btn-submit" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="console.log('{{$regulon_result[$sec0][sec1][0]}}');$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Show Heatmap
+                                                        </button><button style="display:none;" type="button" class="btn btn-submit" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
+                                                        </button>&nbsp;<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to EnrichR
+                                                        </button></td></tr>
+																		<tr >
+																		<td colspan=2>
+																		
+																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
+																						<h1 class='wait_message'>Loading heatmap ...</h1>
+																					</div></div>
+																		</td>
+																		</tr>
+
+                                                                        {{/section}}
+                                                                    </tbody>
+                                                                </table>
+
+																					
+																	</div></div></div>
                                                             </div>	
-															{{/section}}														
+															{{/foreach}}														
 															</div>
                                 </div>
                             </div>
@@ -249,78 +322,7 @@ console.log(flag)
                                                         <div class="tab-content" id="myTabContent">
 														 {{foreach from=$regulon_result item=label1 key=sec0}}
                                                             <div class="tab-pane {{if $sec0 eq '0'}}active{{/if}}" id="regulon-ct{{$sec0+1}}" role="tabpanel">
-																<div class="flatPanel panel panel-default">
-																			<div class="row" >
-																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt">Download CT-{{$sec0+1}}
-                                                                        </button>
-                                                                    </a>
-																	<table id="motiftable" class="table table-bordered" cellpadding="0" cellspacing="0" width="100%">
-                                                                    <thead>
-                                                                        <tr>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {{section name=sec1 loop=$regulon_result[$sec0]}}
-																		<tr ><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
-																		
-                                                                        <tr >
-                                                                            <td style="display:inline-block; overflow-y: scroll;width:49%;max-height:400px;">
-                                                                                <div style="width:100%; font-size:14px;">
-																				<table class="table table-bordered table-hover" >
-	                                 
-	                                
-                                  {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
-                                          <tr >
-										  
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
-										 									
-                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
-										 
-										 {{/section}}
-                                         </tr>
-                                   
-                                 </table>
-											</div>										
-																				
-
-                                                                            </td>
-																			<td style="witdh:49%;display:inline-block; overflow-y: auto;max-height:400px; border:none;" >
-																			
-                                                                                <div class="col-sm-12">
-																				{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
-																				
-																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
-																				
-																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="margin:auto;display:block"></a></span>
-																					
-									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
-									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  /><hr>
-                                                                                </div>
-																				{{/section}}
-                                                                            </td>
-                                                                        </tr>
-																		<tr><td><button type="button" class="btn btn-submit" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="console.log('{{$regulon_result[$sec0][sec1][0]}}');$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Show Heatmap
-                                                        </button><button style="display:none;" type="button" class="btn btn-submit" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
-                                                        </button>&nbsp;<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to EnrichR
-                                                        </button></td></tr>
-																		<tr >
-																		<td colspan=2>
-																		
-																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
-																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
-																						<h1 class='wait_message'>Loading heatmap ...</h1>
-																					</div></div>
-																		</td>
-																		</tr>
-
-                                                                        {{/section}}
-                                                                    </tbody>
-                                                                </table>
-
-																					
-																	</div></div></div>
+																
 
                                                             </div>
 															
