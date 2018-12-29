@@ -48,7 +48,7 @@ $(document).ready(function() {
     });
 });
 </script>
-    <main role="main">
+    <main role="main" style="min-height: calc(100vh - 182px);">
 
       <!-- Main jumbotron for a primary marketing message or call to action -->
 
