@@ -75,7 +75,7 @@ $(document).ready(function() {
 				<li>
 					<a href="#3example" class="last">
 						<span class="section">Example result illustration</span>
-						<span class="description">A guide to interpret the result of IRIS3</span>
+						<span class="description">A guide to the result interpretation of IRIS3</span>
 					</a>
 					<div class="submenu" id="submenu-3example"></div>
 					</li>

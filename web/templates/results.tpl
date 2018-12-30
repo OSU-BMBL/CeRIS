@@ -58,10 +58,11 @@ console.log(flag)
         <div class="container">
             <br/>
             <div class="flatPanel panel panel-default" >
-                <div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong><input style="float:right; "class="btn btn-submit" type="button" value="Download" onClick="javascript:location.href = '/iris3/results.php?jobid=2018122705958#';" /></div>
-                <div class="panel-body">
+                
 
                     {{if $status == "1"}}
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong><input style="float:right; "class="btn btn-submit" type="button" value="Download" onClick="javascript:location.href = '/iris3/data/{{$jobid}}/{{$jobid}}.zip';" /></div>
+                <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="panel with-nav-tabs panel-default">
@@ -70,7 +71,7 @@ console.log(flag)
                                     <ul class="nav nav-tabs">
                                         <li class="active"><a href="#tab1default" data-toggle="tab">General results</a></li>
                                         <li><a href="#tab2default" data-toggle="tab">Cell Type Prediction</a></li>
-                                        <li><a href="#tab3default" data-toggle="tab">Parameters</a></li>
+                                        <li><a href="#tab3default" data-toggle="tab">Job settings</a></li>
                                     </ul>
                                 </div>
                                 <div class="panel-body">
@@ -94,8 +95,13 @@ console.log(flag)
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Filtering ratio: {{$filter_rate*100}}%</p>
                                 </div>
+								{{if $provide_label > 0}}
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Number of provided cell types: {{$total_ct}}</p>
+                                    <p>Number of provided cell types: {{$provide_label}}</p>
+                                </div>
+								{{/if}}
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Number of predicted cell types: {{$predict_label}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Total biclusters: {{$total_bic}}</p>
@@ -118,20 +124,24 @@ console.log(flag)
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td><strong>Predicted Cell Type</strong></td>
+													<tr>
+                                                        <td><strong>
+														{{if $label_use_sc3 == 'user\'s label'}}
+														Provided
+														{{else}}
+															Predicted
+														{{/if}}
+														Cell Type</strong></td>
 														{{section name=ct_idx start=0 loop=$count_ct}}
 															<td>{{$count_ct[ct_idx]}}</td>
                                                         {{/section}}
                                                     </tr>
 													<tr>
-													    <td><strong>Number of Predicted Cells</strong></td>
-                                                        <!--<td>22</td>
-														<td>8</td>
-														<td>24</td>
-														<td>14</td>
-														<td>16</td>
-														<td>6</td>-->
+													    <td><strong>Number of {{if $label_use_sc3 == 'user\'s label'}}
+														Provided
+														{{else}}
+															Predicted
+														{{/if}} Cells</strong></td>
 														{{section name=clust loop=$silh_trace}}<td>{{count($silh_x[{{$silh_trace[clust]}}])}}</td> {{/section}}
                                                     </tr>
                                                     <tr>
@@ -140,6 +150,8 @@ console.log(flag)
 															<td>{{$count_regulon_in_ct[num_regulon_in_ct]}}</td>
                                                         {{/section}}
                                                     </tr>
+												
+                                                    
                                                 </tbody>
                                             </table>
                             </div>
@@ -149,46 +161,48 @@ console.log(flag)
                                             </div>
                                         
                                         <div class="tab-pane fade " id="tab2default">
-                                            
-                                            <!--<table id="tablePreview" class="table">
+										{{if ($ARI  >0)}}
+                                             <table id="tablePreview" class="table">
                                                 <thead>
                                                     <tr>
                                                         <th>ARI</th>
-                                                        <th>FMI</th>
+                                                        <th>RI</th>
                                                         <th>JI</th>
-                                                        <th>F-score</th>
-                                                        <th>Purity</th>
-                                                        <th>Entropy</th>
-                                                        <th>NMI</th>
-                                                        <th>Acc</th>
-                                                        <th>FPR</th>
-                                                        <th>Precision</th>
-                                                        <th>Recall</th>
-                                                        <th>MCC</th>
+                                                        <th>FMI</th>
+                                                        
+                                                        <!--<th>Purity</th>
+                                                        <th>Entropy</th><th>Accuracy</th> <td>{{$purity}}</td>
+                                                        <td>{{$entropy}}</td><td>{{$Accuracy}}</td> -->
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td>0.6549</td>
-                                                        <td>0.7631</td>
-                                                        <td>0.7422</td>
-                                                        <td>0.85</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
-                                                        <td>0.5</td>
+                                                        <td>{{$ARI}}</td>
+                                                        <td>{{$RI}}</td>
+                                                        <td>{{$JI}}</td>
+                                                        <td>{{$FMI}}</td>
+                                                       
+                                                        
                                                     </tr>
                                                 </tbody>
-                                            </table>-->
+                                            </table>
+											
+											{{/if}}
+											{{if ($saving_plot1  >0)}}
+											<div class="col-sm-12">
+											<h4 style="text-align:center"> SC3 consensus heatmap<input style="float:right; "class="btn btn-submit" type="button" value="Save consensus heatmap as .emf" onClick="javascript:location.href = 'data/{{$jobid}}/saving_plot1.emf';" /></h4> 
+											
+											<img src="data/{{$jobid}}/saving_plot1.jpeg"></img>
+											</div>
+											{{/if}}
+											
                                             <div class="CT-result-img">
                                                 <div class="col-sm-12">
+												<h4 style="text-align:center;margin-top:50px"> Silhouette score</h4>
                                                     <div id="score_div"></div>
 												</div>
                                                 <div class="col-sm-12">
+												<h4 style="text-align:center;margin-top:50px"> Sankey plot</h4>
                                                     <div id="sankey_div"></div>
 												</div>
 											</div>
@@ -214,12 +228,11 @@ console.log(flag)
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Uploaded files: {{$expfile_name}} {{$labelfile_name}}</p>
-                                </div>
-                                <div class="form-group col-md-12 col-sm-12">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
 
                             </div>
                         </div>
@@ -264,6 +277,9 @@ console.log(flag)
 																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
                                                                         <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json">Open in new tab
                                                                         </button>
+                                                                    </a>&nbsp;<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt" target="_blank">
+                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt">Download CT-{{$sec0+1}} regulon-gene list 
+                                                                        </button>
                                                                     </a>
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
@@ -272,10 +288,7 @@ console.log(flag)
 <div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt" target="_blank">
-                                                                        <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_name.txt">Download CT-{{$sec0+1}}
-                                                                        </button>
-                                                                    </a>
+																		
 																	<table id="motiftable" class="table table-bordered" cellpadding="0" cellspacing="0" width="100%">
                                                                     <thead>
                                                                         <tr>
@@ -286,7 +299,7 @@ console.log(flag)
 																		<tr ><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
 																		
                                                                         <tr >
-                                                                            <td style="display:inline-block; overflow-y: scroll;width:49%;max-height:400px;">
+                                                                            <td style="display:inline-block; overflow-y: auto;width:49%;max-height:400px;">
                                                                                 <div style="width:100%; font-size:14px;">
 																				<table class="table table-bordered table-hover" >
 	                                 
@@ -306,14 +319,14 @@ console.log(flag)
 																				
 
                                                                             </td>
-																			<td style="witdh:49%;display:inline-block; overflow-y: auto;max-height:400px; border:none;" >
+																			<td style="display:inline-block; overflow-y: auto;max-height:400px; border:none;width:49%;" >
 																			
                                                                                 <div class="col-sm-12">
 																				{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
 																				
 																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
 																				
-																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="margin:auto;display:block"></a></span>
+																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"></a></span>
 																					
 									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
 									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  /><hr>
@@ -352,11 +365,19 @@ console.log(flag)
 						</div>
                     </div>
 					 </div>
+					 </div>
+            </div>
 					{{elseif $status==="404"}}
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
+                <div class="panel-body">
 					<div style="text-align: left;">
                         <p>Job ID nout found</p>
                     </div>
+					</div>
+            
                     {{else}} {{block name="meta"}}
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
+                <div class="panel-body">
                     <META HTTP-EQUIV="REFRESH" CONTENT="15"> {{/block}}
 
                     <div style="text-align: left;">
@@ -371,7 +392,7 @@ console.log(flag)
                             <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
 							
 							
-							<strong>Parameters:</strong><br>
+							<strong>Job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
@@ -388,21 +409,22 @@ console.log(flag)
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
-                                    <p>Uploaded files: {{$expfile_name}},{{$labelfile_name}}</p>
-                                </div>
-                                <div class="form-group col-md-12 col-sm-12">
+								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
+                                <div class="form-group col-md-12 col-sm-12"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+                                
                                 
 
                             </div>
                         </div>
                     </div>
                     </div>
+					</div>
                     {{/if}}
                 </div>
-            </div>
         </div>
     </div>
     <!-- Required JS Libraries -->
@@ -421,35 +443,7 @@ console.log(flag)
     <script src='assets/js/load_clustergram.js'></script>
 
     <script>
-        var sankey_data = {
-            type: "sankey",
-            orientation: "h",
-            node: {
-                pad: 10,
-                thickness: 30,
-                line: {
-                    color: "black",
-                    width: 2
-                },
-                label: {{$sankey_nodes}},
-                color: 'RdBu'
-            },
 
-            link: {
-                source: {{$sankey_src}},
-                target: {{$sankey_target}},
-                value:  {{$sankey_value}}
-            }
-        }
-
-        var sankey_data = [sankey_data]
-
-        var sankey_layout = {
-		title: "Sankey plot",
-            font: {
-                size: 16
-            }
-        }
 
 {{section name=clust loop=$silh_trace}}
 var trace{{$silh_trace[clust]}} = {
@@ -466,14 +460,16 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 
 		var score_layout = {
 		barmode: 'group',
-		title: "Silhouette score",
+		
             font: {
                 size: 12
-            }
+            },
+	"titlefont": {
+    "size": 16
+	},
         }
 		Plotly.react('score_div', score_data, score_layout);
 		
-        Plotly.react('sankey_div', sankey_data, sankey_layout)
 		
 	function get_gene_list(item){
 	match_id = $(item).attr("id").match(/\d+/gm);
@@ -533,6 +529,45 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
   document.body.removeChild(form);
 }
     </script>
+	
+	{{if !empty($sankey_nodes)}} 
+	 <script>
+		    var sankey_data = {
+            type: "sankey",
+            orientation: "h",
+            node: {
+                pad: 10,
+                thickness: 30,
+                line: {
+                    color: "black",
+                    width: 2
+                },
+                label: {{$sankey_nodes}},
+                color: 'RdBu'
+            },
+
+            link: {
+                source: {{$sankey_src}},
+                target: {{$sankey_target}},
+                value:  {{$sankey_value}}
+            }
+        }
+
+        var sankey_data = [sankey_data]
+
+        var sankey_layout = {
+		
+            font: {
+                size: 12
+            },
+	"titlefont": {
+    "size": 16
+	},
+        }
+        Plotly.react('sankey_div', sankey_data, sankey_layout)
+		 </script>
+		{{/if}}
+	
 	<div class="push"></div>
 </main>
 {{/block}}

@@ -64,14 +64,14 @@
                 <nav class="navbar">
                     <div class="container">
                         <div class="navbar-header">
-                            <a class="navbar-brand" href="/iris3/index.php" style="color:white">IRIS3</a>
+                            <a class="navbar-brand" href="/iris3/index.php" style="color:white;font-size:24px">IRIS3</a>
                         </div>
                         <div id="main-nav" class="stellarnav">
                             <ul id="nav" class="nav navbar-nav pull-right">
                                 <li><a href="/iris3/index.php">Home</a></li>
                                 <li><a href="/iris3/submit.php">Submit</a></li>
                                 <li><a href="/iris3/tutorial.php#1basics">Tutorial</a></li>
-								<li><a href="/iris3/news.php">What's new</a></li>
+								<li><a href="/iris3/news.php#1version">What's new</a></li>
 								<li><a href="https://groups.google.com/forum/#!forum/iris3-discussion-board">Forum</a></li>
                             </ul>
                         </div>
@@ -109,8 +109,8 @@
 	<!--<footer class="footer">
 	<div class="footer-copyright text-center wow fadeIn">
                             <p class="m-0 text-center text">© <script>document.write(new Date().getFullYear());</script> <a href="https://www.sdstate.edu/bioinformatics-and-mathematical-biosciences-lab">BMBL</a> | <a href="mailto:bmbl.qinma@gmail.com" title="bmbl.qinma@gmail.com">Contact us: bmbl.qinma@gmail.com</a>  </p>
-                        </div> -->
-	</footer>
+                        </div> </footer>-->
+	
     {{/block}}
     
     <script type="text/javascript">
@@ -127,4 +127,3 @@
     </script>
   </body>
 </html>
-</script>

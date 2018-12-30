@@ -19,6 +19,7 @@
 	                this.removeAllFiles();
 	                this.addFile(file);
 	            },
+				timeout: 300000,
 	            sending: function(file, xhr, formData) {
 	                formData.append('filetype', 'dropzone_exp');
 	            },
@@ -38,6 +39,7 @@
 	            url: "upload.php",
 	            maxFiles: 1,
 	            maxFilesize: 500,
+				timeout: 300000,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
 	                this.addFile(file);
@@ -57,9 +59,9 @@
 	$('#load_exp').click(function(evt) {
 	$('#enable_labelfile').attr("disabled", false);
 	$('#submit_btn').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
-	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
 	$.ajax({
 		url: "upload.php",
@@ -79,9 +81,9 @@
 	$('#load_label').click(function(evt) {
 	$('#submit_btn').attr("disabled", false);
 	$('#enable_labelfile').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
-	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.webp); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
 	// AJAX Query
 	$.ajax({
@@ -120,22 +122,22 @@
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" download>Download example gene expression file</a>
+						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" >Download example gene expression file</a>
 						</li>
 					</ul>
 				</div>
 			</div>
 			<div class="col-sm-12">
-				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table.webp); background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
+				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
 			<div id="loader_exp"></div>
-			<div id="hint_upload" style="font-weight: 200;">Note: We accept gene symbols as row identifiers, automated identifier conversion currently in development.</div>
+			<!--<div id="hint_upload" style="font-weight: 200;">Note: We accept gene symbols as row identifiers, automated identifier conversion currently in development.</div>-->
 			<div id="preview_exp"></div>
 			</div>
 
 		</div>
 		<div class="form-group row">
 			<div class="form-check col-sm-12 ">
-				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="0">
+				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="1">
 				<label class="form-check-label" for="allowstorage">Allow data storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="To check this option, you allow us to store your data in IRIS3 database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
 				</label>
 			</div>
@@ -227,7 +229,7 @@
 													</li>
 												</ul>
 											</div>
-											<div id="dropzone_label" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_label.webp); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
+											<div id="dropzone_label" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
 														<div id="loader_label"></div>
 			<div id="preview_label"></div>
 										</div>
@@ -278,7 +280,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<button type="submit" id="submit_btn" disabled="true" class="btn btn-submit" name="submit" value="submit">Submit</button>
 			<!--<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=2018122630420#" style="color:white">Example output</a>
 			</button>-->
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2018122925343#';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20181229201357#';" />
 
 		</div>
 		<div class="form-group">
