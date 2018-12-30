@@ -11,7 +11,6 @@ is_filter <- args[4] #1 for enable filter
 if(delim == 'tab'){
 	delim <- '\t'
 }
-BiocManager::install("org.Hs.eg.db", version = "3.8")
 
 # srcFile = "C:/Users/flyku/Desktop/Yan_expression.csv"
 # srcFile = "C:/Users/flyku/Desktop/GSE37704.csv"
@@ -66,6 +65,7 @@ filter_func <- function(this){
 }
 
 new_yan_index <- as.vector(apply(yan.test, 1, filter_func))
+
 if(is_filter == 1){
   new_yan <- yan.test[which(new_yan_index == 1),]
 } else{
