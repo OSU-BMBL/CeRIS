@@ -47,7 +47,7 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 			} else if($split_line[0] == "labelfile"){
 				$labelfile_name = $split_line[1];
 			} else if($split_line[0] == "is_filter"){
-				if( $split_line[1] == '0') {
+				if( $split_line[1] == 0) {
 					$is_filter = "No";
 				} else{
 					$is_filter = "Yes";
@@ -67,23 +67,66 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 		// error opening the file.
 	} 
 }
-
+if (file_exists("$DATAPATH/$jobid/saving_plot1.jpeg")){
+	$saving_plot1 = 1;
+}
 
 if (file_exists($done_file)){
+	
+if (file_exists("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt")){
+$evaluation_file = fopen("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt", "r");
+	if ($evaluation_file) {
+		while (($line = fgets($evaluation_file)) !== false) {
+			$split_line = explode (",", $line);
+			if($split_line[0] == "ARI"){
+				$ARI = $split_line[1];
+			} else if($split_line[0] == "RI"){
+				$RI = $split_line[1];
+			} else if($split_line[0] == "JI"){
+				$JI = $split_line[1];
+			} else if($split_line[0] == "FMI"){
+				$FMI = $split_line[1];
+			} else if($split_line[0] == "Accuracy"){
+				$Accuracy = $split_line[1];
+			} else if($split_line[0] == "entropy"){
+				$entropy = $split_line[1];
+			} else if($split_line[0] == "purity"){
+				$purity = $split_line[1];
+			} 
+		}
+		fclose($evaluation_file);
+	} else {
+		print_r("Info file not found");
+		// error opening the file.
+	} 
+}
+
+
+
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon_gene_name.txt") as $file) {
 	
   $regulon_gene_name_file[] = $file;
+  
 }
+
 
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon.txt") as $file) {
 	
   $regulon_id_file[] = $file;
+  
 }
 
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon_motif.txt") as $file) {
 	
   $regulon_motif_file[] = $file;
+ 
 }
+natsort($regulon_gene_name_file);
+natsort($regulon_id_file);
+natsort($regulon_motif_file);
+$regulon_gene_name_file = array_values($regulon_gene_name_file);
+$regulon_id_file = array_values($regulon_id_file);
+$regulon_motif_file = array_values($regulon_motif_file);
 
 $count_ct = range(1,count($regulon_gene_name_file));
 $info_file = fopen("$DATAPATH/$jobid/$jobid"."_info.txt", "r");
@@ -111,6 +154,10 @@ if ($info_file) {
 			$is_evaluation = $split_line[1];
 		} else if($split_line[0] == "species"){
 			$species = $split_line[1];
+		} else if($split_line[0] == "provide_label"){
+			$provide_label = $split_line[1];
+		} else if($split_line[0] == "predict_label"){
+			$predict_label = $split_line[1];
 		}
     }
 
@@ -266,9 +313,20 @@ $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('regulon_motif_result',$regulon_motif_result);
 $smarty->assign('big',$big);
+$smarty->assign('predict_label',$predict_label);
+$smarty->assign('provide_label',$provide_label);
 $smarty->assign('c_arg',$c_arg);
 $smarty->assign('f_arg',$f_arg);
 $smarty->assign('o_arg',$o_arg);
+$smarty->assign('ARI',$ARI);
+$smarty->assign('RI',$RI);
+$smarty->assign('JI',$JI);
+$smarty->assign('FMI',$FMI);
+$smarty->assign('saving_plot1',$saving_plot1);
+$smarty->assign('Accuracy',$Accuracy);
+$smarty->assign('entropy',$entropy);
+$smarty->assign('count_ct',$count_ct);
+$smarty->assign('purity',$purity);
 $smarty->assign('motif_program',$motif_program);
 $smarty->assign('label_use_sc3',$label_use_sc3);
 $smarty->assign('expfile_name',$expfile_name);
@@ -278,7 +336,7 @@ $smarty->assign('if_allowSave',$if_allowSave);
 $smarty->assign('annotation', $annotation1);
 $smarty->assign('LINKPATH', $LINKPATH);
 $smarty->assign('silh_trace',$silh_trace);
-//print_r($silh_trace);
+//print_r($sankey_nodes);
 $smarty->assign('silh_y',$silh_y);
 $smarty->assign('silh_x',$silh_x);
 $smarty->assign('sankey_src',$sankey_src);
