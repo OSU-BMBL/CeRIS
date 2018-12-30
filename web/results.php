@@ -40,7 +40,7 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 				if( $split_line[1] == 0 || $split_line[1] == 1) {
 					$label_use_sc3 = "SC3";
 				} else{
-					$label_use_sc3 = "User's label";
+					$label_use_sc3 = "user's label";
 				}
 			} else if($split_line[0] == "expfile"){
 				$expfile_name = $split_line[1];
@@ -63,7 +63,7 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 
 		fclose($param_file);
 	} else {
-		print_r("Info file not found");
+		//print_r("Info file not found");
 		// error opening the file.
 	} 
 }
@@ -95,11 +95,11 @@ $evaluation_file = fopen("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt"
 			} 
 		}
 		fclose($evaluation_file);
-	} else {
-		print_r("Info file not found");
+	} 
+}else {
+		//print_r("Info file not found");
 		// error opening the file.
 	} 
-}
 
 
 
@@ -197,7 +197,7 @@ if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 } 
 }
 
-
+if (file_exists("$DATAPATH/$jobid/$jobid"."_silh.txt")){
 $silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 if ($silh_file) {
 	$silh_trace = $silh_x = $silh_y  = $line_cell = $line_result = array(); 
@@ -226,6 +226,9 @@ if ($silh_file) {
 	print_r("Info file not found");
     // error opening the file.
 } 
+} else {
+	print_r("Silh file not found");
+}
 foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 	
 	$status = "1";
@@ -272,7 +275,16 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	}
 	fclose($fp);
 	}
+function exception_handler($exception) {
+  echo '<div class="alert alert-danger">';
+  echo '<b>Fatal error</b>:  Uncaught exception \'' . get_class($exception) . '\' with message ';
+  echo $exception->getMessage() . '<br>';
+  echo 'Stack trace:<pre>' . $exception->getTraceAsString() . '</pre>';
+  echo 'thrown in <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b><br>';
+  echo '</div>';
+}
 
+set_exception_handler('exception_handler');
 }else if (!file_exists($tempnam)) {
 	$status= "404";
 }else {
