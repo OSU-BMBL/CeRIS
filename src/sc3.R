@@ -24,12 +24,13 @@ label_file <- 1
 label_file <- args[3] # user label or 1
 delimiter <- args[4] #delimiter
 ###test
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_jpg")
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_id")
 # srcDir <- getwd()
-# jobid <-20181229124519 
-# expFile <- "20181229124519_filtered_expression.txt"
-# label_file <- "Deng_cell_label_updated.csv" #set empty 
-# delimiter <- ","
+# jobid <-20181229184557 
+# expFile <- "20181229184557_filtered_expression.txt"
+# label_file <- "Guo_cell_type.txt"
+# delimiter <- "tab"
+
 
 
 exp_data<- read.delim(expFile,check.names = FALSE, header=TRUE,row.names = 1)
@@ -37,6 +38,9 @@ label_file
 if (label_file == 0 | label_file==1){
   cell_info <- colnames(exp_data)
 } else {
+  if(delimiter == 'tab'){
+    delimiter <- '\t'
+  }
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   cell_info[,2] <- as.factor(cell_info[,2])
 }
@@ -70,10 +74,18 @@ if (label_file == 1){
   png(file="saving_plot1.jpeg",width=800, height=800)
   sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
   dev.off()
+  library(devEMF)
+  emf(file="saving_plot1.emf", emfPlus = FALSE)
+  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  dev.off()
   
 } else {
   silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
   png(file="saving_plot1.jpeg",width=800, height=800)
+  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  dev.off()
+  library(devEMF)
+  emf(file="saving_plot1.emf", emfPlus = FALSE)
   sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
   dev.off()
 }
