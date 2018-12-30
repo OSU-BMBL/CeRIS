@@ -19,12 +19,17 @@ getwd()
 # label_file <- "2018122864543_cell_label.txt"
 #setwd("C:/Users/flyku/Desktop/iris3/data")
 
-conds_file <- read.delim(paste(jobid,"_blocks.conds.txt",sep = ""),sep=" ",header = F)[,-1]
+
+
+#conds_file <- read.delim(paste(jobid,"_blocks.conds.txt",sep = ""),sep=" ",header = F)[,-1]
+conds_file_handle <- file(paste(jobid,"_blocks.conds.txt",sep = ""),"r")
+conds_file <- readLines(conds_file_handle)
+close(conds_file_handle)
+
 gene_file <- read.delim(paste(jobid,"_blocks.gene.txt",sep = ""),sep=" ",header = F)[,-1]
 #conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
 #conds_file <- read_csv(paste(jobid,"_blocks.conds.txt",sep = ""),col_names = F)
 #gene_file <- read_delim(paste(jobid,"_blocks.gene.txt",sep = ""),delim=" ",col_names = F)[,-1]
-conds_file <- conds_file[!apply(conds_file == "", 1, all),]
 #cell_label <- read_delim("iris3_example_expression_label.csv",delim=",",col_names = T)
 cell_label <- read.table(label_file,sep="\t",header = T)
 gene_expression <- read.table(expFile,sep="\t",header = T)
@@ -43,19 +48,20 @@ colnames(cell_label) <- c("cell","label")
 count_cluster <- length(levels(as.factor(cell_label$label)))
 
 #test
-#df=conds_file[1,]
+#i=1
+#df=conds_file[1]
 get_pvalue <- function(df){
   count_cluster <- length(levels(as.factor(cell_label$label)))
   tmp_pvalue <- 0
   result_pvalue <- vector()
   result <- list()
   for (i in 1:count_cluster) {
-    A <- unlist(cell_label[which(cell_label$label==i),1])
-    B <- unlist(df)
+    A <- as.character(unlist(cell_label[which(cell_label$label==i),1]))
+    B <- strsplit(df,"\\s+")[[1]][-1]
     m=length(A)
     n=nrow(cell_label)-m
     x=length(A[(A%in%B)])
-    k=length(na.omit(unlist(df)))-1
+    k=length(B)-1
     tmp_pvalue <- 1 - phyper(x,m,n,k)
     result_pvalue[i] <- tmp_pvalue
   }
@@ -67,7 +73,7 @@ get_pvalue <- function(df){
   return (list(pvalue=result_pvalue,cell_type=seq(1:count_cluster)))
 }
 
-pv <- apply(conds_file,1,get_pvalue)
+pv <- lapply(conds_file,get_pvalue)
 
 
 
@@ -93,7 +99,7 @@ get_bic_in_ct <- function(lis,num){
     }
   }
 }
-total_bic <- nrow(conds_file)
+total_bic <- length(conds_file)
 #i=1;j=1
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
