@@ -86,9 +86,9 @@ if (isset($_POST['submit']))
 	}
 
 	
-	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == '1'){
+	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		
-		header("Location: results.php?jobid=2018122705958#");
+		header("Location: results.php?jobid=20181229201357#");
 	}
 	
 	else {
@@ -163,13 +163,15 @@ Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program \$motif_m
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
-Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid
+Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
 mkdir json
 /home/www/html/iris3/program/build_clustergrammar.sh \$wd
 mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
 /home/www/html/iris3/program/get_logo.sh \$wd
+zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
+
 touch done\n 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 
@@ -193,7 +195,7 @@ for file in *blocks
 do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
-Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1\n
+Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1 ,\n
 label_file=\$jobid\_sc3_label.txt
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
@@ -207,13 +209,15 @@ Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
-Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid
+Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid 0
 mkdir json
 /home/www/html/iris3/program/build_clustergrammar.sh \$wd
 mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
 /home/www/html/iris3/program/get_logo.sh \$wd
+zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
+
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 touch done\n 
 ");}
