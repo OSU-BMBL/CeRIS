@@ -100,7 +100,7 @@ if (isset($_POST['submit']))
 	system("chmod 777 $workdir/email.txt");
 	$fp = fopen("$workdir/email.txt", 'w');
 	if($email == ""){
-		$email == "flykun0620@gmail.com";
+		$email = "flykun0620@gmail.com";
 	}
     fwrite($fp,"$email");
 	

@@ -67,6 +67,27 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 		// error opening the file.
 	} 
 }
+
+
+
+if (file_exists("$DATAPATH/$jobid/email.txt")){
+$email_file = fopen("$DATAPATH/$jobid/email.txt", "r");
+	if ($email_file) {
+		while (($line = fgets($email_file)) !== false) {
+			if($line == "flykun0620@gmail.com" ||strlen($line) == 0){
+				$email_line = "Email not entered.";
+			} else {
+				$email_line = $line;
+			}
+		}
+
+		fclose($email_file);
+	} else {
+		//print_r("email file not found");
+		// error opening the file.
+	} 
+}
+
 if (file_exists("$DATAPATH/$jobid/saving_plot1.jpeg")){
 	$saving_plot1 = 1;
 }
@@ -334,6 +355,7 @@ $smarty->assign('ARI',$ARI);
 $smarty->assign('RI',$RI);
 $smarty->assign('JI',$JI);
 $smarty->assign('FMI',$FMI);
+$smarty->assign('email_line',$email_line);
 $smarty->assign('saving_plot1',$saving_plot1);
 $smarty->assign('Accuracy',$Accuracy);
 $smarty->assign('entropy',$entropy);
