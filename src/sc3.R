@@ -71,7 +71,7 @@ silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
 #silh[,2] = seq(1:nrow(silh))
 if (label_file == 1){
   silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
-  png(file="saving_plot1.jpeg",width=800, height=800)
+  png(file="saving_plot1.jpeg",width=1200, height=1200)
   sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
   dev.off()
   library(devEMF)
@@ -81,7 +81,7 @@ if (label_file == 1){
   
 } else {
   silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
-  png(file="saving_plot1.jpeg",width=800, height=800)
+  png(file="saving_plot1.jpeg",width=1200, height=1200)
   sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
   dev.off()
   library(devEMF)
