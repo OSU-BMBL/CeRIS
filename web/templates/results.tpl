@@ -127,22 +127,34 @@ console.log(flag)
 													<tr>
                                                         <td><strong>
 														{{if $label_use_sc3 == 'user\'s label'}}
-														Provided
+														Provided Cell Type Index
 														{{else}}
-															Predicted
+															Predicted Cell Type
 														{{/if}}
-														Cell Type</strong></td>
+														</strong></td>
 														{{section name=ct_idx start=0 loop=$count_ct}}
 															<td>{{$count_ct[ct_idx]}}</td>
                                                         {{/section}}
                                                     </tr>
+													
+													{{if $label_use_sc3 == 'user\'s label'}}
+													<tr>
+															<td><strong>Provided Cell Type Names</strong></td>
+																{{foreach from=$provided_cell key=k item=v}}<td>{{$k}}</td> {{/foreach}}
+															</tr>
+															{{/if}}
 													<tr>
 													    <td><strong>Number of {{if $label_use_sc3 == 'user\'s label'}}
 														Provided
 														{{else}}
 															Predicted
 														{{/if}} Cells</strong></td>
-														{{section name=clust loop=$silh_trace}}<td>{{count($silh_x[{{$silh_trace[clust]}}])}}</td> {{/section}}
+														{{if $label_use_sc3 == 'user\'s label'}}
+															{{foreach from=$provided_cell key=k item=v}}<td>{{$v}}</td> {{/foreach}}
+															
+														{{else}}
+															{{section name=clust loop=$silh_trace}}<td>{{count($silh_x[{{$silh_trace[clust]}}])}}</td> {{/section}}
+														{{/if}}
                                                     </tr>
                                                     <tr>
                                                         <td><strong>Number of Predicted Regulons</strong></td>
@@ -192,7 +204,7 @@ console.log(flag)
 											<div class="col-sm-12">
 											<h4 style="text-align:center"> SC3 consensus heatmap<input style="float:right; "class="btn btn-submit" type="button" value="Save consensus heatmap as .emf" onClick="javascript:location.href = 'data/{{$jobid}}/saving_plot1.emf';" /></h4> 
 											
-											<img src="data/{{$jobid}}/saving_plot1.jpeg"></img>
+											<img style="width:100%"src="data/{{$jobid}}/saving_plot1.jpeg"></img>
 											</div>
 											{{/if}}
 											
@@ -230,10 +242,12 @@ console.log(flag)
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                <div class="form-group col-md-12 col-sm-12">
+                                <div class="form-group col-md-6 col-sm-6">
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
                                 </div>
-
+								<div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Email: {{$email_line}}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -374,7 +388,55 @@ console.log(flag)
                         <p>Job ID nout found</p>
                     </div>
 					</div>
-            
+					{{elseif $status==="error"}}
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
+						<div class="panel-body">
+					<div style="text-align: left;">
+                        <strong><h3>Sorry, there has been an error.</h3></strong>
+						<p>Check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<!---
+						
+						<p>Perhaps you are here because: </p>
+						<ul>
+						<li> Wrong input file format</li>
+						</ul>
+						
+						--->
+						<br>
+                    </div>
+					
+					<strong>Your job settings:</strong><br>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Gene filtering: {{$is_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Max biclusters: {{$o_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Overlap rate: {{$f_arg}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Email: {{$email_line}}</p>
+                                </div>
+                                
+                                
+
+                            </div>
+					</div>
+					
                     {{else}} {{block name="meta"}}
 					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
                 <div class="panel-body">
@@ -412,8 +474,11 @@ console.log(flag)
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                <div class="form-group col-md-12 col-sm-12"> 
+                                <div class="form-group col-md-6 col-sm-6"> 
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Email: {{$email_line}}</p>
                                 </div>
                                 
                                 
@@ -460,7 +525,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 
 		var score_layout = {
 		barmode: 'group',
-		
+			width:window.innerHeight-20,
             font: {
                 size: 12
             },
@@ -556,7 +621,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
         var sankey_data = [sankey_data]
 
         var sankey_layout = {
-		
+			width:window.innerHeight-20,
             font: {
                 size: 12
             },
