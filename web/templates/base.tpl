@@ -7,12 +7,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Integrated Cell-type-specific Regulon Inference from Single-cell RNA-Seq
-
-" />
-    <meta name="keywords" content="Cell-type-specific Regulon Single-cell RNA-Seq" />
-
-    <title>IRIS3</title>
+    <meta name="description" content="integrated cell type specific Regulon inference from single-cell rna seq" />
+    <meta name="keywords" content="scrnaseq, regulon, single cell rna seq,Cell-type-specific Regulon Single-cell RNA-Seq" />
+    <title>IRIS3 - Integrated Cell-type-specific Regulon Inference Server from Single-cell RNA-Seq</title>
     <script src="assets/js/vendor/jquery-1.12.4.min.js"></script>
     <script src="assets/js/vendor/bootstrap.min.js"></script>
     <script src="assets/js/wow.min.js"></script>
@@ -73,6 +70,7 @@
                                 <li><a href="/iris3/tutorial.php#1basics">Tutorial</a></li>
 								<li><a href="/iris3/news.php#1version">What's new</a></li>
 								<li><a href="https://groups.google.com/forum/#!forum/iris3-discussion-board">Forum</a></li>
+								<li><a href="/iris3/more.php#4FAQ">More</a></li>
                             </ul>
                         </div>
                     </div>
