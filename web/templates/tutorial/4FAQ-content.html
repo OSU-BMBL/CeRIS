@@ -3,7 +3,7 @@
 <html class="gr__amp_pharm_mssm_edu"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css" abt="234"></style></head><body data-gr-c-s-loaded="true"><div id="the-basics-content">
 	<h1>FAQ</h1>
 	<div class="qa">
-		<h3 class="question"><a id="Q1" style="color:black;">What are a regulon and CTS-regulon and why are they important?</a></h3>
+		<h3 class="question"><a id="Q0" style="color:black;">What are regulons and CTS-regulons and why are they important?</a></h3>
 		<div class="answer">
 			<p>The term regulon was first introduced by Maas et al. in 1964, intended to name a maximal group of co-regulated genes, 
 			which may be scattered in a genome without apparent patterns in terms of their genomic locations. Based on that, for the 
@@ -17,7 +17,7 @@
 	</div>
 	
 	<div class="qa">
-		<h3 class="question"><a id="Q2" style="color:black;">Why allow us to store your data?</a></h3>
+		<h3 class="question"><a id="Q1" style="color:black;">Why allow us to store your data?</a></h3>
 		<div class="answer">
 			<p>Our long-term goal is to build a cell-type-specific regulon atlas for diverse cell types across different species 
 			to uncover the heterogeneous regulatory mechanisms in different cell types. Your data could potentially help us set 
@@ -28,13 +28,24 @@
 	</div>
 	
 	<div class="qa">
-		<h3 class="question"><a id="Q3" style="color:black;">What is the hypergeometric test?</a></h3>
+		<h3 class="question"><a id="Q2" style="color:black;">What is the hypergeometric test?</a></h3>
 		<div class="answer">
-			<p>__</p>
-			<br> <a href="equation"></a>
-			<p>P-value is the probability of seeing at least x number of cells out of the total n cells in the list annotated 
+			<p>The hypergeometric test uses the hypergeometric distribution to calculate the significance of having k successes from the annotated population</p>
+			<br> <a href="./assets/img/tutorial/4.Q2.png"></a>
+			<p>P-value of hypergeometric test is the probability of seeing at least x number of cells out of the total n cells in the list annotated 
 			to a particular cell type, given the proportion of cells in the whole population that are annotated to that cell type. 
 			The smaller of the p-value is, the more significant the cell type associated with the bicluster.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+	<div class="qa">
+		<h3 class="question"><a id="Q3" style="color:black;">What are the evaluation indexes for predicted cell types?</a></h3>
+		<div class="answer">
+			<p>The rand index is a measure of similarity between two data clusters. The Rand Index (RI) is related to the accuracy and the Adjusted Rand Index (ARI)
+			is the corrected-for-chance version of RI, and is more commonly used in assessing clustering results. The Full-text index in Minute space (FMI) is a compressed substring index 
+			based on the Burrows-Wheeler transform, and the Jaccard Index (JI) meansers the similarity between finite sample sets. </p>
 			<br>
 		</div>
 		<div class="clear"></div>
@@ -43,7 +54,7 @@
 	<div class="qa">
 		<h3 class="question"><a id="Q4" style="color:black;">How do DMINDA and MEME predict regulons?</a></h3>
 		<div class="answer">
-			<p>DMINDA (DNA motif identification and analyses) [link to web] is an integrated web server for DNA motif 
+			<p>DMINDA: is an integrated web server for DNA motif 
 			identification and analyses. The server provides a suite of cis-regulatory motif analysis functions on DNA 
 			sequences, which are important to elucidation of the mechanisms of transcriptional regulation: (i) de novo 
 			motif finding for a given set of promoter sequences along with statistical scores for the predicted motifs 
@@ -51,7 +62,7 @@
 			provided genomic sequences, (iii) motif comparison and clustering of identified motifs, and (iv) co-occurrence 
 			analyses of query motifs in given promoter sequences.</p>
 			<br>
-			<p>MEME suite [link to web]: The MEME Suite supports motif-based analysis of DNA, RNA and protein sequences. 
+			<p>MEME suite: supports motif-based analysis of DNA, RNA and protein sequences. 
 			It provides motif discovery algorithms using both probabilistic and discrete models, which have complementary 
 			strengths. It also allows the discovery of motifs with arbitrary insertions and deletions (GLAM2). In addition 
 			to motif discovery, the MEME Suite provides tools for scanning sequences for matches to motifs (FIMO, MAST 
@@ -91,7 +102,7 @@
 		<h3 class="question"><a id="Q7" style="color:black;">How does IRIS3 rank regulons?</a></h3>
 		<div class="answer">
 			<p>Each regulon is a set of genes that correspond to the predicted motif based on the motif scanning and 
-			prediction (see <a href="#Q3"><u>FAQ 3</u></a> above). A group of motifs predicted by DMINDA is then be clustered into subgroups composed 
+			prediction (see <a href="#Q4"><b>FAQ above</b></a>). A group of motifs predicted by DMINDA is then be clustered into subgroups composed 
 			of similar motifs using the following algorithm, which is based on a maximum spanning tree (MST) representation 
 			of the candidate motifs. In this way, it is possible that more than one motif with similarities are assigned to 
 			one regulon and the genes are then the union of all motifs. A global P-value for the entire motif instances is 
@@ -106,9 +117,8 @@
 	<div class="qa">
 		<h3 class="question"><a id="Q8" style="color:black;">How does IRIS3 perform normalization for CTS-regulon heatmaps?</a></h3>
 		<div class="answer">
-			<p>To better illustrate the expression value of the gene sets, we applied a <a href="https://f1000research.com/articles/5-2122/v1"><u>log-normalization</u></a> for heatmap interpretation:</p>
+			<p>To better illustrate the expression value of the gene sets, we applied a <a href="https://f1000research.com/articles/5-2122/v1"><b>log-normalization</b></a> for heatmap interpretation:</p>
 			<img src="./assets/img/tutorial/4.Q8-1.png">
-			<br>
 			<br>
 			<br>
 			<br>
@@ -128,56 +138,92 @@
 			the webpage. Based on the complexity of the matrix (total number of genes in the CTS-regulons and the 
 			total number of cells of your data), the time various (normally less than 10 seconds). Please be patient 
 			while waiting for the displaying.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+	<div class="qa">
+		<h3 class="question"><a id="Q10" style="color:black;">Why am I getting 404 error when open the EnrichR, JASPAR and HOCOMOCO links?</a></h3>
+		<div class="answer">
+			<p>All these three functions use the outside server. Please ensure your browser allows the pop-up windows. 
+			Sometimes, an 404 error page shows up due to the temperal server loading error and once you refresh the error page or click the 
+			link button again, the result page can showup successfully</p>
+			<br>
 		</div>
 		<div class="clear"></div>
 	</div>
 	
 	<div class="qa">
-		<h3 class="question"><a id="Q10" style="color:black;">How is the performance of IRIS3?</a></h3>
+		<h3 class="question"><a id="Q11" style="color:black;">How is the performance of IRIS3?</a></h3>
 		<div class="answer">
 			<p>To evaluate the performance of IRIS3, we compared our regulons with the result predicted by the 
-			<a href="https://github.com/aertslab/SCENIC"><u>SCENIC pipeline</u></a>, using the example data. 
+			<a href="https://github.com/aertslab/SCENIC"><b>SCENIC pipeline</b></a>, using the example data. 
 			Default parameters were used for both tools.</p>
 			<img src="./assets/img/tutorial/4.Q10-1.png">
-			<p>As a result, <b>259 CTS-regulons</b>, out of 399 total regulons predicted by IRIS3, were found 
-			significantly (FDR adjusted p-value <0.05) enriched to at least one pathway (KEGG_2016 database) 
-			using the EnrichR package (1.0 version), giving rise to an <b>F-score of 0.631</b> (see the definition of F-score below). 
-			While, 672 regulons were identified by SCENIC following its manual. By removing low-confident-TF-annotated 
-			and less-than-two-gene regulons, 463 were left, and 184 were found significantly enrich the pathways. 
-			The F-score of SCENIC identified regulons was only 0.5465. </p>
-			<p>Meanwhile, it only takes IRIS3 <b>21 min</b> to predict CTS-regulons, 
-			which is about <b>31 times faster</b> than SCENIC (9.5 hours).</p>
-
+			<p>As a result, our test showed that: 
+			<b>65.96% (279/423)</b> and 39.74% (184/463) regulons identified by IRIS3 and SCENIC, respectively, are significantly 
+			enriched with at least one biological pathways among all the 293 pathways. Hence, IRIS3 has a much better 
+			prediction performance than SCENIC, in terms of the precision and recall in the above pathway enrichment 
+			analysis (with F-scores <b>0.636</b> vs. 0.547).</p>
+			<p>Meanwhile, it is noteworthy that IRIS3 only spends <b>23 minutes</b> for identifying the 423 regulons, which is <b>31 times faster</b> than SCENIC (9.5 hours)</p>
 			<p><b>Note:</b> The harmonic mean of precision and recall were calculated to represent the performance 
 			of an algorithm on a given dataset and parameter setting, denoted as F-score:</p>
 			<img src="./assets/img/tutorial/4.Q10-2.png">
 			<img src="./assets/img/tutorial/4.Q10-3.png">
 			<img src="./assets/img/tutorial/4.Q10-4.png">
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>	
+
+	<div class="qa">
+		<h3 class="question"><a id="Q12" style="color:black;">What are included in the Download zip file?</a></h3>
+		<div class="answer">
+			<img src="./assets/img/tutorial/4.Q12.png">
+			<p>1. The conds file contains cell names and the gene file contains gene names extracted from each bicluster (file 5), respectively. Each row represent a bicluster. </p>
+			<p>2. The cell type prediction result from SC3</p>
+			<p>3. The gene list for each CTS-regulon, grouped by cell types. Each row indicates a regulon.</p>
+			<p>4. The filtered gene expression matrix. Omitted if user chooses not to perform the gene filtering step.</p>
+			<p>5. The biclustering result from QUBIC.</p>
+			
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>	
+
+	<div class="qa">
+		<h3 class="question"><a id="Q13" style="color:black;">Why I'm staying in the confirmation page when the job has been done?</a></h3>
+		<div class="answer">
+			<p>The confirmation page and the result page share the same link address. When click the result link in the email, some users may still be 
+			navigated to the confirmation page due to the cache stored in the browser. Just refresh the page or wait 15 sec for automatic refresh, and 
+			your result will show up.</p>
+			<br>
 		</div>
 		<div class="clear"></div>
 	</div>	
 	
 	<div class="qa">
-		<h3 class="question"><a id="Q11" style="color:black;">How do I report errors?</a></h3>
+		<h3 class="question"><a id="Q14" style="color:black;">How do I report errors?</a></h3>
 		<div class="answer">
-			<p>Please report any errors or comments on the <a href="https://groups.google.com/forum/#!forum/iris3-discussion-board"><u>
-			IRIS3 google group</u></a>, or directly email us at <u>bmbl.qinma@gmail.com</u>.</p>
+			<p>Please report any errors or comments on the <a href="https://groups.google.com/forum/#!forum/iris3-discussion-board"><b>
+			IRIS3 google group</b></a>, or directly email us at <b>bmbl.qinma@gmail.com</b>.</p>
 			<br>
 		</div>
 		<div class="clear"></div>
 	</div>	
 
 	<div class="qa">
-		<h3 class="question"><a id="Q12" style="color:black;">Where can I find the source code?</a></h3>
+		<h3 class="question"><a id="Q15" style="color:black;">Where can I find the source code?</a></h3>
 		<div class="answer">
-			<p>The source code of IRIS3 can be accessed on GitHub at https://github.com/bmbl-qinma/iris3</p>
+			<p>The source code of IRIS3 can be accessed on GitHub at <b>https://github.com/bmbl-QM/IRIS3</b></p>
 			<br>
 		</div>
 		<div class="clear"></div>
 	</div>	
 
 	<div class="qa">
-		<h3 class="question"><a id="Q13" style="color:black;">What are the future plans?</a></h3>
+		<h3 class="question"><a id="Q16" style="color:black;">What are the future plans of IRIS3?</a></h3>
 		<div class="answer">
 			<ul>
 			<li>Build up a database of CTS-regulon atlas in diverse cell types of human, mouse and extend to other species.</li>
@@ -192,7 +238,7 @@
 			<br>
 			<li>A more powerful in-house deep learning pipeline, DESSO, will be added in IRIS3 as a replacement of DMINDA and 
 			MEME to analyze cell-type-specific ChIP-Seq data (integrate the Cistrome database) in support of more accurate regulon 
-			prediction. DESSO (<a href="https://www.biorxiv.org/content/biorxiv/early/2018/09/16/417378.full.pdf"><u>bioRxiv version</u></a>) is currently 
+			prediction. DESSO (<a href="https://www.biorxiv.org/content/biorxiv/early/2018/09/16/417378.full.pdf"><b>bioRxiv version</b></a>) is currently 
 			under review in Genome Research </li>
 			<br>
 			</ul>
@@ -201,9 +247,11 @@
 	</div>	
 
 	<div class="qa">
-		<h3 class="question"><a id="Q14" style="color:black;">Brower compatibility of IRIS3.</a></h3>
+		<h3 class="question"><a id="Q17" style="color:black;">Brower compatibility of IRIS3.</a></h3>
 		<div class="answer">
-			<img src="./assets/img/tutorial/4.Q14.png">
+			<img src="./assets/img/tutorial/4.Q16.png">
+			<p>IRIS3 is fully functioned on Chrome. Other browsers may encounter minor loading errors for the main 
+			page figure and button/display effect, while the function of IRIS3 is intact.</p>
 			<br>
 			<br>
 			<br>
