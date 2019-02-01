@@ -17,7 +17,6 @@ getwd()
 # jobid <-2018122864543
 # expFile <- "2018122864543_filtered_expression.txt"
 # label_file <- "2018122864543_cell_label.txt"
-#setwd("C:/Users/flyku/Desktop/iris3/data")
 
 
 
@@ -100,7 +99,7 @@ get_bic_in_ct <- function(lis,num){
   }
 }
 total_bic <- length(conds_file)
-#i=1;j=1
+#i=1;j=2
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
 uniq_li <- sapply(pv, get_bic_in_ct,num=j)
