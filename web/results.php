@@ -75,7 +75,7 @@ $email_file = fopen("$DATAPATH/$jobid/email.txt", "r");
 	if ($email_file) {
 		while (($line = fgets($email_file)) !== false) {
 			if($line == "flykun0620@gmail.com" ||strlen($line) == 0){
-				$email_line = "Email not entered.";
+				$email_line = "Email not entered";
 			} else {
 				$email_line = $line;
 			}
@@ -92,7 +92,15 @@ if (file_exists("$DATAPATH/$jobid/saving_plot1.jpeg")){
 	$saving_plot1 = 1;
 }
 
-if (file_exists($done_file)){
+if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")){
+	if (file_exists("$DATAPATH/$jobid/$jobid"."_user_label_name.txt")){
+		$lines = file("$DATAPATH/$jobid/$jobid"."_user_label_name.txt", FILE_IGNORE_NEW_LINES);
+		$provided_cell = array_count_values($lines);
+		//print_r($provided_cell);
+}else {
+		//print_r("Info file not found");
+		// error opening the file.
+	}
 	
 if (file_exists("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt")){
 $evaluation_file = fopen("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt", "r");
@@ -306,29 +314,16 @@ function exception_handler($exception) {
 }
 
 set_exception_handler('exception_handler');
+}else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")) {
+	
+	$status= "error";
 }else if (!file_exists($tempnam)) {
 	$status= "404";
 }else {
 	$status = "0";
 	header("Refresh: 15;url='results.php?jobid=$jobid'");
 }
- /*
-foreach ($regulon_motif_result as $a1){
-	foreach ($a1 as $a2) {
-		foreach ($a2 as $a3){
-			print_r(explode(',',$a3));
-		}
-		
-	}
-	
-}*/
 
-
-//print_r($regulon_result);
-//$encodedString = json_encode($annotation1);
- 
-//Save the JSON string to a text file.
-//file_put_contents('json_array.txt', $encodedString);
 $_SESSION[$jobid."ann"]=$annotation1;
 $smarty->assign('filter_num',$filter_num);
 $smarty->assign('total_num',$total_num);
@@ -360,6 +355,8 @@ $smarty->assign('saving_plot1',$saving_plot1);
 $smarty->assign('Accuracy',$Accuracy);
 $smarty->assign('entropy',$entropy);
 $smarty->assign('count_ct',$count_ct);
+$smarty->assign('provided_cell',$provided_cell);
+
 $smarty->assign('purity',$purity);
 $smarty->assign('motif_program',$motif_program);
 $smarty->assign('label_use_sc3',$label_use_sc3);
