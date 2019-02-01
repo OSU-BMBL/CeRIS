@@ -79,6 +79,8 @@ $(document).ready(function() {
 					</a>
 					<div class="submenu" id="submenu-3example"></div>
 					</li>
+				<!--
+				
 				<li>
 					<a href="#4FAQ">
 						<span class="section">FAQ</span>
@@ -96,7 +98,8 @@ $(document).ready(function() {
 						<span class="section">Contact</span>
 					</a>
 					<div class="submenu" id="submenu-6contact"></div>
-				</li>				
+				</li>
+				-->
 			</ul>
 			
 			
