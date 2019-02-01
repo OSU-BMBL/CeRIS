@@ -165,6 +165,3 @@ regulon_file <- list.files(srcDir,pattern = "*.regulon.txt")
 #    }
 #  }
 #}
-
-
-
