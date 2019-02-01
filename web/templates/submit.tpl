@@ -10,7 +10,7 @@
 	        $('.dropdown-toggle').dropdown();
 	
 	        dropzone = $("#dropzone_exp").dropzone({
-	            dictDefaultMessage: "Drag or click to upload your gene expression file. <br> Accepted files: .txt,.csv,.tsv,",
+	            dictDefaultMessage: "Drag or click to upload your gene expression file. <br> Accepted files: .txt,.csv,.tsv",
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
 	            url: "upload.php",
 	            maxFiles: 1,
@@ -33,6 +33,7 @@
 	            }
 	        });
 	
+			
 	        $("div#dropzone_label").dropzone({
 	            dictDefaultMessage: "Drag or click to upload your cell label file. <br> Accepted files: .txt,.csv,.tsv",
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
@@ -55,6 +56,7 @@
 	
 	            }
 	        });
+			$('.dz-message').css({'font-size': '18px'});
 	// Load Example
 	$('#load_exp').click(function(evt) {
 	$('#enable_labelfile').attr("disabled", false);
@@ -112,7 +114,7 @@
 		<h2 class="text-center">Job Submission</h2>
 		<div class="form-group row">
 			<div class="form-check col-sm-8 ">
-				<label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A normal gene expression file with genes as rows and cells as columns. Users should normalize and filter the data before the submission. Accept both txt and csv format. "> </span>
+				<label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A gene expression file with genes as rows and cells as columns. Users can provide normalized or non-normalized input file for the submission. Accept both txt, csv and tsv format. "> </span>
 				</label>
 			</div>
 			<div class="form-check col-sm-8  ">
@@ -138,7 +140,7 @@
 		<div class="form-group row">
 			<div class="form-check col-sm-12 ">
 				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="1">
-				<label class="form-check-label" for="allowstorage">Allow data storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="To check this option, you allow us to store your data in IRIS3 database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
+				<label class="form-check-label" for="allowstorage">Allow data storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By checking this option, you allow us to store your data in IRIS3 database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
 				</label>
 			</div>
 		</div>
@@ -180,7 +182,7 @@
 								<br>
 								<div class="row">
 									<div class="col-md-2">
-										<label for="ex3">Max biclusters: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Max number of biclusters to output. Note: the output number will affect the prediction of bicluster, not merely a cutoff, and the output biclusters may less than this number. Default is 100."> </span>
+										<label for="ex3">Max biclusters: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Max number of biclusters to output. Note: the output number will affect the prediction of bicluster, not merely a cutoff, and the output biclusters may be less than this number. Default is 100."> </span>
 										</label>
 									</div>
 									<div class="col-md-2">
