@@ -5,41 +5,92 @@
 {{/block}}
 
 {{block name="extra_js"}}
+
+
+<!-- Piwik -->
+
+<!-- End Piwik Code -->
 {{/block}}
+<script>
+$(document).ready(function () {
+    $("#showcase").awShowcase({
+        content_width: 900,
+        content_height: 1000,
+        auto: true,
+        interval: 3000,
+        continuous: false,
+        arrows: true,
+        buttons: true,
+        btn_numbers: true,
+        keybord_keys: true,
+        mousetrace: false,
+        /* Trace x and y coordinates for the mouse */
+        pauseonover: true,
+        stoponclick: false,
+        transition: 'fade',
+        /* hslide/vslide/fade */
+        transition_delay: 0,
+        transition_speed: 500,
+        show_caption: 'onload'
+		/* onload/onhover/show */
+    });
+});
+</script>
+
+</head>
 {{block name="main"}}
-<main role="main">
+<link href="assets/css/help.css" rel="stylesheet" type="text/css">
+<script src="assets/js/help.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#the-basics-content").click(function() {
+        alert("click menu1");
+    });
+});
+</script>
+    <main role="main" style="min-height: calc(100vh - 182px);">
 
       <!-- Main jumbotron for a primary marketing message or call to action -->
-<main role="main" class="container">
 
-
-            <hr>
-            <h2 class="text-center">FAQ</h2>
-            <div class = "bootstrap-iso">
-					<br/>
-<li>What is IRIS3 and why do I need it?\</li>
-<li>What is the overall pipeline of IRIS3?\</li>
-<li>Why allow data storage in our database?\</li>
-<li>How does IRIS3 filter genes?\</li>
-<li>What is biclustering?\</li>
-<li>What are the paramters mean in QUBIC?\</li>
-<li>What is SC3	and how it predicts cell type?\</li>
-<li>What is a cell_info file?\</li>
-<li>What can I do if I have/don’t have a “cell_info" file?\</li>
-<li>What do the evaluation scores and figures mean for cell type prediction?\</li>
-<li>What is the CTS-bicluster?\</li>
-<li>What is DIMINDA2 and MEME?\</li>
-<li>What are CTS-regulons and CTS-complex regulons?\</li>
-					<hr/>
-
-			</div>
-			</div>
-			<hr>
-
-           
-
+      <div class="container">
+		<div>
+		  <div class="row">
+		  <div class="col-md-3">
+		  	<div id="menu">
+			<ul>
+				<li>
+					<a href="#4FAQ">
+						<span class="section">FAQ</span>
+					</a>
+					<div class="submenu" id="submenu-4FAQ"></div>
+				</li>
+				<li>
+					<a href="#5citation">
+						<span class="section">Citations</span>
+					</a>
+					<div class="submenu" id="submenu-5citation"></div>
+				</li>
+				<li>
+					<a href="#6contact" class="highlight">
+						<span class="section">Contact</span>
+					</a>
+					<div class="submenu" id="submenu-6contact"></div>
+				</li>				
+			</ul>
+			
+			
+		</div>
+		</div>
+<div class="col-md-9">
+		<div class="clear"></div>
+		<div id="content">
+		
+        <hr>
+</div>
+</div>
+      </div> <!--<img src="http://circos.ca/guide/tables/img/guide-table.png"> /container -->
+<div class="push"></div>
     </main>
-
 
 
 
