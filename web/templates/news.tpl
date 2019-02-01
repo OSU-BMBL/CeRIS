@@ -16,11 +16,7 @@
 <link href="assets/css/help.css" rel="stylesheet" type="text/css">
 <script src="assets/js/help.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-    $("#the-basics-content").click(function() {
-        alert("click menu1");
-    });
-});
+
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">
 
@@ -34,7 +30,7 @@ $(document).ready(function() {
 			<ul>
 				<li>
 					<a href="#1version" class="highlight">
-						<span class="section">Version</span>
+						<span class="section">News</span>
 						
 					</a>
 					<div class="submenu" id="submenu-1basics"></div>
