@@ -3,6 +3,12 @@
 #removes genes/transcripts that are either expressed (expression value > 2) in less than X% of cells (rare genes/transcripts) 
 #or expressed (expression value > 0) in at least (100 ??? X)% of cells (ubiquitous genes/transcripts). 
 #By default, X is set at 6.
+
+library(GenomicAlignments)
+library(ensembldb)
+library(EnsDb.Hsapiens.v86)
+library(EnsDb.Mmusculus.v79)
+
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
@@ -11,11 +17,9 @@ is_filter <- args[4] #1 for enable filter
 if(delim == 'tab'){
 	delim <- '\t'
 }
-
-# srcFile = "C:/Users/flyku/Desktop/Yan_expression.csv"
-# srcFile = "C:/Users/flyku/Desktop/GSE37704.csv"
-# srcFile = "/home/www/html/iris3/program/test_yan.csv";
-# outFile <- "1103"
+# setwd("d:/Users/flyku/Documents/IRIS3-data/test_oneregulon")
+# srcFile = "Read counts.csv"
+# outFile <- "2018122864543"
 # delim <- ","
 # is_filter <- 1
 
@@ -23,13 +27,11 @@ if(delim == 'tab'){
 getwd()
 yan.test <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = 1)
 
-# change Ensembl to symbol
+
+# convert Ensembl id to gene symbol
 #i=1
 if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep('ens',rownames(yan.test))) > 0.5 * nrow(yan.test) ){
-  library(GenomicAlignments)
-  library(ensembldb)
-  library(EnsDb.Hsapiens.v86)
-  library(EnsDb.Mmusculus.v79)
+
   result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(yan.test))), 
                              return.type="data.frame", columns=c("gene_name")))
   
@@ -52,6 +54,26 @@ if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep(
 }
 
 
+
+# obtain a matrix of gene length in expresison matrix, used for TPM normalization
+# if the last row read counts are integers, skip the normalizaiotn
+if(all(as.numeric(unlist(yan.test[nrow(yan.test),]))%%1==0)){
+  
+  df_gene_length <- genes(EnsDb.Hsapiens.v86, filter=list(GeneNameFilter(rownames(yan.test))), 
+                          return.type="data.frame", columns=c("gene_seq_start","gene_seq_end"))
+  df_gene_length[,5] <- df_gene_length[,2] - df_gene_length[,1] + 1
+  colnames(df_gene_length)[5] <- "gene_length"
+  gene_length <- df_gene_length[match(rownames(yan.test), df_gene_length$gene_name), ]
+  if(nrow(yan.test[!is.na(gene_length$gene_name),])>1) {
+    yan.test <- yan.test[!is.na(gene_length$gene_name),]
+    gene_length <- gene_length[!is.na(gene_length$gene_name),c(4,5)]
+    tpm <- function(counts, lengths) {
+      rate <- counts / lengths
+      rate / sum(rate) * 1e6
+    }
+    yan.test <- apply(yan.test, 2, function(x) tpm(x, gene_length$gene_length))
+  }
+}
 
 nrare <- ncol(yan.test) * 0.06
 nubi <- ncol(yan.test) * 0.94
