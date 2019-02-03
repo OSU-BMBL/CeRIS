@@ -11,6 +11,14 @@
 <script>
 var flag = [];
 $(document).ready(function () {
+    $('#tablePreview').DataTable( {
+  "searching": false,
+  "paging": false,
+  "bInfo" : false,
+} );
+	
+	    
+	
 
 $("#to_enrichr").click(function (){
                    get_gene_list(1,2);
@@ -18,7 +26,6 @@ $("#to_enrichr").click(function (){
 	  
 	  	make_clust_main('data/{{$jobid}}/json/CT1.json','#container-id-1');
 	  //flag.push("#container-id-1")
-	  flag.push("#container-id-1")
 	  function arrayContains(needle, arrhaystack)
 		{
     return (arrhaystack.indexOf(needle) > -1);
@@ -80,33 +87,33 @@ console.log(flag)
                                             <div class="flatPanel panel panel-default">
                         <div class="panel-body">
                             <div class="col-md-12 col-sm-12">
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p for="reportsList">Species: {{$species}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of cells: {{$total_label}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of genes: {{$total_num}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of filtered genes: {{$filter_num}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Filtering ratio: {{$filter_rate*100}}%</p>
                                 </div>
 								{{if $provide_label > 0}}
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of provided cell types: {{$provide_label}}</p>
                                 </div>
 								{{/if}}
-								<div class="form-group col-md-6 col-sm-6">
+								<div class="form-group col-md-4 col-sm-4">
                                     <p>Number of predicted cell types: {{$predict_label}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Total biclusters: {{$total_bic}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-4 col-sm-4">
                                     <p>Total CTS-Regulons: {{$total_regulon}}</p>
                                 </div>
 <!--Table-->
@@ -114,32 +121,51 @@ console.log(flag)
                                                 <!--Table head-->
                                                 <thead>
                                                     <tr>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
+                                                        <th>{{if $label_use_sc3 == 'user\'s label'}}
+														Provided Cell Type Index
+														{{else}}
+															Predicted Cell Type Index
+														{{/if}}</th>
+                                                        {{if $label_use_sc3 == 'user\'s label'}}
+															<th>
+															Provided Cell Type Labels
+															</th>
+															{{/if}}
+														<th>Number of {{if $label_use_sc3 == 'user\'s label'}}
+														Provided
+														{{else}}
+															Predicted
+														{{/if}} Cells</th>
+                                                        <th>Number of Predicted Regulons</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-													<tr>
-                                                        <td><strong>
-														{{if $label_use_sc3 == 'user\'s label'}}
-														Provided Cell Type Index
-														{{else}}
-															Predicted Cell Type
-														{{/if}}
-														</strong></td>
-														{{section name=ct_idx start=0 loop=$count_ct}}
-															<td>{{$count_ct[ct_idx]}}</td>
-                                                        {{/section}}
+												{{section name=ct_idx start=0 loop=$count_ct}}
+													<tr >
+															<td style="padding: 0px;">{{$count_ct[ct_idx]}}</td>
+															{{if $label_use_sc3 == 'user\'s label'}}
+															<td style="padding: 0px;">
+															{{$provided_cell[ct_idx]}}
+															</td>
+															<td style="padding: 0px;">{{$provided_cell_value[ct_idx]}}</td>
+															{{else}}
+															<td style="padding: 0px;">{{count($silh_x[{{$silh_trace[ct_idx]}}])}}</td>
+															{{/if}}
+															
+															
+															
+															
+															<td style="padding: 0px;">{{$count_regulon_in_ct[ct_idx]}}</td>
                                                     </tr>
+													{{/section}}
+													<!--
+													{{foreach from=$provided_cell key=k item=v}}<td>{{$k}}</td> {{/foreach}}
+													
+													
 													
 													{{if $label_use_sc3 == 'user\'s label'}}
 													<tr>
-															<td><strong>Provided Cell Type Names</strong></td>
+															<td><strong>Provided Cell Type Labels</strong></td>
 																{{foreach from=$provided_cell key=k item=v}}<td>{{$k}}</td> {{/foreach}}
 															</tr>
 															{{/if}}
@@ -162,7 +188,7 @@ console.log(flag)
 															<td>{{$count_regulon_in_ct[num_regulon_in_ct]}}</td>
                                                         {{/section}}
                                                     </tr>
-												
+												-->
                                                     
                                                 </tbody>
                                             </table>
@@ -393,7 +419,7 @@ console.log(flag)
 						<div class="panel-body">
 					<div style="text-align: left;">
                         <strong><h3>Sorry, there has been an error.</h3></strong>
-						<p>Check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
 						<!---
 						
 						<p>Perhaps you are here because: </p>

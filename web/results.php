@@ -95,8 +95,16 @@ if (file_exists("$DATAPATH/$jobid/saving_plot1.jpeg")){
 if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")){
 	if (file_exists("$DATAPATH/$jobid/$jobid"."_user_label_name.txt")){
 		$lines = file("$DATAPATH/$jobid/$jobid"."_user_label_name.txt", FILE_IGNORE_NEW_LINES);
-		$provided_cell = array_count_values($lines);
+		$provided_cell_v = array_count_values($lines);
+		
+		#$provided_cell_value = array_flip($provided_cell_value);
+		$provided_cell = array();
+foreach($provided_cell_v as $k => $v) {
+ $provided_cell[] = $k;
+ $provided_cell_value[] = $v;
+}
 		//print_r($provided_cell);
+		
 }else {
 		//print_r("Info file not found");
 		// error opening the file.
@@ -356,7 +364,7 @@ $smarty->assign('Accuracy',$Accuracy);
 $smarty->assign('entropy',$entropy);
 $smarty->assign('count_ct',$count_ct);
 $smarty->assign('provided_cell',$provided_cell);
-
+$smarty->assign('provided_cell_value',$provided_cell_value);
 $smarty->assign('purity',$purity);
 $smarty->assign('motif_program',$motif_program);
 $smarty->assign('label_use_sc3',$label_use_sc3);
