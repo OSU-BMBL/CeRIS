@@ -5,10 +5,10 @@ library(stringr)
 library(tidyverse)
 
 args <- commandArgs(TRUE)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_meme")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 #srcDir <- getwd()
-#jobid <-2018122833236 
-# is_meme <- 1
+#jobid <-2018122223516 
+# is_meme <- 0
 # motif_len <- 12
 srcDir <- args[1]
 is_meme <- args[2] # no 0, yes 1
@@ -25,19 +25,34 @@ sort_dir <- function(dir) {
   return(tmp[order(split)])
 }
 alldir <- sort_dir(alldir)
-#convert_motif(all_closure[1])
+#convert_motif(all_closure[j])
+#filepath=all_closure[j]
+
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
-  line = readLines(motif_file)
-  df <- line[substr(line,0,1) == ">"]
-  df <- read.table(text=df,sep = "\t")
-  colnames(df) <- c("MotifNum","Seq","start","end","Motif","Score","Info")
+  basename(filepath)
+  line <- readLines(motif_file)
+  # get pvalue and store it in pval_rank
+  split_line <- unlist(strsplit(line," "))
+  pval_value <- split_line[which(split_line == "Pvalue:")+2]
+  if(length(pval_value)>0){
+    pval_value <- as.numeric(gsub("\\((.+)\\)","\\1",pval_value))
+    pval_name <- paste(">",basename(filepath),"-",seq(1:length(pval_value)),sep="")
+    tmp_pval_df <- data.frame(pval_name,pval_value)
+    pval_rank <<-rbind(pval_rank,tmp_pval_df)
+    df <- line[substr(line,0,1) == ">"]
+    df <- read.table(text=df,sep = "\t")
+    colnames(df) <- c("MotifNum","Seq","start","end","Motif","Score","Info")
+    
+  }
   close(motif_file)
   return(df)
 }
+
+
 #i=38
-#filepath=all_closure[1]
+#filepath=all_closure[7]
 convert_meme <- function(filepath){
   this_line <- matrix(0,ncol = 6)
   this_line <- data.frame(this_line)
@@ -109,12 +124,13 @@ convert_meme <- function(filepath){
   
 }
 
-#i=3
-#j=44
+#i=1
+#j=1
 #info = "bic1.txt.fa.closures-1"  
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
+  pval_rank <<- data.frame();
   all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = T)
   short_all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = F)
   for (j in 1:length(all_closure)) {
@@ -147,7 +163,8 @@ for (i in 1:length(alldir)) {
   }
   cat(">end", file=res,sep="\n",append = T)
   write.table(combined_gene,paste(alldir[i],".motifgene.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = T)
-  
+  pval_rank <- pval_rank[order((pval_rank$pval_value),decreasing = T),]
+  write.table(pval_rank,paste(alldir[i],".pval.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 }
 
 
