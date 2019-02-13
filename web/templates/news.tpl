@@ -6,9 +6,7 @@
 
 {{block name="extra_js"}}
 
-<script type="text/javascript">
-  
-</script>
+
 {{/block}}
 
 
@@ -16,7 +14,9 @@
 <link href="assets/css/help.css" rel="stylesheet" type="text/css">
 <script src="assets/js/help.js"></script>
 <script type="text/javascript">
-
+if(window.location.hash == ""){
+ window.location.href = "http://bmbl.sdstate.edu/iris3/news.php#1version";
+}
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">
 

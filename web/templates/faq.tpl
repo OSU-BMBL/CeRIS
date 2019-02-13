@@ -47,6 +47,10 @@ $(document).ready(function() {
         alert("click menu1");
     });
 });
+if(window.location.hash == ""){
+
+ window.location.href = "http://bmbl.sdstate.edu/iris3/more.php#4FAQ";
+}
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">
 

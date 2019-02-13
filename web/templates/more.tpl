@@ -46,7 +46,8 @@ $(document).ready(function() {
     $("#the-basics-content").click(function() {
         alert("click menu1");
     });
-});
+}); 
+
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">
 
@@ -54,7 +55,7 @@ $(document).ready(function() {
 
       <div class="container">
 		<div>
-		  <div class="row">
+		  <div class="row"> 
 		  <div class="col-md-3">
 		  	<div id="menu">
 			<ul>
