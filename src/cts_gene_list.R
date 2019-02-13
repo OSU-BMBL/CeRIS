@@ -13,10 +13,10 @@ expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_oneregulon")
-# jobid <-2018122864543
-# expFile <- "2018122864543_filtered_expression.txt"
-# label_file <- "2018122864543_cell_label.txt"
+# setwd("D:/Users/flyku/Documents/IRIS3-data/20181229190250")
+# jobid <-20181229190250
+# expFile <- "20181229190250_filtered_expression.txt"
+# label_file <- "20181229190250_cell_label.txt"
 
 
 
