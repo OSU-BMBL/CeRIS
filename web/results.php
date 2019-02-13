@@ -99,11 +99,18 @@ if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.
 		
 		#$provided_cell_value = array_flip($provided_cell_value);
 		$provided_cell = array();
-foreach($provided_cell_v as $k => $v) {
- $provided_cell[] = $k;
- $provided_cell_value[] = $v;
-}
-		//print_r($provided_cell);
+		
+		foreach($provided_cell_v as $k => $v) {
+			if($k==1){
+				ksort($provided_cell_v);
+			}
+		}
+		
+		foreach($provided_cell_v as $k => $v) {
+		 $provided_cell[] = $k;
+		 $provided_cell_value[] = $v;
+		}
+		//print_r($provided_cell_v);
 		
 }else {
 		//print_r("Info file not found");

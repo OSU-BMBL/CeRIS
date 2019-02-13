@@ -25,7 +25,7 @@ $("#to_enrichr").click(function (){
             });
 	  
 	  	make_clust_main('data/{{$jobid}}/json/CT1.json','#container-id-1');
-	  //flag.push("#container-id-1")
+	  flag.push("#container-id-1")
 	  function arrayContains(needle, arrhaystack)
 		{
     return (arrhaystack.indexOf(needle) > -1);
@@ -48,7 +48,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 console.log(flag)
   var json_file = $(e.target).attr("json")
   var root_id = $(e.target).attr("root")
-  console.log(!arrayContains(root_id,flag))
+  //console.log(!arrayContains(root_id,flag))
 	if (!arrayContains(root_id,flag)){
 	make_clust(json_file,root_id);
 	flag.push(root_id)
@@ -114,7 +114,7 @@ console.log(flag)
                                     <p>Total biclusters: {{$total_bic}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p>Total CTS-Regulons: {{$total_regulon}}</p>
+                                    <p>Total CTS-Rs: {{$total_regulon}}</p>
                                 </div>
 <!--Table-->
                                             <table id="tablePreview" class="table">
@@ -122,21 +122,17 @@ console.log(flag)
                                                 <thead>
                                                     <tr>
                                                         <th>{{if $label_use_sc3 == 'user\'s label'}}
-														Provided Cell Type Index
+														User's cell label index
 														{{else}}
-															Predicted Cell Type Index
+															Predicted cell label index
 														{{/if}}</th>
                                                         {{if $label_use_sc3 == 'user\'s label'}}
 															<th>
-															Provided Cell Type Labels
+															User's cell label
 															</th>
 															{{/if}}
-														<th>Number of {{if $label_use_sc3 == 'user\'s label'}}
-														Provided
-														{{else}}
-															Predicted
-														{{/if}} Cells</th>
-                                                        <th>Number of Predicted Regulons</th>
+														<th>Number of cells</th>
+                                                        <th>Number of CTS-Rs</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -376,7 +372,7 @@ console.log(flag)
                                                                         </tr>
 																		<tr><td><button type="button" class="btn btn-submit" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="console.log('{{$regulon_result[$sec0][sec1][0]}}');$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Show Heatmap
                                                         </button><button style="display:none;" type="button" class="btn btn-submit" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
-                                                        </button>&nbsp;<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to EnrichR
+                                                        </button>&nbsp;<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to Enrichr
                                                         </button></td></tr>
 																		<tr >
 																		<td colspan=2>
