@@ -17,16 +17,29 @@ is_filter <- args[4] #1 for enable filter
 if(delim == 'tab'){
 	delim <- '\t'
 }
+# setwd("/home/www/html/iris3/data/20190305183801")
+# setwd("C:/Users/Cankun.Wang/Desktop/iris3")
 # setwd("d:/Users/flyku/Documents/IRIS3-data/test_oneregulon")
-# srcFile = "Read counts.csv"
-# outFile <- "2018122864543"
+# srcFile = "/home/www/html/iris3/data/20190305183801/iris3_test2.tsv"
+# srcFile = "iris3_example_expression_matrix.csv"
+# outFile <- "20190305160730"
 # delim <- ","
 # is_filter <- 1
-
+#
 #yan.test <- read.csv("Goolam_cell_label.csv",header=T,sep=",",check.names = FALSE, row.names = 1)
 getwd()
-yan.test <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = 1)
+yan.test <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = NULL)
+colnames(yan.test) <-  gsub('([[:punct:]])|\\s+','_',colnames(yan.test))
 
+if(colnames(yan.test)[1] == ""){
+  colnames(yan.test)[1] = "Gene_ID"
+}
+if(length(which(duplicated.default(yan.test[,1]))) > 0 ){
+  yan.test <- yan.test[-which(duplicated.default(yan.test[,1])==T),]
+}
+																		
+rownames(yan.test) <- yan.test[,1]
+yan.test<- yan.test[,-1]
 
 # convert Ensembl id to gene symbol
 #i=1
@@ -45,7 +58,8 @@ if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep(
     all_match <- genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(yan.test))), 
                        return.type="data.frame", columns=c("gene_name"))
   }
-  yan.test <- yan.test[-which(rownames(yan.test) %in% all_match[duplicated(all_match[,1]),2]),]
+ 
+  yan.test <- yan.test[which(rownames(yan.test) %in% all_match[!duplicated(all_match[,1]),2]),]
   for (i in 1:nrow(yan.test)) {
     if(length(which(all_match[,2] %in% rownames(yan.test)[i]))){
       rownames(yan.test)[i] <- all_match[which(all_match[,2] %in% rownames(yan.test)[i]),1]
@@ -77,6 +91,10 @@ if(all(as.numeric(unlist(yan.test[nrow(yan.test),]))%%1==0)){
 
 nrare <- ncol(yan.test) * 0.06
 nubi <- ncol(yan.test) * 0.94
+if(length(which(rownames(yan.test)=="")) > 0){
+yan.test <- yan.test[-which(rownames(yan.test)==""),]
+}
+
 new_yan <- data.frame()
 filter_func <- function(this){
   if(length(which(this>2)) >= nrare && length(which(this==0)) <= nubi){
@@ -96,6 +114,7 @@ if(is_filter == 1){
 
 
 new_yan <- log1p(new_yan)
+
 filter_num <- nrow(yan.test)-nrow(new_yan)
 filter_rate <- formatC(filter_num/nrow(yan.test),digits = 2)
 
