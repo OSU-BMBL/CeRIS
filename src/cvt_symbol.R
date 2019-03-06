@@ -17,10 +17,10 @@ srcDir <- args[1]
 expName <- args[2]
 setwd(srcDir)
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/mouse_cts")
-# jobid <-2018122982734
+# setwd("/home/www/html/iris3/data/2019030481235")
+# jobid <-2019030481235
 #  srcDir <-  getwd()
-#expName <- "2018122982734_filtered_expression.txt"
+#expName <- "2019030481235_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
 
@@ -37,9 +37,9 @@ get_row_num <- function (this){
 
 check_species <- function(expFile) {
   result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSG", "startsWith")), 
-                               return.type="data.frame", columns=c("gene_id")))
+                             return.type="data.frame", columns=c("gene_id")))
   result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSMUSG", "startsWith")), 
-                  return.type="data.frame", columns=c("gene_id")))
+                             return.type="data.frame", columns=c("gene_id")))
   if(result_human > result_mouse){
     write.table("52","species.txt",quote=F,col.names = F,row.names = F)
     write("species,Human",file=paste(jobid,"_info.txt",sep=""),append=TRUE)
@@ -78,7 +78,11 @@ generate_seq_file <- function(filename){
 
 gene_name <- rownames(expFile)
 gene_df <- genes(species[[1]], filter=list(GeneNameFilter(as.character(gene_name)),GeneIdFilter(species[[2]], "startsWith")), 
-                return.type="data.frame", columns=c("gene_id"))
+                 return.type="data.frame", columns=c("gene_id"))
+if(length(which(gene_df[,2]=='')) > 0){
+	gene_df <- gene_df[-which(gene_df[,2]==''),]
+}
+				 
 write.table(gene_df,paste(jobid,"_gene_id_name.txt",sep=""),sep = "\t",quote = F,col.names = T,row.names = F)
 
 
