@@ -92,7 +92,7 @@ if (file_exists("$DATAPATH/$jobid/saving_plot1.jpeg")){
 	$saving_plot1 = 1;
 }
 
-if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")){
+if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon_gene_name.txt")){
 	if (file_exists("$DATAPATH/$jobid/$jobid"."_user_label_name.txt")){
 		$lines = file("$DATAPATH/$jobid/$jobid"."_user_label_name.txt", FILE_IGNORE_NEW_LINES);
 		$provided_cell_v = array_count_values($lines);
@@ -329,10 +329,12 @@ function exception_handler($exception) {
 }
 
 set_exception_handler('exception_handler');
+}else if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt") && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic/bic1.txt.fa.closures")) {
+	$status= "error_bic";
 }else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")) {
-	
 	$status= "error";
-}else if (!file_exists($tempnam)) {
+}
+else if (!file_exists($tempnam)) {
 	$status= "404";
 }else {
 	$status = "0";
