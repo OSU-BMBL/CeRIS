@@ -13,10 +13,10 @@ $db=$_GET['db'];
 $done_file="a";
 $motif_filename = "/home/www/html/iris3/data/$jobid/logo/ct$ct"."bic$bic"."m$motif".".fsa.meme";
 $check_dir = "/home/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif";
-print_r($check_dir);
+#print_r($check_dir);
 if (!file_exists($check_dir)){
 	
-	print_r ("start running");
+	#print_r ("start running");
 	mkdir ("/home/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif");
 	mkdir ("/home/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO");
 	mkdir ("/home/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR");

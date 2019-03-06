@@ -11,7 +11,7 @@ args <- commandArgs(TRUE)
 srcDir <- args[1]
 jobid <- args[2]
 label_use_sc3 <- args[3]
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+#setwd("/home/www/html/iris3/data/20190305183801")
 #srcDir <- getwd()
 #jobid <-2018122223516 
 #label_use_sc3 <- 1
@@ -29,6 +29,7 @@ all_regulon <- sort_dir(list.files(path = workdir,pattern = "._bic.regulon_gene_
 all_label <- sort_dir(list.files(path = workdir,pattern = ".+cell_label.txt$")[1])
 label_file <- read.table(all_label,header = T)
 exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
+#exp_file<- read.delim(paste(jobid,"_raw_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 exp_file <- log1p(exp_file)

@@ -10,9 +10,9 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(srcDir)
 getwd()
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_mergebbc")
+#setwd("/home/www/html/iris3/data/2019030481235")
 #srcDir <- getwd()
-#jobid <-20181228231938 
+#jobid <-2019030481235 
 #motif_length <- 12
 sort_dir <- function(dir) {
   tmp <- sort(dir)

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 if(@ARGV!=3){
-        die("Usage: send_finish_mail.pl <job_id> <to_email> <message_file>\n")
+        die("Usage: send_eemail.pl <job_id$ARGV[0]> <to_email$ARGV[1]> <message_file$ARGV[2]>\n")
 }
 
 
@@ -15,7 +15,7 @@ close FILE;
 my $message=join("",@lines);
 
 my %mail = ( To      => $email,
-			 Bcc     => 'flykun0620@gmail.com',
+			 Bcc     => 'flykun0620@gmail.com,maqin2001@gmail.com',
              From    => 'IRIS3 <no-reply@bmbl.sdstate.edu>',
              Subject => "Information from Job $job_id on IRIS3",'Content-Type' => 'text/html',
              Message => $message
