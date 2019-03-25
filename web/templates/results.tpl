@@ -232,11 +232,11 @@ console.log(flag)
 											
                                             <div class="CT-result-img">
                                                 <div class="col-sm-12">
-												<h4 style="text-align:center;margin-top:50px"> Silhouette score</h4>
+												<!--<h4 style="text-align:center;margin-top:50px"> Silhouette score</h4>-->
                                                     <div id="score_div"></div>
 												</div>
                                                 <div class="col-sm-12">
-												<h4 style="text-align:center;margin-top:50px"> Sankey plot</h4>
+												<!--<h4 style="text-align:center;margin-top:50px"> Sankey plot</h4>-->
                                                     <div id="sankey_div"></div>
 												</div>
 											</div>
@@ -458,7 +458,54 @@ console.log(flag)
 
                             </div>
 					</div>
+					{{elseif $status==="error_bic"}}
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
+						<div class="panel-body">
+					<div style="text-align: left;">
+                        <strong><h3>Sorry, there has been an error:</h3></strong> <p style="color:red">IRIS3 did not find enough bi-clusters in your data.</p>
+						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<!---
+						
+						<p>Perhaps you are here because: </p>
+						<ul>
+						<li> Wrong input file format</li>
+						</ul>
+						
+						--->
+						<br>
+                    </div>
 					
+					<strong>Your job settings:</strong><br>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Gene filtering: {{$is_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Max biclusters: {{$o_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Overlap rate: {{$f_arg}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Email: {{$email_line}}</p>
+                                </div>
+                                
+                                
+
+                            </div>
+					</div>
                     {{else}} {{block name="meta"}}
 					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
                 <div class="panel-body">
@@ -546,6 +593,7 @@ var trace{{$silh_trace[clust]}} = {
 var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}];
 
 		var score_layout = {
+		title: "Silhouette score",
 		barmode: 'group',
 			width:window.innerHeight-20,
             font: {
@@ -643,6 +691,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
         var sankey_data = [sankey_data]
 
         var sankey_layout = {
+		title: "Sankey plot",
 			width:window.innerHeight-20,
             font: {
                 size: 12
