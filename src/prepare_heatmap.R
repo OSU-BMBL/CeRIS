@@ -96,7 +96,7 @@ regulon_gene<- unique(regulon_gene)
 heat_matrix <- data.frame(matrix(ncol = ncol(exp_file), nrow = 0))
 heat_matrix <- subset(exp_file, rownames(exp_file) %in% as.character(regulon_gene[,1]))
 
-heat_matrix <- heat_matrix[,order(heat_matrix[1,])]
+#heat_matrix <- heat_matrix[,order(heat_matrix[1,])]
 
 #i=j=1 
 # get CT#-regulon1-# heat matrix
