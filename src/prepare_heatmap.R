@@ -139,7 +139,7 @@ for(i in 1: length(unique(label_file[,2]))){
     file_heat_matrix <- rbind(category1,category2,file_heat_matrix)
   }
 
-  file_heat_matrix <- file_heat_matrix[,order(file_heat_matrix[1,])]
+  #file_heat_matrix <- file_heat_matrix[,order(file_heat_matrix[1,])]
   
   for (j in 1:length(combine_regulon_label)) {
     if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
