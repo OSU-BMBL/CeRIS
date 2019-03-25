@@ -25,7 +25,25 @@ session_start();
     }
     return $delimiter;
 }*/
-
+function get_client_ip_server() {
+    $ipaddress = '';
+    if ($_SERVER['HTTP_CLIENT_IP'])
+        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+    else if($_SERVER['HTTP_X_FORWARDED_FOR'])
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    else if($_SERVER['HTTP_X_FORWARDED'])
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+    else if($_SERVER['HTTP_FORWARDED_FOR'])
+        $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+    else if($_SERVER['HTTP_FORWARDED'])
+        $ipaddress = $_SERVER['HTTP_FORWARDED'];
+    else if($_SERVER['REMOTE_ADDR'])
+        $ipaddress = $_SERVER['REMOTE_ADDR'];
+    else
+        $ipaddress = 'UNKNOWN';
+ 
+    return $ipaddress;
+}
 function detectDelimiter($csvFile)
 {
     $delimiters = array(
@@ -48,6 +66,7 @@ function detectDelimiter($csvFile)
 if (isset($_POST['submit']))
 {
 	session_start();
+	file_put_contents("/home/www/html/iris3/ip.txt",PHP_EOL .get_client_ip_server(), FILE_APPEND | LOCK_EX);
 	//$jobid = date("YmdGis");
 	$jobid = $_SESSION['jobid'];
 	$workdir = "./data/$jobid";
@@ -88,7 +107,7 @@ if (isset($_POST['submit']))
 	
 	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		
-		header("Location: results.php?jobid=20181229201357#");
+		header("Location: results.php?jobid=2019030685553#");
 	}
 	
 	else {
