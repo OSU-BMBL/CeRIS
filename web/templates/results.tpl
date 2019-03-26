@@ -224,6 +224,7 @@ console.log(flag)
 											{{/if}}
 											{{if ($saving_plot1  >0)}}
 											<div class="col-sm-12">
+											<hr>
 											<h4 style="text-align:center"> SC3 consensus heatmap<input style="float:right; "class="btn btn-submit" type="button" value="Save consensus heatmap as .emf" onClick="javascript:location.href = 'data/{{$jobid}}/saving_plot1.emf';" /></h4> 
 											
 											<img style="width:100%"src="data/{{$jobid}}/saving_plot1.jpeg"></img>
@@ -233,11 +234,13 @@ console.log(flag)
                                             <div class="CT-result-img">
                                                 <div class="col-sm-12">
 												<!--<h4 style="text-align:center;margin-top:50px"> Silhouette score</h4>-->
+													<hr>
                                                     <div id="score_div"></div>
 												</div>
                                                 <div class="col-sm-12">
 												<!--<h4 style="text-align:center;margin-top:50px"> Sankey plot</h4>-->
-                                                    <div id="sankey_div"></div>
+                                                    <hr>
+													<div id="sankey_div"></div>
 												</div>
 											</div>
 										</div>
@@ -593,7 +596,8 @@ var trace{{$silh_trace[clust]}} = {
 var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}];
 
 		var score_layout = {
-		title: "Silhouette score",
+		title: "<b>Silhouette score</b>",
+		autosize:true,
 		barmode: 'group',
 			width:window.innerHeight-20,
             font: {
@@ -602,8 +606,25 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 	"titlefont": {
     "size": 16
 	},
+	"xaxis": {
+	visible:false,
+	tickangle: -45,
+	},
         }
-		Plotly.react('score_div', score_data, score_layout);
+		var score_config = {
+  toImageButtonOptions: {
+	title: 'Download plot as a svg',
+    format: 'svg', // one of png, svg, jpeg, webp
+    filename: 'new_image',
+    height: 1000,
+    width: 1400,
+    scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+  },
+  showLink: true,
+  displayModeBar: true,
+  modeBarButtonsToRemove:['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d','hoverClosestCartesian', 'hoverCompareCartesian','hoverClosest3d','toggleHover','hoverClosestGl2d','hoverClosestPie','toggleSpikelines']
+};
+		Plotly.react('score_div', score_data, score_layout, score_config);
 		
 		
 	function get_gene_list(item){
@@ -691,7 +712,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
         var sankey_data = [sankey_data]
 
         var sankey_layout = {
-		title: "Sankey plot",
+		title: "<b>Sankey plot</b>",
 			width:window.innerHeight-20,
             font: {
                 size: 12
@@ -700,7 +721,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
     "size": 16
 	},
         }
-        Plotly.react('sankey_div', sankey_data, sankey_layout)
+        Plotly.react('sankey_div', sankey_data, sankey_layout,score_config)
 		 </script>
 		{{/if}}
 	
