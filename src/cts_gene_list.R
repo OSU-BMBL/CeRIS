@@ -12,13 +12,16 @@ args <- commandArgs(TRUE)
 expFile <- args[1] # raw or filtered expression file name
 jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
+gene_module_file <- args[4] # 
+delim_gene_module <- args[5] # gene module file delimter
+
 getwd()
-# setwd("D:/Users/flyku/Documents/IRIS3-data/20181229190250")
-# jobid <-20181229190250
-# expFile <- "20181229190250_filtered_expression.txt"
-# label_file <- "20181229190250_cell_label.txt"
-
-
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+# jobid <-2018122223516
+# expFile <- "2018122223516_filtered_expression.txt"
+# label_file <- "2018122223516_cell_label.txt"
+# gene_module_file <- 'iris3_example_gene_module.csv'
+# delim_gene_module <- ','
 
 #conds_file <- read.delim(paste(jobid,"_blocks.conds.txt",sep = ""),sep=" ",header = F)[,-1]
 conds_file_handle <- file(paste(jobid,"_blocks.conds.txt",sep = ""),"r")
@@ -118,12 +121,12 @@ while (is.null(uniq_li)) { # if result is null, increase pvalue to make at least
   uniq_li <- compact(unlist(uniq_li))
 }
 
-uniq_bic <- gene_file[names(uniq_li),]%>%
-  t%>%
-  as.vector()%>%
-  table()%>%
-  as.data.frame()%>%
-  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
+#uniq_bic <- gene_file[names(uniq_li),]%>%
+#  t%>%
+#  as.vector()%>%
+#  table()%>%
+#  as.data.frame()%>%
+#  write.table(.,paste(jobid,"_CT_",j,"_bic_unique.txt",sep = ""),sep="\t",row.names = F,col.names = F,quote = F)
 
 pvalue_df <- unlist(sapply(pv, get_pvalue_df,num=j))
 #pvalue_thres <- as.numeric(quantile(pvalue_df[pvalue_df <1], 0.05)) # 0.05 for 5% quantile )
@@ -166,3 +169,12 @@ write.table(gene_bic,paste(jobid,"_CT_",j,"_bic.txt",sep = ""),sep="\t",row.name
 }
 write(paste("total_label,",nrow(cell_label),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_bic,",total_bic,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+
+#if exist gene module file, save gene list to jobid_module_#.txt
+if(length(gene_module_file) > 0){
+  gene_module <- read.table(gene_module_file,header = F,sep = delim_gene_module)
+  for (i in 1:ncol(gene_module)) {
+    write.table(gene_module[,i],paste(jobid,"_module_",i,"_bic.txt",sep = ""),quote = F,col.names = F,row.names = F)
+  }
+}
+#i=1

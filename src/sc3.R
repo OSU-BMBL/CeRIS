@@ -23,6 +23,7 @@ jobid <- args[2] # user job id
 label_file <- 1
 label_file <- args[3] # user label or 1
 delimiter <- args[4] #delimiter
+param_k <- args[4] #k parameter for sc3
 ###test
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_id")
 # srcDir <- getwd()
@@ -62,7 +63,12 @@ sce <- sc3_prepare(sce)
 sce <- sc3_estimate_k(sce)
 sce <- sc3_calc_dists(sce)
 sce <- sc3_calc_transfs(sce)
-sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
+if (is.numeric(param_k)){
+  sce <- sc3_kmeans(sce, ks = param_k)
+} else {
+  sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
+}
+
 sce <- sc3_calc_consens(sce)
 # get row data for section 5.2 Silhouette Plot
 # silh stores the bar width

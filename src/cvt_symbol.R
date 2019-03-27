@@ -18,9 +18,9 @@ expName <- args[2]
 setwd(srcDir)
 getwd()
 # setwd("/home/www/html/iris3/data/2019030481235")
-# jobid <-2019030481235
+# jobid <-2018122223516
 #  srcDir <-  getwd()
-#expName <- "2019030481235_filtered_expression.txt"
+#expName <- "2018122223516_filtered_expression.txt"
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
 
@@ -84,7 +84,6 @@ if(length(which(gene_df[,2]=='')) > 0){
 }
 				 
 write.table(gene_df,paste(jobid,"_gene_id_name.txt",sep=""),sep = "\t",quote = F,col.names = T,row.names = F)
-
 
 apply(as.data.frame(srcFile), 1, generate_seq_file)
 

@@ -11,8 +11,9 @@ motif_length <- args[3]
 setwd(srcDir)
 getwd()
 #setwd("/home/www/html/iris3/data/2019030481235")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/new_example")
 #srcDir <- getwd()
-#jobid <-2019030481235 
+#jobid <-20190326211512 
 #motif_length <- 12
 sort_dir <- function(dir) {
   tmp <- sort(dir)
@@ -31,7 +32,9 @@ gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
 #i=1;j=7;k=m=3
 #
 
+module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 count_num_regulon<-0
+regulon_idx_module <- 0
 for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
   res_symbol<- paste(short_dir[i],".regulon_gene_name.txt",sep="")
@@ -48,6 +51,9 @@ for (i in 1:length(alldir)) {
   cat("",file=res_symbol)
   cat("",file=res_motif)
   regulon_idx <- 1
+  if(module_type[i] == "module"){
+    regulon_idx_module <- regulon_idx_module + 1
+  }
   for (j in 1:max(cluster_file[,3])) {
     motif_num <- as.character(cluster_file[which(cluster_file[,3] == j),1])
     sequence_out_name <- paste("ct",i,"motif",j,".fa",sep = "")
@@ -77,8 +83,11 @@ for (i in 1:length(alldir)) {
     if(length(genes) > 100 | length(genes)<=1) {
       next
     }
-    
-    regulon_idx_label <- paste("CT",i,"S-R",regulon_idx,sep = "")
+    if(module_type[i] == "CT"){
+      regulon_idx_label <- paste("CT",i,"S-R",regulon_idx,sep = "")
+    }else{
+      regulon_idx_label <- paste("module",regulon_idx_module,"-R",regulon_idx,sep = "")
+    }
     cat(paste(regulon_idx_label,"\t",sep = ""),file=res_motif,append = T)
     this_combine_motif_label  <- paste(this_motif_label,"\t",sep = "")
     if (length(this_combine_motif_label) > 1) {
