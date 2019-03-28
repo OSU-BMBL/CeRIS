@@ -38,7 +38,7 @@ module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 
 exp_file <- log1p(exp_file)
 exp_file <- exp_file - rowMeans(exp_file)
-user_label_name <- read.table(paste(jobid,"_user_label_name.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
+user_label_name <- read.table(paste(jobid,"_user_label_name.txt",sep = ""),stringsAsFactors = F,header = F,check.names = F)
 i=j=k=1
 #i=2
 #j=19
@@ -157,9 +157,9 @@ for(i in 1: length(unique(label_file[,2]))){
   }
 
   #file_heat_matrix <- file_heat_matrix[,order(file_heat_matrix[1,])]
-  
+  #j=84
   for (j in 1:length(combine_regulon_label)) {
-    if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
+    if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1] && str_detect(names(combine_regulon_label[j]),"CT")){
       regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(file_heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
       #print(regulon_label_col)
       #regulon_label_col[1,1] <- ""
@@ -222,7 +222,7 @@ for(i in 1: (length(all_regulon)-total_ct)){
   #file_heat_matrix <- file_heat_matrix[,order(file_heat_matrix[1,])]
   
   for (j in 1:length(combine_regulon_label)) {
-    if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1]){
+    if(i == as.numeric(strsplit(names(combine_regulon_label[j]), "\\D+")[[1]][-1])[1] && str_detect(names(combine_regulon_label[j]),"module")){
       regulon_label_col <- as.data.frame(paste(names(combine_regulon_label[j]),(rownames(file_heat_matrix) %in% unlist(combine_regulon_label[j]) )*1,sep = ""),stringsAsFactors=F)
       #print(regulon_label_col)
       #regulon_label_col[1,1] <- ""
