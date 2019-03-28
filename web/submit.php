@@ -71,7 +71,6 @@ if (isset($_POST['submit']))
 	$jobid = $_SESSION['jobid'];
 	$workdir = "./data/$jobid";
 	mkdir($workdir);
-	
 	$if_allowSave = $_POST['allowstorage'];
 	$is_filter = $_POST['is_filter'];
 	if($is_filter =="") {
@@ -84,13 +83,16 @@ if (isset($_POST['submit']))
 	$c_arg = '1.0';
 	$f_arg = '0.5';
 	$o_arg = '100';
+	$param_k = 'none';
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
+	$param_k = $_POST['param_k'];
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
 	$expfile = str_replace(" ", "_", $expfile);
 	$labelfile = $_SESSION['labelfile'];
+	$gene_module_file = $_SESSION['gene_module_file'];
 	$bic_inference = $_POST['bicluster_inference'];
 	if( $expfile!='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		$labelfile = "";
@@ -111,10 +113,6 @@ if (isset($_POST['submit']))
 	}
 	
 	else {
-
-	
-	
-		
 	system("touch $workdir/email.txt");
 	system("chmod 777 $workdir/email.txt");
 	$fp = fopen("$workdir/email.txt", 'w');
@@ -141,6 +139,10 @@ if (isset($_POST['submit']))
 		if($delim_label=="\t"){
 		$delim_label = "tab";
 	}
+	$delim_gene_module = detectDelimiter("$workdir2/$gene_module_file");
+		if($delim_gene_module=="\t"){
+		$delim_gene_module = "tab";
+	}
 	$fp = fopen("$workdir/info.txt", 'w');
 	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_filter,$is_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
 	fclose($fp);
@@ -156,6 +158,7 @@ fwrite($fp,"#!/bin/bash\n
 wd=/home/www/html/iris3/data/$jobid/
 exp_file=$expfile
 label_file=$labelfile
+gene_module_file=$gene_module_file
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
@@ -169,9 +172,9 @@ for file in *blocks
 do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
-Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label \n
+Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label $param_k\n
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
-Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
+Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n 
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
@@ -201,6 +204,7 @@ perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 wd=/home/www/html/iris3/data/$jobid/
 exp_file=$expfile
 label_file=$labelfile
+gene_module_file=$gene_module_file
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
@@ -214,7 +218,7 @@ for file in *blocks
 do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
-Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1 ,\n
+Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1 , $param_k\n
 label_file=\$jobid\_sc3_label.txt
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
@@ -246,7 +250,7 @@ touch done\n
 	$fp = fopen("$workdir2/param.txt", 'w+');
 	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
 	fclose($fp);
-	system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
