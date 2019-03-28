@@ -147,23 +147,16 @@ $evaluation_file = fopen("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt"
 
 
 
-foreach (glob("$DATAPATH/$jobid/*_bic.regulon_gene_name.txt") as $file) {
-	
+foreach (glob("$DATAPATH/$jobid/$jobid\_CT_*_bic.regulon_gene_name.txt") as $file) {
   $regulon_gene_name_file[] = $file;
-  
 }
 
-
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon.txt") as $file) {
-	
   $regulon_id_file[] = $file;
-  
 }
 
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon_motif.txt") as $file) {
-	
   $regulon_motif_file[] = $file;
- 
 }
 natsort($regulon_gene_name_file);
 natsort($regulon_id_file);
@@ -171,8 +164,30 @@ natsort($regulon_motif_file);
 $regulon_gene_name_file = array_values($regulon_gene_name_file);
 $regulon_id_file = array_values($regulon_id_file);
 $regulon_motif_file = array_values($regulon_motif_file);
-
 $count_ct = range(1,count($regulon_gene_name_file));
+
+foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon_gene_name.txt") as $file) {
+  $module_gene_name_file[] = $file;
+}
+foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon.txt") as $file) {
+  $module_id_file[] = $file;
+}
+
+foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon_motif.txt") as $file) {
+  $module_motif_file[] = $file;
+}
+
+if(sizeof($module_gene_name_file)){
+	natsort($module_gene_name_file);
+	natsort($module_id_file);
+	natsort($module_motif_file);
+	$module_gene_name_file = array_values($module_gene_name_file);
+	$module_id_file = array_values($module_id_file);
+	$module_motif_file = array_values($module_motif_file);
+	$count_module = range(1,count($module_gene_name_file));
+}
+
+
 $info_file = fopen("$DATAPATH/$jobid/$jobid"."_info.txt", "r");
 $count_regulon_in_ct = array(); 
 if ($info_file) {
@@ -289,7 +304,6 @@ foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 		 die("Unable to open file");
 	 }
 	fclose($fp);
-	
 	}
 	
 foreach ($regulon_id_file as $key=>$this_regulon_id_file){
@@ -319,6 +333,50 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	}
 	fclose($fp);
 	}
+if(sizeof($module_gene_name_file)){
+	foreach ($module_gene_name_file as $key=>$this_module_gene_name_file){
+	
+	$status = "1";
+	$fp = fopen("$this_module_gene_name_file", 'r');
+	 if ($fp){
+	 while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) if ($line) {
+		 $module_result[$key][] = array_map('trim',$line);
+		 
+	 }
+	 } else{
+		 die("Unable to open file");
+	 }
+	fclose($fp);
+	}
+	
+foreach ($module_id_file as $key=>$this_module_id_file){
+	$status = "1";
+	$fp = fopen("$this_module_id_file", 'r');
+	if ($fp){
+	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
+		if ($line) {$module_id_result[$key][] = array_map('trim',$line);}
+	} else{
+		die("Unable to open file");
+	}
+	fclose($fp);
+	}
+	
+foreach ($module_motif_file as $key=>$this_module_motif_file){
+	
+	$status = "1";
+
+	$fp = fopen("$this_module_motif_file", 'r');
+	if ($fp){
+	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
+		if ($line) {$module_motif_result[$key][] = array_map('trim',$line);}
+	} else{
+		die("Unable to open file");
+	}
+	fclose($fp);
+	}
+	
+}
+	
 function exception_handler($exception) {
   echo '<div class="alert alert-danger">';
   echo '<b>Fatal error</b>:  Uncaught exception \'' . get_class($exception) . '\' with message ';
@@ -357,6 +415,9 @@ $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
 $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('regulon_motif_result',$regulon_motif_result);
+$smarty->assign('module_result',$module_result);
+$smarty->assign('module_id_result',$module_id_result);
+$smarty->assign('module_motif_result',$module_motif_result);
 $smarty->assign('big',$big);
 $smarty->assign('predict_label',$predict_label);
 $smarty->assign('provide_label',$provide_label);
@@ -372,6 +433,7 @@ $smarty->assign('saving_plot1',$saving_plot1);
 $smarty->assign('Accuracy',$Accuracy);
 $smarty->assign('entropy',$entropy);
 $smarty->assign('count_ct',$count_ct);
+$smarty->assign('count_module',$count_module);
 $smarty->assign('provided_cell',$provided_cell);
 $smarty->assign('provided_cell_value',$provided_cell_value);
 $smarty->assign('purity',$purity);
@@ -384,7 +446,6 @@ $smarty->assign('if_allowSave',$if_allowSave);
 $smarty->assign('annotation', $annotation1);
 $smarty->assign('LINKPATH', $LINKPATH);
 $smarty->assign('silh_trace',$silh_trace);
-//print_r($sankey_nodes);
 $smarty->assign('silh_y',$silh_y);
 $smarty->assign('silh_x',$silh_x);
 $smarty->assign('sankey_src',$sankey_src);
