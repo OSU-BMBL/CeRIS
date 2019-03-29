@@ -29,7 +29,7 @@ alldir <- sort_dir(alldir)
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 short_dir<- sort_dir(short_dir)
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
-#i=1;j=7;k=m=3
+#i=7;j=1;k=m=3
 #
 
 module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
@@ -56,7 +56,7 @@ for (i in 1:length(alldir)) {
   }
   for (j in 1:max(cluster_file[,3])) {
     motif_num <- as.character(cluster_file[which(cluster_file[,3] == j),1])
-    sequence_out_name <- paste("ct",i,"motif",j,".fa",sep = "")
+    #sequence_out_name <- paste("ct",i,"motif",j,".fa",sep = "")
     sequence_info <- character()
     genes_num <- vector()
     idx <- 1
@@ -78,6 +78,9 @@ for (i in 1:length(alldir)) {
     this_bic <- gsub(".txt.fa.*","",this_bic)
     this_id <- gsub(".*closures-","",this_motifs)
     this_motif_label <- paste(this_ct,this_bic,this_id,sep = ",")
+    if(module_type[i] == "module"){
+      this_motif_label <- paste(regulon_idx_module,this_bic,this_id,sep = ",")
+    }
     this_motif_label <- unique(this_motif_label)
     genes <- as.character(genes[!duplicated(genes)])
     if(length(genes) > 100 | length(genes)<=1) {

@@ -43,21 +43,18 @@ while ( my $entry = readdir $DIR ) {
 	if ( $filename =~ /$filename_regex/g ) {
 	
 	my $fullname =  $workdir.'/'.$filename;
+
+	if($fullname =~ m/CT/){
 	my ($a)= $fullname =~ m/(?<=_CT_)\d+/g;
+	}
+	if($fullname =~ m/module/){
+	my ($a)= $fullname =~ m/(?<=_module_)\d+/g;
+	}
 	my ($b)= $fullname =~ m/(?<=\/bic)\d+/g;
-	
-		#my $regex_ct = qr/(?<=_CT_)\d+/p;
-		#my $subst = '';
-		#my $ct_result = $str =~ s/$regex_ct/$subst/r;
-        #
-		#print $ct_result;
-		#my $file_location = "/home/www/html/iris3/program/step3/test.fa"; 
 		open my $fh, $fullname or die "Could not open $fullname: $!";
 		{
 			my $motif_now = '';
-			
 			while(my $row = <$fh>) {
-			
 			  next unless ($row =~ s/^>//);
 			  my ($motif, $seq) = (split ' ', $row)[0, 4];
 			  if($motif eq $motif_now) {
@@ -65,23 +62,24 @@ while ( my $entry = readdir $DIR ) {
 			  } else {
 			    $motif_now = $motif;
 				my ($c)= $motif =~ m/(?<=Motif-)\d+/g;
+				
+				if($fullname =~ m/CT/){
+				my ($a)= $fullname =~ m/(?<=_CT_)\d+/g;
 				$out_name = "ct".$a."bic".$b."m".$c;
+				}
+				if($fullname =~ m/module/){
+				my ($a)= $fullname =~ m/(?<=_module_)\d+/g;
+				$out_name = "module".$a."bic".$b."m".$c;
+				}
 			    $align .= ">".$out_name."\n";
 			    $align .= $seq."\n";
-				
 			  }
-			  
 			}	open(my $out, '>', $out_dir.$out_name.".b2a") or die "Could not open file '$filename' $!";
 				print $out $align;
 				close $out;
 				$align = "";
-			
-			
-				
-			
 		}
 		close($fh);
-	
 		#print $fullname."\n";
 	}
 
