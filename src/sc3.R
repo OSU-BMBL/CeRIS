@@ -23,15 +23,16 @@ jobid <- args[2] # user job id
 label_file <- 1
 label_file <- args[3] # user label or 1
 delimiter <- args[4] #delimiter
-param_k <- args[4] #k parameter for sc3
+param_k <- args[5] #k parameter for sc3
+as.numeric(param_k)
 ###test
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_id")
 # srcDir <- getwd()
-# jobid <-20181229184557 
-# expFile <- "20181229184557_filtered_expression.txt"
-# label_file <- "Guo_cell_type.txt"
-# delimiter <- "tab"
-
+# jobid <-2019032810957 
+# expFile <- "2019032810957_filtered_expression.txt"
+# label_file <- "iris3_example_expression_label.csv"
+# delimiter <- ","
+# param_k <- '8'
 
 
 exp_data<- read.delim(expFile,check.names = FALSE, header=TRUE,row.names = 1)
@@ -63,7 +64,7 @@ sce <- sc3_prepare(sce)
 sce <- sc3_estimate_k(sce)
 sce <- sc3_calc_dists(sce)
 sce <- sc3_calc_transfs(sce)
-if (is.numeric(param_k)){
+if (as.numeric(param_k)>0){
   sce <- sc3_kmeans(sce, ks = param_k)
 } else {
   sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
@@ -78,21 +79,37 @@ silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
 if (label_file == 1){
   silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
   png(file="saving_plot1.jpeg",width=1200, height=1200)
-  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
+  if (as.numeric(param_k)>0){
+    sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2]))
+  } else {
+    sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
+  }
   dev.off()
   library(devEMF)
   emf(file="saving_plot1.emf", emfPlus = FALSE)
-  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  if (as.numeric(param_k)>0){
+    sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  } else {
+    sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  }
   dev.off()
   
 } else {
   silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
   png(file="saving_plot1.jpeg",width=1200, height=1200)
-  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  if (as.numeric(param_k)>0){
+    sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  } else {
+    sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  }
   dev.off()
   library(devEMF)
   emf(file="saving_plot1.emf", emfPlus = FALSE)
-  sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  if (as.numeric(param_k)>0){
+    sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  } else {
+    sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2],colnames(colData(sce))[3]))
+  }
   dev.off()
 }
 silh_out <- silh_out[order(silh[,1]),]
