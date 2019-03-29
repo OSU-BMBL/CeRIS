@@ -158,12 +158,25 @@ foreach (glob("$DATAPATH/$jobid/*_bic.regulon.txt") as $file) {
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon_motif.txt") as $file) {
   $regulon_motif_file[] = $file;
 }
+
+$tomtom_path = "$DATAPATH/$jobid/tomtom/";
+foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tomtom_path)) as $filename)
+{
+    if(pathinfo($filename)["extension"] == "tsv"){
+		$tomtom_file[] = $filename;
+	}
+	
+}
+
 natsort($regulon_gene_name_file);
 natsort($regulon_id_file);
 natsort($regulon_motif_file);
+natsort($tomtom_file);
 $regulon_gene_name_file = array_values($regulon_gene_name_file);
 $regulon_id_file = array_values($regulon_id_file);
 $regulon_motif_file = array_values($regulon_motif_file);
+$tomtom_file = array_values($tomtom_file);
+
 $count_ct = range(1,count($regulon_gene_name_file));
 
 foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon_gene_name.txt") as $file) {
@@ -321,9 +334,7 @@ foreach ($regulon_id_file as $key=>$this_regulon_id_file){
 	}
 	
 foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
-	
 	$status = "1";
-
 	$fp = fopen("$this_regulon_motif_file", 'r');
 	if ($fp){
 	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
@@ -333,10 +344,40 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	}
 	fclose($fp);
 	}
+	
+function getStringBetween($str,$from,$to)
+{
+    $sub = substr($str, strpos($str,$from)+strlen($from),strlen($str));
+    return substr($sub,0,strpos($sub,$to));
+}
+
+foreach ($tomtom_file as $key=>$this_tomtom_file){
+	$status = "1";
+	$fp = fopen("$this_tomtom_file", 'r');
+	if ($fp){
+	$count = 0;
+	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE){
+		if ($line && $line[0][0] != "#"&& $line[0][0] != "Q") {
+			$count ++;	
+			#print_r($this_tomtom_file->getRealPath());
+			#getStringBetween($this_tomtom_file->getRealPath(),"tomtom","JASPER");
+			$motif_name = getStringBetween($this_tomtom_file->getRealPath(),"tomtom/","/tomtom.tsv");
+			$motif_name = str_replace("/","_",$motif_name);
+			$tomtom_result[$motif_name][] = array_map('trim',$line);
+			#print_r($count);
+		}
+		if ($count > 4) {
+			break;
+		}
+	}
+	} else{
+		die("Unable to open file");
+	}
+	fclose($fp);
+	}
+	#print_r($tomtom_result['ct1bic1m1_JASPAR'][2]);
 if(sizeof($module_gene_name_file)){
 	foreach ($module_gene_name_file as $key=>$this_module_gene_name_file){
-	
-	$status = "1";
 	$fp = fopen("$this_module_gene_name_file", 'r');
 	 if ($fp){
 	 while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) if ($line) {
@@ -349,8 +390,7 @@ if(sizeof($module_gene_name_file)){
 	fclose($fp);
 	}
 	
-foreach ($module_id_file as $key=>$this_module_id_file){
-	$status = "1";
+	foreach ($module_id_file as $key=>$this_module_id_file){
 	$fp = fopen("$this_module_id_file", 'r');
 	if ($fp){
 	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
@@ -361,20 +401,20 @@ foreach ($module_id_file as $key=>$this_module_id_file){
 	fclose($fp);
 	}
 	
-foreach ($module_motif_file as $key=>$this_module_motif_file){
+	foreach ($module_motif_file as $key=>$this_module_motif_file){
 	
-	$status = "1";
-
 	$fp = fopen("$this_module_motif_file", 'r');
 	if ($fp){
 	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
-		if ($line) {$module_motif_result[$key][] = array_map('trim',$line);}
+		if ($line){
+			$module_motif_result[$key][] = array_map('trim',$line);
+			
+			}
 	} else{
 		die("Unable to open file");
 	}
 	fclose($fp);
 	}
-	
 }
 	
 function exception_handler($exception) {
@@ -415,6 +455,7 @@ $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
 $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('regulon_motif_result',$regulon_motif_result);
+$smarty->assign('tomtom_result',$tomtom_result);
 $smarty->assign('module_result',$module_result);
 $smarty->assign('module_id_result',$module_id_result);
 $smarty->assign('module_motif_result',$module_motif_result);

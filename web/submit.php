@@ -7,24 +7,7 @@ require("config/smarty.php");
 $smarty->caching = true;
 $smarty->assign('section', 'Homepage');
 session_start();
-/*function detectDelimiter($fh)
-{
-    $delimiters = [",", ";", "|", "tab", " "];
-    $data_1 = null; $data_2 = null;
-    $delimiter = $delimiters[0];
-    foreach($delimiters as $d) {
-        $data_1 = fgetcsv($fh, 65536, $d);
-        if(sizeof($data_1) > sizeof($data_2)) {
-            $delimiter = sizeof($data_1) > sizeof($data_2) ? $d : $delimiter;
-			$size = sizeof($data_1);
-			$writetmp = "$d\t$size";
-			$myfile = file_put_contents('/home/www/html/iris3/data/20181219134153/email.txt', $writetmp.PHP_EOL , FILE_APPEND | LOCK_EX);
-            $data_2 = $data_1;
-        }
-        rewind($fh);
-    }
-    return $delimiter;
-}*/
+
 function get_client_ip_server() {
     $ipaddress = '';
     if ($_SERVER['HTTP_CLIENT_IP'])
@@ -83,11 +66,14 @@ if (isset($_POST['submit']))
 	$c_arg = '1.0';
 	$f_arg = '0.5';
 	$o_arg = '100';
-	$param_k = 'none';
+	$param_k = '';
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
-	$param_k = $_POST['param_k'];
+	$enable_sc3_k = $_POST['enable_sc3_k'];
+	if($enable_sc3_k == "specify"){
+		$param_k = $_POST['param_k'];
+	}
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
 	$expfile = str_replace(" ", "_", $expfile);
@@ -107,9 +93,9 @@ if (isset($_POST['submit']))
 	}
 
 	
-	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
+	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '1000000' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		
-		header("Location: results.php?jobid=2019030685553#");
+		header("Location: results.php?jobid=20190327230542#");
 	}
 	
 	else {
@@ -192,6 +178,7 @@ mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
 /home/www/html/iris3/program/get_logo.sh \$wd
+/home/www/html/iris3/program/get_tomtom.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
 touch done\n 
@@ -239,6 +226,7 @@ mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
 /home/www/html/iris3/program/get_logo.sh \$wd
+/home/www/html/iris3/program/get_tomtom.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
