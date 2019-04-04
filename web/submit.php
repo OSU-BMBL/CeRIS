@@ -52,13 +52,21 @@ if (isset($_POST['submit']))
 	file_put_contents("/home/www/html/iris3/ip.txt",PHP_EOL .get_client_ip_server(), FILE_APPEND | LOCK_EX);
 	//$jobid = date("YmdGis");
 	$jobid = $_SESSION['jobid'];
+	if($jobid == ""){
+		jobid = date("YmdGis");
+	}
 	$workdir = "./data/$jobid";
 	mkdir($workdir);
 	$if_allowSave = $_POST['allowstorage'];
-	$is_filter = $_POST['is_filter'];
-	if($is_filter =="") {
-		$is_filter = '0';
+	$is_gene_filter = $_POST['is_gene_filter'];
+	if($is_gene_filter =="") {
+		$is_gene_filter = '0';
 	}
+	$is_cell_filter = $_POST['is_cell_filter'];
+	if($is_cell_filter =="") {
+		$is_cell_filter = '0';
+	}
+	
 	if($if_allowSave =="") {
 		$if_allowSave = '0';
 	}
@@ -66,13 +74,18 @@ if (isset($_POST['submit']))
 	$c_arg = '1.0';
 	$f_arg = '0.5';
 	$o_arg = '100';
-	$param_k = '';
+	$promoter_arg = '1000';
+	$param_k = '0';
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
+	$promoter_arg = $_POST['promoter_arg'];
 	$enable_sc3_k = $_POST['enable_sc3_k'];
 	if($enable_sc3_k == "specify"){
 		$param_k = $_POST['param_k'];
+		if ($param_k == ""){
+			$param_k = '0';
+		}
 	}
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
@@ -82,6 +95,9 @@ if (isset($_POST['submit']))
 	$bic_inference = $_POST['bicluster_inference'];
 	if( $expfile!='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		$labelfile = "";
+	}
+	if( $expfile!='iris3_example_expression_matrix.csv' && $gene_module_file == 'iris3_example_gene_module.csv'){
+		$gene_module_file = "";
 	}
 	$len = strlen($labelfile);
 	if($bic_inference=='1' && strlen($labelfile) > 0){#have label use sc3
@@ -130,7 +146,7 @@ if (isset($_POST['submit']))
 		$delim_gene_module = "tab";
 	}
 	$fp = fopen("$workdir/info.txt", 'w');
-	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_filter,$is_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
+	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_filter,$is_gene_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
 	fclose($fp);
 	$fp = fopen("$workdir2/qsub.sh", 'w');
 	if($if_allowSave != '0'){
@@ -148,7 +164,7 @@ gene_module_file=$gene_module_file
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
-Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_filter
+Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter
 /home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
 for file in *blocks
 do
@@ -162,7 +178,7 @@ Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt 
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n 
-perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
+perl /home/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
 cd \$wd\n
@@ -179,6 +195,7 @@ mkdir logo_tmp\n
 mkdir logo\n
 /home/www/html/iris3/program/get_logo.sh \$wd
 /home/www/html/iris3/program/get_tomtom.sh \$wd
+/home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
 touch done\n 
@@ -195,7 +212,7 @@ gene_module_file=$gene_module_file
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
-Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_filter
+Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter
 /home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
 for file in *blocks
 do
@@ -208,9 +225,9 @@ done
 Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1 , $param_k\n
 label_file=\$jobid\_sc3_label.txt
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
-Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt\n
+Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
 Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n
-perl /home/www/html/iris3/program/prepare_promoter.pl \$wd\n
+perl /home/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
 cd \$wd\n
@@ -227,6 +244,7 @@ mkdir logo_tmp\n
 mkdir logo\n
 /home/www/html/iris3/program/get_logo.sh \$wd
 /home/www/html/iris3/program/get_tomtom.sh \$wd
+/home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
@@ -238,7 +256,7 @@ touch done\n
 	$fp = fopen("$workdir2/param.txt", 'w+');
 	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
 	fclose($fp);
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
