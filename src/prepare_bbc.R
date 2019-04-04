@@ -1,14 +1,12 @@
 #######  Read all motif result, convert to input for BBC ##########
 # remove all empty files before this
-
-library(stringr)
-library(tidyverse)
+ 
 
 args <- commandArgs(TRUE)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_meme")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 #srcDir <- getwd()
-#jobid <-2018122833236 
-# is_meme <- 1
+#jobid <-2018122223516 
+# is_meme <- 0
 # motif_len <- 12
 srcDir <- args[1]
 is_meme <- args[2] # no 0, yes 1
@@ -18,6 +16,14 @@ getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
+#gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3-R/data/gene_start_info_human.txt")
+species_id <-  as.character(read.table("species.txt"))
+if(species_id == "52"){
+  gene_info <- read.table("/home/www/html/iris3/program/dminda/human_gene_start_info.txt")
+} else if (species_id == "53"){
+  gene_info <- read.table("/home/www/html/iris3/program/dminda/mouse_gene_start_info.txt")
+}
+
 sort_dir <- function(dir) {
   tmp <- sort(dir)
   split <- strsplit(tmp, "_CT_") 
@@ -109,9 +115,12 @@ convert_meme <- function(filepath){
   
 }
 
-#i=3
-#j=44
+#i=1
+#j=1
 #info = "bic1.txt.fa.closures-1"  
+module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
+regulon_idx_module <- 0
+result_gene_pos <- data.frame()
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
@@ -124,6 +133,19 @@ for (i in 1:length(alldir)) {
     #test
     #motif_seq <- convert_motif(paste(all_closure[j],".test",sep = ""))[,c(1,5,7)]
     motif_seq <- convert_motif(all_closure[j])[,c(1,5,7)]
+    motif_pos <- convert_motif(all_closure[j])[,c(1,2,3,4,7)]
+    gene_pos <- merge(motif_pos,gene_info,by.x = "Info",by.y = 'V2')
+    gene_pos <-transform(gene_pos, min = pmin(start, end), max=pmax(start,end))
+    gene_pos[,4] <-  gene_pos[,7] + gene_pos[,8]
+    gene_pos[,5] <-  gene_pos[,7] + gene_pos[,9]
+    gene_pos[,10] <- module_type[i]
+    gene_pos[,11] <- paste(i,j,sub(">Motif-","",gene_pos[,2]),sep = ",")
+    if(module_type[i] == "module"){
+      regulon_idx_module <- regulon_idx_module + 1
+      gene_pos[,11] <- paste(regulon_idx_module,j,sub(">Motif-","",gene_pos[,2]),sep = ",")
+    }
+    #write.table(gene_pos[,c(6,4,5,1)],paste(alldir[i],"/bic",j,".bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+    result_gene_pos <- rbind(result_gene_pos,gene_pos[,c(6,4,5,1,10,11)])
     motif_seq[,1] <- gsub(">Motif","",motif_seq[,1])
     motif_seq[,4] <- as.factor(paste(short_all_closure[j],motif_seq[,1],sep=""))
     seq_file <- motif_seq[,c(4,3)]
@@ -147,8 +169,7 @@ for (i in 1:length(alldir)) {
   }
   cat(">end", file=res,sep="\n",append = T)
   write.table(combined_gene,paste(alldir[i],".motifgene.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = T)
-  
 }
-
+write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
 
