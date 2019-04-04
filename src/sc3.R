@@ -23,8 +23,9 @@ jobid <- args[2] # user job id
 label_file <- 1
 label_file <- args[3] # user label or 1
 delimiter <- args[4] #delimiter
+param_k <- character()
 param_k <- args[5] #k parameter for sc3
-as.numeric(param_k)
+
 ###test
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_id")
 # srcDir <- getwd()
