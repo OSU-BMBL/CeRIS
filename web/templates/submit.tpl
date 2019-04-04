@@ -33,7 +33,6 @@
 	            }
 	        });
 	
-			
 	        $("div#dropzone_label").dropzone({
 	            dictDefaultMessage: "Drag or click to upload your cell label file. <br> Accepted files: .txt,.csv,.tsv",
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
@@ -56,8 +55,32 @@
 	
 	            }
 	        });
+			
+			$("div#dropzone_gene_module").dropzone({
+	            dictDefaultMessage: "Drag or click to upload your gene module file. <br> Accepted files: .txt,.csv,.tsv",
+	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
+	            url: "upload.php",
+	            maxFiles: 1,
+	            maxFilesize: 500,
+				timeout: 300000,
+	            maxfilesexceeded: function(file) {
+	                this.removeAllFiles();
+	                this.addFile(file);
+	            },
+	            sending: function(file, xhr, formData) {
+	                formData.append('filetype', 'dropzone_gene_module');
+	            },
+	            success: function(file, response) {
+					$('#enable_gene_module').attr("disabled", false);
+	                response = JSON.parse(response);
+	                console.log(response);
+	                addTable(response);
+	
+	            }
+	        });
+			
 			$('.dz-message').css({'font-size': '18px'});
-	// Load Example
+	// Load Example expression file
 	$('#load_exp').click(function(evt) {
 	$('#enable_labelfile').attr("disabled", false);
 	$('#submit_btn').attr("disabled", false);
@@ -65,21 +88,21 @@
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
+	$('#loader_gene_module').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#dropzone_gene_module').hide();
 	$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'expression'},
 		dataType: 'json',
 		success: function(response) {
-		alert('Items added');
-		console.log(response);
-	    addTable(response);
 		},
         error: function(e){
             console.log(e.message);
         }
 	})
 });
+	// load example cell label
 	$('#load_label').click(function(evt) {
 	$('#submit_btn').attr("disabled", false);
 	$('#enable_labelfile').attr("disabled", false);
@@ -87,6 +110,8 @@
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
+	$('#loader_gene_module').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#dropzone_gene_module').hide();
 	// AJAX Query
 	$.ajax({
 		url: "upload.php",
@@ -94,9 +119,29 @@
 		data: {'filename': 'label'},
 		dataType: 'json',
 		success: function(response) {
-		alert('Items added');
-		console.log(response);
-	    addTable(response);
+		},
+        error: function(e){
+            console.log(e.message);
+        }
+	})
+});
+
+	// load example gene module
+	$('#load_gene_module').click(function(evt) {
+	$('#submit_btn').attr("disabled", false);
+	$('#enable_labelfile').attr("disabled", false);
+	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+	$('#dropzone_exp').hide();
+	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#dropzone_label').hide();
+	$('#loader_gene_module').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#dropzone_gene_module').hide();
+	$.ajax({
+		url: "upload.php",
+		type: 'POST',
+		data: {'filename': 'gene_module'},
+		dataType: 'json',
+		success: function(response) {
 		},
         error: function(e){
             console.log(e.message);
@@ -113,11 +158,11 @@
 	<form method="POST" action="{{$URL}}" encType="multipart/form-data" id="needs-validation">
 		<h2 class="text-center">Job Submission</h2>
 		<div class="form-group row">
-			<div class="form-check col-sm-8 ">
+			<div class="form-check col-sm-12 ">
 				<label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A gene expression file with genes as rows and cells as columns. Users can provide normalized or non-normalized input file for the submission. Accept both txt, csv and tsv format. "> </span>
 				</label>
 			</div>
-			<div class="form-check col-sm-8  ">
+			<div class="form-check col-sm-2  ">
 				<div class="dropdown">
 					<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
 					</button>
@@ -129,6 +174,18 @@
 					</ul>
 				</div>
 			</div>
+			<!--<div class="form-check col-sm-1  ">
+				<div class="dropdown">
+					<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example (10x) <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
+						</li>
+						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" >Download example gene expression file</a>
+						</li>
+					</ul>
+				</div>
+			</div>-->
 			<div class="col-sm-12">
 				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
 			<div id="loader_exp"></div>
@@ -145,11 +202,18 @@
 			</div>
 		</div>
 		<div class="form-group row">
+		
 			<div class="form-check col-sm-12 ">
-				<input class="form-check-input" type="checkbox" name="is_filter" id="is_filter" value="1" checked>
-				<label class="form-check-label" for="is_filter">Enable gene filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are either expressed (expression value > 2) in less than 6% of cells or expressed (expression value > 0) in at least 96% of cells. The method was fully described in SC3 manuscript. The filtering will not affect the result of cell prediction nor the bicluster results, but only shorten the ruuning time."> </span>
+				<input class="form-check-input" type="checkbox" name="is_gene_filter" id="is_gene_filter" value="1" checked>
+				<label class="form-check-label" for="is_gene_filter">Enable gene filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are either expressed (expression value > 2) in less than 6% of cells or expressed (expression value > 0) in at least 96% of cells. The method was fully described in SC3 manuscript. The filtering will not affect the result of cell prediction nor the bicluster results, but only shorten the ruuning time."> </span>
 				</label>
 			</div>
+			<div class="form-check col-sm-12 ">
+				<input class="form-check-input" type="checkbox" name="is_cell_filter" id="is_cell_filter" value="1">
+				<label class="form-check-label" for="is_cell_filter">Enable cell filtering (default: No) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description"> </span>
+				</label>
+			</div>
+			
 		</div>
 		<hr>
 		<div class="bs-example2">
@@ -216,6 +280,24 @@
 									</div>
 								</div>
 							</div>
+							<h4 class="font-italic text-left">SC3 option <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="sc3 description"> </span></h4>
+							<div class="row">
+									<div class="col-md-1">
+										<label for="ex4">k: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Number of clusters"> </span>
+										</label>
+										
+									</div>
+									<div class="col-md-2">
+										<input type="radio" value="estimate" id="enable_sc3_k" name="enable_sc3_k" class="custom-control-input" checked required>
+									<label class="custom-control-label" for="enable_sc3_estimate">Estimated by SC3
+									</label>
+									</div>
+									<div class="col-md-5">
+									<label class="custom-control-label" for="enable_sc3_estimate"><input type="radio" value="specify" id="enable_sc3_k" name="enable_sc3_k" class="custom-control-input" > Specify:<input name="param_k" type="text" id="param_k" size="5" value="" title="Please enter numeric value > 0" style="position:relative;left:10px; width : 50%;" pattern="^[1-9][0-9]*$" oninvalid="setCustomValidity('Please enter numeric value > 0')"
+    onchange="try{setCustomValidity('')}catch(e){}"/></label>
+									
+									</div>
+								</div>
 							<h4 class="font-italic text-left">Upload cell label: (Optional) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A table contains cell infomation. The file should includes a cell names in the first column match with the expression file, and the second column indicating the cell clusters. Cell clusters are used in two ways: (i) assess the cell-type prediction results from SC3, and (ii) assign Cell-type-specific regulons. If no cell label file uploaded, the pipeline will automatically use the predicted clusters from SC3 for the following regulon predictions. Accept both txt and csv format."> </span></h4>
 							
 							<div id="upload_label">
@@ -243,6 +325,7 @@
 									<input type="radio" value="1" id="enable_sc3" name="bicluster_inference" class="custom-control-input" checked="">
 									<label class="custom-control-label" for="enable_sc3">SC3 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
 									</label>
+									
 								</div>
 								<div class="col-sm-4">
 									<input type="radio" value="2" id="enable_labelfile" name="bicluster_inference" disabled="true" class="custom-control-input">
@@ -250,6 +333,28 @@
 									</label>
 								</div>
 								
+							</div>
+							<br>
+							<h4 class="font-italic text-left">Upload gene module: (Optional) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Gene module description"> </span></h4>
+			
+							<div id="upload_gene_module">
+									<div class="form-group row">
+										<div class="col-sm-4">
+											<div class="dropdown">
+												<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+													<li><a id="load_gene_module" class="dropdown-item" href="#dropzone_label">Load example file</a>
+													</li>
+													<li><a class="dropdown-item" href="/iris3/storage/iris3_example_gene_module.csv" download>Download example gene module file</a>
+													</li>
+												</ul>
+											</div>
+											<div id="dropzone_gene_module" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
+														<div id="loader_gene_module"></div>
+			<div id="preview_label"></div>
+										</div>
+									</div>
 							</div>
 							<br>
 							<h4 class="font-italic text-left">CTS-regulon prediction <span class="glyphicon glyphicon-question-sign" data-html="true" data-toggle="tooltip" data-original-title="Regulon: a group of genes that controlled by the same regulatory gene.<br>
@@ -266,7 +371,21 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 									<label class="custom-control-label" for="motif_meme">MEME <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="We integrated the MEME command line version as an option for motif prediction. Default parameters are used. "> </span>
 									</label>
 								</div>
+								<br>
 							</div>
+							<div class="row">
+									<div class="col-md-3">
+										<label for="ex2">Get promoter sequence relative to TSS:	<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. 0 means no overlap and 1 means complete overlap. Default is 0.5."> </span>
+										</label>
+									</div>
+									<div class="col-md-2">
+										<select class="selectpicker" name="promoter_arg" data-width="auto">
+											<option>500</option>
+											<option data-subtext="Default" selected="selected">1000</option>
+											<option>2000</option>
+										</select>
+									</div>
+								</div>
 						</div>
 					</div>
 				</div>
@@ -282,7 +401,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<button type="submit" id="submit_btn" disabled="true" class="btn btn-submit" name="submit" value="submit">Submit</button>
 			<!--<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=2018122630420#" style="color:white">Example output</a>
 			</button>-->
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20181229201357#';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2019032810957#';" />
 
 		</div>
 		<div class="form-group">
