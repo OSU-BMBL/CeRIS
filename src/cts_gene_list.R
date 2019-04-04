@@ -65,7 +65,7 @@ get_pvalue <- function(df){
     x=length(A[(A%in%B)])
     k=length(B)-1
     tmp_pvalue <- 1 - phyper(x,m,n,k)
-    result_pvalue[i] <- tmp_pvalue
+    result_pvalue[i] <- tmp_pvalue*count_cluster 
   }
   
   #min_pvalue <- min(result_pvalue)
