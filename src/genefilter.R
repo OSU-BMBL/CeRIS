@@ -8,39 +8,43 @@ library(GenomicAlignments)
 library(ensembldb)
 library(EnsDb.Hsapiens.v86)
 library(EnsDb.Mmusculus.v79)
-
+library(monocle)
+library(stringr)
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
 delim <- args[3] #delimiter
-is_filter <- args[4] #1 for enable filter
+is_gene_filter <- args[4] #1 for enable gene filtering
+is_cell_filter <- args[5] #1 for enable cell filtering
 if(delim == 'tab'){
 	delim <- '\t'
 }
 # setwd("/home/www/html/iris3/data/20190305183801")
 # setwd("C:/Users/Cankun.Wang/Desktop/iris3")
 # setwd("d:/Users/flyku/Documents/IRIS3-data/test_oneregulon")
-# srcFile = "/home/www/html/iris3/data/20190305183801/iris3_test2.tsv"
+# srcFile = "count-data-small.csv"
 # srcFile = "iris3_example_expression_matrix.csv"
 # outFile <- "20190305160730"
 # delim <- ","
-# is_filter <- 1
-#
+# is_gene_filter <- 1
+# is_cell_filter <- 1
 #yan.test <- read.csv("Goolam_cell_label.csv",header=T,sep=",",check.names = FALSE, row.names = 1)
 getwd()
 yan.test <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = NULL)
 colnames(yan.test) <-  gsub('([[:punct:]])|\\s+','_',colnames(yan.test))
 
+#check if [1,1] is empty
 if(colnames(yan.test)[1] == ""){
   colnames(yan.test)[1] = "Gene_ID"
 }
+#remove duplicated rows with same gene 
 if(length(which(duplicated.default(yan.test[,1]))) > 0 ){
   yan.test <- yan.test[-which(duplicated.default(yan.test[,1])==T),]
-}
-																		
+}	
 rownames(yan.test) <- yan.test[,1]
 yan.test<- yan.test[,-1]
-
+thres_genes <- nrow(yan.test) * 0.01
+thres_cells <- ncol(yan.test) * 0.05
 # convert Ensembl id to gene symbol
 #i=1
 if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep('ens',rownames(yan.test))) > 0.5 * nrow(yan.test) ){
@@ -66,64 +70,83 @@ if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep(
     }
   }
 }
-
-
-
-# obtain a matrix of gene length in expresison matrix, used for TPM normalization
-# if the last row read counts are integers, skip the normalizaiotn
-if(all(as.numeric(unlist(yan.test[nrow(yan.test),]))%%1==0)){
-  
-  df_gene_length <- genes(EnsDb.Hsapiens.v86, filter=list(GeneNameFilter(rownames(yan.test))), 
-                          return.type="data.frame", columns=c("gene_seq_start","gene_seq_end"))
-  df_gene_length[,5] <- df_gene_length[,2] - df_gene_length[,1] + 1
-  colnames(df_gene_length)[5] <- "gene_length"
-  gene_length <- df_gene_length[match(rownames(yan.test), df_gene_length$gene_name), ]
-  if(nrow(yan.test[!is.na(gene_length$gene_name),])>1) {
-    yan.test <- yan.test[!is.na(gene_length$gene_name),]
-    gene_length <- gene_length[!is.na(gene_length$gene_name),c(4,5)]
-    tpm <- function(counts, lengths) {
-      rate <- counts / lengths
-      rate / sum(rate) * 1e6
-    }
-    yan.test <- apply(yan.test, 2, function(x) tpm(x, gene_length$gene_length))
+#this <- yan.test[977,]
+# keep the gene with number of non-0 expression value cells >= 5%
+filter_gene_func <- function(this){
+  if(length(which(this>0)) >= thres_cells){
+    return (1)
+  } else {
+    return (0)
   }
 }
-
-nrare <- ncol(yan.test) * 0.06
-nubi <- ncol(yan.test) * 0.94
-if(length(which(rownames(yan.test)=="")) > 0){
-yan.test <- yan.test[-which(rownames(yan.test)==""),]
-}
-
-new_yan <- data.frame()
-filter_func <- function(this){
-  if(length(which(this>2)) >= nrare && length(which(this==0)) <= nubi){
+# this <- yan.test[,1]
+# keep the cell with number of non-0 expression value gene >= 1%
+filter_cell_func <- function(this){
+  if(length(which(this>0)) >= thres_genes){
     return (1)
   } else {
     return (0)
   }
 }
 
-new_yan_index <- as.vector(apply(yan.test, 1, filter_func))
-
-if(is_filter == 1){
-  new_yan <- yan.test[which(new_yan_index == 1),]
-} else{
+# apply gene filtering
+if(is_gene_filter == "1"){
+  gene_index <- as.vector(apply(yan.test, 1, filter_gene_func))
+  new_yan <- yan.test[which(gene_index == 1),]
+} else {
+  new_yan <- yan.test
+}
+# apply cell filtering
+if(is_cell_filter == "1"){
+  cell_index <- as.vector(apply(yan.test, 2, filter_cell_func))
+  yan.test <- yan.test[,which(cell_index == 1)]
+} else {
   new_yan <- yan.test
 }
 
+sample_sheet <- data.frame(groups = str_split_fixed(colnames(yan.test), "\\.+", 3), row.names = colnames(yan.test))
+gene_ann <- data.frame(gene_short_name = row.names(yan.test), row.names = row.names(yan.test))
+pd <- new("AnnotatedDataFrame",data=sample_sheet)
+fd <- new("AnnotatedDataFrame",data=gene_ann)
 
-new_yan <- log1p(new_yan)
+tpm_mat <- yan.test
+tpm_mat <- apply(tpm_mat, 2, function(x) x / sum(x) * 1e6)
 
-filter_num <- nrow(yan.test)-nrow(new_yan)
-filter_rate <- formatC(filter_num/nrow(yan.test),digits = 2)
+# if reads are integers, normalize with 'negbinomial.size()'
+# for log-transformed FPKM, TPM, RPKM, if value < 10, use gaussianff()
+# for FPKM, TPM, RPKM judge values not integers and some >10, use tobit()
+
+if(all(as.numeric(unlist(yan.test))%%1==0)){
+  URMM_all_std <- newCellDataSet(as.matrix(tpm_mat),phenoData = pd,featureData =fd,
+                                 expressionFamily = negbinomial.size())
+} else if (all(as.numeric(unlist(yan.test)) < 10)){
+  URMM_all_std <- newCellDataSet(as.matrix(tpm_mat),phenoData = pd,featureData =fd,
+                                 expressionFamily = gaussianff())
+} else {
+  URMM_all_std <- newCellDataSet(as.matrix(tpm_mat),phenoData = pd,featureData =fd,
+                                 expressionFamily = tobit())
+}
+
+result_matrix <-as.matrix(URMM_all_std@assayData$exprs)
+
+# calculate filtering rate
+filter_gene_num <- nrow(yan.test)-nrow(new_yan)
+filter_gene_rate <- formatC(filter_gene_num/nrow(yan.test),digits = 2)
+filter_cell_num <- ncol(yan.test)-ncol(new_yan)
+filter_cell_rate <- formatC(filter_cell_num/nrow(yan.test),digits = 2)
+if(filter_cell_num == 0){
+  filter_cell_rate <- '0'
+}
 
 #write.table(cbind(filter_num,filter_rate,nrow(yan.test)), paste(outFile,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
-write(paste("filter_num,",as.character(filter_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("total_num,",as.character(nrow(yan.test)),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("filter_rate,",as.character(filter_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write.table(yan.test,paste(outFile,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-write.table(new_yan,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("total_gene_num,",as.character(nrow(yan.test)),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("filter_gene_rate,",as.character(filter_gene_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("filter_cell_num,",as.character(filter_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("total_cell_num,",as.character(ncol(yan.test)),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write.table(result_matrix,paste(outFile,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+write.table(result_matrix,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 #write.table(yan.test,"Goolam_cell_label.txt",sep="\t")
 #write.csv(new_yan,"Goolam_expression_filtered.csv")
 
