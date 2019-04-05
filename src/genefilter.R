@@ -46,32 +46,31 @@ rownames(yan.test) <- yan.test[,1]
 yan.test<- yan.test[,-1]
 thres_genes <- nrow(yan.test) * 0.01
 thres_cells <- ncol(yan.test) * 0.05
-# convert Ensembl id to gene symbol
-#i=1
-#if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep('ens',rownames(yan.test))) > 0.5 * nrow(yan.test) ){
-#
-#  result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(yan.test))), 
-#                             return.type="data.frame", columns=c("gene_name")))
-#  
-#  result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(yan.test))), 
-#                             return.type="data.frame", columns=c("gene_name")))
-#  if(result_human > result_mouse){
-#    all_match <- genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(yan.test))), 
-#                       return.type="data.frame", columns=c("gene_name"))
-#    
-#  } else {
-#    all_match <- genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(yan.test))), 
-#                       return.type="data.frame", columns=c("gene_name"))
-#  }
-# 
-#  yan.test <- yan.test[which(rownames(yan.test) %in% all_match[!duplicated(all_match[,1]),2]),]
-#  for (i in 1:nrow(yan.test)) {
-#    if(length(which(all_match[,2] %in% rownames(yan.test)[i]))){
-#      rownames(yan.test)[i] <- all_match[which(all_match[,2] %in% rownames(yan.test)[i]),1]
-#    }
-#  }
-#}
+ convert Ensembl id to gene symbol
+i=1
+if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep('ens',rownames(yan.test))) > 0.5 * nrow(yan.test) ){
 
+  result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(yan.test))), 
+                             return.type="data.frame", columns=c("gene_name")))
+  
+  result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(yan.test))), 
+                             return.type="data.frame", columns=c("gene_name")))
+  if(result_human > result_mouse){
+    all_match <- genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(yan.test))), 
+                       return.type="data.frame", columns=c("gene_name"))
+    
+  } else {
+    all_match <- genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(yan.test))), 
+                       return.type="data.frame", columns=c("gene_name"))
+  }
+ 
+  yan.test <- yan.test[which(rownames(yan.test) %in% all_match[!duplicated(all_match[,1]),2]),]
+  for (i in 1:nrow(yan.test)) {
+    if(length(which(all_match[,2] %in% rownames(yan.test)[i]))){
+      rownames(yan.test)[i] <- all_match[which(all_match[,2] %in% rownames(yan.test)[i]),1]
+    }
+  }
+}
 
 #this <- yan.test[1,]
 # keep the gene with number of non-0 expression value cells >= 5%
@@ -105,32 +104,32 @@ if(is_cell_filter == "1"){
   new_yan <- new_yan[,which(cell_index == 1)]
 } 
 
-#sample_sheet <- data.frame(groups = str_split_fixed(colnames(new_yan), "\\.+", 3), row.names = colnames(new_yan))
-#gene_ann <- data.frame(gene_short_name = row.names(new_yan), row.names = row.names(new_yan))
-#pd <- new("AnnotatedDataFrame",data=sample_sheet)
-#fd <- new("AnnotatedDataFrame",data=gene_ann)
-#
-#tpm_mat <- new_yan
-#tpm_mat <- apply(tpm_mat, 2, function(x) x / sum(x) * 1e6)
-#
-## if reads are integers, normalize with 'negbinomial.size()'
-## for log-transformed FPKM, TPM, RPKM, if value < 10, use gaussianff()
-## for FPKM, TPM, RPKM judge values not integers and some >10, use tobit()
-#
-#if(all(as.numeric(unlist(yan.test))%%1==0)){
-#  URMM_all_std <- newCellDataSet(as.matrix(new_yan),phenoData = pd,featureData =fd,
-#                                 expressionFamily = negbinomial.size())
-#} else if (all(as.numeric(unlist(yan.test)) < 10)){
-#  URMM_all_std <- newCellDataSet(as.matrix(new_yan),phenoData = pd,featureData =fd,
-#                                 expressionFamily = gaussianff())
-#} else {
-#  URMM_all_std <- newCellDataSet(as.matrix(new_yan),phenoData = pd,featureData =fd,
-#                                 expressionFamily = tobit())
-# 
-#}
-#
-#result_matrix <-as.matrix(URMM_all_std@assayData$exprs)
-#
+sample_sheet <- data.frame(groups = str_split_fixed(colnames(new_yan), "\\.+", 3), row.names = colnames(new_yan))
+gene_ann <- data.frame(gene_short_name = row.names(new_yan), row.names = row.names(new_yan))
+pd <- new("AnnotatedDataFrame",data=sample_sheet)
+fd <- new("AnnotatedDataFrame",data=gene_ann)
+
+tpm_mat <- new_yan
+tpm_mat <- apply(tpm_mat, 2, function(x) x / sum(x) * 1e6)
+
+# if reads are integers, normalize with 'negbinomial.size()'
+# for log-transformed FPKM, TPM, RPKM, if value < 10, use gaussianff()
+# for FPKM, TPM, RPKM judge values not integers and some >10, use tobit()
+
+if(all(as.numeric(unlist(yan.test))%%1==0)){
+  URMM_all_std <- newCellDataSet(as.matrix(new_yan),phenoData = pd,featureData =fd,
+                                 expressionFamily = negbinomial.size())
+} else if (all(as.numeric(unlist(yan.test)) < 10)){
+  URMM_all_std <- newCellDataSet(as.matrix(new_yan),phenoData = pd,featureData =fd,
+                                 expressionFamily = gaussianff())
+} else {
+  URMM_all_std <- newCellDataSet(as.matrix(new_yan),phenoData = pd,featureData =fd,
+                                 expressionFamily = tobit())
+ 
+}
+
+result_matrix <-as.matrix(URMM_all_std@assayData$exprs)
+
 # calculate filtering rate
 filter_gene_num <- nrow(yan.test)-nrow(new_yan)
 filter_gene_rate <- formatC(filter_gene_num/nrow(yan.test),digits = 2)
@@ -139,6 +138,7 @@ filter_cell_rate <- formatC(filter_cell_num/nrow(yan.test),digits = 2)
 if(filter_cell_num == 0){
   filter_cell_rate <- '0'
 }
+new_yan <- log1p(new_yan)
 
 #write.table(cbind(filter_num,filter_rate,nrow(yan.test)), paste(outFile,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
@@ -151,12 +151,6 @@ write.table(yan.test,paste(outFile,"_raw_expression.txt",sep = ""), row.names = 
 write.table(new_yan,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 #write.table(yan.test,"Goolam_cell_label.txt",sep="\t")
 #write.csv(new_yan,"Goolam_expression_filtered.csv")
-
-
-
-
-
-
 
 
 
