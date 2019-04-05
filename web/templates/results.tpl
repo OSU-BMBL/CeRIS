@@ -94,13 +94,19 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Number of cells: {{$total_label}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p>Number of genes: {{$total_num}}</p>
+                                    <p>Number of genes: {{$total_gene_num}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p>Number of filtered genes: {{$filter_num}}</p>
+                                    <p>Number of filtered genes: {{$filter_gene_num}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p>Filtering ratio: {{$filter_rate*100}}%</p>
+                                    <p>Gene filtering ratio: {{$filter_gene_rate*100}}%</p>
+                                </div>
+								<div class="form-group col-md-4 col-sm-4">
+                                    <p>Number of filtered cells: {{$filter_cell_num}}</p>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-4">
+                                    <p>Cell filtering ratio: {{$filter_cell_rate*100}}%</p>
                                 </div>
 								{{if $provide_label > 0}}
                                 <div class="form-group col-md-4 col-sm-4">
@@ -259,7 +265,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_filter}}</p>
+                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Cell filtering: {{$is_cell_filter}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Consistency level: {{$c_arg}}</p>
@@ -273,12 +282,13 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
-                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								
                             </div>
                         </div>
                     </div>
@@ -337,10 +347,13 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																		<button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon.txt">Download CT-{{$sec0+1}} regulon-gene list (Ensembl gene ID)
                                                                         </button>
                                                                     </a>
+																	
+																	<div class="panel-body"><div class="flatPanel panel panel-default">
+																	
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div>
+																					</div></div></div></div></div></div> </div> 
 <div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
@@ -457,10 +470,11 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																		<td colspan=2>
 																		
 																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																					<div class="panel-body"><div class="flatPanel panel panel-default">
 																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																						<h1 class='wait_message'>Loading heatmap ...</h1>
 																					</div>
-																					</div>
+																					</div></div> </div> 
 																					<div id="peak-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
 																						<div id='table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																					</div>
@@ -505,11 +519,11 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_module_{{$sec0+1}}_bic.regulon.txt" target="_blank">
 																		<button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/html/iris3/data/{{$jobid}}/{{$jobid}}_module_{{$sec0+1}}_bic.regulon.txt">Download module-{{$sec0+1}} regulon-gene list (Ensembl gene ID) 
                                                                         </button>
-                                                                    </a>
+                                                                    </a><div class="panel-body"><div class="flatPanel panel panel-default">
 																				<div id="heatmap">
 																						<div id='container-id-module-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div>
+																					</div></div></div></div></div></div></div>
 <div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
@@ -626,9 +640,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																		<td colspan=2>
 																		
 																					<div id="heatmap-{{$module_result[$sec0][sec1][0]}}" style="display:none;">
+																					<div class="panel-body"><div class="flatPanel panel panel-default">
 																						<div id='ci-{{$module_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																						<h1 class='wait_message'>Loading heatmap ...</h1>
-																					</div></div>
+																					</div></div></div> </div> 
 																					<div id="peak-{{$module_result[$sec0][sec1][0]}}" style="display:none;">
 																						<div id='table-{{$module_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																					</div>
@@ -700,7 +715,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_filter}}</p>
+                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Cell filtering: {{$is_cell_filter}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Consistency level: {{$c_arg}}</p>
@@ -714,12 +732,13 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
-                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
+                                <div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								
                                 
                                 
 
@@ -748,7 +767,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_filter}}</p>
+                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Cell filtering: {{$is_cell_filter}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Consistency level: {{$c_arg}}</p>
@@ -762,12 +784,13 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
-                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
+                                <div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								
                                 
                                 
 
@@ -785,7 +808,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                             <img src="static/images/busy.gif" />
                             <br /> Your request is received now.
                             <br> You can remember your jobid <font color="red"> <strong>{{$jobid}}</strong> </font>
-                            <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>15</b> seconds.
+                            <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>30</b> seconds.
                             <br/> Link:&nbsp
                             <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
 							
@@ -796,7 +819,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_filter}}</p>
+                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Cell filtering: {{$is_cell_filter}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Consistency level: {{$c_arg}}</p>
@@ -810,12 +836,13 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
-                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
+                                <div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								
                                 
                                 
 

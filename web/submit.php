@@ -52,9 +52,7 @@ if (isset($_POST['submit']))
 	file_put_contents("/home/www/html/iris3/ip.txt",PHP_EOL .get_client_ip_server(), FILE_APPEND | LOCK_EX);
 	//$jobid = date("YmdGis");
 	$jobid = $_SESSION['jobid'];
-	if($jobid == ""){
-		jobid = date("YmdGis");
-	}
+	
 	$workdir = "./data/$jobid";
 	mkdir($workdir);
 	$if_allowSave = $_POST['allowstorage'];
@@ -146,7 +144,7 @@ if (isset($_POST['submit']))
 		$delim_gene_module = "tab";
 	}
 	$fp = fopen("$workdir/info.txt", 'w');
-	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_filter,$is_gene_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
+	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_gene_filter,$is_gene_filter\nis_cell_filter,$is_cell_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
 	fclose($fp);
 	$fp = fopen("$workdir2/qsub.sh", 'w');
 	if($if_allowSave != '0'){
@@ -198,7 +196,7 @@ mkdir logo\n
 /home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
-touch done\n 
+echo 'finish'> done\n  
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 
 ");
@@ -248,7 +246,7 @@ mkdir logo\n
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
 perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
-touch done\n 
+echo 'finish'> done\n 
 ");}
 	fclose($fp);
 	session_destroy();

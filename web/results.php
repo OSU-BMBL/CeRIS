@@ -46,11 +46,17 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 				$expfile_name = $split_line[1];
 			} else if($split_line[0] == "labelfile"){
 				$labelfile_name = $split_line[1];
-			} else if($split_line[0] == "is_filter"){
+			} else if($split_line[0] == "is_gene_filter"){
 				if( $split_line[1] == 0) {
-					$is_filter = "No";
+					$is_gene_filter = "No";
 				} else{
-					$is_filter = "Yes";
+					$is_gene_filter = "Yes";
+				}
+			} else if($split_line[0] == "is_cell_filter"){
+				if( $split_line[1] == 0) {
+					$is_cell_filter = "No";
+				} else{
+					$is_cell_filter = "Yes";
 				}
 			} else if($split_line[0] == "if_allowSave"){
 				if( $split_line[1] == 0) {
@@ -206,14 +212,18 @@ $count_regulon_in_ct = array();
 if ($info_file) {
     while (($line = fgets($info_file)) !== false) {
         $split_line = explode (",", $line);
-		if($split_line[0] == "filter_num"){
-			$filter_num = $split_line[1];
-		} else if($split_line[0] == "total_num"){
-			$total_num = $split_line[1];
-		} else if($split_line[0] == "filter_num"){
-			$filter_num = $split_line[1];
-		} else if($split_line[0] == "filter_rate"){
-			$filter_rate = $split_line[1];
+		if($split_line[0] == "filter_gene_num"){
+			$filter_gene_num = $split_line[1];
+		} else if($split_line[0] == "filter_cell_num"){
+			$filter_cell_num = $split_line[1];
+		} else if($split_line[0] == "total_gene_num"){
+			$total_gene_num = $split_line[1];
+		}  else if($split_line[0] == "total_cell_num"){
+			$total_cell_num = $split_line[1];
+		} else if($split_line[0] == "filter_gene_rate"){
+			$filter_gene_rate = $split_line[1];
+		} else if($split_line[0] == "filter_cell_rate"){
+			$filter_cell_rate = $split_line[1];
 		} else if($split_line[0] == "total_label"){
 			$total_label = $split_line[1];
 		} else if($split_line[0] == "total_bic"){
@@ -440,9 +450,12 @@ else if (!file_exists($tempnam)) {
 }
 
 $_SESSION[$jobid."ann"]=$annotation1;
-$smarty->assign('filter_num',$filter_num);
-$smarty->assign('total_num',$total_num);
-$smarty->assign('filter_rate',$filter_rate);
+$smarty->assign('filter_gene_num',$filter_gene_num);
+$smarty->assign('total_gene_num',$total_gene_num);
+$smarty->assign('filter_gene_rate',$filter_gene_rate);
+$smarty->assign('filter_cell_num',$filter_cell_num);
+$smarty->assign('total_cell_num',$total_cell_num);
+$smarty->assign('filter_cell_rate',$filter_cell_rate);
 $smarty->assign('total_label',$total_label);
 $smarty->assign('total_bic',$total_bic);
 $smarty->assign('total_ct',$total_ct);
@@ -482,7 +495,8 @@ $smarty->assign('motif_program',$motif_program);
 $smarty->assign('label_use_sc3',$label_use_sc3);
 $smarty->assign('expfile_name',$expfile_name);
 $smarty->assign('labelfile_name',$labelfile_name);
-$smarty->assign('is_filter',$is_filter);
+$smarty->assign('is_gene_filter',$is_gene_filter);
+$smarty->assign('is_cell_filter',$is_cell_filter);
 $smarty->assign('if_allowSave',$if_allowSave);
 $smarty->assign('annotation', $annotation1);
 $smarty->assign('LINKPATH', $LINKPATH);
