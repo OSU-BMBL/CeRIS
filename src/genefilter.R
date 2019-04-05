@@ -46,8 +46,8 @@ rownames(yan.test) <- yan.test[,1]
 yan.test<- yan.test[,-1]
 thres_genes <- nrow(yan.test) * 0.01
 thres_cells <- ncol(yan.test) * 0.05
- convert Ensembl id to gene symbol
-i=1
+## convert Ensembl id to gene symbol
+##i=1
 if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep('ens',rownames(yan.test))) > 0.5 * nrow(yan.test) ){
 
   result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(yan.test))), 
