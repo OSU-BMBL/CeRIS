@@ -72,6 +72,12 @@ if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep(
   }
 }
 
+## remove rows with empty gene name
+if(length(which(rownames(yan.test)=="")) > 0){
+  yan.test <- yan.test[-which(rownames(yan.test)==""),]
+}
+
+
 #this <- yan.test[1,]
 # keep the gene with number of non-0 expression value cells >= 5%
 filter_gene_func <- function(this){
