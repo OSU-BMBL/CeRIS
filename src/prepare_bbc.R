@@ -16,7 +16,7 @@ getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
-#gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3-R/data/gene_start_info_human.txt")
+#gene_info <- read.table("mouse_gene_start_info.txt")
 species_id <-  as.character(read.table("species.txt"))
 if(species_id == "52"){
   gene_info <- read.table("/home/www/html/iris3/program/dminda/human_gene_start_info.txt")
@@ -30,6 +30,21 @@ sort_dir <- function(dir) {
   split <- as.numeric(sapply(split, function(x) x <- sub("_bic.*", "", x[2])))
   return(tmp[order(split)])
 }
+
+sort_closure <- function(dir){
+  tmp <- sort(dir)
+  split <- strsplit(tmp, "/bic") 
+  split <- as.numeric(sapply(split, function(x) x <- sub("\\D+", "", x[2])))
+  return(tmp[order(split)])
+}
+
+sort_short_closure <- function(dir){
+  tmp <- sort(dir)
+  split <- strsplit(tmp, "bic") 
+  split <- as.numeric(sapply(split, function(x) x <- sub("\\D+", "", x[2])))
+  return(tmp[order(split)])
+}
+
 alldir <- sort_dir(alldir)
 #convert_motif(all_closure[1])
 convert_motif <- function(filepath){
@@ -42,7 +57,7 @@ convert_motif <- function(filepath){
   close(motif_file)
   return(df)
 }
-#i=38
+#i=1
 #filepath=all_closure[1]
 convert_meme <- function(filepath){
   this_line <- matrix(0,ncol = 6)
@@ -116,20 +131,26 @@ convert_meme <- function(filepath){
 }
 
 #i=1
-#j=1
+#j=19
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
 regulon_idx_module <- 0
+
 result_gene_pos <- data.frame()
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
   all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = T)
   short_all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = F)
+  all_closure <- sort_closure(all_closure)
+  short_all_closure <- sort_short_closure(short_all_closure)
+  
   for (j in 1:length(all_closure)) {
     if(is_meme == 1) {
       convert_meme(all_closure[j])
     }
+    matches <- regmatches(short_all_closure[j], gregexpr("[[:digit:]]+", short_all_closure[j]))
+    bic_idx <- as.numeric(unlist(matches))
     #test
     #motif_seq <- convert_motif(paste(all_closure[j],".test",sep = ""))[,c(1,5,7)]
     motif_seq <- convert_motif(all_closure[j])[,c(1,5,7)]
@@ -139,10 +160,10 @@ for (i in 1:length(alldir)) {
     gene_pos[,4] <-  gene_pos[,7] + gene_pos[,8]
     gene_pos[,5] <-  gene_pos[,7] + gene_pos[,9]
     gene_pos[,10] <- module_type[i]
-    gene_pos[,11] <- paste(i,j,sub(">Motif-","",gene_pos[,2]),sep = ",")
+    gene_pos[,11] <- paste(i,bic_idx,sub(">Motif-","",gene_pos[,2]),sep = ",")
     if(module_type[i] == "module"){
       regulon_idx_module <- regulon_idx_module + 1
-      gene_pos[,11] <- paste(regulon_idx_module,j,sub(">Motif-","",gene_pos[,2]),sep = ",")
+      gene_pos[,11] <- paste(regulon_idx_module,bic_idx,sub(">Motif-","",gene_pos[,2]),sep = ",")
     }
     #write.table(gene_pos[,c(6,4,5,1)],paste(alldir[i],"/bic",j,".bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
     result_gene_pos <- rbind(result_gene_pos,gene_pos[,c(6,4,5,1,10,11)])
