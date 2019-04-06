@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-*.txt
 *.closures
 *.MC
 *.similarity
@@ -14,5 +13,4 @@ prepare_promoter.pl
 *.json
 *.zip
 *.conf
-
 *.meme
