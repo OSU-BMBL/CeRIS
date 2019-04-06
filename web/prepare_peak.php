@@ -1,48 +1,32 @@
 <?php
-	header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-	header("Cache-Control: post-check=0, pre-check=0", false);
-	header("Pragma: no-cache");
-	#http://bmbl.sdstate.edu/iris3/prepare_tomtom.php?jobid=2018122581354&ct=6&bic=3&m=3&db=HOCOMOCO
-	require_once("config/common.php");
-	require_once("config/smarty.php");
-	require_once("lib/spyc.php");
-//require_once("lib/hmmer.php");
-$jobid = $_GET['jobid'];
-$ct=$_GET['ct'];
-$bic=$_GET['bic'];
-$module=$_GET['module'];
-$motif=$_GET['m'];
-$db=$_GET['db'];
-//$encodedString = json_encode($annotation1);
-$done_file="a";
-if(strlen($module) > 0){
-	$motif_filename = "/home/www/html/iris3/data/$jobid/logo/$module"."bic$bic"."m$motif".".fsa.meme";
-	$check_dir = "/home/www/html/iris3/data/$jobid/tomtom/module$module"."bic$bic"."m$motif"."/JASPAR/tomtom.html";
-	if (!file_exists($check_dir)){
-	header("Refresh: 1;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
-}   else if (file_exists("/home/www/html/iris3/data/$jobid/tomtom/module$module"."bic$bic"."m$motif/$db")){
-	$status = "0";
-	header("Location: data/$jobid/tomtom/module$module"."bic$bic"."m$motif/$db/tomtom.html");
-}	else {
-
-	header("Refresh: 30;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
-}
-} else {
-	$motif_filename = "/home/www/html/iris3/data/$jobid/logo/ct$ct"."bic$bic"."m$motif".".fsa.meme";
-	$check_dir = "/home/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif"."/JASPAR/tomtom.html";
-	if (!file_exists($check_dir)){
-	header("Refresh: 1;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
-}   else if (file_exists("/home/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/$db")){
-	$status = "0";
-	header("Location: data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/$db/tomtom.html");
-}	else {
-
-	header("Refresh: 30;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
-}
-}
-
-$smarty->assign('filename',$filename);
-$smarty->assign('jobid',$jobid);
-$smarty->display('prepare_tomtom.tpl');
-
+	$jobid = $_GET['jobid'];
+	$regulon_id=$_GET['regulon_id'];
+	$species=$_GET['species'];
+	$table_content_id=$_GET['table'];
+	$wd = "./data/$jobid/";
+	system("cd $wd; /home/www/html/iris3/program/count_peak_overlap_single_file.sh $wd $regulon_id $species");
+	#echo "<table id='$table_content_id' border='1'>
+	#<tr>
+	#<th>$jobid</th>
+	#<th>$regulon_id</th>
+	#<th>$species </th>
+	#</tr></table>";
+	#
+	#$db_contents=file_get_contents($db_file);
+	$db_file= "$wd/atac/$regulon_id.atac_overlap_result.txt";
+	$fp = fopen("$db_file", 'r');
+	if ($fp){
+	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE){
+		if ($line) {
+			$test_json['data'][] = array_map('trim',$line);
+			#print_r($count);
+		}
+	}
+	} else{
+		die("Unable to open file");
+	}
+	fclose($fp);
+	echo json_encode($test_json); 
+	#print_r($json);
+	
 ?>
