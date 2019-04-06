@@ -195,6 +195,19 @@
 
 		</div>
 		<div class="form-group row">
+		<div class="form-check col-sm-6 ">
+		<label class="form-check-label" for="allowstorage">Species:<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description."> </span>
+				</label>
+		<select class="selectpicker" multiple data-max-options="2">
+  <option>Human</option>
+  <option>Mouse</option>
+  <option>Zebrafish</option>
+  <option>Fruit fly</option>
+  <option>Yeast</option>
+  <option>Worm</option>
+</select>
+</div>
+		
 			<div class="form-check col-sm-12 ">
 				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="1">
 				<label class="form-check-label" for="allowstorage">Allow data storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By checking this option, you allow us to store your data in IRIS3 database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
@@ -209,8 +222,8 @@
 				</label>
 			</div>
 			<div class="form-check col-sm-12 ">
-				<input class="form-check-input" type="checkbox" name="is_cell_filter" id="is_cell_filter" value="1">
-				<label class="form-check-label" for="is_cell_filter">Enable cell filtering (default: No) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description"> </span>
+				<input class="form-check-input" type="checkbox" name="is_cell_filter" id="is_cell_filter" value="1" checked>
+				<label class="form-check-label" for="is_cell_filter">Enable cell filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description"> </span>
 				</label>
 			</div>
 			
