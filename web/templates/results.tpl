@@ -403,6 +403,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 									<thead>
                                         <tr>
 										<td>
+										Database
+										</td>
+										<td>
 										Matched TF
 										</td>
 										<td>
@@ -420,6 +423,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 									
 									{{section name=tomtom_idx  start=0 loop=$tomtom_result.$motif_num_jaspar}}
 									<tr>
+									<td >
+									JASPAR
+									</td>
 									<td>
 									<a href="http://jaspar2018.genereg.net/matrix/{{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}</a>
 									</td>
@@ -435,6 +441,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 									{{/section}}
 									{{section name=tomtom_idx  start=0 loop=$tomtom_result.$motif_num_homo}}
 									<tr>
+									<td >
+									HOCOMOCO
+									</td>
 									<td>
 									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_homo[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_homo[tomtom_idx][1]}} </a>
 									</td>
@@ -465,8 +474,12 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                         </button>
 														<button type="button" style="display:none;" id="peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="$('#peakbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#peak-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide ATAC-seq peak enrichment
                                                         </button>
+														<button type="button" id="tadbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="show_tad_table(this);$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Show additional TAD covered genes
+                                                        </button>
+														<button type="button" style="display:none;" id="tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide additional TAD covered genes
+                                                        </button>
 														</td></tr>
-																		<tr >
+																		<tr>
 																		<td colspan=2>
 																		
 																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
@@ -488,6 +501,19 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																								<th>Species</th>
 																								<th>CistromeDB ID</th>
 																								<th>GEO accession</th>
+																							</tr>
+																						</thead>
+																					</table>
+																					</div>
+																					<div id="tad-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																						<div id='tad-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
+																					</div>
+																					<table id="tad-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+																						<thead>
+																							<tr>
+																								<th>Tissue/ Cell type</th>
+																								<th>Species</th>
+																								<th>Additional cell type specific genes found in TAD</th>
 																							</tr>
 																						</thead>
 																					</table>
@@ -574,6 +600,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 									<thead>
                                         <tr>
 										<td>
+										Database
+										</td>
+										<td>
 										Matched TF
 										</td>
 										<td>
@@ -592,6 +621,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 									{{section name=tomtom_idx  start=0 loop=$tomtom_result.$motif_num_jaspar}}
 									<tr>
 									<td>
+									JASPAR
+									</td>
+									<td>
 									<a href="http://jaspar2018.genereg.net/matrix/{{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}</a>
 									</td>
 									<td class="tomtom_pvalue">
@@ -606,6 +638,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 									{{/section}}
 									{{section name=tomtom_idx  start=0 loop=$tomtom_result.$motif_num_homo}}
 									<tr>
+									<td>
+									HOCOMOCO
+									</td>
 									<td>
 									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_homo[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_homo[tomtom_idx][1]}} </a>
 									</td>
@@ -635,6 +670,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                         </button>
 														<button type="button" style="display:none;" id="peak_hidebtn-{{$module_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="$('#peakbtn-{{$module_result[$sec0][sec1][0]}}').show();$('#peak_hidebtn-{{$module_result[$sec0][sec1][0]}}').hide();$('#peak-{{$module_result[$sec0][sec1][0]}}').hide();" >Hide ATAC-seq peak enrichment
                                                         </button>
+														<button type="button" id="tadbtn-{{$module_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="show_tad_table(this);$('#tad_hidebtn-{{$module_result[$sec0][sec1][0]}}').show();$('#tad-{{$module_result[$sec0][sec1][0]}}').show();$('#tadbtn-{{$module_result[$sec0][sec1][0]}}').hide();" >Show additional TAD covered genes
+                                                        </button>
+														<button type="button" style="display:none;" id="tad_hidebtn-{{$module_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="$('#tadbtn-{{$module_result[$sec0][sec1][0]}}').show();$('#tad_hidebtn-{{$module_result[$sec0][sec1][0]}}').hide();$('#tad-{{$module_result[$sec0][sec1][0]}}').hide();" >Hide additional TAD covered genes
+                                                        </button>
 														</td></tr>
 																		<tr >
 																		<td colspan=2>
@@ -657,6 +696,19 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																								<th>Species</th>
 																								<th>CistromeDB ID</th>
 																								<th>GEO accession</th>
+																							</tr>
+																						</thead>
+																					</table>
+																					</div>
+																					<div id="tad-{{$module_result[$sec0][sec1][0]}}" style="display:none;">
+																						<div id='tad-table-{{$module_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
+																					</div>
+																					<table id="tad-table-content-{{$module_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+																						<thead>
+																							<tr>
+																								<th>Tissue/ Cell type</th>
+																								<th>Species</th>
+																								<th>Additional cell type specific genes found in TAD</th>
 																							</tr>
 																						</thead>
 																					</table>
@@ -946,31 +998,41 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 }],
 		});
 		}
-		
 		document.getElementById(table_id).innerHTML=""
-		//xmlhttp = new XMLHttpRequest()
-		//xmlhttp.onreadystatechange=function()
-		//{
-		//	if (xmlhttp.readyState==4 && xmlhttp.status==200)
-		//	{
-		//		//$(table_jquery_id).DataTable( {
-		//		//  "searching": false,
-		//		//  "paging": false,
-		//		//  "bInfo" : false,
-		//		//} );
-		//		//document.getElementById(table_id).innerHTML=xmlhttp.responseText
-		//		
-		//	}
-		//}
-		//xmlhttp.open("GET","prepare_peak.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,true)
-		//xmlhttp.send();
-		
-		//$(table_jquery_id).DataTable( {
-		//		  "searching": false,
-		//		  "paging": false,
-		//		  "bInfo" : false,
-		//		} );
 	}
+	
+	
+	function show_tad_table(item){
+		match_id = $(item).attr("id").match(/\d+/gm)
+		regulon_id = $(item).attr("id").substring(7);
+		table_id = "tad-table-"+regulon_id
+		species = document.getElementById("species").innerHTML
+		match_species =  species.match(/[^Species: ].+/gm)
+		jobid = location.search.match(/\d+/gm)
+		table_content_id = "tad-table-content-"+regulon_id
+		table_jquery_id="#"+table_content_id
+		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
+			if(match_species=='Human'){
+			$(table_jquery_id).DataTable( {
+				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
+			"iDisplayLength": 5
+		});
+			} else if (match_species == 'Mouse'){
+			$(table_jquery_id).DataTable( {
+				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[ -1], [ "All"]],
+			"iDisplayLength": -1
+		});
+			}
+		}
+		document.getElementById(table_id).innerHTML=""
+	}
+	
 	function get_gene_list(item){
 	match_id = $(item).attr("id").match(/\d+/gm);
 	if($(item).attr("id").includes("CT")) {
