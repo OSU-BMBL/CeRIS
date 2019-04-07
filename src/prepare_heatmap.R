@@ -13,10 +13,10 @@ args <- commandArgs(TRUE)
 srcDir <- args[1]
 jobid <- args[2]
 label_use_sc3 <- args[3]
-#setwd("/home/www/html/iris3/data/20190404232115")
-#setwd("d:/Users/flyku/Documents/IRIS3-data/test_missing_heatmap")
+#setwd("/home/www/html/iris3/data/20190406223453")
+#setwd("d:/Users/flyku/Documents/IRIS3-data/test_heatmap")
 #srcDir <- getwd()
-#jobid <-20190404232115
+#jobid <-20190406223453
 #label_use_sc3 <- 0
 setwd(srcDir)
 getwd()
@@ -35,6 +35,7 @@ exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFact
 #exp_file<- read.delim(paste(jobid,"_raw_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
+short_dir <- sort_dir(short_dir)
 module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 
 exp_file <- log1p(exp_file)
@@ -83,7 +84,7 @@ for (i in 1:length(all_regulon)) {
     ct_index <- as.numeric(gsub("_bic","",ct_index))
     regulon_label <- paste("CT",ct_index,"S-R",name_idx,": ",sep = "")
     ct_colnames <- label_file[which(label_file[,2]==ct_index),1]
-    regulon_heat_matrix <- regulon_heat_matrix[,colnames(regulon_heat_matrix) %in% ct_colnames]
+    regulon_heat_matrix <- as.data.frame(regulon_heat_matrix[,colnames(regulon_heat_matrix) %in% ct_colnames])
     rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
     rownames(regulon_heat_matrix)[1] <- ""
     colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
