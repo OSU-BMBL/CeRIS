@@ -1,7 +1,7 @@
 #######  Read all motif result, convert to input for BBC ##########
 # remove all empty files before this
  
-
+library(seqinr)
 args <- commandArgs(TRUE)
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 #srcDir <- getwd()
@@ -16,7 +16,7 @@ getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
-#gene_info <- read.table("mouse_gene_start_info.txt")
+#gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3_data_backup/dminda/human_gene_start_info.txt")
 species_id <-  as.character(read.table("species.txt"))
 if(species_id == "52"){
   gene_info <- read.table("/home/www/html/iris3/program/dminda/human_gene_start_info.txt")
@@ -47,13 +47,25 @@ sort_short_closure <- function(dir){
 
 alldir <- sort_dir(alldir)
 #convert_motif(all_closure[1])
+#filepath<-all_closure[17]
+
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
-  line = readLines(motif_file)
+  line <- readLines(motif_file)
+  # get pvalue and store it in pval_rank
+  split_line <- unlist(strsplit(line," "))
+  pval_value <- split_line[which(split_line == "Pvalue:")+2]
+  if(length(pval_value)>0){
+    pval_value <- as.numeric(gsub("\\((.+)\\)","\\1",pval_value))
+    pval_name <- paste(">",basename(filepath),"-",seq(1:length(pval_value)),sep="")
+    tmp_pval_df <- data.frame(pval_name,pval_value)
+    #print(tmp_pval_df)
+    pval_rank <<-rbind(pval_rank,tmp_pval_df)
   df <- line[substr(line,0,1) == ">"]
   df <- read.table(text=df,sep = "\t")
   colnames(df) <- c("MotifNum","Seq","start","end","Motif","Score","Info")
+  }
   close(motif_file)
   return(df)
 }
@@ -134,12 +146,13 @@ convert_meme <- function(filepath){
 #j=19
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
+#module_type <- rep("CT",7)
 regulon_idx_module <- 0
-
 result_gene_pos <- data.frame()
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
+  pval_rank <- data.frame()
   all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = T)
   short_all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = F)
   all_closure <- sort_closure(all_closure)
@@ -188,9 +201,20 @@ for (i in 1:length(alldir)) {
       cat(sequence, file=res,sep="\n",append = T)
     }
   }
-  cat(">end", file=res,sep="\n",append = T)
+  
   write.table(combined_gene,paste(alldir[i],".motifgene.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = T)
+  pval_rank <- pval_rank[!duplicated(pval_rank$pval_name),]
+  #test_pval_rank <- pval_rank[!duplicated(pval_rank$pval_name),] 
+  pval_rank[,3] <- seq(1:nrow(pval_rank))
+  pval_rank <- pval_rank[order((pval_rank$pval_value),decreasing = T),]
+  pval_idx <- pval_rank[,3]
+  #write.table(pval_rank,paste(alldir[i],".pval.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+  this_fasta <- read.fasta(paste(alldir[i],".bbc.txt",sep=""))
+  this_fasta <- this_fasta[pval_idx]
+  write.fasta(this_fasta,names(this_fasta),paste(alldir[i],".bbc.txt",sep=""),nbchar = 12)
+  cat(">end", file=res,sep="\n",append = T)
 }
+
 write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
 
