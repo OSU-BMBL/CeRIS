@@ -185,6 +185,7 @@ Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program \$motif_m
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
+cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
 Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
 mkdir json
 /home/www/html/iris3/program/build_clustergrammar.sh \$wd
@@ -234,6 +235,7 @@ Rscript /home/www/html/iris3/program/prepare_bbc.R \$wd $motif_program\n
 touch bg \n
 /home/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
+cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
 Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid 0
 mkdir json
 /home/www/html/iris3/program/build_clustergrammar.sh \$wd

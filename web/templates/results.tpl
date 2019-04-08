@@ -9,8 +9,11 @@
 <!-- OR an un-minified version is also available -->
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
 <script>
+
+
 var flag = [];
 $(document).ready(function () {
+
 document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
     $('#tablePreview').DataTable( {
   "searching": false,
@@ -349,12 +352,11 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                                     </a>
 																	
 																	<div class="panel-body"><div class="flatPanel panel panel-default">
-																	
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
 																					</div></div></div></div></div></div> </div> 
-<div class="flatPanel panel panel-default">
+																	<div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																		
@@ -393,7 +395,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																				
 																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
 																				
-																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"></a></span>
+																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="lozad" data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"/></a></span>
 																					
 									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
 									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  />
@@ -478,6 +480,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                         </button>
 														<button type="button" style="display:none;" id="tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide additional TAD covered genes
                                                         </button>
+														<button type="button" id="similarbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="show_similar_table(this);$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Show similar CTS-Rs
+                                                        </button>
+                                                        <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-submit" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
+                                                        </button>
 														</td></tr>
 																		<tr>
 																		<td colspan=2>
@@ -518,6 +524,17 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																						</thead>
 																					</table>
 																					</div>
+																					<div id="similar-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+                                                                                    <div id='similar-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
+                                                                                    </div>
+                                                                                    <table id="similar-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th>Similar CTS-Rs in other cell types</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                    </table>
+                                                                                </div>
 																		</td>
 																		</tr>
 
@@ -589,7 +606,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																				
 																				{{assign var="this_motif" value=","|explode:$module_motif_result[$sec0][sec1][sec3]}}
 																				
-																					<span>{{$module_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&module={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img src="data/{{$jobid}}/logo/module{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"></a></span>
+																					<span>{{$module_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&module={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="lozad" data-src="data/{{$jobid}}/logo/module{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"/></a></span>
 																					
 									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&module={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
 									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&module={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  />
@@ -923,7 +940,8 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     <script src='assets/js/load_clustergram.js'></script>
 
     <script>
-
+const observer = lozad(); // lazy loads elements with default selector as '.lozad'
+observer.observe();
 
 {{section name=clust loop=$silh_trace}}
 var trace{{$silh_trace[clust]}} = {
@@ -981,21 +999,34 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		table_jquery_id="#"+table_content_id
 		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ) {
 		$(table_jquery_id).DataTable( {
+				dom: 'Bfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_peak'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_peak'
+				}
+				],
 				"ajax": "prepare_peak.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
 				"searching": false,
 				"bInfo" : false,
+				"order": [[ 3, "desc" ]],
 				columnDefs: [
-{
-    targets: 6,
-    render: function (data, type, row, meta)
-    {
-        if (type === 'display')
-        {
-            data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +data+ '" target="_blank">'+data +'</a>';
-        }
-        return data;
-    }
-}],
+				{
+					targets: 6,
+					render: function (data, type, row, meta)
+					{
+						if (type === 'display')
+						{
+							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +data+ '" target="_blank">'+data +'</a>';
+						}
+						return data;
+					}
+				}],
+		
 		});
 		}
 		document.getElementById(table_id).innerHTML=""
@@ -1014,23 +1045,81 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
 			if(match_species=='Human'){
 			$(table_jquery_id).DataTable( {
+				dom: 'Bfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				}
+				],
 				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
 				"searching": false,
 				"bInfo" : false,
 				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
-			"iDisplayLength": 5
+			"iDisplayLength": 5,
 		});
 			} else if (match_species == 'Mouse'){
 			$(table_jquery_id).DataTable( {
+				dom: 'Bfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				}
+				],
 				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
 				"searching": false,
 				"bInfo" : false,
 				"aLengthMenu": [[ -1], [ "All"]],
-			"iDisplayLength": -1
+			"iDisplayLength": -1,
 		});
 			}
 		}
 		document.getElementById(table_id).innerHTML=""
+	}
+	function show_similar_table(item) {
+	match_id = $(item).attr("id").match(/\d+/gm)
+	regulon_id = $(item).attr("id").substring(11)
+	table_id = "similar-table-" + regulon_id
+	species = document.getElementById("species").innerHTML
+	match_species = species.match(/[^Species: ].+/gm)
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "similar-table-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	if (!$.fn.DataTable.isDataTable(table_jquery_id)) {
+	$(table_jquery_id).DataTable({
+		dom: 'Bfrtip',
+		buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_similar_regulon'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_similar_regulon'
+				}
+				],
+		"ajax": "prepare_similar_regulon.php?jobid=" + jobid + "&regulon_id=" + regulon_id + "&species=" + match_species + "&table=" + table_content_id,
+		"searching": false,
+		"paging": false,
+		"bInfo" : false,
+		"aLengthMenu": [
+			[10, -1],
+			[10, "All"]
+		],
+		"iDisplayLength": 10,
+		
+	});
+	}
+	document.getElementById(table_id).innerHTML = ""
 	}
 	
 	function get_gene_list(item){
@@ -1136,5 +1225,6 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		{{/if}}
 
 	<div class="push"></div>
+
 </main>
 {{/block}}
