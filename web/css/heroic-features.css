@@ -659,3 +659,14 @@ textarea {
 #tomtom_module_table{
 	font-size:12px;
 }
+
+.dt-button{
+	font-size:12px !important;
+}
+.dataTables_paginate {
+	font-size:12px !important;
+}
+.dataTables_length{
+	font-size:12px !important;
+	margin-right: 1em;
+}
