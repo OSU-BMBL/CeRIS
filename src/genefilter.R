@@ -46,6 +46,7 @@ rownames(yan.test) <- yan.test[,1]
 yan.test<- yan.test[,-1]
 thres_genes <- nrow(yan.test) * 0.01
 thres_cells <- ncol(yan.test) * 0.05
+
 ## convert Ensembl id to gene symbol
 ##i=1
 if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep('ens',rownames(yan.test))) > 0.5 * nrow(yan.test) ){
@@ -71,6 +72,8 @@ if (length(grep('ENS',rownames(yan.test))) > 0.5 * nrow(yan.test) | length(grep(
     }
   }
 }
+total_cell_num <- ncol(yan.test)
+total_gene_num <- nrow(yan.test)
 
 ## remove rows with empty gene name
 if(length(which(rownames(yan.test)=="")) > 0){
@@ -138,9 +141,9 @@ result_matrix <-as.matrix(URMM_all_std@assayData$exprs)
 
 # calculate filtering rate
 filter_gene_num <- nrow(yan.test)-nrow(new_yan)
-filter_gene_rate <- formatC(filter_gene_num/nrow(yan.test),digits = 2)
+filter_gene_rate <- formatC(filter_gene_num/total_gene_num,digits = 2)
 filter_cell_num <- ncol(yan.test)-ncol(new_yan)
-filter_cell_rate <- formatC(filter_cell_num/nrow(yan.test),digits = 2)
+filter_cell_rate <- formatC(filter_cell_num/total_cell_num,digits = 2)
 if(filter_cell_num == 0){
   filter_cell_rate <- '0'
 }
@@ -148,10 +151,10 @@ new_yan <- log1p(new_yan)
 
 #write.table(cbind(filter_num,filter_rate,nrow(yan.test)), paste(outFile,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("total_gene_num,",as.character(nrow(yan.test)),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("total_gene_num,",as.character(total_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write(paste("filter_gene_rate,",as.character(filter_gene_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write(paste("filter_cell_num,",as.character(filter_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("total_cell_num,",as.character(ncol(yan.test)),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write.table(yan.test,paste(outFile,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 write.table(new_yan,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
