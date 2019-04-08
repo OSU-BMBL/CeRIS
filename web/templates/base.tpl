@@ -15,47 +15,30 @@
     <script src="assets/js/wow.min.js"></script>
     <script src="assets/js/jquery.ajaxchimp.js"></script>
     <script src="assets/js/jquery.sticky.js"></script>
-
-    <!--<script>$(document).ready(function () {
-  $('#motiftable').DataTable({
-	"order": [[ 2, "asc" ]]
-  });
-  $('.dataTables_length').addClass('bs-select');
-});  </script>-->
     <script src="assets/js/main.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-
-    <!--====== FAVICON ICON =======-->
-	
+	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
     <link rel="shortcut icon" type="image/ico" href="assets/img/favicon.png" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
     <!--====== STYLESHEETS ======-->
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
 	<link href="css/heroic-features.css" rel="stylesheet">
     <link href="assets/css/plugins.css" rel="stylesheet">
     <link href="assets/css/theme.css" rel="stylesheet">
     <link href="assets/css/icons.css" rel="stylesheet">
-
     <!--====== MAIN STYLESHEETS ======-->
     <link href="style.css" rel="stylesheet">
     <link href="assets/css/responsive.css" rel="stylesheet">
     <script src="assets/js/vendor/modernizr-2.8.3.min.js"></script>
 
-    <!--[if lt IE 9]>
-        <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-	</head>
-<!-- 
-<div class="preeloader">
-   <div class="preloader-spinner"></div>
-    </div>
--->
 
-    <!--SCROLL TO TOP-->
+	</head>
+
     <a href="#scroolup" class="scrolltotop"><i class="fa fa-long-arrow-up"></i></a>
         <div class="header-top-area" id="scroolup">
-            <!--MAINMENU AREA-->
             <div class="mainmenu-area" id="mainmenu-area">
                 <div class="mainmenu-area-bg"></div>
                 <nav class="navbar">
@@ -103,12 +86,7 @@
             </div>
         </div>
     </footer>
-	
-	<!--<footer class="footer">
-	<div class="footer-copyright text-center wow fadeIn">
-                            <p class="m-0 text-center text">© <script>document.write(new Date().getFullYear());</script> <a href="https://www.sdstate.edu/bioinformatics-and-mathematical-biosciences-lab">BMBL</a> | <a href="mailto:bmbl.qinma@gmail.com" title="bmbl.qinma@gmail.com">Contact us: bmbl.qinma@gmail.com</a>  </p>
-                        </div> </footer>-->
-	
+
     {{/block}}
     
     <script type="text/javascript">
