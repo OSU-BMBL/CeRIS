@@ -289,7 +289,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
 								
                             </div>
@@ -999,7 +999,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		table_jquery_id="#"+table_content_id
 		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ) {
 		$(table_jquery_id).DataTable( {
-				dom: 'Bfrtip',
+				dom: 'lBfrtip',
 				buttons: [
 				{
 				extend:'copy',
@@ -1045,7 +1045,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
 			if(match_species=='Human'){
 			$(table_jquery_id).DataTable( {
-				dom: 'Bfrtip',
+				dom: 'lBfrtip',
 				buttons: [
 				{
 				extend:'copy',
@@ -1064,7 +1064,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		});
 			} else if (match_species == 'Mouse'){
 			$(table_jquery_id).DataTable( {
-				dom: 'Bfrtip',
+				dom: 'lBfrtip',
 				buttons: [
 				{
 				extend:'copy',
@@ -1079,7 +1079,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 				"searching": false,
 				"bInfo" : false,
 				"aLengthMenu": [[ -1], [ "All"]],
-			"iDisplayLength": -1,
+				"iDisplayLength": -1,
 		});
 			}
 		}
@@ -1096,7 +1096,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 	table_jquery_id = "#" + table_content_id
 	if (!$.fn.DataTable.isDataTable(table_jquery_id)) {
 	$(table_jquery_id).DataTable({
-		dom: 'Bfrtip',
+		dom: 'lBfrtip',
 		buttons: [
 				{
 				extend:'copy',
