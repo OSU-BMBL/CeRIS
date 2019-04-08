@@ -20,10 +20,8 @@ function detectDelimiter($fh)
 
     return $delimiter;
 }
-$json=$_POST['filename'];
-$fp = fopen("/home/www/html/iris3/data/2018122084151/upload_file_info.txt", 'w');
-fwrite($fp,"$json");
-fclose($fp);
+ $json=$_POST['filename'];
+
 if(!empty($_FILES))
 {
  session_start();
@@ -37,12 +35,11 @@ if(!empty($_FILES))
  $workdir = "./data/$jobid/";
  mkdir($workdir);
  $temp_file = $_FILES['file']['tmp_name'];
- $location = $workdir.$_FILES['file']['name'];
+ 
  $csv= file_get_contents($temp_file);
  $detect_exp = fopen("$temp_file", 'r');
  $delim = detectDelimiter($detect_exp);
  fclose($detect_exp);
- move_uploaded_file($temp_file, $location);
 
  $array = array_map("str_getcsv",$delimiter=$delim, explode("\n", $csv));
  $response = json_encode($array);
@@ -50,12 +47,27 @@ if(!empty($_FILES))
  $_SESSION['filetype'] = $filetype;
 
  if ($filetype == "dropzone_exp"){
-	 $expfile = $_FILES['file']['name'];
-	 $_SESSION['expfile'] = $expfile;
+	$expfile = $_FILES['file']['name'];
+	$expfile = str_replace(" ", "_", $expfile);
+	$expfile = str_replace(array( '(', ')' ), '_', $expfile);
+	$_SESSION['expfile'] = $expfile;
+	$location = $workdir.$expfile;
+	move_uploaded_file($temp_file, $location);
  } else if ($filetype == "dropzone_label"){
-	 $labelfile = $_FILES['file']['name'];
-	 $_SESSION['labelfile'] = $labelfile;
- } else {
+	$labelfile = $_FILES['file']['name'];
+	$labelfile = str_replace(" ", "_", $labelfile);
+	$labelfile = str_replace(array( '(', ')' ), '_', $labelfile);
+	$location = $workdir.$labelfile;
+	$_SESSION['labelfile'] = $labelfile;
+	move_uploaded_file($temp_file, $location);
+ } else if ($filetype == "dropzone_gene_module"){
+	 $gene_module_file = $_FILES['file']['name'];
+	 $gene_module_file = str_replace(" ", "_", $gene_module_file);
+	 $gene_module_file = str_replace(array( '(', ')' ), '_', $gene_module_file);
+	 $location = $workdir.$gene_module_file;
+	 $_SESSION['gene_module_file'] = $gene_module_file;
+	 move_uploaded_file($temp_file, $location);
+ }else {
 	 $_SESSION['expfile'] = "test";
  }
 
@@ -73,10 +85,14 @@ if(!empty($_FILES))
 	mkdir($workdir);
 	system("cp ./storage/iris3_example_expression_matrix.csv $workdir");
 	system("cp ./storage/iris3_example_expression_label.csv $workdir");
+	system("cp ./storage/iris3_example_gene_module.csv $workdir");
 	$expfile = 'iris3_example_expression_matrix.csv';
 	$_SESSION['expfile'] = $expfile;
 	$labelfile = 'iris3_example_expression_label.csv';
 	$_SESSION['labelfile'] = $labelfile;
+	$gene_module_file = 'iris3_example_gene_module.csv';
+	$_SESSION['gene_module_file'] = $gene_module_file;
+
 	
 }
 $page = $_SERVER['PHP_SELF'];

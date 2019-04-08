@@ -87,9 +87,9 @@ if (isset($_POST['submit']))
 	}
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
-	$expfile = str_replace(" ", "_", $expfile);
 	$labelfile = $_SESSION['labelfile'];
 	$gene_module_file = $_SESSION['gene_module_file'];
+
 	$bic_inference = $_POST['bicluster_inference'];
 	if( $expfile!='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		$labelfile = "";
