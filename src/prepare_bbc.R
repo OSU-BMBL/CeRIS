@@ -2,11 +2,12 @@
 # remove all empty files before this
  
 library(seqinr)
+library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_meme_new")
 #srcDir <- getwd()
-#jobid <-2018122223516 
-# is_meme <- 0
+#jobid <-2019040834307 
+# is_meme <- 1
 # motif_len <- 12
 srcDir <- args[1]
 is_meme <- args[2] # no 0, yes 1
@@ -47,7 +48,7 @@ sort_short_closure <- function(dir){
 
 alldir <- sort_dir(alldir)
 #convert_motif(all_closure[1])
-#filepath<-all_closure[17]
+#filepath<-all_closure[1]
 
 convert_motif <- function(filepath){
   this_line <- data.frame()
@@ -70,7 +71,7 @@ convert_motif <- function(filepath){
   return(df)
 }
 #i=1
-#filepath=all_closure[1]
+#filepath=all_closure[2]
 convert_meme <- function(filepath){
   this_line <- matrix(0,ncol = 6)
   this_line <- data.frame(this_line)
@@ -112,6 +113,7 @@ convert_meme <- function(filepath){
       this_motif_length <- this_info[6]
       this_num_sites <- as.numeric(this_info[9])
       this_pval <- this_info[15]
+      this_pval <- as.numeric(this_pval)
       motif_idx_range <- seq(all_motif_index,all_motif_index + this_num_sites - 1)
       all_motif_index <- all_motif_index + this_num_sites
       this_motif_align <- motif_result[motif_idx_range,]
@@ -127,7 +129,7 @@ convert_meme <- function(filepath){
       cat(paste(" Candidate Motif   ",this_index,sep=""), file=filepath,append = T)
       cat("\n*********************************************************\n\n", file=filepath,append = T)
       cat(paste(" Motif length: ",this_motif_length,"\n Motif number: ",this_num_sites,
-                "\n Motif Pvalue: ",this_pval,"\n\n",sep=""), file=filepath,append = T)
+                "\n Motif Pvalue: ",1/this_pval," ",this_pval,"\n\n",sep=""), file=filepath,append = T)
       cat(paste("\n------------------- Consensus sequences------------------\n",this_consensus,"\n\n",sep=""), file=filepath,append = T)
       cat("------------------- Aligned Motif ------------------\n#Motif	Seq	start	end	Motif		Score	Info\n", file=filepath,append = T)
       for (j in 1:nrow(this_motif_align)) {
@@ -136,17 +138,14 @@ convert_meme <- function(filepath){
       }
       cat("----------------------------------------------------\n\n", file=filepath,append = T)
     }
-    
-    
   }
-  
 }
 
 #i=1
 #j=19
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
-#module_type <- rep("CT",7)
+#module_type <- rep("CT",6)
 regulon_idx_module <- 0
 result_gene_pos <- data.frame()
 for (i in 1:length(alldir)) {
