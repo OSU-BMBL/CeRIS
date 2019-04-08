@@ -46,6 +46,8 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 				$expfile_name = $split_line[1];
 			} else if($split_line[0] == "labelfile"){
 				$labelfile_name = $split_line[1];
+			} else if($split_line[0] == "gene_module_file"){
+				$gene_module_file_name = $split_line[1];
 			} else if($split_line[0] == "is_gene_filter"){
 				if( $split_line[1] == 0) {
 					$is_gene_filter = "No";
@@ -495,6 +497,7 @@ $smarty->assign('motif_program',$motif_program);
 $smarty->assign('label_use_sc3',$label_use_sc3);
 $smarty->assign('expfile_name',$expfile_name);
 $smarty->assign('labelfile_name',$labelfile_name);
+$smarty->assign('gene_module_file_name',$gene_module_file_name);
 $smarty->assign('is_gene_filter',$is_gene_filter);
 $smarty->assign('is_cell_filter',$is_cell_filter);
 $smarty->assign('if_allowSave',$if_allowSave);
