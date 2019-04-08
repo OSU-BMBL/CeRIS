@@ -1,5 +1,5 @@
 #!/bin/bash
-cores=10
+cores=4
 dir=$1
 mkdir tomtom
 
