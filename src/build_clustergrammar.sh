@@ -1,6 +1,8 @@
 #!/bin/bash
-cores=8
+cores=4
 dir=$1
+jobid=$2
+use_user_label=$3
 files="$(find $dir -name "*.heatmap.txt")"
 #echo "$files"
 for file in $files ;
@@ -13,7 +15,11 @@ do
     sleep 1
 	done
 	out="$(basename $file .heatmap.txt)"
-	echo $file $out $dir
-    python /home/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir&
+	if [[ $out == *"S-R"* ]]; then
+	python /home/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir $jobid 0 &
+	echo $file $out $dir $jobid $use_user_label
+	else
+    python /home/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir $jobid $use_user_label &
+	fi
 done
 wait

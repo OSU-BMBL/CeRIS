@@ -89,6 +89,10 @@ for (i in 1:length(all_regulon)) {
     rownames(regulon_heat_matrix)[1] <- ""
     colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
     write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
+    # if # of lines=13, clustergrammer fails. add a line break
+    if(nrow(regulon_heat_matrix) == 13) {
+      write('\n',file=regulon_heat_matrix_filename,append=TRUE)
+    }
     #save regulon label to one list
     combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
     names(combine_regulon_label)[regulon_label_index] <- regulon_label
@@ -103,6 +107,10 @@ for (i in 1:length(all_regulon)) {
       rownames(regulon_heat_matrix)[1] <- ""
       colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
       write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
+      # if # of lines=14, clustergrammer fails. add a line break
+      if(nrow(regulon_heat_matrix) == 14) {
+        write('\n',file=regulon_heat_matrix_filename,append=TRUE)
+      }
       #save regulon label to one list
       combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
       names(combine_regulon_label)[regulon_label_index] <- regulon_label
