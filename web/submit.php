@@ -144,7 +144,7 @@ if (isset($_POST['submit']))
 		$delim_gene_module = "tab";
 	}
 	$fp = fopen("$workdir/info.txt", 'w');
-	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\nis_gene_filter,$is_gene_filter\nis_cell_filter,$is_cell_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
+	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\ngene_module_file,$gene_module_file\nis_gene_filter,$is_gene_filter\nis_cell_filter,$is_cell_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
 	fclose($fp);
 	$fp = fopen("$workdir2/qsub.sh", 'w');
 	if($if_allowSave != '0'){
@@ -188,7 +188,7 @@ Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length
 cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
 Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
 mkdir json
-/home/www/html/iris3/program/build_clustergrammar.sh \$wd
+/home/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
 mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
@@ -238,7 +238,7 @@ Rscript /home/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
 cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
 Rscript /home/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid 0
 mkdir json
-/home/www/html/iris3/program/build_clustergrammar.sh \$wd
+/home/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid 0
 mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
