@@ -85,13 +85,13 @@ if(!empty($_FILES))
 	mkdir($workdir);
 	system("cp ./storage/iris3_example_expression_matrix.csv $workdir");
 	system("cp ./storage/iris3_example_expression_label.csv $workdir");
-	system("cp ./storage/iris3_example_gene_module.csv $workdir");
+	#system("cp ./storage/iris3_example_gene_module.csv $workdir");
 	$expfile = 'iris3_example_expression_matrix.csv';
 	$_SESSION['expfile'] = $expfile;
 	$labelfile = 'iris3_example_expression_label.csv';
 	$_SESSION['labelfile'] = $labelfile;
-	$gene_module_file = 'iris3_example_gene_module.csv';
-	$_SESSION['gene_module_file'] = $gene_module_file;
+	#$gene_module_file = 'iris3_example_gene_module.csv';
+	#$_SESSION['gene_module_file'] = $gene_module_file;
 
 	
 }
