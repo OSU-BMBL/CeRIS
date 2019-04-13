@@ -83,6 +83,7 @@ var exp_file_status = 0;
 			$('.dz-message').css({'font-size': '18px'});
 	// Load Example expression file
 	$('#load_exp').click(function(evt) {
+	exp_file_status = 1;
 	$('#enable_labelfile').attr("disabled", false);
 	$('#submit_btn').attr("disabled", false);
 	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
@@ -106,6 +107,7 @@ var exp_file_status = 0;
 });
 	// load example cell label
 	$('#load_label').click(function(evt) {
+	exp_file_status = 1;
 	$('#submit_btn').attr("disabled", false);
 	$('#enable_labelfile').attr("disabled", false);
 	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
@@ -425,7 +427,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<button type="submit" id="submit_btn" disabled="true" class="btn btn-submit" name="submit" value="submit">Submit</button>
 			<!--<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=2018122630420#" style="color:white">Example output</a>
 			</button>-->
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2019032810957#';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20190408191738#';" />
 
 		</div>
 		<div class="form-group">
