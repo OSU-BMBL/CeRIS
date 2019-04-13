@@ -77,6 +77,7 @@ if (isset($_POST['submit']))
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
+	$k_arg = "18";
 	$promoter_arg = $_POST['promoter_arg'];
 	$enable_sc3_k = $_POST['enable_sc3_k'];
 	if($enable_sc3_k == "specify"){
@@ -85,6 +86,11 @@ if (isset($_POST['submit']))
 			$param_k = '0';
 		}
 	}
+	$species_arg=$_POST['species_arg'];
+	#$fp = fopen("$workdir/species.txt", 'w');
+	#fwrite($fp,"$species_arg");
+	#fclose($fp);
+	file_put_contents('species.txt', implode(PHP_EOL, $species_arg));
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
@@ -107,9 +113,9 @@ if (isset($_POST['submit']))
 	}
 
 	
-	if($c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '1000000' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
+	if($is_gene_filter == '1' && $is_cell_filter == '1' && $c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		
-		header("Location: results.php?jobid=20190327230542#");
+		header("Location: results.php?jobid=20190408191738#");
 	}
 	
 	else {
@@ -120,7 +126,6 @@ if (isset($_POST['submit']))
 		$email = "flykun0620@gmail.com";
 	}
     fwrite($fp,"$email");
-	
     fclose($fp);
 	//$fp = fopen("$workdir/info.txt", 'w');
 	//fwrite($fp,"$c_arg\t$f_arg\t$o_arg\t$motif_program\t$label_use_sc3\t$expfile\t$labelfile\t");
@@ -162,8 +167,9 @@ gene_module_file=$gene_module_file
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
+perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter
-/home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
+/home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k $k_arg -o $o_arg
 for file in *blocks
 do
 grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
@@ -175,7 +181,7 @@ done
 Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label $param_k\n
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n 
+Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid\n 
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
@@ -197,8 +203,8 @@ mkdir logo\n
 /home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
-echo 'finish'> done\n  
-perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
+#echo 'finish'> done\n  
+
 
 ");
 	} else {
@@ -211,8 +217,9 @@ gene_module_file=$gene_module_file
 jobid=$jobid
 motif_min_length=12
 motif_max_length=12
+perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
 Rscript /home/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter
-/home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k 18 -o $o_arg
+/home/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k $k_arg -o $o_arg
 for file in *blocks
 do
 grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
@@ -225,7 +232,7 @@ Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt 
 label_file=\$jobid\_sc3_label.txt
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt\n
+Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid\n
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
@@ -247,8 +254,7 @@ mkdir logo\n
 /home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
-perl /home/www/html/iris3/program/prepare_email.pl \$jobid\n
-echo 'finish'> done\n 
+#echo 'finish'> done\n 
 ");}
 	fclose($fp);
 	session_destroy();
