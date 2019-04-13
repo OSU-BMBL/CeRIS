@@ -3,11 +3,9 @@
 <!-- Latest compiled and minified plotly.js JavaScript -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<!-- OR use a specific plotly.js release (e.g. version 1.5.0) -->
+<!-- OR use a specific plotly.js release (e.g. version 1.5.0)
 <script src="https://cdn.plot.ly/plotly-1.5.0.min.js"></script>
-
-<!-- OR an un-minified version is also available -->
-<script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
+<script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script> -->
 <script>
 
 
@@ -334,7 +332,15 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                         </ul>
                                                         <div class="tab-content" id="myTabContent">	
 														{{section name=ct_idx start=0 loop=$count_ct}}	{{/section}}
-														{{foreach from=$regulon_result item=label1 key=sec0}}														
+														{{foreach from=$regulon_result item=label1 key=sec0}}	
+														{{if $regulon_result[$sec0][0][0] == '0'}}
+																			<div class="tab-pane {{if {{$sec0+1}} eq '1'}}active{{/if}}" id="main_CT{{$sec0+1}}" role="tabpanel">
+																<div class="flatPanel panel panel-default">
+																			<div class="row" style="">
+																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
+																			<strong>No CTS-R found in CT{{$sec0+1}} </strong>
+																	</div></div> </div> </div> 
+															{{else}}	
 															<div class="tab-pane {{if {{$sec0+1}} eq '1'}}active{{/if}}" id="main_CT{{$sec0+1}}" role="tabpanel">
 																<div class="flatPanel panel panel-default">
 																			<div class="row" style="">
@@ -355,7 +361,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div></div> </div> 
+																					</div></div></div></div></div></div>
+
+																					</div> 
 																	<div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
@@ -545,6 +553,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																					
 																	</div></div></div>
                                                             </div>	
+															{{/if}}
 															{{/foreach}}
 
 															{{foreach from=$module_result item=label1 key=sec0}}														
@@ -819,6 +828,58 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 					<div style="text-align: left;">
                         <strong><h3>Sorry, there has been an error:</h3></strong> <p style="color:red">IRIS3 did not find enough bi-clusters in your data.</p>
 						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<!---
+						
+						<p>Perhaps you are here because: </p>
+						<ul>
+						<li> Wrong input file format</li>
+						</ul>
+						
+						--->
+						<br>
+                    </div>
+					
+					<strong>Your job settings:</strong><br>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Cell filtering: {{$is_cell_filter}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Max biclusters: {{$o_arg}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6">
+                                    <p>Overlap rate: {{$f_arg}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Email: {{$email_line}}</p>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-6"> 
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                </div>
+								
+                                
+                                
+
+                            </div>
+					</div>
+										{{elseif $status==="error_num_cells"}}
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
+						<div class="panel-body">
+					<div style="text-align: left;">
+                        <strong><h3>Sorry, there has been an error:</h3></strong> <p style="color:red">IRIS3 did not find enough cell types in your data, it is recommended to have at lease around 100 cells in your scRNA-seq experiment.</p>
+						<br>For further question, please contact ma.1915@osu.edu<br>
 						<!---
 						
 						<p>Perhaps you are here because: </p>
