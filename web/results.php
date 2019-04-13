@@ -328,6 +328,9 @@ foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 	 } else{
 		 die("Unable to open file");
 	 }
+	 if(!filesize($this_regulon_gene_name_file)) {
+     $regulon_result[$key][0] = '0';
+	 }
 	fclose($fp);
 	}
 	
@@ -441,6 +444,8 @@ function exception_handler($exception) {
 set_exception_handler('exception_handler');
 }else if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt") && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic/bic1.txt.fa.closures")) {
 	$status= "error_bic";
+}else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_cell_label.txt")) {
+	$status= "error_num_cells";
 }else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")) {
 	$status= "error";
 }
