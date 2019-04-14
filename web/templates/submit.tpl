@@ -131,7 +131,7 @@ var exp_file_status = 0;
 });
 
 	// load example gene module
-	$('#load_gene_module').click(function(evt) {
+	/*$('#load_gene_module').click(function(evt) {
 	$('#submit_btn').attr("disabled", false);
 	$('#enable_labelfile').attr("disabled", false);
 	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
@@ -150,10 +150,11 @@ var exp_file_status = 0;
             console.log(e.message);
         }
 	})
-});
+});*/
 $("select#species_arg").on("change", function(value){
    var This      = $(this);
    var selectedD = $(this).val();
+	console.log(selectedD)
    if(selectedD && exp_file_status ){
 	$('#submit_btn').attr("disabled", false);
    } else {
@@ -211,7 +212,7 @@ $("select#species_arg").on("change", function(value){
 		<div class="form-check col-sm-6 ">
 		<label class="form-check-label" for="species_select">Species:<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description."> </span>
 				</label>
-		<select class="selectpicker" id="species_arg" name="species_arg" multiple data-max-options="2">
+		<select class="selectpicker" id="species_arg" name="species_arg[]" multiple data-max-options="2">
   <option value="Human">Human</option>
   <option value="Mouse">Mouse</option>
   <option value="Zebrafish">Zebrafish</option>

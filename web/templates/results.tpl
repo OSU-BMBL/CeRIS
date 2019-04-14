@@ -89,7 +89,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 						
                             <div class="col-md-12 col-sm-12"> 
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p id="species">Species: {{$species}}</p>
+                                    <p id="species">Species: {{$species}} {{$main_species}}{{if $second_species != ''}},{{/if}} {{$second_species}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of cells: {{$total_label}}</p>
@@ -1054,7 +1054,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		regulon_id = $(item).attr("id").substring(8);
 		table_id = "table-"+regulon_id
 		species = document.getElementById("species").innerHTML
-		match_species =  species.match(/[^Species: ].+/gm)
+		match_species =  species.match(/[^Species: ].+/gm)[0]
 		jobid = location.search.match(/\d+/gm)
 		table_content_id = "table-content-"+regulon_id
 		table_jquery_id="#"+table_content_id
@@ -1099,7 +1099,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		regulon_id = $(item).attr("id").substring(7);
 		table_id = "tad-table-"+regulon_id
 		species = document.getElementById("species").innerHTML
-		match_species =  species.match(/[^Species: ].+/gm)
+		match_species =  species.match(/[^Species: ].+/gm)[0]
 		jobid = location.search.match(/\d+/gm)
 		table_content_id = "tad-table-content-"+regulon_id
 		table_jquery_id="#"+table_content_id
@@ -1151,7 +1151,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 	regulon_id = $(item).attr("id").substring(11)
 	table_id = "similar-table-" + regulon_id
 	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)
+	match_species = species.match(/[^Species: ].+/gm)[0]
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "similar-table-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id

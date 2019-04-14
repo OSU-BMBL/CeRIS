@@ -90,7 +90,8 @@ if (isset($_POST['submit']))
 	#$fp = fopen("$workdir/species.txt", 'w');
 	#fwrite($fp,"$species_arg");
 	#fclose($fp);
-	file_put_contents('species.txt', implode(PHP_EOL, $species_arg));
+	file_put_contents("$workdir/species.txt", implode(PHP_EOL, $species_arg));
+	file_put_contents("$workdir/species.txt", "\n",FILE_APPEND);
 	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
@@ -155,6 +156,9 @@ if (isset($_POST['submit']))
 	if($if_allowSave != '0'){
     system("cp $workdir2$expfile /home/www/html/iris3/storage");
 	}
+	if($expfile == "Camp_each5.csv" || $expfile =='zeisel_each10.csv'){
+		$k_arg = "5";
+	}
 
 	
 if ($labelfile != ''){
@@ -181,7 +185,7 @@ done
 Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label $param_k\n
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid\n 
+Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait
@@ -232,7 +236,7 @@ Rscript /home/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt 
 label_file=\$jobid\_sc3_label.txt
 Rscript /home/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
 Rscript /home/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid\n
+Rscript /home/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n
 perl /home/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /home/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
 wait

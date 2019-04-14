@@ -238,6 +238,10 @@ if ($info_file) {
 			$is_evaluation = $split_line[1];
 		} else if($split_line[0] == "species"){
 			$species = $split_line[1];
+		} else if($split_line[0] == "main_species"){
+			$main_species = $split_line[1];
+		} else if($split_line[0] == "second_species"){
+			$second_species = $split_line[1];
 		} else if($split_line[0] == "provide_label"){
 			$provide_label = $split_line[1];
 		} else if($split_line[0] == "predict_label"){
@@ -469,6 +473,8 @@ $smarty->assign('total_ct',$total_ct);
 $smarty->assign('total_regulon',$total_regulon);
 $smarty->assign('count_ct',$count_ct);
 $smarty->assign('species',$species);
+$smarty->assign('second_species',$second_species);
+$smarty->assign('main_species',$main_species);
 $smarty->assign('status',$status);
 $smarty->assign('jobid',$jobid);
 $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
