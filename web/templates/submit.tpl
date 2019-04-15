@@ -64,7 +64,8 @@ var addTable = function(dataset, type) {
 	//$('button[form="upload-expression-form"]').toggleClass('black white bg-white bg-blue');
 	$('#dropzone_'+type).hide();
 	$('#formats').hide();
-	$('#drop_'+type).hide();
+	$('#drop_exp').hide();
+	$('#drop_label').hide();
 	addPreviewTable(dataset, true ,type);
 	$('#intro_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('Your uploaded gene expression file contains <span class="highlight">'+dataset['columns'][0].length+' cells</span> and <span class="highlight">'+dataset['gene_num'][0]+' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
 	}
@@ -177,9 +178,9 @@ var exp_file_status = 0;
 	exp_file_status = 1;
 	$('#submit_btn').attr("disabled", false);
 	$('#enable_labelfile').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
-	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
 	$('select[name=species_arg]').val('Human');
 	$('.selectpicker').selectpicker('refresh')
