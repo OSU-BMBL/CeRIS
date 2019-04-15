@@ -814,7 +814,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
 								
                                 
@@ -866,7 +866,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
 								
                                 
@@ -918,7 +918,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
 								
                                 
@@ -970,7 +970,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
-                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p>
+                                    <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
 								
                                 
