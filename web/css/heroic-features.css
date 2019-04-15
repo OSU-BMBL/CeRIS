@@ -719,7 +719,7 @@ textarea {
 .ultra-light {	font-weight: 100; }
 .extra-bold {	font-weight: 600; }
 
-.px-2 {padding-right:.5rem!important; padding-left:.5rem!important;}
-.py-1 {padding-bottom:.25rem!important;padding-top:.25rem!important;}
+.px-2 {padding-right:1.5rem!important; padding-left:1.5rem!important;}
+.py-1 {padding-bottom:.5rem!important;padding-top:.5rem!important;}
 .w-100 {width:100%!important;}
 .highlight { font-weight: 500; font-style: normal; color: #00AA90; }
