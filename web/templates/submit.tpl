@@ -46,7 +46,12 @@ function addPreviewTable(response, metadata=true, type) {
 		  $('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">ERROR: '+err.message+', please check your upload data format.</span></label>'))
 		}
 		if (response['columns'][0].length != response['data'][0].length){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
+		}
+		percent = (1 - response['count_zero'][0]/(response['columns'][0].length*response['gene_num'][0])).toFixed(6)
+		
+		if (percent > 0.8){
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros in your dataset ('+percent*100+'%), errors are likely to occur when you submit to IRIS3.</span></label>'))
 		}
 }
 
@@ -155,7 +160,7 @@ var exp_file_status = 0;
 	$('select[name=species_arg]').val('Human');
 	$('.selectpicker').selectpicker('refresh')
 	
-	$.ajax({
+	/*$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'expression'},
@@ -165,7 +170,7 @@ var exp_file_status = 0;
         error: function(e){
             console.log(e.message);
         }
-	})
+	})*/
 });
 	// load example cell label
 	$('#load_label').click(function(evt) {
@@ -179,7 +184,7 @@ var exp_file_status = 0;
 	$('select[name=species_arg]').val('Human');
 	$('.selectpicker').selectpicker('refresh')
 	// AJAX Query
-	$.ajax({
+	/*$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'label'},
@@ -189,7 +194,7 @@ var exp_file_status = 0;
         error: function(e){
             console.log(e.message);
         }
-	})
+	})*/
 });
 
 	// load example gene module
