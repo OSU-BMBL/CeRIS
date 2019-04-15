@@ -3,23 +3,27 @@ require("config/smarty.php");
 require("config/common.php");
 require("config/tools.php");
 
-
-function detectDelimiter($fh)
+function detectDelimiter($csvFile)
 {
-    $delimiters = ["\\t", ";", "|", ",", " "];
-    $data_1 = null; $data_2 = null;
-    $delimiter = $delimiters[0];
-    foreach($delimiters as $d) {
-        $data_1 = fgetcsv($fh, 4096, $d);
-        if(sizeof($data_1) > sizeof($data_2)) {
-            $delimiter = sizeof($data_1) > sizeof($data_2) ? $d : $delimiter;
-            $data_2 = $data_1;
-        }
-        rewind($fh);
+    $delimiters = array(
+        ';' => 0,
+        ',' => 0,
+        "\t" => 0,
+        "|" => 0,
+		" " => 0,
+    );
+
+    $handle = fopen($csvFile, "r");
+    $firstLine = fgets($handle);
+    fclose($handle); 
+    foreach ($delimiters as $delimiter => &$count) {
+        $count = count(str_getcsv($firstLine, $delimiter));
     }
 
-    return $delimiter;
+
+    return array_search(max($delimiters), $delimiters);
 }
+
  $json=$_POST['filename'];
 
 if(!empty($_FILES))
@@ -33,16 +37,63 @@ if(!empty($_FILES))
  }
  $_SESSION['jobid'] = $jobid;
  $workdir = "./data/$jobid/";
- mkdir($workdir);
+
+ if (!file_exists($workdir)) {
+     mkdir($workdir);
+}
  $temp_file = $_FILES['file']['tmp_name'];
  
  $csv= file_get_contents($temp_file);
- $detect_exp = fopen("$temp_file", 'r');
- $delim = detectDelimiter($detect_exp);
- fclose($detect_exp);
 
- $array = array_map("str_getcsv",$delimiter=$delim, explode("\n", $csv));
- $response = json_encode($array);
+
+
+ $delim = detectDelimiter($temp_file);
+$array = file($temp_file);
+#$new_array = array();
+#foreach ($array as $line) {
+#    // explode the line on tab. Note double quotes around \t are mandatory
+#    $line_array = explode("$delim", $line);
+#    // set first element to the new array
+#    #$new_array[] = $line_array[0];
+#	$new_array[] = array_map('trim',$line_array);
+#}
+
+ $fp = fopen("$temp_file", 'r');
+	if ($fp){
+	$idx = 0;
+		while (($line = fgetcsv($fp, 0, "$delim")) !== FALSE){
+			if ($line) {
+				if ($idx == 0) {
+					$remove_first =array_shift($line);
+					$new_array['columns'][] = $line;
+				}
+				else {
+					$new_array['index'][] = array_map('trim',$line)[0];
+					$remove_first =array_shift($line);
+					$new_array['data'][] = array_map('trim',$line);
+				}
+			}
+			$idx = $idx + 1;
+			if ($idx == 10){
+				break;
+			}
+		}
+
+	} else{
+		die("Unable to open file");
+	}
+fclose($fp);
+  $fp = fopen("$temp_file", 'r');
+	if ($fp){
+ 	$linecount = -2;
+	while(!feof($fp)){
+	  $line = fgets($fp);
+	  $linecount++;
+	}
+	}
+	$new_array['gene_num'][] = $linecount;
+	fclose($fp);
+ #$response = json_encode($array);
  $filetype=$_POST['filetype'];
  $_SESSION['filetype'] = $filetype;
 
@@ -71,7 +122,9 @@ if(!empty($_FILES))
 	 $_SESSION['expfile'] = "test";
  }
 
- //echo $_POST[json_encode($response)]; 
+#$response=$new_array;
+ $response = array_slice($new_array, 0, 5);
+ echo json_encode($response); 
   
 }else if ($json !=""){
 	$example= $_POST['filename'];
@@ -82,7 +135,9 @@ if(!empty($_FILES))
     }else {}
 	$_SESSION['jobid'] = $jobid;
 	$workdir = "./data/$jobid/";
-	mkdir($workdir);
+	 if (!file_exists($workdir)) {
+     mkdir($workdir);
+	}
 	system("cp ./storage/iris3_example_expression_matrix.csv $workdir");
 	system("cp ./storage/iris3_example_expression_label.csv $workdir");
 	#system("cp ./storage/iris3_example_gene_module.csv $workdir");

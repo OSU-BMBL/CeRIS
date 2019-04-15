@@ -1,6 +1,68 @@
 {{extends file="base.tpl"}} {{block name="extra_style"}} form div.fieldWrapper label { min-width: 5%; } {{/block}} {{block name="extra_js"}} {{/block}} {{block name="main"}}
 	<script src="vendor/bootstrap/js/bootstrap-select.min.js"></script>
 <script>
+
+function addPreviewTable(response, metadata=true, type) {
+
+	// Define table
+	var $table = $('<table>', {'class': 'table-striped w-100'}).append($('<thead>').append($('<tr>', {'class': ' very-small text-center border-grey border-left-0 border-right-0'}))).append($('<tbody>'));
+	// Add headers
+	//label = metadata ? 'Gene' : 'Cell Label'
+	if (type == 'exp') {
+		label = 'Gene'
+			$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(label));
+			$.each(response['columns'][0], function(i, col) {
+			$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(col));
+			})
+		
+		
+	} else if (type == 'label'){
+		label = 'Cell label'
+		$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(label));
+		$.each(response['columns'][0], function(i, col) {
+		$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(col));
+	})
+	} else if (type == 'module'){
+		label = 'Module'
+	} 
+	
+	// Get row number
+	n = metadata ? 6 : response['index'].length
+
+	// Add rows
+	try {
+	for (i=0; i<n; i++) {
+		var $tr = $('<tr>').append($('<td>', {'class': 'bold text-center px-2 py-1'}).html(response['index'][i]));
+		$.each(response['data'][i], function(i, val) {
+			$tr.append($('<td>', {'class': 'light text-center tiny'}).html(val));
+		})
+		$table.find('tbody').append($tr);
+	}
+		// Add
+	$('#loader_'+type).addClass('d-none');
+	$('#preview_'+type).append($table);
+	}
+		catch(err) {
+		  $('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">ERROR: '+err.message+', please check your upload data format.</span></label>'))
+		}
+		if (response['columns'][0].length != response['data'][0].length){
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
+		}
+}
+
+
+var addTable = function(dataset, type) {
+	// method from biojupies/upload/table
+	$('#expression').val(JSON.stringify(dataset));
+	// Toggle Interfaces
+	//$('button[form="upload-expression-form"]').prop('disabled', false);
+	//$('button[form="upload-expression-form"]').toggleClass('black white bg-white bg-blue');
+	$('#dropzone_'+type).hide();
+	$('#formats').hide();
+	$('#drop_'+type).hide();
+	addPreviewTable(dataset, true ,type);
+	$('#intro_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('Your uploaded gene expression file contains <span class="highlight">'+dataset['columns'][0].length+' cells</span> and <span class="highlight">'+dataset['gene_num'][0]+' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
+	}
 var exp_file_status = 0;
 	$(document).ready(function() {
 	        $('.selectpicker').selectpicker();
@@ -31,7 +93,7 @@ var exp_file_status = 0;
 					exp_file_status = 1;
 	                response = JSON.parse(response);
 	                console.log(response);
-	                addTable(response);
+	                addTable(response,'exp');
 	            }
 	        });
 	
@@ -53,7 +115,7 @@ var exp_file_status = 0;
 					$('#enable_labelfile').attr("disabled", false);
 	                response = JSON.parse(response);
 	                console.log(response);
-	                addTable(response);
+	                addTable(response,'label');
 	
 	            }
 	        });
@@ -76,7 +138,7 @@ var exp_file_status = 0;
 					$('#enable_gene_module').attr("disabled", false);
 	                response = JSON.parse(response);
 	                console.log(response);
-	                addTable(response);
+	                addTable(response,'gene_module');
 	            }
 	        });
 			
@@ -86,9 +148,9 @@ var exp_file_status = 0;
 	exp_file_status = 1;
 	$('#enable_labelfile').attr("disabled", false);
 	$('#submit_btn').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
-	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:1.5em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
 	$('select[name=species_arg]').val('Human');
 	$('.selectpicker').selectpicker('refresh')
@@ -150,7 +212,7 @@ var exp_file_status = 0;
             console.log(e.message);
         }
 	})
-});*/
+	});*/
 $("select#species_arg").on("change", function(value){
    var This      = $(this);
    var selectedD = $(this).val();
@@ -177,7 +239,7 @@ $("select#species_arg").on("change", function(value){
 				</label>
 			</div>
 			<div class="form-check col-sm-2  ">
-				<div class="dropdown">
+				<div class="dropdown"  id="drop_exp">
 					<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -205,12 +267,14 @@ $("select#species_arg").on("change", function(value){
 			<div id="loader_exp"></div>
 			<!--<div id="hint_upload" style="font-weight: 200;">Note: We accept gene symbols as row identifiers, automated identifier conversion currently in development.</div>-->
 			<div id="preview_exp"></div>
+			<div id="intro_exp" class="mt-2"></div>
 			</div>
 
 		</div>
 		<div class="form-group row">
 		<div class="form-check col-sm-6 ">
-		<label class="form-check-label" for="species_select">Species:<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description."> </span>
+		<label class="form-check-label" for="species_select">Species:
+		 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Specify the species belongs to your gene expression matrix."> </span> 
 				</label>
 		<select class="selectpicker" id="species_arg" name="species_arg[]" multiple data-max-options="2">
   <option value="Human">Human</option>
@@ -241,13 +305,15 @@ $("select#species_arg").on("change", function(value){
 						<div class="form-group row">
 						<div class="form-check col-sm-12 ">
 							<input class="form-check-input" type="checkbox" name="is_gene_filter" id="is_gene_filter" value="1" checked>
-							<label class="form-check-label" for="is_gene_filter">Enable gene filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are either expressed (expression value > 2) in less than 6% of cells or expressed (expression value > 0) in at least 96% of cells. The method was fully described in SC3 manuscript. The filtering will not affect the result of cell prediction nor the bicluster results, but only shorten the ruuning time."> </span>
+							<label class="form-check-label" for="is_gene_filter">Enable gene filtering (default: Yes) 
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are expressed in less than 5% of total cells."> </span> 
 							</label>
 						</div>
 						<div class="form-check col-sm-12 ">
 							<input class="form-check-input" type="checkbox" name="is_cell_filter" id="is_cell_filter" value="1" checked>
-							<label class="form-check-label" for="is_cell_filter">Enable cell filtering (default: Yes) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="description"> </span>
-							</label>
+							<label class="form-check-label" for="is_cell_filter">Enable cell filtering (default: Yes) 
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes cells that are expressed in less than 1% of total genes."> </span>
+							<!-- </label> -->
 						</div>
 					</div>
 							<h4 class="font-italic text-left">Biclustering parameters</h4>
@@ -304,7 +370,9 @@ $("select#species_arg").on("change", function(value){
 									</div>
 								</div>
 							</div>
-							<h4 class="font-italic text-left">SC3 option <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="sc3 description"> </span></h4>
+							<h4 class="font-italic text-left">SC3 option 
+							<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By default, cell types are predicted in SC3 by gene distance calculation, PCA dimension reduction, tSNE-k-means clustering, and consensus clustering. You may also manually specify the nubmer of cell types in SC3."> </span> 
+							</h4>
 							<div class="row">
 									<div class="col-md-1">
 										<label for="ex4">k: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Number of clusters"> </span>
@@ -327,7 +395,7 @@ $("select#species_arg").on("change", function(value){
 							<div id="upload_label">
 									<div class="form-group row">
 										<div class="col-sm-4">
-											<div class="dropdown">
+											<div class="dropdown"  id="drop_label">
 												<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
 												</button>
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -338,7 +406,7 @@ $("select#species_arg").on("change", function(value){
 												</ul>
 											</div>
 											<div id="dropzone_label" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
-														<div id="loader_label"></div>
+											<div id="loader_label"></div>
 			<div id="preview_label"></div>
 										</div>
 									</div>
@@ -359,12 +427,14 @@ $("select#species_arg").on("change", function(value){
 								
 							</div>
 							<br>
-							<h4 class="font-italic text-left">Upload gene module: (Optional) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Gene module description"> </span></h4>
+							<h4 class="font-italic text-left">Upload gene module: (Optional) 
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The developed gene modules that you are interested in or identified by preferred module detection methods can be uploaded to IRIS3 and have them analyzed to identify the “module-specific regulons”. Each column should represents a gene module, check example gene module file for more details."> </span> 
+							</h4>
 			
 							<div id="upload_gene_module">
 									<div class="form-group row">
 										<div class="col-sm-4">
-											<div class="dropdown">
+											<div class="dropdown" id="drop_gene_module">
 												<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
 												</button>
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -376,7 +446,7 @@ $("select#species_arg").on("change", function(value){
 											</div>
 											<div id="dropzone_gene_module" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
 														<div id="loader_gene_module"></div>
-			<div id="preview_label"></div>
+			<div id="preview_gene_module"></div>
 										</div>
 									</div>
 							</div>
@@ -399,7 +469,8 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 							</div>
 							<div class="row">
 								<div class="col-md-5">
-									<label for="ex2">Upstream promoter region:	<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. 0 means no overlap and 1 means complete overlap. Default is 0.5."> </span>
+									<label for="ex2">Upstream promoter region:	
+									 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The upstream length from a gene and its DNA sequence will be used for DNA motif prediction."> </span> 
 									</label>
 									<select class="selectpicker" name="promoter_arg" data-width="auto">
 										<option>500</option>

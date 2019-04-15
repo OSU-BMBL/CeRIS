@@ -670,3 +670,56 @@ textarea {
 	font-size:12px !important;
 	margin-right: 1em;
 }
+
+#preview_exp {
+  overflow-x: auto;
+}
+#preview_label {
+  overflow-x: auto;
+}
+#preview_gene_module {
+}
+.text-center { text-align: center !important; }
+
+/* Borders */
+.border-black { border: 1px solid black !important;}
+.border-grey {border: 1px solid #c9c9c9;}
+.border-custom { border: 1px solid #c9c9c9; border-bottom: 2px solid #d5d5d5; }
+.border-hover-blue:hover { border: 1px solid #3cb2f7 !important; border-bottom: 2px solid #3bb1f7 !important; }
+.border-black-custom { border: 1px solid black !important; border-bottom: 2px solid #8a8a8a !important; }
+.border-grey-light { border: 1px solid rgba(0,0,0,0.1); }
+.border-blue { border: 1px solid #007bff; }
+.border-none { border: none; }
+/*.border-black-custom:focus { border-bottom: 1px solid black !important; }*/
+
+.border         { border: $border-width solid $border-color !important; }
+.border-top     { border-top: $border-width solid $border-color !important; }
+.border-right   { border-right: $border-width solid $border-color !important; }
+.border-bottom  { border-bottom: $border-width solid $border-color !important; }
+.border-left    { border-left: $border-width solid $border-color !important; }
+
+.border-0        { border: 0 !important; }
+.border-top-0    { border-top: 0 !important; }
+.border-right-0  { border-right: 0 !important; }
+.border-bottom-0 { border-bottom: 0 !important; }
+.border-left-0   { border-left: 0 !important; }
+/* Font size */
+.very-large { font-size: 27pt;}
+.large { font-size: 23pt;}
+.medium-large { font-size: 20pt;}
+.medium { font-size: 17pt !important;}
+.small { font-size: 15pt;}
+.very-small {font-size: 12pt;}
+.tiny { font-size: 11pt;}
+.micro { font-size: 10pt;}
+/* Font Weight */
+.light { font-weight: 200; }
+.regular { font-weight: 300; }
+.bold {font-weight: 400;}
+.ultra-light {	font-weight: 100; }
+.extra-bold {	font-weight: 600; }
+
+.px-2 {padding-right:.5rem!important; padding-left:.5rem!important;}
+.py-1 {padding-bottom:.25rem!important;padding-top:.25rem!important;}
+.w-100 {width:100%!important;}
+.highlight { font-weight: 500; font-style: normal; color: #00AA90; }
