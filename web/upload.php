@@ -61,6 +61,7 @@ $array = file($temp_file);
  $fp = fopen("$temp_file", 'r');
 	if ($fp){
 	$idx = 0;
+	$count_zero = 0;
 		while (($line = fgetcsv($fp, 0, "$delim")) !== FALSE){
 			if ($line) {
 				if ($idx == 0) {
@@ -71,12 +72,16 @@ $array = file($temp_file);
 					$new_array['index'][] = array_map('trim',$line)[0];
 					$remove_first =array_shift($line);
 					$new_array['data'][] = array_map('trim',$line);
+					$count_zero = $count_zero + count(array_filter($line));
 				}
 			}
 			$idx = $idx + 1;
-			if ($idx == 10){
+			if ($idx == 1000){
 				break;
-			}
+				}
+			/*if ($new_array['columns'][0] > 1000) {
+				
+			}*/
 		}
 
 	} else{
@@ -92,6 +97,7 @@ fclose($fp);
 	}
 	}
 	$new_array['gene_num'][] = $linecount;
+	$new_array['count_zero'][] = $count_zero;
 	fclose($fp);
  #$response = json_encode($array);
  $filetype=$_POST['filetype'];
@@ -123,8 +129,10 @@ fclose($fp);
  }
 
 #$response=$new_array;
- $response = array_slice($new_array, 0, 5);
- echo json_encode($response); 
+$new_array['data'] =  array_slice($new_array['data'] , 0, 10);
+$new_array['index'] =  array_slice($new_array['index'] , 0, 10);
+
+ echo json_encode($new_array); 
   
 }else if ($json !=""){
 	$example= $_POST['filename'];
