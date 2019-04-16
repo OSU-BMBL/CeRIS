@@ -41,18 +41,37 @@ function addPreviewTable(response, metadata=true, type) {
 		// Add
 	$('#loader_'+type).addClass('d-none');
 	$('#preview_'+type).append($table);
+	document.getElementById("is_load_"+type).value = 1;
 	}
 		catch(err) {
 		  $('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">ERROR: '+err.message+', please check your upload data format.</span></label>'))
 		}
-		if (response['columns'][0].length != response['data'][0].length){
+		if (response['columns'][0].length != response['data'][0].length && type=='exp'){
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
 		}
-		percent = (1 - response['count_zero'][0]/(response['columns'][0].length*response['gene_num'][0])).toFixed(6)
+		percent = (1 - response['count_zero'][0]/(response['columns'][0].length*1000)).toFixed(6)
 		
-		if (percent > 0.8){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros in your dataset ('+percent*100+'%), errors are likely to occur when you submit to IRIS3.</span></label>'))
+		if (percent > 0.85 && type=='exp'){
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
 		}
+		if (response['columns'][0].length < 40 && type=='exp'){
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at lease around 100 cells in your scRNA-seq experiment. </span></label>'))
+			document.getElementById("k_arg").value = 5;
+		}
+		var check_cell_name_start_with_number = function (array) {
+			for (var i = 0; i < array.length; i += 1) {
+				// Use the index i here
+				console.log();
+				if ('0123456789'.indexOf(array[i].charAt(0)) !== -1) {
+					return true;
+				}
+			}
+		}
+
+		if (check_cell_name_start_with_number(response['columns'][0]) && type=='exp'){
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, IRIS3 will try to rename them in data pre-processing.  </span></label>'))
+		}
+
 }
 
 
@@ -450,7 +469,7 @@ $("select#species_arg").on("change", function(value){
 													</li>
 												</ul>
 											</div>
-											<div id="dropzone_gene_module" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
+											<div id="dropzone_gene_module" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/gene_module_example.jpg); background-size: 100% 100%;margin:0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
 														<div id="loader_gene_module"></div>
 			<div id="preview_gene_module"></div>
 										</div>
@@ -503,8 +522,10 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 		<hr>
 		<div class="form-group">
 			<button type="submit" id="submit_btn" disabled="true" class="btn btn-submit" name="submit" value="submit">Submit</button>
-			<!--<button class="btn btn-submit"> <a href="/iris3/results.php?jobid=2018122630420#" style="color:white">Example output</a>
-			</button>-->
+			<input type="hidden" id="is_load_exp" name="is_load_exp" value="0">
+			<input type="hidden" id="is_load_label" name="is_load_label" value="0">
+			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
+			<input type="hidden" id="k_arg" name="k_arg" value="18">
 			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20190408191738#';" />
 
 		</div>

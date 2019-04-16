@@ -1,12 +1,15 @@
 <?php
 // include "head.html";
 set_time_limit(300);
+session_start();
+
+
+
 require("config/common.php");
 require("config/smarty.php");
 
 $smarty->caching = true;
 $smarty->assign('section', 'Homepage');
-session_start();
 
 function get_client_ip_server() {
     $ipaddress = '';
@@ -77,7 +80,10 @@ if (isset($_POST['submit']))
 	$c_arg = $_POST['c_arg'];
 	$f_arg = $_POST['f_arg'];
 	$o_arg = $_POST['o_arg'];
-	$k_arg = "18";
+	$k_arg = $_POST['k_arg'];
+	$is_load_exp = $_POST['is_load_exp'];
+	$is_load_label = $_POST['is_load_label'];
+	$is_load_gene_module = $_POST['is_load_gene_module'];
 	$promoter_arg = $_POST['promoter_arg'];
 	$enable_sc3_k = $_POST['enable_sc3_k'];
 	if($enable_sc3_k == "specify"){
@@ -96,7 +102,15 @@ if (isset($_POST['submit']))
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
 	$gene_module_file = $_SESSION['gene_module_file'];
-
+	if ($is_load_exp == '0') {
+		$expfile = "";
+	}
+	if ($is_load_label == '0') {
+		$labelfile = "";
+	}
+	if ($is_load_gene_module == '0') {
+		$gene_module_file = "";
+	}
 	$bic_inference = $_POST['bicluster_inference'];
 	if( $expfile!='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		$labelfile = "";
@@ -156,9 +170,6 @@ if (isset($_POST['submit']))
 	if($if_allowSave != '0'){
     system("cp $workdir2$expfile /home/www/html/iris3/storage");
 	}
-	if($expfile == "Camp_each5.csv" || $expfile =='zeisel_each10.csv'){
-		$k_arg = "5";
-	}
 
 	
 if ($labelfile != ''){
@@ -207,7 +218,7 @@ mkdir logo\n
 /home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
-#echo 'finish'> done\n  
+echo 'finish'> done\n  
 
 
 ");
@@ -258,7 +269,7 @@ mkdir logo\n
 /home/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
 
-#echo 'finish'> done\n 
+echo 'finish'> done\n 
 ");}
 	fclose($fp);
 	session_destroy();
