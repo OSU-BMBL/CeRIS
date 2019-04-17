@@ -79,8 +79,8 @@
                             <i class="fa fa-rocket"></i>
                         </div>-->
                         <h3 class="box-title">News</h3>
-                                    <p>Posted: 12/28/2018</p>
-						<p> We are excited to present you the IRIS3 server 1.0! Please feel free to contact us if you encounter any issues.</p>
+                                    <p>Posted: 3/25/2019</p>
+						<p> IRIS3 now supports scRNA-Seq analysis for Zebrafish, Fruit Fly, Yeast, and Roundworm.</p>
             <p><a class="enroll-button" href="/iris3/news.php#1version" role="button">More changes</a></p>
                     </div>
                 </div>

@@ -30,11 +30,12 @@
 	<div class="qa">
 		<h3 class="question"><a id="Q2" style="color:black;">What is the hypergeometric test?</a></h3>
 		<div class="answer">
-			<p>The hypergeometric test uses the hypergeometric distribution to calculate the significance of having k successes from the annotated population</p>
+			<p>The hypergeometric enrichment test is performed in both CTS-gene module assignment and the functional enrichment for CTS-R evaluations. To infer CTS-gene modules, the probability of having x cells of the same cell type in a bicluster of size n from the dataset with a total of N cells can be computed using the following hypergeometric function:</p>
 			<br> <a href="./assets/img/tutorial/4.Q2.png"></a>
-			<p>P-value of hypergeometric test is the probability of seeing at least x number of cells out of the total n cells in the list annotated 
-			to a particular cell type, given the proportion of cells in the whole population that are annotated to that cell type. 
-			The smaller of the p-value is, the more significant the cell type associated with the bicluster.</p>
+			<p>where p is the percentage of that cell type among all cell types in the data set. The p-value of getting such enriched bicluster is calculated as:</p>
+			<br> <a href="./assets/img/tutorial/4.Q2.2.png"></a>
+			<p>The p-value of a bicluster corresponding to a specific cell type is Bonferroni-adjusted by multiplying by the total number of cell types, and such bicluster is assigned as a CTS-gene module if its adjusted p-value to that cell type is significant (adj.p<0.05). </p>
+			<p>The functional enrichment analysis between genes in the CTS-R and databases, such as KEGG, GO, ProteomicDB, etc. uses the same hypergeometric test and p-value adjustment shown above, but compares genes instead of cells. All the enrichment analysis in IRIS3 are performed using Enrichr. </p>
 			<br>
 		</div>
 		<div class="clear"></div>
@@ -43,9 +44,7 @@
 	<div class="qa">
 		<h3 class="question"><a id="Q3" style="color:black;">What are the evaluation indexes for predicted cell types?</a></h3>
 		<div class="answer">
-			<p>The rand index is a measure of similarity between two data clusters. The Rand Index (RI) is related to the accuracy and the Adjusted Rand Index (ARI)
-			is the corrected-for-chance version of RI, and is more commonly used in assessing clustering results. The Full-text index in Minute space (FMI) is a compressed substring index 
-			based on the Burrows-Wheeler transform, and the Jaccard Index (JI) meansers the similarity between finite sample sets. </p>
+			<p>Four index scores, Rand Index (RI), Adjusted Rand Index (ARI), Fowlkes and Mallows's index (FMI), and Jaccard Index (JI) are calculated to evaluate the similarity between the prediction and ground-truth labels. A Silhouette score showing how similar each cell is to its type compared to other clusters is also calculated. If the ground-truth cell type file is not provided by users, both the index scores and Silhouette score are omitted since no comparing target can be accessed. </p>
 			<br>
 		</div>
 		<div class="clear"></div>
@@ -115,6 +114,24 @@
 	</div>
 	
 	<div class="qa">
+		<h3 class="question"><a id="Q18" style="color:black;">How does IRIS3 perform comparison of CTS-Rs to ATAC-Seq peaks?</a></h3>
+		<div class="answer">
+			<p>Genes can be regulated only if their promoter regions are located in the open chromatin area that is available for the regulator to bind. We downloaded several ATAC-Seq data of human (74 tissue) and mouse (117) from <a href="http://cistrome.org/db/#/"><b>CistromeDB</a></b>. Specifically, we compare all motifs in a CTS-R to the peak regions from the ATAC-Seq. If a motif instance overlaps with the peak region, it will be considered as an open chromatin region enriched motif which is available for the binding of the corresponding TF. Genes in the CTS-R and supported by the ATAC-Seq are then validated as a true CTS-gene. However, such chromatin activities (peaks) are diverse in different cell types, or even cells. The bulk ATAC-Seq data we found for different tissues/cell types cannot provide accurate validation to CTS-genes. Thus, such function is only additionally provided to users to have a general glance. In the future, we are expecting to have single-cell ATAC-Seq data pairing with scRNA-Seq data for credible gene validations in CTS-Rs.  </p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>	
+	
+	<div class="qa">
+		<h3 class="question"><a id="Q19" style="color:black;">How does IRIS3 use TAD to retrive additional genes?</a></h3>
+		<div class="answer">
+			<p>Considering the computational efficiency, the region for motif finding in IRIS3 is limited to 1000-2000 bp region upstream to each gene, and motifs outside of the region may not be found. To amend such a deficiency, we integrated <b>TAD (Topologically Associated Domain)</b> data resulted from Hi-C to trace back genes in the CTS-gene modules of a cell type but not in the CTS-R. Genes in the same TAD are more likely to be regulated together due to the topological folding structure of such region. We first downloaded 19 human tissue and five mouse tissues TAD files, respectively, and identified all genes for each TAD region per file. TAD regions are selected if any genes in a CTS-R are found in the TAD gene list. The remaining TAD-genes are used to search in the CTS-gene modules of that CTS-R and output all matched genes as TAD supplementary genes.</p>
+			<br>
+		</div>
+		<div class="clear"></div>
+	</div>	
+
+	<div class="qa">
 		<h3 class="question"><a id="Q8" style="color:black;">How does IRIS3 perform normalization for CTS-R heatmaps?</a></h3>
 		<div class="answer">
 			<p>To better illustrate the expression value of the gene sets, we applied a <a href="https://f1000research.com/articles/5-2122/v1"><b>log-normalization</b></a> for heatmap interpretation:</p>
@@ -144,7 +161,7 @@
 	</div>
 
 	<div class="qa">
-		<h3 class="question"><a id="Q10" style="color:black;">Why am I getting 404 error when open the EnrichR, JASPAR and HOCOMOCO links?</a></h3>
+		<h3 class="question"><a id="Q10" style="color:black;">Why am I getting 404 error when open the Enrichr, JASPAR and HOCOMOCO links?</a></h3>
 		<div class="answer">
 			<p>All these three functions use the outside server. Please ensure your browser allows the pop-up windows. 
 			Sometimes, an 404 error page shows up due to the temperal server loading error and once you refresh the error page or click the 
@@ -162,11 +179,7 @@
 			Default parameters were used for both tools.</p>
 			<img src="./assets/img/tutorial/4.Q10-1.png">
 			<p>As a result, our test showed that: 
-			<b>65.96% (279/423)</b> and 39.74% (184/463) regulons identified by IRIS3 and SCENIC, respectively, are significantly 
-			enriched with at least one biological pathways among all the 293 pathways. Hence, IRIS3 has a much better 
-			prediction performance than SCENIC, in terms of the precision and recall in the above pathway enrichment 
-			analysis (with F-scores <b>0.636</b> vs. 0.547).</p>
-			<p>Meanwhile, it is noteworthy that IRIS3 only spends <b>23 minutes</b> for identifying the 423 regulons, which is <b>31 times faster</b> than SCENIC (9.5 hours)</p>
+			69.60% (316/454) and 39.74% (184/463) of regulons identified by IRIS3 and SCENIC were significantly enriched with at least one KEGG pathway among all 293 pathways. IRIS3 achieved an F1-score of 0.673 compared to the 0.547 in SCENIC, indicating a better performance of IRIS3 related to the prediction of more significant CTS-Rs. In addition, IRIS3 only spent 42 minutes to complete the prediction, while SCENIC spent 9.5 hours under the same computational configuration. 
 			<p><b>Note:</b> The harmonic mean of precision and recall were calculated to represent the performance 
 			of an algorithm on a given dataset and parameter setting, denoted as F-score:</p>
 			<img src="./assets/img/tutorial/4.Q10-2.png">
@@ -216,7 +229,7 @@
 	<div class="qa">
 		<h3 class="question"><a id="Q15" style="color:black;">Where can I find the source code?</a></h3>
 		<div class="answer">
-			<p>The source code of IRIS3 can be accessed on GitHub at <b>https://github.com/bmbl-QM/IRIS3</b></p>
+			<p>The source code of IRIS3 can be accessed on GitHub at <b>https://github.com/OSU-BMBL/IRIS3</b></p>
 			<br>
 		</div>
 		<div class="clear"></div>

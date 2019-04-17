@@ -5,9 +5,9 @@
 
 		<div class="answer">
 			<br>
-			<p>We applied IRIS3 on a single-cell RNA-seq dataset consisting of 90 human embryonic stem cells and 20,214 genes from 
-			<a href="https://www.nature.com/articles/nsmb.2660"><b>Dr. Yan's study</b></a>. Default parameters (c=1, o=100, f=0.5) were used for QUBIC biclustering; 
-			cell types were predicted using SC3 and evaluated by comparing with the ground truth labels provided by the paper; CTS-regulons were inferenced using 
+			<p>We applied IRIS3 on a single-cell RNA-seq dataset consisting of 90 cells from human embryonic organs and 20,214 genes from 
+			<a href="https://www.nature.com/articles/nsmb.2660"><b>Yan, et al.</b></a>. Default parameters (c=1, o=100, f=0.5) were used for QUBIC biclustering; 
+			cell types were predicted using SC3 and evaluated by comparing with the ground-truth labels provided by the paper; CTS-Rs were inferenced using 
 			DMINDA based on the clustering result of SC3.</p>
 			<br>
 			<p>This tutorial will guide you through the output page of IRIS3 in details.</p>
@@ -21,12 +21,9 @@
 			<img src="./assets/img/tutorial/3.1.1.png">
 			<p><b>1.</b> Your Job ID</p>
 			<p><b>2.</b> Click to download a zip file containing the result files. See <a href="http://bmbl.sdstate.edu/iris3/more.php#4FAQ&q=12"><b>here</b></a> for details. </p>
-			<P><b>3. General results:</b> including the compatible species matched to the database (currently, only human and mouse data are supported). 
-			The number of cells and genes are counted based on the input expression matrix, and genes excluded by the optional filtering step are given 
-			(if the user chooses not to perform gene filtering step, show "NA" instead). Cell types are predicted by SC3 and biclusters are identified by 
-			QUBIC. If user's cell label is not provided, "Number of provided cell types" will be "NA". In all, the total number of CTS-regulons throughout 
-			all cell types are predicted by DMINDA.</p>
-			<p>The table below shows the number of biclusters and CTS-regulons in each cell type. </p>
+			<P><b>3. General results:</b> including: species, 
+			the number of original cells and genes, the number of removed (filtered) cells and genes as well as their filtering ratio, the number of provided cell type by users, the number of predicted cell types, the total number of predicted biclusters (gene modules), and the total number of identified CTS-Rs. </p>
+			<p>The table below shows the number of cells and CTS-R in each cell type. </p>
 			<p><b>4. Cell type prediction:</b> See details below.</p>
 			<p><b>5. Job settings:</b> See details below.</p>
 			<br>
@@ -38,14 +35,14 @@
 		<h3 class="question">Cell type prediction results</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/3.1.3.png">
-			<p>1. A table showing the <a href="http://bmbl.sdstate.edu/iris3/more.php#4FAQ&q=3"><b>four rand indexes</b></a> for predicted cell type evaluation. </p>
-			<p><b>Note:</b> if ground truth cell labels are not provided by the user, the table will be omitted.</p>
+			<p>1. A table showing the <a href="http://bmbl.sdstate.edu/iris3/more.php#4FAQ&q=3"><b>four Rand indexes</b></a> for the predicted cell type evaluations. </p>
+			<p><b>Note:</b> if ground-truth cell labels are not provided by the user, the table will be omitted.</p>
 			<p>2. A heatmap showing the consensus clustering result from SC3. Both predicted labels and user's labels (if provided) are indicated in the figure. The user can download
 			an emf format file by clicking the topright button.</p>
-			<p>3. A bar plot is showing the silhouette score that measures how similar each cell is to its type compared to other clusters. </p> 
-			<p>4. A Sankey plot is showing the conserveness and divergence of a two cell groups (ground truth versus SC3 prediction). 
-			The width of the arrows is shown proportionally to the flow quantity.</p>
-			<p><b>Note:</b> if ground truth cell labels are not provided by the user, the Sankey plot will be omitted.</p>
+			<p>3. A bar plot showing the silhouette score that measures how similar each cell is to its type compared to other clusters. </p> 
+			<p>4. A Sankey plot showing the convergence and divergence of a two cell groups (ground truth versus SC3 prediction). 
+			The width of the arrows shown proportionally to the flow quantity.</p>
+			<p><b>Note:</b> if ground-truth cell labels are not provided by the user, the Sankey plot will be omitted.</p>
 			<br>
 		</div>
 		<div class="clear"></div>
@@ -55,8 +52,7 @@
 		<h3 class="question">Job settings</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/3.1.4.png">
-			<p>A table showing the number of biclusters and CTS-regulons in each cell type. "Predicted cell type" shows up when using SC3 clusters for SCT-regulon inference, otherwise 
-			"Cell lable" shows up to indicate provided cell types.</p> 
+			<p>A table showing all settings and file names of this Job.</p> 
 			<br>
 		</div>
 		<div class="clear"></div>
@@ -67,24 +63,22 @@
 		<div class="answer">
 			<img src="./assets/img/tutorial/3.2.1.png" style="width:100%">
 			<p>Following the general results, a CTS cell-gene-regulon heatmap is displayed to cover the gene distribution of 
-			CTS-regulons in each cell type and corresponding expression level across all cells. </p>
-			<p>To explore details about how the Clustergrammer, please read the <a href="https://clustergrammer.readthedocs.io/"><b>documentation</b></a>. 
+			CTS-Rs in each cell type and corresponding expression level across all cells. </p>
+			<p>To explore details about Clustergrammer, please read the <a href="https://clustergrammer.readthedocs.io/"><b>documentation</b></a>. 
 			<br>
 			<p>1. Choose which cell type to display.</p>
-			<p>2. Results and evaluations for the predicted cell types from SC3 in a new page.</p>
-			<img src="./assets/img/tutorial/3.2.4.png">			
-			<p>3. Download the gene list for CT1S-regulons. The first column is the regulon name and followed by its corresponding
+			<p>2. Open the heatmap in a new tab.</p>	
+			<p>3 & 4. Download the gene list for CT1S-Rs. The first column is the CTS-R name, followed by its corresponding
 			genes (tab delimited).</p>
-			<p>4. Click to show the extension bar for figure copy and row/column sorting.</p>
-			<br>
-			<br>
+			<p>5. Click to show the extension bar for figure copy and row/column sorting.</p>
+
 			<br>
 			<img src="./assets/img/tutorial/3.2.2.png">
-			<p>5. Click to show the enrichment analysis result.</p>
-			<p>6. The gene distribution of CTS-regulons. Genes included in a regulon is labeled as green. The genes can be 
-			sorted by each regulon by double-clicking the regulon name. Due to the space limit, at most 15 regulons are shown 
-			in the figure based on the <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=7"><b>rank of regulons</b></a></p>
-			<p>7. The <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=8"><b>log-normalized</b></a> gene expression heatmap for genes covered in CTS-regulons and all cells. 
+			<p>6. Click to show the enrichment analysis result.</p>
+			<p>7. The gene composition of CTS-Rs. Genes included in a CTS-R are labeled as green. The genes can be 
+			sorted by each CTS-R by double-clicking the CTS-R name. Due to the space limit, at most 15 CTS-Rs are shown 
+			in the figure based on the <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=7"><b>rank of CTS-Rs</b></a></p>
+			<p>8. The <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=8"><b>log-normalized</b></a> gene expression heatmap for genes covered in CTS-Rs and all cells. 
 			Genes can be sorted by double-clicking the gene names (sort cells by value from high to low), cell names (sort 
 			genes by value from high to low), or cell types (sort cells by cell type groups)</p>
 		</div>
@@ -92,46 +86,67 @@
 	</div>
 	
 	<div class="qa">
-		<h3 class="question">CTS-regulon details</h3>
+		<h3 class="question">Detailed result of CTS-Rs</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/3.3.1.png" style="width:100%">
-			<p>1. Regulon name.</p>
-			<p>2. A two-column gene list of CT3S-R1. The left column lists the Gene Symbol, and the right column lists 
+			<p>1 & 2. A two-column gene list of CT1S-R1. The left column lists the Gene Symbol, and the right column lists 
 			the corresponding Gene ID. Each Gene Symbol or Gene ID is linked to its profile on GeneCards for users to discover more gene details.</p>
 			<br>
 			<br>
 			<img src="./assets/img/tutorial/3.3.2.png">
-			<p>3. Click to show the Clustergrammer heatmap for CT3S-R1 individually to give users a local view of regulons. The heatmap is almost 
-			the same to the CTS cell-gene-regulon heatmap but remove the regulon part and only shows the expression in this specific cell type.</p>
+			<p>3. Click to show the Clustergrammer heatmap for CT1S-R1 individually to give users a local view of CTS-Rs. The heatmap is almost 
+			the same to the CTS cell-gene-regulon heatmap, without the CTS-R part and only shows the expression in this specific cell type.</p>
 			<br>
 			<br>
 			<br>
 			<br>
 			<br>
-			<br>
-			<br>
+
 			<img src="./assets/img/tutorial/3.3.3.png">
-			<p>4. Performing the enrichment analysis on EnrichR server in a new page.The tutorial of EnrichR can be 
+			<p>4. Performing the enrichment analysis on Enrichr server in a new page.The tutorial of Enrichr can be 
 			found <a href="http://amp.pharm.mssm.edu/Enrichr/help#basics"><b>here</b></a>.</p>
-			<br>
-			<br>
-			<br>
-						<br>
-			<br>
+
 			<br>
 						<br>
 			<br>
 			<br>
 						<br>
 			<br>
+			<br>
+						<br>
+			<br>
+			<img src="./assets/img/tutorial/3.3.7.png">
+			<p>5. Performing <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=18"><b>ATAC-Seq peak enrichment</b></a> to find out how many genes in CT1S-R1 correspond to an open chromatin region (ATAC-Seq peak); </p>
+
+						<br>
+			<br>
+									<br>
+			<br>
+						<br>
+			<br>
+			<img src="./assets/img/tutorial/3.3.8.png">
+			<p>6. Identifying extra genes in Cell Type 1 but not CT1S-R1 using <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=19"><b>TAD data</b></a></p>
+
+						<br>
+			<br>
+									<br>
+			<br>
+						<br>
+			<br>
+			<img src="./assets/img/tutorial/3.3.9.png">
+			<p>7. Finding CTS-Rs in other cell types that are similar to CT1S-R1 in the manner of motif similarity comparisons. </p>
+
+			<br>
+									<br>
+			<br>
+						<br>
 			<br>
 			<img src="./assets/img/tutorial/3.3.4.png">
-			<p>5. The corresponsive motif is shown as an interactive logo. Multiple similar motifs may be displayed by motif comparison, 
-			and the most significant one is chosen as the main signature of the regulon and used for <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=7"><b>regulon ranking</b></a>. 
+			<p>8. The corresponding motif is shown as an interactive logo. Multiple similar motifs may be displayed by motif comparison, 
+			and the most significant one is chosen as the main signature of the CTS-R and used for <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=7"><b>CTS-R ranking</b></a>. 
 			The result of motif finding can be accessed in a new page by clicking the motif logo. Please 
-			check the <a href="http://bmbl.sdstate.edu/DMINDA2/documentation.php"><b>DMINDA FAQ</b></a> for more information about motif result interpreting.</p>
-			<br>
-			<br>
+			check the <a href="http://bmbl.sdstate.edu/DMINDA2/documentation.php"><b>DMINDA FAQ</b></a> for more information about motif result interpretation.</p>
+
 			<br>
 						<br>
 			<br>
@@ -148,7 +163,7 @@
 			<br>
 			<br>
 			<img src="./assets/img/tutorial/3.3.5.png">
-			<p>6. Click to see the matched motifs in the JASPER database in MEME.</p>
+			<p>9. Click to see the matched motifs in the JASPER & HOCOMOCO database in MEME.</p>
 			<br>
 			<br>
 			<br>
@@ -164,8 +179,7 @@
 						<br>
 			<br>
 			<br>
-			<img src="./assets/img/tutorial/3.3.6.png">
-			<p>7. Click to see the matched motifs in the HOCOMOCO database in MEME.</p>
+			<p>10. A summary table to showcase the top five matched TF results from the JASPAR and HOCOMOCO database, respectively.</p>
 			
 			<br>
 			<br>
