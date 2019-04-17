@@ -49,10 +49,11 @@ function addPreviewTable(response, metadata=true, type) {
 		if (response['columns'][0].length != response['data'][0].length && type=='exp'){
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
 		}
-		percent = (1 - response['count_zero'][0]/(response['columns'][0].length*1000)).toFixed(6)
+		percent_gene_num = response['gene_num'][0]>1000 ? 1000 : response['gene_num'][0]
+		percent = (1 - response['count_zero'][0]/(response['columns'][0].length*percent_gene_num)).toFixed(6)
 		
 		if (percent > 0.85 && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
 		}
 		if (response['columns'][0].length < 40 && type=='exp'){
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at lease around 100 cells in your scRNA-seq experiment. </span></label>'))
