@@ -248,7 +248,9 @@ if ($info_file) {
 			$predict_label = $split_line[1];
 		}
     }
-
+	if ($species == $main_species) {
+		$main_species = "";
+	}
     fclose($info_file);
 } else {
 	print_r("Info file not found");
