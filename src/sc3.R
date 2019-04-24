@@ -44,6 +44,9 @@ if (label_file == 0 | label_file==1){
   if(delimiter == 'tab'){
     delimiter <- '\t'
   }
+  if(delimiter == 'space'){
+    delimiter <- ' '
+  }
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   cell_info[,2] <- as.factor(cell_info[,2])
 }

@@ -155,13 +155,22 @@ if (isset($_POST['submit']))
 	if($delim=="\t"){
 		$delim = "tab";
 	}
+	if($delim==" "){
+		$delim = "space";
+	}
 	$delim_label = detectDelimiter("$workdir2/$labelfile");
 		if($delim_label=="\t"){
 		$delim_label = "tab";
 	}
+	if($delim_label==" "){
+		$delim_label = "space";
+	}
 	$delim_gene_module = detectDelimiter("$workdir2/$gene_module_file");
 		if($delim_gene_module=="\t"){
 		$delim_gene_module = "tab";
+	}
+	if($delim_gene_module==" "){
+		$delim_gene_module = "space";
 	}
 	$fp = fopen("$workdir/info.txt", 'w');
 	fwrite($fp,"c_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\ngene_module_file,$gene_module_file\nis_gene_filter,$is_gene_filter\nis_cell_filter,$is_cell_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
@@ -170,6 +179,7 @@ if (isset($_POST['submit']))
 	if($if_allowSave != '0'){
     system("cp $workdir2$expfile /home/www/html/iris3/storage");
 	}
+	if($expfile == "Camp_each5.csv" || $expfile =='zeisel_each10.csv'){$k_arg = "5";}
 
 	if ($species_arg[0] == "Zebrafish" || $species_arg[0] == "Fruit_fly" ||$species_arg[0] == "Worm" ||$species_arg[0] == "Yeast" ) {
 		if ($labelfile != ''){
@@ -378,12 +388,11 @@ echo 'finish'> done\n
 	$fp = fopen("$workdir2/param.txt", 'w+');
 	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
 	fclose($fp);
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
 	header("Location: results.php?jobid=$jobid");
-		
 		
 	}
 

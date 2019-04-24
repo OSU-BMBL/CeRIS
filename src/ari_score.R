@@ -8,7 +8,9 @@ delim <- args[3] #label file delimiter
 if(delim == 'tab'){
   delim <- '\t'
 }
-
+if(delim == 'space'){
+  delim <- ' '
+}
 label_use_sc3 <- 0 #default 1
 label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 #delim <- args[3]

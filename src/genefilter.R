@@ -21,6 +21,9 @@ is_cell_filter <- args[5] #1 for enable cell filtering
 if(delim == 'tab'){
 	delim <- '\t'
 }
+if(delim == 'space'){
+	delim <- ' '
+}
 
 load_test_data <- function(){
   rm(list = ls(all = TRUE))

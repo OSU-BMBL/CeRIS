@@ -14,7 +14,12 @@ jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 gene_module_file <- args[4] # 
 delim_gene_module <- args[5] # gene module file delimter
-
+if(delim_gene_module == 'tab'){
+  delim_gene_module <- '\t'
+}
+if(delim_gene_module == 'space'){
+  delim_gene_module <- ' '
+}
 getwd()
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 # jobid <-2018122223516
@@ -65,7 +70,7 @@ get_pvalue <- function(df){
     x=length(A[(A%in%B)])
     k=length(B)-1
     tmp_pvalue <- 1 - phyper(x,m,n,k)
-    result_pvalue[i] <- tmp_pvalue*count_cluster 
+    result_pvalue[i] <- tmp_pvalue
   }
   
   #min_pvalue <- min(result_pvalue)
