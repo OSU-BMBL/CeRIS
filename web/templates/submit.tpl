@@ -59,10 +59,11 @@ function addPreviewTable(response, metadata=true, type) {
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at lease around 100 cells in your scRNA-seq experiment. </span></label>'))
 			document.getElementById("k_arg").value = 5;
 		}
+		if (type=='module'){
+			console.log(response)
+		}
 		var check_cell_name_start_with_number = function (array) {
 			for (var i = 0; i < array.length; i += 1) {
-				// Use the index i here
-				console.log();
 				if ('0123456789'.indexOf(array[i].charAt(0)) !== -1) {
 					return true;
 				}
@@ -179,9 +180,11 @@ var exp_file_status = 0;
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
 	$('select[name=species_arg]').val('Human');
+	document.getElementById("is_load_exp").value = '1';
+	document.getElementById("is_load_label").value = '1';
 	$('.selectpicker').selectpicker('refresh')
 	
-	/*$.ajax({
+	$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'expression'},
@@ -191,7 +194,7 @@ var exp_file_status = 0;
         error: function(e){
             console.log(e.message);
         }
-	})*/
+	})
 });
 	// load example cell label
 	$('#load_label').click(function(evt) {
@@ -203,9 +206,11 @@ var exp_file_status = 0;
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
 	$('select[name=species_arg]').val('Human');
+	document.getElementById("is_load_exp").value = '1';
+	document.getElementById("is_load_label").value = '1';
 	$('.selectpicker').selectpicker('refresh')
-	// AJAX Query
-	/*$.ajax({
+	
+	$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'label'},
@@ -215,7 +220,7 @@ var exp_file_status = 0;
         error: function(e){
             console.log(e.message);
         }
-	})*/
+	})
 });
 
 	// load example gene module
