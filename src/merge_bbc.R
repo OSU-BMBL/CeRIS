@@ -39,6 +39,7 @@ for (i in 1:length(alldir)) {
   res <- paste(short_dir[i],".regulon.txt",sep="")
   res_symbol<- paste(short_dir[i],".regulon_gene_name.txt",sep="")
   res_motif<- paste(short_dir[i],".regulon_motif.txt",sep="")
+  file.create(res_motif,showWarnings = F)
   cat("",file=res)
   this_ct <- i
   
@@ -94,6 +95,7 @@ for (i in 1:length(alldir)) {
       }else{
         regulon_idx_label <- paste("module",regulon_idx_module,"-R",regulon_idx,sep = "")
       }
+      
       cat(paste(regulon_idx_label,"\t",sep = ""),file=res_motif,append = T)
       this_combine_motif_label  <- paste(this_motif_label,"\t",sep = "")
       if (length(this_combine_motif_label) > 1) {

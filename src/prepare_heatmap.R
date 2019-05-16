@@ -70,45 +70,28 @@ for (i in 1:length(all_regulon)) {
   regulon_gene <- rbind(regulon_gene,as.data.frame(gene))
   #For each regulon.txt, convert ENSG -> gene name
   name_idx <- 1
-  for (j in 1:length(regulon_file)) {
-    regulon_gene_name <- regulon_file[[j]][-1]
-    regulon_gene_name <- regulon_gene_name[regulon_gene_name!=""]
-    if(length(regulon_gene_name)>100 | length(regulon_gene_name) <=1){
-      next
-    }
-    regulon_heat_matrix <- subset(exp_file,rownames(exp_file) %in% regulon_gene_name)
-    regulon_heat_matrix <- rbind(category,regulon_heat_matrix)
-    if(i <= total_ct) {
-    regulon_heat_matrix_filename <- paste("heatmap/CT",i,"S-R",name_idx,".heatmap.txt",sep="")
-    ct_index <- gsub(".*_CT_","",short_dir[i])
-    ct_index <- as.numeric(gsub("_bic","",ct_index))
-    regulon_label <- paste("CT",ct_index,"S-R",name_idx,": ",sep = "")
-    ct_colnames <- label_file[which(label_file[,2]==ct_index),1]
-    regulon_heat_matrix <- as.data.frame(regulon_heat_matrix[,colnames(regulon_heat_matrix) %in% ct_colnames])
-    rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
-    rownames(regulon_heat_matrix)[1] <- ""
-    colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
-    write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
-    # if # of lines=13, clustergrammer fails. add a line break
-    if(nrow(regulon_heat_matrix) == 13) {
-      write('\n',file=regulon_heat_matrix_filename,append=TRUE)
-    }
-    #save regulon label to one list
-    combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
-    names(combine_regulon_label)[regulon_label_index] <- regulon_label
-    regulon_label_index <- regulon_label_index + 1
-    name_idx <- name_idx + 1
-    } else {
-      regulon_heat_matrix_filename <- paste("heatmap/module",i-total_ct,"-R",name_idx,".heatmap.txt",sep="")
-      module_index <- i - total_ct
-      regulon_label <- paste("module",module_index,"-R",name_idx,": ",sep = "")
-      module_colnames <- label_file[,1]
+  if(length(regulon_file) > 0){
+    for (j in 1:length(regulon_file)) {
+      regulon_gene_name <- regulon_file[[j]][-1]
+      regulon_gene_name <- regulon_gene_name[regulon_gene_name!=""]
+      if(length(regulon_gene_name)>100 | length(regulon_gene_name) <=1){
+        next
+      }
+      regulon_heat_matrix <- subset(exp_file,rownames(exp_file) %in% regulon_gene_name)
+      regulon_heat_matrix <- rbind(category,regulon_heat_matrix)
+      if(i <= total_ct) {
+      regulon_heat_matrix_filename <- paste("heatmap/CT",i,"S-R",name_idx,".heatmap.txt",sep="")
+      ct_index <- gsub(".*_CT_","",short_dir[i])
+      ct_index <- as.numeric(gsub("_bic","",ct_index))
+      regulon_label <- paste("CT",ct_index,"S-R",name_idx,": ",sep = "")
+      ct_colnames <- label_file[which(label_file[,2]==ct_index),1]
+      regulon_heat_matrix <- as.data.frame(regulon_heat_matrix[,colnames(regulon_heat_matrix) %in% ct_colnames])
       rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
       rownames(regulon_heat_matrix)[1] <- ""
       colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
       write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
-      # if # of lines=14, clustergrammer fails. add a line break
-      if(nrow(regulon_heat_matrix) == 14) {
+      # if # of lines=13, clustergrammer fails. add a line break
+      if(nrow(regulon_heat_matrix) == 13) {
         write('\n',file=regulon_heat_matrix_filename,append=TRUE)
       }
       #save regulon label to one list
@@ -116,6 +99,25 @@ for (i in 1:length(all_regulon)) {
       names(combine_regulon_label)[regulon_label_index] <- regulon_label
       regulon_label_index <- regulon_label_index + 1
       name_idx <- name_idx + 1
+      } else {
+        regulon_heat_matrix_filename <- paste("heatmap/module",i-total_ct,"-R",name_idx,".heatmap.txt",sep="")
+        module_index <- i - total_ct
+        regulon_label <- paste("module",module_index,"-R",name_idx,": ",sep = "")
+        module_colnames <- label_file[,1]
+        rownames(regulon_heat_matrix)[-1] <- paste("Genes:",rownames(regulon_heat_matrix)[-1],sep = " ")
+        rownames(regulon_heat_matrix)[1] <- ""
+        colnames(regulon_heat_matrix) <- paste("Cells:",colnames(regulon_heat_matrix),sep = " ")
+        write.table(regulon_heat_matrix,regulon_heat_matrix_filename,quote = F,sep = "\t", col.names=NA)
+        # if # of lines=14, clustergrammer fails. add a line break
+        if(nrow(regulon_heat_matrix) == 14) {
+          write('\n',file=regulon_heat_matrix_filename,append=TRUE)
+        }
+        #save regulon label to one list
+        combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
+        names(combine_regulon_label)[regulon_label_index] <- regulon_label
+        regulon_label_index <- regulon_label_index + 1
+        name_idx <- name_idx + 1
+      }
     }
   }
 }
