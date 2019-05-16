@@ -258,35 +258,6 @@ if ($info_file) {
 } 
 
 
-
-if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
-	$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
-	if ($sankey_file) {
-	$sankey_nodes = $sankey_src = $sankey_target = $sankey_value = array(); 
-    while (($line = fgets($sankey_file)) !== false) {
-        $split_line = explode (",", $line);
-		$split_line[1] = preg_replace( "/\r|\n/", "", $split_line[1] );
-		if($split_line[0] == "src"){
-			array_push($sankey_src,$split_line[1]);
-		} else if($split_line[0] == "target"){
-			array_push($sankey_target,$split_line[1]);
-		} else if($split_line[0] == "value"){
-			array_push($sankey_value,$split_line[1]);
-		} else if($split_line[0] == "nodes"){
-			array_push($sankey_nodes,$split_line[1]);
-		}
-    }
-    fclose($sankey_file);
-	$sankey_src = json_encode($sankey_src);
-	$sankey_target = json_encode($sankey_target);
-	$sankey_value = json_encode($sankey_value);
-	$sankey_nodes = json_encode($sankey_nodes);
-} else {
-	print_r("Info file not found");
-    // error opening the file.
-} 
-}
-
 if (file_exists("$DATAPATH/$jobid/$jobid"."_silh.txt")){
 $silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 if ($silh_file) {
@@ -319,6 +290,36 @@ if ($silh_file) {
 } else {
 	print_r("Silh file not found");
 }
+if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
+	$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
+	if ($sankey_file) {
+	$sankey_nodes = $sankey_src = $sankey_target = $sankey_value = array(); 
+    while (($line = fgets($sankey_file)) !== false) {
+        $split_line = explode (",", $line);
+		$split_line[1] = preg_replace( "/\r|\n/", "", $split_line[1] );
+		if($split_line[0] == "src"){
+			array_push($sankey_src,$split_line[1]);
+		} else if($split_line[0] == "target"){
+			array_push($sankey_target,$split_line[1]);
+		} else if($split_line[0] == "value"){
+			array_push($sankey_value,$split_line[1]);
+		} else if($split_line[0] == "nodes"){
+			array_push($sankey_nodes,$split_line[1]);
+		}
+    }
+    fclose($sankey_file);
+	$sankey_src = json_encode($sankey_src);
+	$sankey_target = json_encode($sankey_target);
+	$sankey_value = json_encode($sankey_value);
+	$sankey_nodes_count = count($sankey_nodes) - count($silh_trace);
+	$sankey_nodes = json_encode($sankey_nodes);
+} else {
+	print_r("Info file not found");
+    // error opening the file.
+} 
+}
+
+
 foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 	
 	$status = "1";
@@ -523,6 +524,7 @@ $smarty->assign('sankey_src',$sankey_src);
 $smarty->assign('sankey_target',$sankey_target);
 $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
+$smarty->assign('sankey_nodes_count', $sankey_nodes_count);
 $smarty->display('results.tpl');
-
+#print_r($regulon_motif_file);
 ?>

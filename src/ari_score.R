@@ -5,13 +5,8 @@ args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 jobid <- args[2] # job id
 delim <- args[3] #label file delimiter 
-if(delim == 'tab'){
-  delim <- '\t'
-}
-if(delim == 'space'){
-  delim <- ' '
-}
-label_use_sc3 <- 0 #default 1
+
+label_use_sc3 <- 0 #default 0
 label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 #delim <- args[3]
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
@@ -19,7 +14,12 @@ label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label,
 # jobid <- "2018122223516"
 # delim <- ","
 # label_use_sc3 <- 0
-
+if(delim == 'tab'){
+  delim <- '\t'
+}
+if(delim == 'space'){
+  delim <- ' '
+}
 #install.packages("NMF")
 #install.packages("clues")
 #install.packages("igraph")
@@ -52,14 +52,14 @@ user_label_file <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
 
 user_label_index <- 2
 user_cellname_index <- 1
-user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,user_label_index])
+user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,user_label_index],stringsAsFactors = F)
 
 #test
 #user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,3])
 user_label_name <- user_label[,2]
-user_label[,2] <- as.factor(user_label[,2])
+user_label[,2] <- factor(user_label[,2])
+label_order <- unique(user_label[,2])
 levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
-
 colnames(sc3_cluster) <- c("cell_name","cluster")
 colnames(user_label) <- c("cell_name","label")
 
@@ -185,7 +185,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   write(paste("src,",links$src,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("target,",links$target,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("value,",links$value,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
-  
+  write(paste("label_order,",label_order,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   # title left: cell label; right:sc3 cluster
  
 }

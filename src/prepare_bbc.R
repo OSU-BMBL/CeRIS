@@ -19,10 +19,10 @@ workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
 #gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3_data_backup/dminda/human_gene_start_info.txt")
-species_id <-  as.character(read.table("species.txt"))
-if(species_id == "52"){
+species_id <-  as.character(read.table("species_main.txt")[1,1])
+if(species_id == "Human"){
   gene_info <- read.table("/home/www/html/iris3/program/dminda/human_gene_start_info.txt")
-} else if (species_id == "53"){
+} else if (species_id == "Mouse"){
   gene_info <- read.table("/home/www/html/iris3/program/dminda/mouse_gene_start_info.txt")
 }
 

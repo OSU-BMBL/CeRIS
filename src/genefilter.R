@@ -4,14 +4,12 @@
 #or expressed (expression value > 0) in at least (100 ??? X)% of cells (ubiquitous genes/transcripts). 
 #By default, X is set at 6.
 
-library(GenomicAlignments)
-library(ensembldb)
-library(EnsDb.Hsapiens.v86)
-library(EnsDb.Mmusculus.v79)
-library(monocle)
-library(stringr)
-library(Seurat)
+#library(GenomicAlignments)
+#library(ensembldb)
 
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(monocle))
+suppressPackageStartupMessages(library(Seurat))
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
@@ -22,31 +20,21 @@ if(delim == 'tab'){
 	delim <- '\t'
 }
 if(delim == 'space'){
-	delim <- ' '
+  delim <- ' '
 }
-
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # setwd("/home/www/html/iris3/data/20190305183801")
   # setwd("C:/Users/flyku/Desktop/iris3_data")
-  setwd("d:/Users/flyku/Documents/IRIS3-data/test_id")
-  srcFile = "Guo_expression.txt"
+  setwd("d:/Users/flyku/Documents/IRIS3-data/")
+  srcFile = "single_cell.csv"
   #srcFile = "iris3_example_expression_matrix.csv"
   outFile <- "20190408154828"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
 }
-# setwd("/home/www/html/iris3/data/20190305183801")
-# setwd("C:/Users/flyku/Desktop/iris3_data")
-# setwd("d:/Users/flyku/Documents/IRIS3-data/test_oneregulon")
-# srcFile = "Guo_expression.txt"
-# srcFile = "iris3_example_expression_matrix.csv"
-# outFile <- "20190305160730"
-# delim <- "\t"
-# is_gene_filter <- 1
-# is_cell_filter <-0
-#expFile <- read.csv("Goolam_cell_label.csv",header=T,sep=",",check.names = FALSE, row.names = 1)
+
 getwd()
 expFile <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = NULL)
 colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
@@ -55,40 +43,19 @@ colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
 if(colnames(expFile)[1] == ""){
   colnames(expFile)[1] = "Gene_ID"
 }
+total_gene_num <- nrow(expFile)
 #remove duplicated rows with same gene 
 if(length(which(duplicated.default(expFile[,1]))) > 0 ){
   expFile <- expFile[-which(duplicated.default(expFile[,1])==T),]
 }	
 rownames(expFile) <- expFile[,1]
 expFile<- expFile[,-1]
+total_cell_num <- ncol(expFile)
 thres_genes <- nrow(expFile) * 0.01
 thres_cells <- ncol(expFile) * 0.05
 
-## convert Ensembl id to gene symbol
-##i=1
-if (length(grep('ENS',rownames(expFile))) > 0.5 * nrow(expFile) | length(grep('ens',rownames(expFile))) > 0.5 * nrow(expFile) ){
+# detect rownames gene list with identifer by the largest number of matches: 1) gene symbol 2)ensembl geneid 3) ncbi entrez id
 
-  result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(expFile))), 
-                             return.type="data.frame", columns=c("gene_name")))
-  
-  result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(expFile))), 
-                             return.type="data.frame", columns=c("gene_name")))
-  if(result_human > result_mouse){
-    all_match <- genes(EnsDb.Hsapiens.v86, filter=list(GeneIdFilter(rownames(expFile))), 
-                       return.type="data.frame", columns=c("gene_name"))
-    
-  } else {
-    all_match <- genes(EnsDb.Mmusculus.v79, filter=list(GeneIdFilter(rownames(expFile))), 
-                       return.type="data.frame", columns=c("gene_name"))
-  }
- 
-  expFile <- expFile[which(rownames(expFile) %in% all_match[!duplicated(all_match[,1]),2]),]
-  for (i in 1:nrow(expFile)) {
-    if(length(which(all_match[,2] %in% rownames(expFile)[i]))){
-      rownames(expFile)[i] <- all_match[which(all_match[,2] %in% rownames(expFile)[i]),1]
-    }
-  }
-}
 get_rowname_type <- function (l, db){
   res1 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "SYMBOL")),error = function(e) 0)
   res2 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENSEMBL")),error = function(e) 0)
@@ -113,7 +80,7 @@ suppressPackageStartupMessages(library(org.Ce.eg.db))
 suppressPackageStartupMessages(library(org.Sc.sgd.db))
 suppressPackageStartupMessages(library(org.Dr.eg.db))
 db <- c("Worm"=org.Ce.eg.db, "Fruit_fly"=org.Dm.eg.db, "Zebrafish"=org.Dr.eg.db,
-        "Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
+"Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
 
 select_db <- db[which(names(db)%in%species_file)]
 gene_identifier <- sapply(select_db, get_rowname_type, l=rownames(expFile))
@@ -125,8 +92,19 @@ if(length(species_file) == 2) {
   second_species <- names(which.min(gene_identifier[2,]))
   write(paste("second_species,",second_species,sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 }
-total_cell_num <- ncol(expFile)
-total_gene_num <- nrow(expFile)
+all_match <- select(main_db, keys = rownames(expFile), columns = c("SYMBOL","ENSEMBL"),keytype = main_identifier)
+expFile <- merge(expFile,all_match,by.x=0,by.y=main_identifier)
+expFile <- na.omit(expFile)
+
+if (main_identifier == "ENSEMBL") {
+  expFile <- expFile[!duplicated(expFile[,ncol(expFile)]),]
+  rownames(expFile) <- expFile[,ncol(expFile)]
+} else {
+  expFile <- expFile[!duplicated(expFile[,1]),]
+  rownames(expFile) <- expFile[,1]
+}
+
+expFile <- expFile[,c(-1,-(ncol(expFile)))]
 
 ## remove rows with empty gene name
 if(length(which(rownames(expFile)=="")) > 0){
@@ -187,19 +165,20 @@ if(all(as.numeric(unlist(expFile))%%1==0)){
 } else {
   URMM_all_std <- newCellDataSet(as.matrix(new_exp),phenoData = pd,featureData =fd,
                                  expressionFamily = tobit())
- 
 }
 
 new_exp <-as.matrix(URMM_all_std@assayData$exprs)
-
 # calculate filtering rate
-filter_gene_num <- nrow(expFile)-nrow(new_exp)
+#filter_gene_num <- nrow(expFile)-nrow(new_exp)
+filter_gene_num <- total_gene_num-nrow(new_exp)
 filter_gene_rate <- formatC(filter_gene_num/total_gene_num,digits = 2)
 filter_cell_num <- ncol(expFile)-ncol(new_exp)
 filter_cell_rate <- formatC(filter_cell_num/total_cell_num,digits = 2)
 if(filter_cell_num == 0){
   filter_cell_rate <- '0'
 }
+
+
 new_exp <- log1p(new_exp)
 
 #write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(outFile,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
@@ -209,10 +188,9 @@ write(paste("filter_gene_rate,",as.character(filter_gene_rate),sep=""),file=past
 write(paste("filter_cell_num,",as.character(filter_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+write(paste("main_species,",main_species,sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
 write.table(expFile,paste(outFile,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 write.table(new_exp,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-write(paste("main_species,",main_species,sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-
 
 
 install_db <- function(){

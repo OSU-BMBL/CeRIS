@@ -230,11 +230,24 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 											
 											{{/if}}
 											{{if ($saving_plot1  >0)}}
-											<div class="col-sm-12">
+											<div class="col-ld-12">
+											
 											<hr>
 											<h4 style="text-align:center"> SC3 consensus heatmap</h4> 
-											<input style="float:right; "class="btn btn-submit" type="button" value="Save consensus heatmap as .emf" onClick="javascript:location.href = 'data/{{$jobid}}/saving_plot1.emf';" />
-											
+											<div class="dropdown"  id="drop_sc3">
+											<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Save image as: <span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+													<li><a class="dropdown-item" target="_blank" href="data/{{$jobid}}/saving_plot1.png" >png</a>
+													</li>
+													<li><a class="dropdown-item" target="_blank" href="data/{{$jobid}}/saving_plot1.jpeg" >jpeg</a>
+													</li>
+													<li><a class="dropdown-item" target="_blank" href="data/{{$jobid}}/saving_plot1.emf" >emf</a>
+													</li>
+													<li><a class="dropdown-item" target="_blank" href="data/{{$jobid}}/saving_plot1.pdf" >pdf</a>
+													</li>
+											</ul>
+											</div>
 											<img style="width:100%"src="data/{{$jobid}}/saving_plot1.jpeg"></img>
 											</div>
 											{{/if}}
@@ -346,6 +359,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																			<strong>CTS Cell-Gene-Regulon Heatmap for Cell Type {{$sec0+1}}</strong><br>
+																			
 																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
                                                                         <button type="button" class="btn btn-submit" data-toggle="collapse" data-target="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json">Open in new tab
                                                                         </button>
@@ -878,7 +892,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
 						<div class="panel-body">
 					<div style="text-align: left;">
-                        <strong><h3>Sorry, there has been an error</h3></strong> <p style="color:red">Please check with your data format (input file should csv or tsv format): <br>1. Gene expression matrix: Gene expression matrix (GEMAT) file with genes as rows and cells as columns. <br>2. Cell label file (Optional): a two-column matrix with the first column as the cell names exactly matching the gene expression file, and the second column as ground-truth cell clusters. <br>3. Gene module file (Optional): Each column should reprensents a gene module.</p>
+                        <strong><h3>Sorry, there has been an error</h3></strong> <p style="color:red">Please check with your data format (input file should be txt, csv or tsv format): <br>1. Gene expression matrix: Gene expression matrix (GEMAT) file with genes as rows and cells as columns. <br>2. Cell label file (Optional): a two-column matrix with the first column as the cell names exactly matching the gene expression file, and the second column as ground-truth cell clusters. <br>3. Gene module file (Optional): Each column should reprensents a gene module.</p>
 						<br>For further question, please contact ma.1915@osu.edu<br>
 						<!---
 						
@@ -1003,12 +1017,27 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     <script>
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();
-
+color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
+"#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
+"#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+"#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
+"#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
+"#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+"#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
+"#885578", "#0089A3", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C",
+"#34362D", "#B4A8BD", "#00A6AA", "#452C2C", "#636375", "#A3C8C9", "#FF913F", "#938A81",
+"#575329", "#00FECF", "#B05B6F", "#8CD0FF", "#3B9700", "#04F757", "#C8A1A1", "#1E6E00",
+"#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
+"#549E79", "#FFF69F", "#201625", "#CB7E98", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
+"#5B4534", "#FDE8DC", "#404E55", "#FAD09F", "#A4E804", "#f58231", "#324E72", "#402334"];
 {{section name=clust loop=$silh_trace}}
 var trace{{$silh_trace[clust]}} = {
   x: [{{section name=idx loop=$silh_x[{{$silh_trace[clust]}}]}} "{{$silh_x[{{$silh_trace[clust]}}][idx]}}",{{/section}}],
   y: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} "{{$silh_y[{{$silh_trace[clust]}}][idx]}}",{{/section}}],
   name: '{{$silh_trace[clust]}}',
+  marker:{
+    color: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} color_array3[{{$silh_trace[clust]}}],{{/section}}]
+  },
   type: 'bar'
 };
 
@@ -1213,7 +1242,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
     var defaultOptions = {
     description: "",
     popup: false
-  };
+	};
 
   if (typeof options.description == 'undefined')
     options.description = defaultOptions.description;
@@ -1260,7 +1289,8 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
                     width: 2
                 },
                 label: {{$sankey_nodes}},
-                color: 'RdBu'
+                //color: 'RdBu'
+				color:[{{section name=clust loop=$silh_trace}} color_array3[{{$silh_trace[clust]}}],{{/section}}{{for $clust= 1 to $sankey_nodes_count}} color_array3[64-{{$clust}}],{{/for}}]
             },
             link: {
                 source: {{$sankey_src}},
@@ -1284,8 +1314,6 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
         Plotly.react('sankey_div', sankey_data, sankey_layout,score_config)
 		 </script>
 		{{/if}}
-
 	<div class="push"></div>
-
 </main>
 {{/block}}

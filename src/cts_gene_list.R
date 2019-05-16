@@ -14,11 +14,14 @@ jobid <- args[2] # user job id
 label_file <- args[3] # sc3 or user label
 gene_module_file <- args[4] # 
 delim_gene_module <- args[5] # gene module file delimter
+
+if (!is.na(args[5])) {
 if(delim_gene_module == 'tab'){
   delim_gene_module <- '\t'
 }
 if(delim_gene_module == 'space'){
   delim_gene_module <- ' '
+}
 }
 getwd()
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
@@ -176,7 +179,7 @@ write(paste("total_label,",nrow(cell_label),sep=""),file=paste(jobid,"_info.txt"
 write(paste("total_bic,",total_bic,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 
 #if exist gene module file, save gene list to jobid_module_#.txt
-if(length(gene_module_file) > 0){
+if(length(gene_module_file) > 0 && !is.na(gene_module_file)){
   gene_module <- read.table(gene_module_file,header = F,sep = delim_gene_module)
   for (i in 1:ncol(gene_module)) {
     write.table(gene_module[,i],paste(jobid,"_module_",i,"_bic.txt",sep = ""),quote = F,col.names = F,row.names = F)

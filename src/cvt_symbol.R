@@ -1,4 +1,4 @@
-#######  Convert gene name -> Ensembl gene id ##########
+#######  Convert gene name -> Ensembl gene id -> fasta file ##########
 #######  Create a folder by filename, inside folder create each module by clusters  ##########
 
 #if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -9,22 +9,44 @@
 #BiocManager::install("EnsDb.Mmusculus.v79", version = "3.8")
 library(GenomicAlignments)
 library(ensembldb)
-library(EnsDb.Hsapiens.v86)
-library(EnsDb.Mmusculus.v79)
+suppressPackageStartupMessages(library(BSgenome.Celegans.UCSC.ce11))
+suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg38))
+suppressPackageStartupMessages(library(BSgenome.Mmusculus.UCSC.mm10))
+suppressPackageStartupMessages(library(BSgenome.Scerevisiae.UCSC.sacCer3))
+suppressPackageStartupMessages(library(BSgenome.Drerio.UCSC.danRer10))
+suppressPackageStartupMessages(library(BSgenome.Dmelanogaster.UCSC.dm6))
+suppressPackageStartupMessages(library(TxDb.Celegans.UCSC.ce11.refGene))
+suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg38.knownGene))
+suppressPackageStartupMessages(library(TxDb.Mmusculus.UCSC.mm10.knownGene))
+suppressPackageStartupMessages(library(TxDb.Scerevisiae.UCSC.sacCer3.sgdGene))
+suppressPackageStartupMessages(library(TxDb.Drerio.UCSC.danRer10.refGene))
+suppressPackageStartupMessages(library(TxDb.Dmelanogaster.UCSC.dm6.ensGene))
+suppressPackageStartupMessages(library(org.Dm.eg.db))
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+suppressPackageStartupMessages(library(org.Mm.eg.db))
+suppressPackageStartupMessages(library(org.Ce.eg.db))
+suppressPackageStartupMessages(library(org.Sc.sgd.db))
+suppressPackageStartupMessages(library(org.Dr.eg.db))
+
+
 #setwd("C:/Users/flyku/Desktop/iris3")
 args <- commandArgs(TRUE)
 srcDir <- args[1]
 expName <- args[2]
+jobid <-args[3]
+promoter_len <- args[4]
 setwd(srcDir)
 getwd()
 # setwd("/home/www/html/iris3/data/2019030481235")
-# jobid <-2018122223516
-#  srcDir <-  getwd()
-#expName <- "2018122223516_filtered_expression.txt"
+# setwd("d:/Users/flyku/Documents/IRIS3-data/test_id")
+# jobid <-20190408222612
+# srcDir <-  getwd()
+# expName <- "20190408222612_filtered_expression.txt"
+# promoter_len <- '1000'
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
 expFile <- read.table(expName,sep="\t",header = T)
+promoter_len <- as.numeric(promoter_len)
 
-jobid <- gsub("_.*","",expName)
 get_row_num <- function (this){
   num = 0
   for (i in 1:length(this)) {
@@ -34,57 +56,115 @@ get_row_num <- function (this){
   }
   return (num)
 }
+get_rowname_type <- function (l, db){
+  res1 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "SYMBOL")),error = function(e) 0)
+  res2 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENSEMBL")),error = function(e) 0)
+  res3 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENTREZID")),error = function(e) 0)
+  result <- c("error","SYMBOL","ENSEMBL","ENTREZID")
+  result_vec <- c(1,res1,res2,res3)
+  return(c(result[which.max(result_vec)],result_vec[which.max(result_vec)]))
+  #write("No matched gene identifier found, please check your data.",file=paste(outFile,"_error.txt",sep=""),append=TRUE)
+}
 
-check_species <- function(expFile) {
-  result_human <- nrow(genes(EnsDb.Hsapiens.v86, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSG", "startsWith")), 
-                             return.type="data.frame", columns=c("gene_id")))
-  result_mouse <- nrow(genes(EnsDb.Mmusculus.v79, filter=list(GeneNameFilter(rownames(expFile)),GeneIdFilter("ENSMUSG", "startsWith")), 
-                             return.type="data.frame", columns=c("gene_id")))
-  if(result_human > result_mouse){
-    write.table("52","species.txt",quote=F,col.names = F,row.names = F)
-    write("species,Human",file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-    return (list(EnsDb.Hsapiens.v86,"ENSG"))
-  } else {
-    write.table("53","species.txt",quote=F,col.names = F,row.names = F)
-    write("species,Mouse",file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-    return (list(EnsDb.Mmusculus.v79,"ENSMUSG"))
-  }
+species_file <- as.character(read.table("species.txt",header = F,stringsAsFactors = F)[,1])
+
+db <- c("Worm"=org.Ce.eg.db, "Fruit_fly"=org.Dm.eg.db, "Zebrafish"=org.Dr.eg.db,
+        "Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
+db_txdb <- c("Worm"=TxDb.Celegans.UCSC.ce11.refGene, "Fruit_fly"=TxDb.Dmelanogaster.UCSC.dm6.ensGene, "Zebrafish"=TxDb.Drerio.UCSC.danRer10.refGene,
+             "Yeast"=TxDb.Scerevisiae.UCSC.sacCer3.sgdGene,"Mouse"=TxDb.Mmusculus.UCSC.mm10.knownGene,"Human"=TxDb.Hsapiens.UCSC.hg38.knownGene)
+db_bsgenome <- c("Worm"=BSgenome.Celegans.UCSC.ce11, "Fruit_fly"=BSgenome.Dmelanogaster.UCSC.dm6, "Zebrafish"=BSgenome.Drerio.UCSC.danRer10,
+        "Yeast"=BSgenome.Scerevisiae.UCSC.sacCer3,"Mouse"=BSgenome.Mmusculus.UCSC.mm10,"Human"=BSgenome.Hsapiens.UCSC.hg38)
+
+
+
+select_db <- db[which(names(db)%in%species_file)]
+gene_identifier <- sapply(select_db, get_rowname_type, l=rownames(expFile))
+main_species <- names(which.max(gene_identifier[2,]))
+write(main_species,"species_main.txt")
+main_db <- db[which(names(db)%in%main_species)][[1]]
+main_txdb <- db_txdb[which(names(db)%in%main_species)][[1]]
+main_txdb <-  keepStandardChromosomes(main_txdb)
+main_bsgenome <- db_bsgenome[which(names(db)%in%main_species)][[1]]
+main_identifier <- as.character(gene_identifier[1,which.max(gene_identifier[2,])])
+main_grangelist <- transcriptsBy (main_txdb, by = "gene")
+
+if(length(species_file) == 2) {
+  second_species <- names(which.min(gene_identifier[2,]))
+  second_db <- db[which(names(db)%in%second_species)][[1]]
+  second_txdb <- db_txdb[which(names(db)%in%second_species)][[1]]
+  second_txdb <-  keepStandardChromosomes(second_txdb)
+  second_bsgenome <- db_bsgenome[which(names(db)%in%second_species)][[1]]
+  second_identifier <- as.character(gene_identifier[1,which.min(gene_identifier[2,])])
+  second_grangelist <- transcriptsBy (second_txdb, by = "gene")
 }
 #i=1
-species <- check_species(expFile)
-#filename <- as.data.frame(srcFile)[1,1]
+
+#filename <- as.data.frame(srcFile)[3,1]
 generate_seq_file <- function(filename){
   print(filename)
   genes <- read.table(as.character(filename),header = T,sep = "\t");
   new_dir <- paste(srcDir,"/",gsub(".txt", "", filename,".txt"),sep="")
   dir.create(new_dir, showWarnings = FALSE)
-  #i=21
+  #i=2
   for (i in 1:ncol(genes)) {
     this_genes <- as.character(genes[,i])
     this_genes <- this_genes[!this_genes==""]
     this_genes <- this_genes[!is.na(this_genes)]
     if(length(this_genes) > 0){
-      name <- colnames(genes)[i]
-      result <- genes(species[[1]], filter=list(GeneNameFilter(this_genes),GeneIdFilter(species[[2]], "startsWith")), 
-                      return.type="data.frame", columns=c("gene_id"))
-      if(nrow(result)>4){
-        tmp <- as.data.frame(result[,1])
-        colnames(tmp) <- paste("bic",i,sep = "")
-        write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
+      all_match <- select(main_db, keys = this_genes, columns = c("SYMBOL","ENSEMBL","ENTREZID"),keytype = "SYMBOL")
+      all_match <- all_match[!duplicated(all_match[,3]),]
+      all_match <- na.omit(all_match)
+      this_genes_id <- all_match[!duplicated(all_match[,3]),3]
+      this_grangelist <-  main_grangelist[which(names(main_grangelist) %in% this_genes_id)]
+      promoter_seqs <- getPromoterSeq(this_grangelist,main_bsgenome, upstream=promoter_len, downstream=0)
+      result <-  DNAStringSet(sapply(promoter_seqs, `[[`, 1)) 
+      names(result) <- all_match[match(names(result),all_match[,3]),2]
+      if(length(species_file) == 2) {
+        #this_genes <- c("TRP53","TNF",'TLR2',"TNIK","Rdh1")
+        tryCatch(all_match <- select(second_db, keys = this_genes, columns = c("SYMBOL","ENSEMBL","ENTREZID"),keytype = "SYMBOL")
+                 ,error = function(e) all_match <<- list())
+        if (length(na.omit(all_match)) != 0) {
+          all_match <- all_match[!duplicated(all_match[,3]),]
+          all_match <- na.omit(all_match)
+          if (nrow(all_match) > 0) {
+            this_genes_id <- all_match[!duplicated(all_match[,3]),3]
+            this_grangelist <-  second_grangelist[which(names(second_grangelist) %in% this_genes_id)]
+            promoter_seqs <- getPromoterSeq(this_grangelist,second_bsgenome, upstream=promoter_len, downstream=0)
+            tmp <-  DNAStringSet(sapply(promoter_seqs, `[[`, 1)) 
+            names(tmp) <- all_match[match(names(tmp),all_match[,3]),2]
+            result <- append(result,tmp)
+          }
+        }
+      }
+      if(length(result)>3){
+        writeXStringSet(result, paste(new_dir,"/","bic",i,".txt.fa",sep=""),format = "fasta",width=2000)
+        #write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt.fa",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
       }
     }
   }
 }
 
 gene_name <- rownames(expFile)
-gene_df <- genes(species[[1]], filter=list(GeneNameFilter(as.character(gene_name)),GeneIdFilter(species[[2]], "startsWith")), 
-                 return.type="data.frame", columns=c("gene_id"))
-if(length(which(gene_df[,2]=='')) > 0){
-	gene_df <- gene_df[-which(gene_df[,2]==''),]
+gene_df <- select(main_db, keys = gene_name, columns = c("ENSEMBL","SYMBOL"),keytype = "SYMBOL")
+gene_df <- gene_df[!duplicated(gene_df[,1]),]
+gene_df <- na.omit(gene_df)
+if(length(species_file) == 2) {
+  tryCatch(tmp <- select(second_db, keys = gene_name, columns = c("ENSEMBL","SYMBOL"),keytype = "SYMBOL")
+           ,error = function(e) tmp <<- list())
+  if (length(na.omit(tmp)) != 0) {
+     tmp <- tmp[!duplicated(tmp[,1]),]
+    tmp <- na.omit(tmp)
+    gene_df <- rbind(gene_df,tmp)
+  }
 }
-				 
+gene_df <- gene_df[,c(2,1)]
+#colnames(gene_df) <- c('gene_id','gene_name')
+if(length(which(gene_df[,2]=='')) > 0){
+  gene_df <- gene_df[-which(gene_df[,2]==''),]
+}
+
 write.table(gene_df,paste(jobid,"_gene_id_name.txt",sep=""),sep = "\t",quote = F,col.names = T,row.names = F)
 
-apply(as.data.frame(srcFile), 1, generate_seq_file)
+lapply(srcFile, generate_seq_file)
 
 
