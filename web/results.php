@@ -293,7 +293,7 @@ if ($silh_file) {
 if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 	$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
 	if ($sankey_file) {
-	$sankey_nodes = $sankey_src = $sankey_target = $sankey_value = array(); 
+	$sankey_nodes = $sankey_src = $sankey_target = $sankey_value =$sankey_label_order = array(); 
     while (($line = fgets($sankey_file)) !== false) {
         $split_line = explode (",", $line);
 		$split_line[1] = preg_replace( "/\r|\n/", "", $split_line[1] );
@@ -305,6 +305,8 @@ if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 			array_push($sankey_value,$split_line[1]);
 		} else if($split_line[0] == "nodes"){
 			array_push($sankey_nodes,$split_line[1]);
+		} else if($split_line[0] == "label_order"){
+			array_push($sankey_label_order,$split_line[1]);
 		}
     }
     fclose($sankey_file);
@@ -313,6 +315,7 @@ if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 	$sankey_value = json_encode($sankey_value);
 	$sankey_nodes_count = count($sankey_nodes) - count($silh_trace);
 	$sankey_nodes = json_encode($sankey_nodes);
+	#$sankey_label_order = json_encode($sankey_label_order);
 } else {
 	print_r("Info file not found");
     // error opening the file.
@@ -524,6 +527,7 @@ $smarty->assign('sankey_src',$sankey_src);
 $smarty->assign('sankey_target',$sankey_target);
 $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
+$smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
 $smarty->display('results.tpl');
 #print_r($regulon_motif_file);

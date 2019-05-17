@@ -1290,7 +1290,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
                 },
                 label: {{$sankey_nodes}},
                 //color: 'RdBu'
-				color:[{{section name=clust loop=$silh_trace}} color_array3[{{$silh_trace[clust]}}],{{/section}}{{for $clust= 1 to $sankey_nodes_count}} color_array3[64-{{$clust}}],{{/for}}]
+				color:[{{section name=clust loop=$silh_trace}} color_array3[{{$silh_trace[clust]}}],{{/section}}{{for $clust= 0 to $sankey_nodes_count-1}} color_array3[64-{{$sankey_label_order[$clust]}}],{{/for}}]
             },
             link: {
                 source: {{$sankey_src}},

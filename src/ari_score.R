@@ -9,11 +9,11 @@ delim <- args[3] #label file delimiter
 label_use_sc3 <- 0 #default 0
 label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 #delim <- args[3]
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
+# setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
 # srcFile = "iris3_example_expression_label.csv"
 # jobid <- "2018122223516"
 # delim <- ","
-# label_use_sc3 <- 0
+# label_use_sc3 <- 1
 if(delim == 'tab'){
   delim <- '\t'
 }
@@ -185,7 +185,9 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   write(paste("src,",links$src,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("target,",links$target,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("value,",links$value,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
-  write(paste("label_order,",label_order,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
+  write(paste("label_order,",order(label_order),sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   # title left: cell label; right:sc3 cluster
  
 }
+
+
