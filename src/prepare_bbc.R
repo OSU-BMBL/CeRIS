@@ -5,7 +5,7 @@ library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_meme_new")
-#setwd("/home/www/html/iris3_test/data/20190408202315/")
+#setwd("/var/www/html/iris3_test/data/20190408202315/")
 #srcDir <- getwd()
 #jobid <-20190408202315 
 # is_meme <- 0
@@ -21,9 +21,9 @@ alldir <- grep(".+_bic$",alldir,value=T)
 #gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3_data_backup/dminda/human_gene_start_info.txt")
 species_id <-  as.character(read.table("species_main.txt")[1,1])
 if(species_id == "Human"){
-  gene_info <- read.table("/home/www/html/iris3/program/dminda/human_gene_start_info.txt")
+  gene_info <- read.table("/var/www/html/iris3/program/dminda/human_gene_start_info.txt")
 } else if (species_id == "Mouse"){
-  gene_info <- read.table("/home/www/html/iris3/program/dminda/mouse_gene_start_info.txt")
+  gene_info <- read.table("/var/www/html/iris3/program/dminda/mouse_gene_start_info.txt")
 }
 
 sort_dir <- function(dir) {

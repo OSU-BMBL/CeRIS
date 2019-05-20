@@ -15,8 +15,8 @@ close FILE;
 my $message=join("",@lines);
 
 my %mail = ( To      => $email,
-			 Bcc     => 'flykun0620@gmail.com,maqin2001@gmail.com',
-             From    => 'IRIS3 <no-reply@bmbl.sdstate.edu>',
+			 Bcc     => 'flykun0620@gmail.com',
+             From    => 'IRIS3 <no-reply@bmbl.bmi.osumc.edu>',
              Subject => "Information from Job $job_id on IRIS3",'Content-Type' => 'text/html',
              Message => $message
            );

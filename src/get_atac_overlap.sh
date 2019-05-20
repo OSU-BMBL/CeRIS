@@ -2,7 +2,7 @@
 
 # input (1,1,1) 
 dir=$1
-atac_dir=/home/www/html/iris3/program/human_atac_seq
+atac_dir=/var/www/html/iris3/program/human_atac_seq
 mkdir atac
 files="$(find $dir -maxdepth 2 -name "*.regulon_motif.txt" -print)"
 bed_files="$(find $atac_dir -maxdepth 2 -name "*.bed" )"

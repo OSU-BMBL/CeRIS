@@ -16,10 +16,10 @@ do
 	done
 	out="$(basename $file .heatmap.txt)"
 	if [[ $out == *"S-R"* ]]; then
-	python /home/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir $jobid 0 &
+	python /var/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir $jobid 0 &
 	echo $file $out $dir $jobid $use_user_label
 	else
-    python /home/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir $jobid $use_user_label &
+    python /var/www/html/iris3/program/clustergrammer/make_clustergrammer.py $file $out $dir $jobid $use_user_label &
 	fi
 done
 wait

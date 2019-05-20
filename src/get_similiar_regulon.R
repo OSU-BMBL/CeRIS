@@ -6,7 +6,7 @@ args <- commandArgs(TRUE)
 # srcDir <- getwd()
 # regulon <- 'CT1S-R2'
 # jobid <- '20190406210706'
-srcDir <- args[1] # /home/www/html/iris3/data/20190406210706
+srcDir <- args[1] # /var/www/html/iris3/data/20190406210706
 regulon <- args[2] # CT3S-R5
 jobid <- args[3]
 setwd(srcDir)

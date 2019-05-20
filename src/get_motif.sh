@@ -16,11 +16,11 @@ do
     sleep 1
 	done
 	if [ "$is_meme" = "1" ]; then
-		/home/www/html/iris3/program/meme/bin/meme $file -p 8 -w $min_length -allw -mod zoops -nmotifs 5 -text -maxsites 100 -oc $file.closures > $file.closures &
+		/var/www/html/iris3/program/meme/bin/meme $file -p 8 -w $min_length -allw -mod zoops -nmotifs 5 -text -maxsites 100 -oc $file.closures > $file.closures &
     else
-        /home/www/html/iris3/program/dminda/src/BoBro/BoBro -i $file -l $min_length -F -o 5&
+        /var/www/html/iris3/program/dminda/src/BoBro/BoBro -i $file -l $min_length -F -o 5&
     fi
     
-	#perl /home/www/html/iris3/program/dminda/BBR1.pl 1 $file -L $min_length -U $max_length -R 2 -F -n 10 0.4
+	#perl /var/www/html/iris3/program/dminda/BBR1.pl 1 $file -L $min_length -U $max_length -R 2 -F -n 10 0.4
 done
 wait

@@ -2,15 +2,14 @@
 	$jobid = $_GET['jobid'];
 	$regulon_id=$_GET['regulon_id'];
 	$species=$_GET['species'];
-	$wd = "/home/www/html/iris3/data/$jobid/";
-	system("cd $wd; nohup Rscript /home/www/html/iris3/program/get_similiar_regulon.R $wd $regulon_id $jobid &");
+	$wd = "/var/www/html/iris3/data/$jobid/";
+	system("cd $wd; nohup Rscript /var/www/html/iris3/program/get_similiar_regulon.R $wd $regulon_id $jobid &");
 	#echo "<table id='$table_content_id' border='1'>
 	#<tr>
 	#<th>$jobid</th>
 	#<th>$regulon_id</th>
 	#<th>$species </th>
 	#</tr></table>";
-	#
 	#$db_contents=file_get_contents($db_file);
 	$db_file= "$wd/similar_regulon/$regulon_id.similar.txt";
 	$fp = fopen("$db_file", 'r');

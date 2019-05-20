@@ -79,7 +79,7 @@
                 <div class="row">
                     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
                         <div class="footer-copyright text-center wow fadeIn">
-                            <p class="m-0 text-center text">© <script>document.write(new Date().getFullYear());</script> <a href="https://u.osu.edu/bmbl/">BMBL</a> | <a href="mailto:ma.1915@osu.edu" title="ma.1915@osu.edu">Contact us: ma.1915@osu.edu</a>  </p>
+                            <p class="m-0 text-center text">© <script>document.write(new Date().getFullYear());</script> <a href="https://u.osu.edu/bmbl/">BMBL</a> | <a href="mailto:qin.ma@osumc.edu" title="qin.ma@osumc.edu">Contact us: qin.ma@osumc.edu</a>  </p>
                         </div>
                     </div>
                 </div>

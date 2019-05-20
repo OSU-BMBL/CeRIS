@@ -7,16 +7,16 @@ args <- commandArgs(TRUE)
 # tad_dir <- 'D:/Users/flyku/Documents/IRIS3-data/tad/mm10'
 # regulon <- 'CT1S-R2'
 # jobid <- '20190404232115'
-srcDir <- args[1] # /home/www/html/iris3/data/20190404232115
+srcDir <- args[1] # /var/www/html/iris3/data/20190404232115
 regulon <- args[2] # CT3S-R5
 species <- args[3] #Human, Mouse
 jobid <- args[4]
 setwd(srcDir)
 
 if (species == "Human") {
-  tad_dir <- '/home/www/html/iris3/program/tad/hg38'
+  tad_dir <- '/var/www/html/iris3/program/tad/hg38'
 } else if (species == "Mouse"){
-  tad_dir <- '/home/www/html/iris3/program/tad/mm10'
+  tad_dir <- '/var/www/html/iris3/program/tad/mm10'
 }
 # parse 'CT3S-R5' to 'CT', '3', '5'
 #regulon_ct <- strsplit(regulon,"S-R")[[1]][1]

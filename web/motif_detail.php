@@ -9,8 +9,8 @@ $bic=$_GET['bic'];
 $id=$_GET['id'];
 $from=$_GET['from'];
 $max=0;
-$DATAPATH="/home/www/html/iris3/data";
-$TOOLPATH="/home/www/html/iris3/program/dminda";
+$DATAPATH="/var/www/html/iris3/data";
+$TOOLPATH="/var/www/html/iris3/program/dminda";
    session_start();
    
 $motif_tmp_filename="ct".$ct."bic".$bic."m".$id;
@@ -315,7 +315,7 @@ for($i=1;$i<=count($show);$i++)
 
   $matrix="";
  
-  //cat /home/www/html/bobro/data/20131124133808/Motif-1 | perl /home/www/html/bobro/tools/motif_tools/uniprobe2meme > /home/www/html/bobro/data/20131124133808/Motif-1.meme
+  //cat /var/www/html/bobro/data/20131124133808/Motif-1 | perl /var/www/html/bobro/tools/motif_tools/uniprobe2meme > /var/www/html/bobro/data/20131124133808/Motif-1.meme
     //$matrix=$matrix."-----------------------------------------Motif Matrix Format--------------------------------------"."\n";
     if($fp = fopen("$DATAPATH/$jobid/$select.matrix", 'r')){
 	

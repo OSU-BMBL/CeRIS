@@ -2,7 +2,7 @@
 #use warnings;
 use DBI;
 
-#my $workdir = "/home/www/html/iris3/program/step3/2018110573518_CT_5_bic";
+#my $workdir = "/var/www/html/iris3/program/step3/2018110573518_CT_5_bic";
 my $path = $ARGV[0];
 my $length = $ARGV[1];
 die "Please specify which directory to search" 
@@ -35,7 +35,7 @@ while ( my $entry = readdir $DIR ) {
 		my $fullname =  $workdir.'/'.$filename;
 		my $file_location_fa = $fullname."\.fa";
 	
-		#my $file_location = "/home/www/html/iris3/program/step3/test.fa"; 
+		#my $file_location = "/var/www/html/iris3/program/step3/test.fa"; 
 		
 	open(my $fh, '<:encoding(UTF-8)', $fullname) or die "Could not open file '$fullname' $!";
 

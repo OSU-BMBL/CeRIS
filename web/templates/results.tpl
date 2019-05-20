@@ -789,7 +789,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 						<div class="panel-body">
 					<div style="text-align: left;">
                         <strong><h3>Sorry, there has been an error.</h3></strong>
-						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="https://bmbl.bmi.osumc.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
 						<!---
 						
 						<p>Perhaps you are here because: </p>
@@ -841,7 +841,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 						<div class="panel-body">
 					<div style="text-align: left;">
                         <strong><h3>Sorry, there has been an error:</h3></strong> <p style="color:red">IRIS3 did not find enough bi-clusters in your data.</p>
-						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="https://bmbl.bmi.osumc.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
 						<!---
 						
 						<p>Perhaps you are here because: </p>
@@ -954,7 +954,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                             <br> You can remember your jobid <font color="red"> <strong>{{$jobid}}</strong> </font>
                             <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>30</b> seconds.
                             <br/> Link:&nbsp
-                            <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">http://bmbl.sdstate.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
+                            <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">https://bmbl.bmi.osumc.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
 							
 							
 							<strong>Job settings:</strong><br>

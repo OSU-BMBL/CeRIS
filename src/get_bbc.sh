@@ -24,7 +24,7 @@ do
 	#echo "$file"
 	fbname=$(basename "$file")
 	#pval_fbname=$(basename "$pval_files")
-	#perl /home/www/html/iris3/program/sort_bbc.pl $fbname $pval_fbname > $fbname.1
+	#perl /var/www/html/iris3/program/sort_bbc.pl $fbname $pval_fbname > $fbname.1
 
 	#samtools faidx $fbname
 	#samtools faidx $fbname $(cat $pval_fbname) > $fbname.sorted
@@ -32,7 +32,7 @@ do
 	#fold -w 12 -s bbc.1 > $fbname
 	#rm tmp.idx
 	#echo '>end' >> $fbname
-	perl /home/www/html/iris3/program/dminda/BBC.pl bg $fbname -1 0.4 0.8
+	perl /var/www/html/iris3/program/dminda/BBC.pl bg $fbname -1 0.4 0.8
 done
 
-perl /home/www/html/iris3/program/dminda/BBC.pl bg combine_bbc.bbc.txt -1 0.4 0.8
+perl /var/www/html/iris3/program/dminda/BBC.pl bg combine_bbc.bbc.txt -1 0.4 0.8
