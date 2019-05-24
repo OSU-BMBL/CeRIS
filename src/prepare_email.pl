@@ -77,7 +77,7 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 <td class='content-block' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><span>Copyright 2018 &copy; </span><a href='https://www.sdstate.edu/agronomy-horticulture-plant-science/bioinformatics-and-mathematical-biosciences-lab' target='_blank' rel='noopener'>BMBL</a><span>, </span><a href='http://prod.sdstate.edu/' target='_blank' rel='noopener'>SDSU</a><span>. All rights reserved. </span></td>
 </tr>
 <tr>
-<td class='content-block powered-by' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><a href='mailto:bmbl.qinma\@gmail.com' title='bmbl.qinma\@gmail.com'>Contact us: bmbl.qinma\@gmail.com</a><span> </span></td>
+<td class='content-block powered-by' style='font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;'><a href='mailto:qin.ma\@osumc.edu' title='qin.ma\@osumc.edu'>Contact us: qin.ma\@osumc.edu</a><span> </span></td>
 </tr>
 </tbody>
 </table>
