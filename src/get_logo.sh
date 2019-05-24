@@ -1,5 +1,5 @@
 #!/bin/bash
-cores=4
+cores=8
 dir=$1
 mkdir tomtom
 perl /var/www/html/iris3/program/dminda/motif_tools/bobro2align.pl $dir

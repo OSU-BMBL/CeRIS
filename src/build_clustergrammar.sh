@@ -1,5 +1,5 @@
 #!/bin/bash
-cores=4
+cores=6
 dir=$1
 jobid=$2
 use_user_label=$3
