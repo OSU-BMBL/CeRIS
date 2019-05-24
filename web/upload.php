@@ -41,8 +41,9 @@ if(!empty($_FILES))
  if (!file_exists($workdir)) {
      mkdir($workdir);
 }
+
+ #check php.ini maximum upload size
  $temp_file = $_FILES['file']['tmp_name'];
- 
  $csv= file_get_contents($temp_file);
 
 

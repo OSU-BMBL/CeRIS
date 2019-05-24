@@ -288,7 +288,7 @@ echo 'finish'> done\n
 	$fp = fopen("$workdir2/param.txt", 'w+');
 	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
 	fclose($fp);
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
