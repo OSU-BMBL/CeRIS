@@ -4,10 +4,10 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_meme_new")
-#setwd("/var/www/html/iris3_test/data/20190408202315/")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_zscore")
+#setwd("/var/www/html/iris3_test/data/2019052895653/")
 #srcDir <- getwd()
-#jobid <-20190408202315 
+#jobid <-2019052895653 
 # is_meme <- 0
 # motif_len <- 12
 srcDir <- args[1]
@@ -49,21 +49,22 @@ sort_short_closure <- function(dir){
 
 alldir <- sort_dir(alldir)
 #convert_motif(all_closure[1])
-#filepath<-all_closure[1]
+#filepath<-all_closure[6]
 
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
   line <- readLines(motif_file)
-  # get pvalue and store it in pval_rank
+  # get pvalue and zscore and store it in motif_rank
   split_line <- unlist(strsplit(line," "))
   pval_value <- split_line[which(split_line == "Pvalue:")+2]
+  zscore_value <- split_line[which(split_line == "Zscore:")+1]
   if(length(pval_value)>0){
     pval_value <- as.numeric(gsub("\\((.+)\\)","\\1",pval_value))
     pval_name <- paste(">",basename(filepath),"-",seq(1:length(pval_value)),sep="")
-    tmp_pval_df <- data.frame(pval_name,pval_value)
-    #print(tmp_pval_df)
-    pval_rank <<-rbind(pval_rank,tmp_pval_df)
+    tmp_pval_df <- data.frame(pval_name,pval_value,zscore_value)
+    #motif_rank <- data.frame()
+    motif_rank <<-rbind(motif_rank,tmp_pval_df)
   df <- line[substr(line,0,1) == ">"]
   df <- read.table(text=df,sep = "\t")
   colnames(df) <- c("MotifNum","Seq","start","end","Motif","Score","Info")
@@ -143,7 +144,7 @@ convert_meme <- function(filepath){
 }
 
 #i=1
-#j=19
+#j=1
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
 #module_type <- rep("CT",6)
@@ -152,7 +153,7 @@ result_gene_pos <- data.frame()
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
-  pval_rank <- data.frame()
+  motif_rank <- data.frame()
   all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = T)
   short_all_closure <- list.files(alldir[i],pattern = "*.closures$",full.names = F)
   all_closure <- sort_closure(all_closure)
@@ -206,13 +207,15 @@ for (i in 1:length(alldir)) {
   }
   write.table(combined_gene,paste(alldir[i],".motifgene.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = T)
 
-  pval_rank <- pval_rank[!duplicated(pval_rank$pval_name),]
-  #test_pval_rank <- pval_rank[!duplicated(pval_rank$pval_name),] 
-  if(nrow(pval_rank) > 0){
-  pval_rank[,3] <- seq(1:nrow(pval_rank))
-  pval_rank <- pval_rank[order((pval_rank$pval_value),decreasing = T),] 
-  pval_idx <- pval_rank[,3]
-  #write.table(pval_rank,paste(alldir[i],".pval.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+  motif_rank <- motif_rank[!duplicated(motif_rank$pval_name),]
+  #motif_rank_bc <- motif_rank
+  #motif_rank<-motif_rank_bc
+  #test_motif_rank <- motif_rank[!duplicated(motif_rank$pval_name),] 
+  if(nrow(motif_rank) > 0){
+  motif_rank[,4] <- seq(1:nrow(motif_rank))
+  motif_rank <- motif_rank[order(as.numeric(as.character(motif_rank$zscore_value)),motif_rank$pval_value,decreasing = T),] 
+  pval_idx <- motif_rank[,4]
+  #write.table(motif_rank,paste(alldir[i],".pval.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
   this_fasta <- read.fasta(paste(alldir[i],".bbc.txt",sep=""))
   this_fasta <- this_fasta[pval_idx]
   write.fasta(this_fasta,names(this_fasta),paste(alldir[i],".bbc.txt",sep=""),nbchar = 12)
