@@ -223,6 +223,12 @@ for (i in 1:length(alldir)) {
   cat(">end", file=paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
 }
 
+  this_bic <- gsub(">bic","",motif_rank[,1])
+  this_bic <- gsub(".txt.fa.*","",this_bic)
+  this_id <- gsub(".*closures-","",motif_rank[,1])
+  motif_rank[,5] <- paste(i,this_bic,this_id,sep=",")
+  write.table(motif_rank[,c(5,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+  }
 write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
 
