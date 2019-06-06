@@ -147,9 +147,9 @@ $new_array['index'] =  array_slice($new_array['index'] , 0, 10);
 	 if (!file_exists($workdir)) {
      mkdir($workdir);
 	}
-	system("cp ./storage/iris3_example_expression_matrix.csv $workdir");
-	system("cp ./storage/iris3_example_expression_label.csv $workdir");
-	#system("cp ./storage/iris3_example_gene_module.csv $workdir");
+	system("cp ./upload/iris3_example_expression_matrix.csv $workdir");
+	system("cp ./upload/iris3_example_expression_label.csv $workdir");
+	#system("cp ./upload/iris3_example_gene_module.csv $workdir");
 	$expfile = 'iris3_example_expression_matrix.csv';
 	$_SESSION['expfile'] = $expfile;
 	$labelfile = 'iris3_example_expression_label.csv';
