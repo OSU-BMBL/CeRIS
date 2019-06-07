@@ -2,12 +2,12 @@
 # install
 #if (!requireNamespace("BiocManager", quietly = TRUE))
 #  install.packages("BiocManager")
-#BiocManager::install("SC3", version = "3.8")
-#BiocManager::install("scater", version = "3.8")
-#BiocManager::install("XVector", version = "3.8")
-#BiocManager::install("Biobase", version = "3.8")
-#BiocManager::install("BiocGenerics", version = "3.8")
-#BiocManager::install("purrr", version = "3.8")
+#BiocManager::install("SC3")
+#BiocManager::install("scater") 
+#BiocManager::install("XVector")
+#BiocManager::install("Biobase")
+#BiocManager::install("BiocGenerics")
+#BiocManager::install("purrr")
 #SingleCellExperiment
 #install.packages("shiny")
 #remove.packages( installed.packages( priority = "NA" )[,1] )
