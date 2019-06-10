@@ -1,5 +1,6 @@
 # set working directory, you may change the directory first.
 setwd("/home/cyz/Bigstore/BigData/runningdata/outs")
+#setwd("/var/www/html/iris3/data/20190528122627")
 # loading required packege
 if(!require(Seurat)) {
   install.packages("Seurat")
@@ -7,10 +8,7 @@ if(!require(Seurat)) {
 if(!require(hdf5r)) {
   install.packages("hdf5r")
 } 
-if(!require(cellity)){
-  source("https://bioconductor.org/biocLite.R")
-  biocLite("cellity")
-}
+
 if(!require(Matrix)) {
   install.packages("Matrix")
 }
