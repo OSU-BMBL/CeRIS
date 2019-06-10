@@ -84,9 +84,8 @@ write.table(my.expression.data,
 ##############################################
 # Add meta info(cell type) to seurat object###
 ##############################################
-my.meta.info<-read.table("BRIC_Cell_type.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
+my.meta.info<-read.table("./websiteoutput/test_zscore/2019052895653_cell_label.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
 my.object<-AddMetaData(my.object,my.meta.info,col.name = "Customized.idents")
-my.object<-AddMetaData(my.object,c(rep("A",30),rep("B",60)),col.name = "Customized.idents")
 Idents(my.object)
 Idents(my.object)<-my.object$Customized.idents
 ##############################################
@@ -222,13 +221,12 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-
   if(!customized){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=my.object$Customized.idents)
+                                         Cell_type=as.factor(my.object$Customized.idents))
   }
   p.cluster<-ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
@@ -240,7 +238,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   }
   
 # test plot cluster function. 
-  Plot.cluster2D(reduction.method = "pca",customized = F)
+  Plot.cluster2D(reduction.method = "tsne",customized = T)
  
 # plot CTS-R
 # input website CTS-R under a specific cell type
@@ -253,7 +251,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   for (i in 1:my.regulon.number){
     my.cts.regulon.tmp<-subset(my.object,cells = colnames(my.object),features = my.regulon.list[[i]][-1])
     my.cts.regulon<-append(my.cts.regulon,my.cts.regulon.tmp)
-    print(paste0("Finished to mergethe ",i,"th regulon"))
+    print(paste0("Finished to merge the ",i,"th regulon"))
   }
   
   
@@ -279,7 +277,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
       my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
     }else{
       my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                           Cell_type=my.object$Customized.idents)[,c(1,2)]
+                                           Cell_type=as.factor(my.object$Customized.idents))
       my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
     }
     my.plot.all.source.new.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
@@ -287,7 +285,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
     my.plot.all.source.new<-my.plot.all.source.new[,c(-4,-5)]
     p.regulon<-ggplot(my.plot.all.source.new,
                       aes(x=my.plot.all.source.new[,1],y=my.plot.all.source.new[,2]))+xlab(colnames(my.plot.all.source.new)[1])+ylab(colnames(my.plot.all.source.new)[2])
-    p.regulon<-p.regulon+geom_point(aes(col=my.plot.all.source.new[,"regulon.score"]))+scale_color_gradient(low = "white",high = "red")
+    p.regulon<-p.regulon+geom_point(aes(col=my.plot.all.source.new[,"regulon.score"]))+scale_color_gradient(low = "blue",high = "red")
     #p.cluster<-theme_linedraw()
     p.regulon<-p.regulon + labs(col="regulon score")
     p.regulon
@@ -295,9 +293,9 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   }
   
   # test plot cluster function. 
-  Plot.cluster2D(reduction.method = "pca",customized = F)
-  Plot.regulon2D(reduction.method = "pca",regulon = 1,customized = F) 
-  
+  Plot.cluster2D(reduction.method = "tsne",customized = T)# "tsne" ,"pca","umap"
+  Plot.regulon2D(reduction.method = "tsne",regulon = 14,customized =T)  
+
   
   
   
