@@ -84,7 +84,7 @@ write.table(my.expression.data,
 ##############################################
 # Add meta info(cell type) to seurat object###
 ##############################################
-my.meta.info<-read.table("./websiteoutput/test_zscore/2019052895653_cell_label.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
+my.meta.info<-read.table("./2019052895653_cell_label.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
 my.object<-AddMetaData(my.object,my.meta.info,col.name = "Customized.idents")
 Idents(my.object)
 Idents(my.object)<-my.object$Customized.idents
