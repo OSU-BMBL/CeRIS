@@ -56,7 +56,7 @@ function addPreviewTable(response, metadata=true, type) {
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
 		}
 		if (response['columns'][0].length < 40 && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at lease around 100 cells in your scRNA-seq experiment. </span></label>'))
 			document.getElementById("k_arg").value = 5;
 		}
 		if (type=='module'){
@@ -104,12 +104,12 @@ var exp_file_status = 0;
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
 	            url: "upload.php",
 	            maxFiles: 1,
-	            maxFilesize: 1000,
+	            maxFilesize: 500,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
 	                this.addFile(file);
 	            },
-				timeout: 1800000,
+				timeout: 300000,
 	            sending: function(file, xhr, formData) {
 	                formData.append('filetype', 'dropzone_exp');
 	            },
@@ -129,8 +129,8 @@ var exp_file_status = 0;
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
 	            url: "upload.php",
 	            maxFiles: 1,
-	            maxFilesize: 100,
-				timeout: 1800000,
+	            maxFilesize: 500,
+				timeout: 300000,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
 	                this.addFile(file);
@@ -179,7 +179,7 @@ var exp_file_status = 0;
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
-	$("#species_arg option[value='Human']").prop('selected', true);
+	$('select[name=species_arg]').val('Human');
 	document.getElementById("is_load_exp").value = '1';
 	document.getElementById("is_load_label").value = '1';
 	$('.selectpicker').selectpicker('refresh')
@@ -205,7 +205,7 @@ var exp_file_status = 0;
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
-	$("#species_arg option[value='Human']").prop('selected', true);
+	$('select[name=species_arg]').val('Human');
 	document.getElementById("is_load_exp").value = '1';
 	document.getElementById("is_load_label").value = '1';
 	$('.selectpicker').selectpicker('refresh')
@@ -532,7 +532,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_label" name="is_load_label" value="0">
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
 			<input type="hidden" id="k_arg" name="k_arg" value="18">
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2019052895653#';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20190408191738#';" />
 
 		</div>
 		<div class="form-group">
