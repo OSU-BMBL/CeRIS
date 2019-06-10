@@ -19,7 +19,7 @@ if (!require("RColorBrewer")) {
   install.packages("RColorBrewer")
 }
 if (!require("Polychrome")) {
-  install.packages("Polychrome")
+  #install.packages("Polychrome")
   library(Polychrome)
 }
 ##############################
@@ -44,7 +44,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
   }else {stop("Missing 'x' argument, please input correct data")}
 }
 #####################  
-# rad.data function:#
+# read.data function:#
 #####################
 # Two input arguments.
 # 1. input files are gene(row)*cell(column) matrix, h5 file, and folder which 
@@ -292,7 +292,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   
   # test plot cluster function. 
   Plot.cluster2D(reduction.method = "tsne",customized = T)# "tsne" ,"pca","umap"
-  Plot.regulon2D(reduction.method = "tsne",regulon = 14,customized =T)  
+  Plot.regulon2D(reduction.method = "tsne",regulon = 14,customized =T)
 
   
   
