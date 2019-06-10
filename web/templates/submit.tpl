@@ -56,14 +56,13 @@ function addPreviewTable(response, metadata=true, type) {
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
 		}
 		if (response['columns'][0].length < 40 && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at lease around 100 cells in your scRNA-seq experiment. </span></label>'))
 			document.getElementById("k_arg").value = 5;
-		}
-		if (type=='module'){
-			console.log(response)
 		}
 		var check_cell_name_start_with_number = function (array) {
 			for (var i = 0; i < array.length; i += 1) {
+				// Use the index i here
+				console.log();
 				if ('0123456789'.indexOf(array[i].charAt(0)) !== -1) {
 					return true;
 				}
@@ -100,8 +99,8 @@ var exp_file_status = 0;
 	        $('.dropdown-toggle').dropdown();
 			
 	        dz_exp = $("#dropzone_exp").dropzone({
-	            dictDefaultMessage: "Drag or click to upload your gene expression file. <br> Accepted files: .txt,.csv,.tsv",
-	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
+	            dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv) <br>2. HDF5 feature barcode batrix (hdf5)<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
+	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5",
 	            url: "upload.php",
 	            maxFiles: 1,
 	            maxFilesize: 1000,
@@ -175,7 +174,7 @@ var exp_file_status = 0;
 	exp_file_status = 1;
 	$('#enable_labelfile').attr("disabled", false);
 	$('#submit_btn').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table_remove.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
@@ -294,7 +293,7 @@ $("select#species_arg").on("change", function(value){
 				</div>
 			</div>-->
 			<div class="col-sm-12">
-				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"></div>
+				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table_remove.jpg); background-size: 100% 100%;margin:10px 0 0 0;border:2px dashed #c9c9c9;border-radius:.25rem!important"></div>
 			<div id="loader_exp"></div>
 			<!--<div id="hint_upload" style="font-weight: 200;">Note: We accept gene symbols as row identifiers, automated identifier conversion currently in development.</div>-->
 			<div id="preview_exp"></div>
@@ -481,6 +480,7 @@ $("select#species_arg").on("change", function(value){
 										</div>
 									</div>
 							</div>
+							<!--
 							<br>
 							<h4 class="font-italic text-left">CTS-regulon prediction <span class="glyphicon glyphicon-question-sign" data-html="true" data-toggle="tooltip" data-original-title="Regulon: a group of genes that controlled by the same regulatory gene.<br>
 CTS-regulon: A group of genes controlled by ONE motif under the same cell type. Genes can repeated show up in multiple regulons. <br>
@@ -498,6 +498,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 								</div>
 								<br>
 							</div>
+							-->
 							<div class="row">
 								<div class="col-md-5">
 									<label for="ex2">Upstream promoter region:	
