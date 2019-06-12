@@ -8,8 +8,6 @@
 *.pdf
 *.json
 prepare_promoter.pl
-*.fa
-*.fasta
 *.json
 *.zip
 *.conf
