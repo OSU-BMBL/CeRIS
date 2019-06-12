@@ -99,7 +99,7 @@ var exp_file_status = 0;
 	        $('.dropdown-toggle').dropdown();
 			
 	        dz_exp = $("#dropzone_exp").dropzone({
-	            dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv) <br>2. HDF5 feature barcode batrix (hdf5)<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
+	            dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5",
 	            url: "upload.php",
 	            maxFiles: 3,
@@ -529,7 +529,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_label" name="is_load_label" value="0">
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
 			<input type="hidden" id="k_arg" name="k_arg" value="18">
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20190408191738#';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2019052895653#';" />
 
 		</div>
 		<div class="form-group">
