@@ -21,17 +21,7 @@ rm *.bbc.txt.tmp
 files="$(find $dir -maxdepth 2 -name "20*.bbc.txt" -print)"
 for file in $files ;
 do
-	#echo "$file"
 	fbname=$(basename "$file")
-	#pval_fbname=$(basename "$pval_files")
-	#perl /var/www/html/iris3/program/sort_bbc.pl $fbname $pval_fbname > $fbname.1
-
-	#samtools faidx $fbname
-	#samtools faidx $fbname $(cat $pval_fbname) > $fbname.sorted
-	#echo "samtools $fbname $(cat $pval_fbname) > $fbname.sorted"
-	#fold -w 12 -s bbc.1 > $fbname
-	#rm tmp.idx
-	#echo '>end' >> $fbname
 	perl /var/www/html/iris3/program/dminda/BBC.pl bg $fbname -1 0.4 0.8
 done
 
