@@ -11,7 +11,7 @@ install_all <- function(){
     
   )
   cran_packages <- c(
-    "base","stringr","Seurat","tidyverse","rlist","hdf5r","Matrix","plotly","RColorBrewer","Polychrome"
+    "seqinr","base","stringr","Seurat","tidyverse","rlist","hdf5r","Matrix","plotly","RColorBrewer","Polychrome"
   )
   bioc_np <- bioc_packages[!(bioc_packages %in% installed.packages()[,"Package"])]
   cran_np <- cran_packages[!(cran_packages %in% installed.packages()[,"Package"])]
