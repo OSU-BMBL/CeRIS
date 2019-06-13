@@ -4,12 +4,11 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_zscore")
-#setwd("/var/www/html/iris3_test/data/2019052895653/")
+#setwd("C:/Users/wan268/Documents/iris3_data/test_meme")
 #srcDir <- getwd()
 #jobid <-2019052895653 
-# is_meme <- 0
-# motif_len <- 12
+#is_meme <- 1
+#motif_len <- 12
 srcDir <- args[1]
 is_meme <- args[2] # no 0, yes 1
 motif_len <- args[3]
@@ -18,12 +17,12 @@ getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
-#gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3_data_backup/dminda/human_gene_start_info.txt")
+#gene_info <- read.table("file:///C:/Users/wan268/Documents/iris3_db/human_gene_start_info.txt")
 species_id <-  as.character(read.table("species_main.txt")[1,1])
 if(species_id == "Human"){
-  gene_info <- read.table("/var/www/html/iris3/program/dminda/human_gene_start_info.txt")
+  gene_info <- read.table("/var/www/html/iris3/program/db/human_gene_start_info.txt")
 } else if (species_id == "Mouse"){
-  gene_info <- read.table("/var/www/html/iris3/program/dminda/mouse_gene_start_info.txt")
+  gene_info <- read.table("/var/www/html/iris3/program/db/mouse_gene_start_info.txt")
 }
 
 sort_dir <- function(dir) {
@@ -50,7 +49,6 @@ sort_short_closure <- function(dir){
 alldir <- sort_dir(alldir)
 #convert_motif(all_closure[1])
 #filepath<-all_closure[6]
-
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
