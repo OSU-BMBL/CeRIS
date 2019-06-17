@@ -4,20 +4,18 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("C:/Users/wan268/Documents/iris3_data/test_meme")
+#setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
 #srcDir <- getwd()
 #jobid <-2019052895653 
-#is_meme <- 1
 #motif_len <- 12
 srcDir <- args[1]
-is_meme <- args[2] # no 0, yes 1
-motif_len <- args[3]
+motif_len <- args[2]
 setwd(srcDir)
 getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
-#gene_info <- read.table("file:///C:/Users/wan268/Documents/iris3_db/human_gene_start_info.txt")
+#gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3_data_backup/dminda/human_gene_start_info.txt")
 species_id <-  as.character(read.table("species_main.txt")[1,1])
 if(species_id == "Human"){
   gene_info <- read.table("/var/www/html/iris3/program/db/human_gene_start_info.txt")
@@ -47,8 +45,8 @@ sort_short_closure <- function(dir){
 }
 
 alldir <- sort_dir(alldir)
-#convert_motif(all_closure[1])
-#filepath<-all_closure[6]
+#convert_motif(all_closure[6])
+#filepath<-all_closure[j]
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
@@ -71,7 +69,7 @@ convert_motif <- function(filepath){
   return(df)
 }
 
-#i=1
+#i=3
 #j=1
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
@@ -146,13 +144,13 @@ for (i in 1:length(alldir)) {
   write.fasta(this_fasta,names(this_fasta),paste(alldir[i],".bbc.txt",sep=""),nbchar = 12)
   }
   cat(">end", file=paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
-}
 
-  this_bic <- gsub(">bic","",motif_rank[,1])
-  this_bic <- gsub(".txt.fa.*","",this_bic)
-  this_id <- gsub(".*closures-","",motif_rank[,1])
-  motif_rank[,5] <- paste(i,this_bic,this_id,sep=",")
-  write.table(motif_rank[,c(5,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+
+ #this_bic <- gsub(">bic","",motif_rank[,1])
+ #this_bic <- gsub(".txt.fa.*","",this_bic)
+ #this_id <- gsub(".*closures-","",motif_rank[,1])
+ #motif_rank[,5] <- paste(i,this_bic,this_id,sep=",")
+ #write.table(motif_rank[,c(5,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
   }
 write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
