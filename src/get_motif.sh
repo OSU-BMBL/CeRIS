@@ -1,12 +1,13 @@
 #!/bin/bash
-cores=6
+cores=8
 dir=$1
 min_length=$2
 max_length=$3
 is_meme=$4
 files="$(find $dir -maxdepth 2 -name "*fa" -print)"
+meme_index="$(find $dir -maxdepth 2 -name "*fa" -print|wc -l)"
 echo "$files"
-while read -r species; 
+while read -r species; do 
 	for file in $files ;
 	do
 		while :; do
@@ -17,12 +18,11 @@ while read -r species;
 		sleep 1
 		done
 		if [ "$is_meme" = "1" ]; then
-			#/var/www/html/iris3/program/meme/bin/meme $file -p 8 -w $min_length -allw -mod zoops -nmotifs 10 -text -maxsites 100 -revcomp -dna -oc $file.closures > $file.closures &
-			/var/www/html/iris3/program/meme/bin/meme $file -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 10 -objfun de -neg /var/www/html/iris3/program/bg_data/Human.bg.fa -dna -text > $file.meme.closures &
-			#/var/www/html/iris3/program/meme/bin/meme bic1.txt.fa -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 10 -csites 1000 -objfun de -neg /var/www/html/iris3/program/bg_data/Human.bg.fa -dna -text > 
+			ct_dir=$(dirname "${file}")
+			/var/www/html/iris3/program/meme/bin/meme $file -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 3 -objfun de -neg /var/www/html/iris3/program/bg_data/Human.bg.fa -dna -text > $ct_dir"/bic"$meme_index.txt.fa.closures &
+			meme_index=$((meme_index+1))
 		else
-			/var/www/html/iris3/program/dminda/src/BoBro/BoBro -i $file -l $min_length -F -o 10 -Z /var/www/html/iris3/program/bg_data/$species.bg.fa&
-			
+			/var/www/html/iris3/program/dminda/src/BoBro/BoBro -i $file -l $min_length -F -o 10 -Z /var/www/html/iris3/program/bg_data/$species.bg.fa &
 		fi
 		
 		#perl /var/www/html/iris3/program/dminda/BBR1.pl 1 $file -L $min_length -U $max_length -R 2 -F -n 10 0.4
