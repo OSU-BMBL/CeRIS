@@ -208,11 +208,13 @@ Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_labe
 Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
 Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
 #perl /var/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
-/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
+/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
+Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
+/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
 wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
-Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd $motif_program \$motif_min_length\n
+Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd \$motif_min_length\n
 touch bg \n
 /var/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
@@ -259,11 +261,14 @@ Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
 Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
 Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n
 #perl /var/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
-/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length $motif_program\n
+/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
+Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
+/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
+
 wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
-Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd $motif_program\n
+Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd\n
 touch bg \n
 /var/www/html/iris3/program/get_bbc.sh \$wd\n
 Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
