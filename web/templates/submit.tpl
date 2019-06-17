@@ -271,7 +271,11 @@ $("select#species_arg").on("change", function(value){
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" >Download example gene expression file</a>
+						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" >Download example gene expression matrix</a>
+						</li>
+						<li><a class="dropdown-item" href="storage/iris3_example_hdf5.h5" >Download example HDF5 feature barcode matrix</a>
+						</li>
+						<li><a class="dropdown-item" href="storage/iris3_example_10x_matrices.zip" >Download example gene-barcode matrices (3 files in 10X output)</a>
 						</li>
 					</ul>
 				</div>
