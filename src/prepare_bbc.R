@@ -4,20 +4,18 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("C:/Users/wan268/Documents/iris3_data/test_meme")
+#setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
 #srcDir <- getwd()
 #jobid <-2019052895653 
-#is_meme <- 1
 #motif_len <- 12
 srcDir <- args[1]
-is_meme <- args[2] # no 0, yes 1
-motif_len <- args[3]
+motif_len <- args[2]
 setwd(srcDir)
 getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
 alldir <- grep(".+_bic$",alldir,value=T)
-#gene_info <- read.table("file:///C:/Users/wan268/Documents/iris3_db/human_gene_start_info.txt")
+#gene_info <- read.table("file:///D:/Users/flyku/Documents/IRIS3_data_backup/dminda/human_gene_start_info.txt")
 species_id <-  as.character(read.table("species_main.txt")[1,1])
 if(species_id == "Human"){
   gene_info <- read.table("/var/www/html/iris3/program/db/human_gene_start_info.txt")
@@ -47,8 +45,8 @@ sort_short_closure <- function(dir){
 }
 
 alldir <- sort_dir(alldir)
-#convert_motif(all_closure[1])
-#filepath<-all_closure[6]
+#convert_motif(all_closure[6])
+#filepath<-all_closure[j]
 convert_motif <- function(filepath){
   this_line <- data.frame()
   motif_file <- file(filepath,"r")
@@ -87,12 +85,12 @@ convert_meme <- function(filepath){
       
       if(length(grep(".+[ATCG]",this_line[5])) == 1){
         tmp_bind <- t(data.frame(this_line))
-        if(ncol(tmp_bind) < 6) {
-          if (nchar(as.character(tmp_bind[5])) < motif_len){
+        if(ncol(tmp_bind) < 7) {
+          if (nchar(as.character(tmp_bind[6])) < motif_len){
             tmp_bind <- cbind(tmp_bind,"A")
-            tmp <- tmp_bind[4]
-            tmp_bind[4] <- tmp_bind[5]
-            tmp_bind[5] <- tmp
+            tmp <- tmp_bind[5]
+            tmp_bind[5] <- tmp_bind[6]
+            tmp_bind[6] <- tmp
           } else {
             tmp_bind <- cbind(tmp_bind,"A")
           }
@@ -119,17 +117,17 @@ convert_meme <- function(filepath){
       this_motif_align <- motif_result[motif_idx_range,]
       this_motif_name <- paste(">Motif-",i,sep = "")
       this_motif_align <- cbind(this_motif_align,this_motif_name)
-      this_motif_align[,4] <- as.numeric(as.character(this_motif_align[,2])) + as.numeric(this_motif_length) - 1
-      this_seq_idx <- sample(seq(1:this_num_sites))
-      this_motif_align[,6] <- this_seq_idx
-      colnames(this_motif_align) <- (c("V1","V2","V3","V4","V5","V6","V7"))
-      this_motif_align <- this_motif_align[,c(7,6,2,4,5,3,1)]
+      this_motif_align[,5] <- as.numeric(as.character(this_motif_align[,3])) + as.numeric(this_motif_length) - 1
+      this_seq_idx <- seq(1:this_num_sites)
+      this_motif_align[,7] <- this_seq_idx
+      colnames(this_motif_align) <- (c("V1","V2","V3","V4","V5","V6","V7","V8"))
+      this_motif_align <- this_motif_align[,c(8,7,3,5,6,4,1)]
       this_motif_align[, ] <- lapply(this_motif_align[, ], as.character)
       cat("*********************************************************\n", file=filepath,append = T)
       cat(paste(" Candidate Motif   ",this_index,sep=""), file=filepath,append = T)
       cat("\n*********************************************************\n\n", file=filepath,append = T)
       cat(paste(" Motif length: ",this_motif_length,"\n Motif number: ",this_num_sites,
-                "\n Motif Pvalue: ",1/this_pval," ",this_pval,"\n\n",sep=""), file=filepath,append = T)
+                "\n Motif Pvalue: ",this_pval," (",-1*(100*log10(this_pval)),")\n Seed Zscore: ",-1*(100*log10(this_pval)),"\n",sep=""), file=filepath,append = T)
       cat(paste("\n------------------- Consensus sequences------------------\n",this_consensus,"\n\n",sep=""), file=filepath,append = T)
       cat("------------------- Aligned Motif ------------------\n#Motif	Seq	start	end	Motif		Score	Info\n", file=filepath,append = T)
       for (j in 1:nrow(this_motif_align)) {
@@ -141,7 +139,7 @@ convert_meme <- function(filepath){
   }
 }
 
-#i=1
+#i=3
 #j=1
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
@@ -158,7 +156,7 @@ for (i in 1:length(alldir)) {
   short_all_closure <- sort_short_closure(short_all_closure)
   if(length(all_closure) > 0){
     for (j in 1:length(all_closure)) {
-      if(is_meme == 1) {
+      if(length(grep(".meme.closures",basename(all_closure[j])))==1) {
         convert_meme(all_closure[j])
       }
       matches <- regmatches(short_all_closure[j], gregexpr("[[:digit:]]+", short_all_closure[j]))
@@ -219,13 +217,13 @@ for (i in 1:length(alldir)) {
   write.fasta(this_fasta,names(this_fasta),paste(alldir[i],".bbc.txt",sep=""),nbchar = 12)
   }
   cat(">end", file=paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
-}
 
-  this_bic <- gsub(">bic","",motif_rank[,1])
-  this_bic <- gsub(".txt.fa.*","",this_bic)
-  this_id <- gsub(".*closures-","",motif_rank[,1])
-  motif_rank[,5] <- paste(i,this_bic,this_id,sep=",")
-  write.table(motif_rank[,c(5,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+
+ #this_bic <- gsub(">bic","",motif_rank[,1])
+ #this_bic <- gsub(".txt.fa.*","",this_bic)
+ #this_id <- gsub(".*closures-","",motif_rank[,1])
+ #motif_rank[,5] <- paste(i,this_bic,this_id,sep=",")
+ #write.table(motif_rank[,c(5,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
   }
 write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
