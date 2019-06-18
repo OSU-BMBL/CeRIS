@@ -98,11 +98,10 @@ if (isset($_POST['submit']))
 	#fclose($fp);
 	file_put_contents("$workdir/species.txt", implode(PHP_EOL, $species_arg));
 	file_put_contents("$workdir/species.txt", "\n",FILE_APPEND);
-	$motif_program = $_POST['motif_program'];
 	$expfile = $_SESSION['expfile'];
 	$labelfile = $_SESSION['labelfile'];
 	$gene_module_file = $_SESSION['gene_module_file'];
-	if ($is_load_exp == '0') {
+	/*if ($is_load_exp == '0') {
 		$expfile = "";
 	}
 	if ($is_load_label == '0') {
@@ -110,7 +109,7 @@ if (isset($_POST['submit']))
 	}
 	if ($is_load_gene_module == '0') {
 		$gene_module_file = "";
-	}
+	}*/
 	$bic_inference = $_POST['bicluster_inference'];
 	if( $expfile!='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		$labelfile = "";
@@ -128,7 +127,7 @@ if (isset($_POST['submit']))
 	}
 
 	
-	if($is_gene_filter == '1' && $is_cell_filter == '1' && $c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $motif_program == '0' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
+	if($is_gene_filter == '1' && $is_cell_filter == '1' && $c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		
 		header("Location: results.php?jobid=20190408191738#");
 	}
@@ -175,7 +174,7 @@ if (isset($_POST['submit']))
 	}
 	}
 	$fp = fopen("$workdir/info.txt", 'w');
-	fwrite($fp,"is_load_exp,$is_load_exp\nc_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nmotif_program,$motif_program\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\ngene_module_file,$gene_module_file\nis_gene_filter,$is_gene_filter\nis_cell_filter,$is_cell_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
+	fwrite($fp,"is_load_exp,$is_load_exp\nc_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\ngene_module_file,$gene_module_file\nis_gene_filter,$is_gene_filter\nis_cell_filter,$is_cell_filter\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
 	fclose($fp);
 	$fp = fopen("$workdir2/qsub.sh", 'w');
 	if($if_allowSave != '0'){
@@ -290,10 +289,7 @@ echo 'finish'> done\n
 	fclose($fp);
 	session_destroy();
 	system("chmod -R 777 $workdir2");
-	$fp = fopen("$workdir2/param.txt", 'w+');
-	fwrite($fp,"$jobid $workdir $selected_val $c_arg $k_arg $o_arg $f_arg $expfile");
-	fclose($fp);
-	system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);

@@ -56,7 +56,7 @@ function addPreviewTable(response, metadata=true, type) {
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
 		}
 		if (response['columns'][0].length < 40 && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at lease around 100 cells in your scRNA-seq experiment. </span></label>'))
+			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
 			document.getElementById("k_arg").value = 5;
 		}
 		var check_cell_name_start_with_number = function (array) {
@@ -108,7 +108,7 @@ var exp_file_status = 0;
 	                this.removeAllFiles();
 	                this.addFile(file);
 	            },
-				timeout: 300000,
+				timeout: 1800000,
 	            sending: function(file, xhr, formData) {
 	                formData.append('filetype', 'dropzone_exp');
 	            },
@@ -129,7 +129,7 @@ var exp_file_status = 0;
 	            url: "upload.php",
 	            maxFiles: 1,
 	            maxFilesize: 500,
-				timeout: 300000,
+				timeout: 1800000,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
 	                this.addFile(file);
@@ -178,10 +178,10 @@ var exp_file_status = 0;
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
-	$('select[name=species_arg]').val('Human');
+	$("#species_arg option[value='Human']").prop('selected', true);
 	$('.selectpicker').selectpicker('refresh')
-	
-	/*$.ajax({
+	// load example data
+	$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'expression'},
@@ -191,7 +191,7 @@ var exp_file_status = 0;
         error: function(e){
             console.log(e.message);
         }
-	})*/
+	})
 });
 	// load example cell label
 	$('#load_label').click(function(evt) {
@@ -202,10 +202,10 @@ var exp_file_status = 0;
 	$('#dropzone_exp').hide();
 	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
 	$('#dropzone_label').hide();
-	$('select[name=species_arg]').val('Human');
+	$("#species_arg option[value='Human']").prop('selected', true);
 	$('.selectpicker').selectpicker('refresh')
-	// AJAX Query
-	/*$.ajax({
+	// AJAX upload example
+	$.ajax({
 		url: "upload.php",
 		type: 'POST',
 		data: {'filename': 'label'},
@@ -215,7 +215,7 @@ var exp_file_status = 0;
         error: function(e){
             console.log(e.message);
         }
-	})*/
+	})
 });
 
 	// load example gene module
