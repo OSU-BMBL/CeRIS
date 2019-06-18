@@ -31,16 +31,11 @@ getwd()
 # gene_module_file <- 'iris3_example_gene_module.csv'
 # delim_gene_module <- ','
 
-#conds_file <- read.delim(paste(jobid,"_blocks.conds.txt",sep = ""),sep=" ",header = F)[,-1]
 conds_file_handle <- file(paste(jobid,"_blocks.conds.txt",sep = ""),"r")
 conds_file <- readLines(conds_file_handle)
 close(conds_file_handle)
 
 gene_file <- read.delim(paste(jobid,"_blocks.gene.txt",sep = ""),sep=" ",header = F)[,-1]
-#conds_file <- read_delim(paste(jobid,"_blocks.conds.txt",sep = ""),delim=" ",col_names = F)[,-1]
-#conds_file <- read_csv(paste(jobid,"_blocks.conds.txt",sep = ""),col_names = F)
-#gene_file <- read_delim(paste(jobid,"_blocks.gene.txt",sep = ""),delim=" ",col_names = F)[,-1]
-#cell_label <- read_delim("iris3_example_expression_label.csv",delim=",",col_names = T)
 cell_label <- read.table(label_file,sep="\t",header = T)
 gene_expression <- read.table(expFile,sep="\t",header = T)
 gene_name <- rownames(gene_expression)
@@ -78,15 +73,11 @@ get_pvalue <- function(df){
   
   #min_pvalue <- min(result_pvalue)
   #min_i <- which(min_pvalue==result_pvalue)
-  
   #return (list(pvalue=min_pvalue,cell_type=min_i))
   return (list(pvalue=result_pvalue,cell_type=seq(1:count_cluster)))
 }
 
 pv <- lapply(conds_file,get_pvalue)
-
-
-
 get_pvalue_df <- function(lis,num){
   result <- lis$pvalue
   ct <- lis$cell_type
@@ -97,7 +88,7 @@ get_pvalue_df <- function(lis,num){
   }
 }
 
-#test get_bic_in_ct
+#test get_bic_in_ct function
 #lis=pv[[2]]
 #num=4
 get_bic_in_ct <- function(lis,num){
@@ -149,31 +140,27 @@ gene_bic <- gene_file[names(li),]%>%
 
 gene_bic[] <- lapply(gene_bic, as.character)
 gene_bic <- data.frame(lapply(gene_bic, function(x) {gsub("_.", "", x)}))
-
 if(length(gene_bic) > 0) {
-colnames(gene_bic) <- paste0("bic",names(li))
-
-gene_name <- read.table(paste(jobid,"_gene_name.txt",sep = ""),header = F,stringsAsFactors = F)
-
-
-get_gene_name_overlap <- function(df){
-  match <- gene_name$V1%in%as.character(df)
-  return (match)
-}
-
-gene_overlap <- gene_name
-for (i in 1:ncol(gene_bic)) {
-  tmp_match <- gene_name$V1%in%as.character(gene_bic[,i])
-  gene_overlap[,i+1] <- ifelse(tmp_match,1,0)
+  colnames(gene_bic) <- paste0("bic",names(li))
+  gene_name <- read.table(paste(jobid,"_gene_name.txt",sep = ""),header = F,stringsAsFactors = F)
+  get_gene_name_overlap <- function(df){
+    match <- gene_name$V1%in%as.character(df)
+    return (match)
+  }
   
-}
-ncol(gene_overlap)
-colnames(gene_overlap) <- c("geneid",colnames(gene_bic))
-gene_overlap[,"weight"] <- rowSums(as.data.frame(gene_overlap[,-1]))
-#total_bic <- total_bic + ncol(gene_bic) #total gene modules
-write.table(gene_bic,paste(jobid,"_CT_",j,"_bic.txt",sep = ""),sep="\t",row.names = F,col.names = T,na = "",quote = F)
-#write.table(gene_overlap,paste("gene_overlap",j,".txt",sep = ""),row.names = F,col.names = T,quote = F)
-}
+  gene_overlap <- gene_name
+  for (i in 1:ncol(gene_bic)) {
+    tmp_match <- gene_name$V1%in%as.character(gene_bic[,i])
+    gene_overlap[,i+1] <- ifelse(tmp_match,1,0)
+  }
+  
+  ncol(gene_overlap)
+  colnames(gene_overlap) <- c("geneid",colnames(gene_bic))
+  gene_overlap[,"weight"] <- rowSums(as.data.frame(gene_overlap[,-1]))
+  #total_bic <- total_bic + ncol(gene_bic) #total gene modules
+  write.table(gene_bic,paste(jobid,"_CT_",j,"_bic.txt",sep = ""),sep="\t",row.names = F,col.names = T,na = "",quote = F)
+  #write.table(gene_overlap,paste("gene_overlap",j,".txt",sep = ""),row.names = F,col.names = T,quote = F)
+  }
 }
 write(paste("total_label,",nrow(cell_label),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_bic,",total_bic,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
@@ -185,4 +172,3 @@ if(length(gene_module_file) > 0 && !is.na(gene_module_file)){
     write.table(gene_module[,i],paste(jobid,"_module_",i,"_bic.txt",sep = ""),quote = F,col.names = F,row.names = F)
   }
 }
-#i=1

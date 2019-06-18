@@ -39,7 +39,11 @@ quiet <- function(x) {
   on.exit(sink()) 
   invisible(force(x)) 
 } 
-png(paste("regulon_id/",id,".png",sep = ""),width=800, height=800)
+png(paste("regulon_id/overview_",id,".png",sep = ""),width=700, height=700)
+Plot.cluster2D(reduction.method = "tsne",customized = T)
+quiet(dev.off())
+
+png(paste("regulon_id/",id,".png",sep = ""),width=700, height=700)
 Plot.regulon2D(reduction.method = "tsne",regulon = as.numeric(regulon_id),customized =T)  
 quiet(dev.off())
 

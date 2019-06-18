@@ -12,8 +12,8 @@ $max=0;
 $DATAPATH="/var/www/html/iris3/data";
 $TOOLPATH="/var/www/html/iris3/program/dminda";
    session_start();
-   
 $motif_tmp_filename="ct".$ct."bic".$bic."m".$id;
+   
 $ct_path=$DATAPATH."/".$jobid."/".$jobid."_CT_".$ct."_bic/";
 $motif_background_filename=$ct_path."bic".$bic.".txt.fa";
 $tempnam =$ct_path."bic".$bic.".txt.fa.closures";
@@ -208,7 +208,7 @@ if(file_exists($tempnam)&& file_get_contents($tempnam)!="")
 }else{
 }
 
-
+$select = $motif_tmp_filename;
    for($i=0;$i<count($annotation1);$i++)
    {
 	   
@@ -223,13 +223,12 @@ if(file_exists($tempnam)&& file_get_contents($tempnam)!="")
 					file_put_contents("$ct_path$motif_tmp_filename", $annotation1[$i]['Motifs'][$j]['Motif'].PHP_EOL, FILE_APPEND);
 				}
 				file_put_contents("$ct_path$motif_tmp_filename", ">end".PHP_EOL, FILE_APPEND);
-          	   system("cat $ct_path$motif_tmp_filename |python $TOOLPATH/motif_tools/align2matrix.py > $DATAPATH/$jobid/$select.matrix");
-             system("cat $ct_path$motif_tmp_filename | perl $TOOLPATH/motif_tools/align2uniprobe.pl > $DATAPATH/$jobid/$select.uniprobe");
-             system("cat $ct_path$motif_tmp_filename.uniprobe | perl $TOOLPATH/motif_tools/uniprobe2meme > $DATAPATH/$jobid/$select.meme");
+          	   system("cat $ct_path$motif_tmp_filename |python $TOOLPATH/motif_tools/align2matrix.py > $DATAPATH/$jobid/logo_tmp/$select.matrix");
+             system("cat $ct_path$motif_tmp_filename | perl $TOOLPATH/motif_tools/align2uniprobe.pl > $DATAPATH/$jobid/logo_tmp/$select.uniprobe");
+             system("cat $DATAPATH/$jobid/logo_tmp/$select.uniprobe | perl $TOOLPATH/motif_tools/uniprobe2meme > $DATAPATH/$jobid/logo_tmp/$select.meme");
                 break;
           }
          
-      
    }
 
         $workdir="$DATAPATH/$jobid";
@@ -314,10 +313,8 @@ for($i=1;$i<=count($show);$i++)
 }
 
   $matrix="";
- 
-  //cat /var/www/html/bobro/data/20131124133808/Motif-1 | perl /var/www/html/bobro/tools/motif_tools/uniprobe2meme > /var/www/html/bobro/data/20131124133808/Motif-1.meme
-    //$matrix=$matrix."-----------------------------------------Motif Matrix Format--------------------------------------"."\n";
-    if($fp = fopen("$DATAPATH/$jobid/$select.matrix", 'r')){
+    $matrix=$matrix."-----------------------------------------Motif Matrix Format--------------------------------------"."\n";
+    if($fp = fopen("$DATAPATH/$jobid/logo_tmp/$select.matrix", 'r')){
 	
 	   while(!feof($fp)) 
 	  	   {
@@ -327,8 +324,8 @@ for($i=1;$i<=count($show);$i++)
 	
 	  fclose($fp);
 	}
-    //$matrix=$matrix."--------------------------------------Motif Uniprobe Format------------------------------------"."\n";
-    if( $fp = fopen("$DATAPATH/$jobid/$select.uniprobe", 'r')){
+    $matrix=$matrix."--------------------------------------Motif Uniprobe Format------------------------------------"."\n";
+    if( $fp = fopen("$DATAPATH/$jobid/logo_tmp/$select.uniprobe", 'r')){
 	   while(!feof($fp)) 
 	  	   {
 	  	  $line=fgets($fp);
@@ -336,8 +333,8 @@ for($i=1;$i<=count($show);$i++)
 	  	   }
 	  fclose($fp);
 	  }
-    //$matrix=$matrix."---------------------------------------Motif meme Format----------------------------------------"."\n";
-       if($fp = fopen("$DATAPATH/$jobid/$select.meme", 'r')){
+    $matrix=$matrix."---------------------------------------Motif meme Format----------------------------------------"."\n";
+       if($fp = fopen("$DATAPATH/$jobid/logo_tmp/$select.meme", 'r')){
 	   while(!feof($fp)) 
 	  	   {
 	  	  $line=fgets($fp);

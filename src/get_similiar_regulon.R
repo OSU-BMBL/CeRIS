@@ -12,8 +12,8 @@ jobid <- args[3]
 setwd(srcDir)
 
 # parse 'CT3S-R5' to 'CT', '3', '5'
-#regulon_ct <- strsplit(regulon,"S-R")[[1]][1]
-#regulon_ct <- gsub( "[0-9].*$", "", regulon )
+# regulon_ct <- strsplit(regulon,"S-R")[[1]][1]
+# regulon_ct <- gsub( "[0-9].*$", "", regulon )
 # regulon= 'modul1-R2'
 # regulon= 'CT3S-R9'
 regulon_type <- gsub( "[0-9].*$", "", regulon)

@@ -14,9 +14,9 @@ jobid <- args[4]
 setwd(srcDir)
 
 if (species == "Human") {
-  tad_dir <- '/var/www/html/iris3/program/tad/hg38'
+  tad_dir <- '/var/www/html/iris3/program/db/tad/hg38'
 } else if (species == "Mouse"){
-  tad_dir <- '/var/www/html/iris3/program/tad/mm10'
+  tad_dir <- '/var/www/html/iris3/program/db/tad/mm10'
 }
 # parse 'CT3S-R5' to 'CT', '3', '5'
 #regulon_ct <- strsplit(regulon,"S-R")[[1]][1]

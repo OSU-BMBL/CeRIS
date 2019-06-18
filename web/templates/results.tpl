@@ -1253,7 +1253,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		data: {'id': regulon_id},
 		dataType: 'json',
 		success: function(response) {
-		document.getElementById(table_id).innerHTML = '<p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" />'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>t-SNE plot in this CT</p><img src="./data/'+jobid+'/regulon_id/overview_' + regulon_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
