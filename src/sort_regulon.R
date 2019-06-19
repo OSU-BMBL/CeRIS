@@ -12,7 +12,7 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 
 ###test
-# wd <- "D:/Users/flyku/Documents/IRIS3-data/test_combine"
+# wd <- "C:/Users/wan268/Documents/iris3_data/20190617154456"
 # jobid <-20190617154456 
 # expFile <- "20190617154456_filtered_expression.txt"
 # labelFile <- "20190617154456_cell_label.txt"
@@ -28,7 +28,9 @@ calc_jsd <- function(v1,v2) {
 }
 
 #num_ct <- 1
-#genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1","SF1")
+#genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1","BRCA2")
+#genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
+#genes <- "BRCA2"
 calc_regulon_score <- function (cells_rankings=cells_rankings,genes,num_ct){
   geneSets <- list(geneSet1=genes)
   cells_AUC <- AUCell_calcAUC(geneSets, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05)
@@ -54,8 +56,8 @@ sort_dir <- function(dir) {
   return(tmp[order(split)])
   
 }
-workdir <- getwd()
-alldir <- list.dirs(path = workdir)
+
+alldir <- list.dirs(path = wd)
 alldir <- grep("*_bic$",alldir,value=T)
 alldir <- sort_dir(alldir)
 
@@ -136,4 +138,33 @@ for (i in 1:length(alldir)) {
   }
   
 }
-
+#.AUC.geneSet_norm <- function(geneSet=genes, rankings=cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05, gSetName="")
+#{
+#  geneSet <- unique(geneSet)
+#  nGenes <- length(geneSet)
+#  geneSet <- geneSet[which(geneSet %in% rownames(rankings))]
+#  missing <- nGenes-length(geneSet)
+#  
+#  gSetRanks <- rankings[which(rownames(rankings) %in% geneSet),,drop=FALSE]
+#  rm(rankings)
+#  
+#  aucThreshold <- round(aucMaxRank)
+#  ########### NEW version:  #######################
+#  x_th <- 1:nrow(gSetRanks)
+#  x_th <- sort(x_th[x_th<aucThreshold])
+#  y_th <- seq_along(x_th)
+#  maxAUC <- sum(diff(c(x_th, aucThreshold)) * y_th) 
+#  ############################################
+#  
+#  # Apply by columns (i.e. to each ranking)
+#  auc <- apply(gSetRanks@assays@.xData$data$ranking, 2, .auc, aucThreshold, maxAUC)
+#  
+#  return(c(auc, missing=missing, nGenes=nGenes))
+#}
+#
+#.auc <- function(oneRanking=gSetRanks@assays@.xData$data$ranking[,90], aucThreshold, maxAUC)
+#{
+#  x <- unlist(oneRanking)[1]
+#  y <- seq_along(x)
+#  sum(diff(c(x, aucThreshold)) * y)/maxAUC
+#}
