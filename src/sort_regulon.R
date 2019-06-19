@@ -114,12 +114,13 @@ for (i in 1:length(alldir)) {
     gene_name_list[[j]] <- append(regulon_tag,gene_name_list[[j]])
     gene_id_list[[j]] <- append(regulon_tag,gene_id_list[[j]])
     motif_list[[j]] <- append(regulon_tag,motif_list[[j]])
+    rss_list[[j]] <- append(regulon_tag,rss_list[[j]])
   }
   #lapply(gene_name_list, function(x) write_file(data.frame(x), 'test_regulon_gene_name.txt',append= T))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
-  
+  cat("",file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""))
   for (j in 1:length(gene_name_list)) {
     cat(gene_name_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),append = T,sep = "\t")
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),append = T)
@@ -129,6 +130,9 @@ for (i in 1:length(alldir)) {
     
     cat(motif_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),append = T,sep = "\t")
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),append = T)
+    
+    cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""),append = T,sep = "\t")
+    cat("\n",file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""),append = T)
   }
   
 }
