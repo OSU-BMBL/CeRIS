@@ -6,16 +6,28 @@
 
 #library(GenomicAlignments)
 #library(ensembldb)
-
+#BiocManager::install("Seurat")
 suppressPackageStartupMessages(library(stringr))
-suppressPackageStartupMessages(library(monocle))
 suppressPackageStartupMessages(library(Seurat))
+suppressPackageStartupMessages(library(hdf5r))
+suppressPackageStartupMessages(library(stringr))
+library(SingleCellExperiment)
+library(SC3)
+library(scater)
+
+
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 outFile <- args[2] # user job id
 delim <- args[3] #delimiter
 is_gene_filter <- args[4] #1 for enable gene filtering
 is_cell_filter <- args[5] #1 for enable cell filtering
+label_file <- 1
+label_file <- args[6] # user label file name or 1
+param_k <- character()
+param_k <- args[5] #k parameter for sc3
+
+
 if(delim == 'tab'){
 	delim <- '\t'
 }
@@ -26,19 +38,41 @@ load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # setwd("/home/www/html/iris3/data/20190305183801")
   # setwd("C:/Users/flyku/Desktop/iris3_data")
-  setwd("d:/Users/flyku/Documents/IRIS3-data/")
-  srcFile = "single_cell.csv"
-  #srcFile = "iris3_example_expression_matrix.csv"
+  setwd("C:/Users/wan268/Documents/iris3_data/test_meme")
+  #srcFile = "single_cell.csv"
+  srcFile = "iris3_example_expression_matrix.csv"
   outFile <- "20190408154828"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
 }
 
-getwd()
-expFile <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE, row.names = NULL)
-colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
+##############################
+# define a fucntion for reading in 10X hd5f data and cell gene matrix by input (TenX) or (CellGene)
+read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
+  if(!is.null(x)){
+    if(!is.null(read.method)){
+      if(read.method !="TenX.h5"&&read.method!="CellGene"&&read.method!="TenX.folder"){
+        stop("wrong 'read.method' argument, please choose 'TenX.h5','TenX.folder', or 'CellGene'!")}
+      if(read.method == "TenX.h5"){
+        tmp_x<-Read10X_h5(x)
+        return(tmp_x)
+      }else if(read.method =="TenX.folder"){
+        tmp_x<-Read10X(x)
+        return(tmp_x)
+      } else if(read.method == "CellGene"){# read in cell * gene matrix, if there is error report, back to 18 line to run again.
+        tmp_x<-read.delim(x,header = T,row.names = NULL,check.names = F,sep=sep,...)
+        
+        return(tmp_x)
+      }
+    }
+  }else {stop("Missing 'x' argument, please input correct data")}
+}
 
+getwd()
+
+expFile <- read_data(x = srcFile,read.method = "CellGene",sep = delim)
+colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
 #check if [1,1] is empty
 if(colnames(expFile)[1] == ""){
   colnames(expFile)[1] = "Gene_ID"
@@ -50,6 +84,7 @@ if(length(which(duplicated.default(expFile[,1]))) > 0 ){
 }	
 rownames(expFile) <- expFile[,1]
 expFile<- expFile[,-1]
+
 total_cell_num <- ncol(expFile)
 thres_genes <- nrow(expFile) * 0.01
 thres_cells <- ncol(expFile) * 0.05
@@ -110,7 +145,7 @@ expFile <- expFile[,c(-1,-(ncol(expFile)))]
 if(length(which(rownames(expFile)=="")) > 0){
   expFile <- expFile[-which(rownames(expFile)==""),]
 }
-
+expFile<-as.sparse(expFile)
 
 #this <- expFile[1,]
 # keep the gene with number of non-0 expression value cells >= 5%
@@ -144,30 +179,27 @@ if(is_cell_filter == "1"){
   new_exp <- new_exp[,which(cell_index == 1)]
 } 
 
-sample_sheet <- data.frame(groups = str_split_fixed(colnames(new_exp), "\\.+", 3), row.names = colnames(new_exp))
-gene_ann <- data.frame(gene_short_name = row.names(new_exp), row.names = row.names(new_exp))
-pd <- new("AnnotatedDataFrame",data=sample_sheet)
-fd <- new("AnnotatedDataFrame",data=gene_ann)
+# normalization using Seurat
+new_exp<-CreateSeuratObject(new_exp)
+#new_exp<-GetAssayData(object = my.object,slot = "counts")
 
-tpm_mat <- new_exp
-tpm_mat <- apply(tpm_mat, 2, function(x) x / sum(x) * 1e6)
-
-# if reads are integers, normalize with 'negbinomial.size()'
-# for log-transformed FPKM, TPM, RPKM, if value < 10, use gaussianff()
-# for FPKM, TPM, RPKM judge values not integers and some >10, use tobit()
-
-if(all(as.numeric(unlist(expFile))%%1==0)){
-  URMM_all_std <- newCellDataSet(as.matrix(new_exp),phenoData = pd,featureData =fd,
-                                 expressionFamily = negbinomial.size())
-} else if (all(as.numeric(unlist(expFile)) < 10)){
-  URMM_all_std <- newCellDataSet(as.matrix(new_exp),phenoData = pd,featureData =fd,
-                                 expressionFamily = gaussianff())
-} else {
-  URMM_all_std <- newCellDataSet(as.matrix(new_exp),phenoData = pd,featureData =fd,
-                                 expressionFamily = tobit())
+if(user_provide_label == "1") {
+  #################################
+  # Key part for customizing cell type: 
+  ##############################################
+  # Add meta info(cell type) to seurat object###
+  ##############################################
+  my.meta.info<-read.table("./websiteoutput/test_zscore/2019052895653_cell_label.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
+  my.object<-AddMetaData(new_exp,my.meta.info,col.name = "Customized.idents")
+  Idents(new_exp)
+  Idents(new_exp)<-new_exp$Customized.idents
+  ##############################################
 }
 
-new_exp <-as.matrix(URMM_all_std@assayData$exprs)
+
+new_exp<-NormalizeData(new_exp,normalization.method = "LogNormalize",scale.factor = 10000)
+
+
 # calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(new_exp)
 filter_gene_num <- total_gene_num-nrow(new_exp)
@@ -179,7 +211,7 @@ if(filter_cell_num == 0){
 }
 
 
-new_exp <- log1p(new_exp)
+new_exp <- GetAssayData(object = new_exp,slot = "counts")
 
 #write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(outFile,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
@@ -192,5 +224,87 @@ write(paste("main_species,",main_species,sep=""),file=paste(outFile,"_info.txt",
 write.table(expFile,paste(outFile,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 write.table(new_exp,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 
+
+
+if (label_file == 0 | label_file==1){
+  cell_info <- colnames(exp_data)
+} else {
+  if(delimiter == 'tab'){
+    delimiter <- '\t'
+  }
+  if(delimiter == 'space'){
+    delimiter <- ' '
+  }
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
+  cell_info[,2] <- as.factor(cell_info[,2])
+}
+
+# create a SingleCellExperiment object
+sce <- SingleCellExperiment(
+  assays = list(
+    counts = as.matrix(exp_data),
+    logcounts = log2(as.matrix(exp_data) + 1)
+  ), 
+  colData = cell_info
+)
+
+# define feature names in feature_symbol column
+rowData(sce)$feature_symbol <- rownames(sce)
+# remove features with duplicated names
+sce <- sce[!duplicated(rowData(sce)$feature_symbol), ]
+sce <- sc3_prepare(sce)
+
+if (as.numeric(param_k)>0){
+  sce <- sc3_calc_dists(sce)
+  sce <- sc3_calc_transfs(sce)
+  sce <- sc3_kmeans(sce, ks = as.numeric(param_k))
+} else {
+  sce <- sc3_estimate_k(sce)
+  sce <- sc3_calc_dists(sce)
+  sce <- sc3_calc_transfs(sce)
+  sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
+}
+
+sce <- sc3_calc_consens(sce)
+# get row data for section 5.2 Silhouette Plot
+# silh stores the bar width
+# modify k to the number of cluster
+silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
+#silh[,2] = seq(1:nrow(silh))
+save_image <- function(type,filetype){
+  if(filetype == "jpeg" || filetype == "png"){
+    type(file=paste("saving_plot1.",as.character(filetype),sep=""),width=1200, height=1200)
+  } else if (filetype == "pdf"){
+    type(file=paste("saving_plot1.",as.character(filetype),sep=""))
+  } else if (filetype == "emf"){
+    library(devEMF)
+    emf(file="saving_plot1.emf", emfPlus = FALSE)
+  }
+  if (as.numeric(param_k)>0){
+    sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2]))
+  } else {
+    sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
+  }
+  dev.off()
+}
+
+if (label_file == 1){
+  silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
+} else {
+  silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
+}
+
+save_image(pdf,"pdf")
+save_image(emf,"emf")
+save_image(png,"png")
+save_image(jpeg,"jpeg")
+silh_out <- silh_out[order(silh[,1]),]
+write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
+#apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
+
+a <- as.data.frame(colData(sce))
+a <- cbind(rownames(a),a[,ncol(a)])
+colnames(a) <- c("cell_name","label")
+write.table(a,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 
 
