@@ -25,6 +25,11 @@ if (!require("AUCell")) {
   BiocManager::install("AUCell")
   library(AUCell)
 }
+if (!require("dplyr")) {
+  install.packages("dplyr")
+  library(dplyr)
+}
+
 #pre-optional
 options(stringsAsFactors = F)
 ##############################
@@ -163,7 +168,7 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
       my.cell.type<-my.cts.regulon.S4$seurat_clusters
       message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
     } 
-    tmp_data<-my.cts.regulon.S4@assays$RNA@data
+    tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
     # geneSets<-list(GeneSet1=rownames(tmp_data))
     # cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
     # cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
@@ -237,13 +242,30 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
   
 
 }
-Plot.regulon2D(cell.type=1,regulon=2)
+Plot.regulon2D(cell.type=1,regulon=5,customized = T)
 
-my.marker<-c()
-for (i in 1:length(unique(Idents(my.object)))){
-  my.marker.tmp<-FindMarkers(my.object,only.pos = T,ident.1 = Idents(my.object)[i])
-  my.marker<-c(my.marker,my.marker.tmp)
-} 
+
+Get.MarkerGene<-function(customized=T){
+  if(customized){
+    Idents(my.object)<-my.object$Customized.idents
+    my.marker<-FindAllMarkers(my.object,only.pos = T)
+  } else {
+    Idents(my.object)<-my.object$seurat_clusters
+    my.marker<-FindAllMarkers(my.object,only.pos = T)
+  }
+  my.cluster<-unique(as.character(Idents(my.object)))
+  my.top.20<-c()
+  for( i in 1:length(my.cluster)){
+    my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
+    my.top.20.tmp<-list(my.cluster.data.frame$gene[1:100])
+    my.top.20<-append(my.top.20,my.top.20.tmp)
+  }
+  names(my.top.20)<-paste0("CT",my.cluster)
+  my.top.20<-as.data.frame(my.top.20)
+  return(my.top.20)
+}
+my.cluster.uniq.marker<-Get.MarkerGene(customized = T)
+write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
 
 #sad
 # regulon genes t-sne
