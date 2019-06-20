@@ -6,7 +6,7 @@
 
 #library(GenomicAlignments)
 #library(ensembldb)
-#BiocManager::install("Seurat")
+#BiocManager::install("SC3")
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(hdf5r))
@@ -38,13 +38,15 @@ load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # setwd("/home/www/html/iris3/data/20190305183801")
   # setwd("C:/Users/flyku/Desktop/iris3_data")
-  setwd("C:/Users/wan268/Documents/iris3_data/test_meme")
+  setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
   #srcFile = "single_cell.csv"
   srcFile = "iris3_example_expression_matrix.csv"
-  outFile <- "20190408154828"
+  outFile <- "2019052895653"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
+  label_file<-1
+  param_k<-character()
 }
 
 ##############################
@@ -183,22 +185,8 @@ if(is_cell_filter == "1"){
 new_exp<-CreateSeuratObject(new_exp)
 #new_exp<-GetAssayData(object = my.object,slot = "counts")
 
-if(user_provide_label == "1") {
-  #################################
-  # Key part for customizing cell type: 
-  ##############################################
-  # Add meta info(cell type) to seurat object###
-  ##############################################
-  my.meta.info<-read.table("./websiteoutput/test_zscore/2019052895653_cell_label.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
-  my.object<-AddMetaData(new_exp,my.meta.info,col.name = "Customized.idents")
-  Idents(new_exp)
-  Idents(new_exp)<-new_exp$Customized.idents
-  ##############################################
-}
-
-
 new_exp<-NormalizeData(new_exp,normalization.method = "LogNormalize",scale.factor = 10000)
-
+new_exp<-SCTransform()
 
 # calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(new_exp)

@@ -243,7 +243,9 @@ my.marker<-c()
 for (i in 1:length(unique(Idents(my.object)))){
   my.marker.tmp<-FindMarkers(my.object,only.pos = T,ident.1 = Idents(my.object)[i])
   my.marker<-c(my.marker,my.marker.tmp)
-}
+} 
+
+#sad
 # regulon genes t-sne
 
 
