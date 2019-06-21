@@ -14,11 +14,11 @@ suppressPackageStartupMessages(library(stringr))
 library(SingleCellExperiment)
 library(SC3)
 library(scater)
-
-
+library(devEMF)
+library(dplyr)
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
-outFile <- args[2] # user job id
+jobid <- args[2] # user job id
 delim <- args[3] #delimiter
 is_gene_filter <- args[4] #1 for enable gene filtering
 is_cell_filter <- args[5] #1 for enable cell filtering
@@ -36,17 +36,17 @@ if(delim == 'space'){
 }
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
-  # setwd("/home/www/html/iris3/data/20190305183801")
-  # setwd("C:/Users/flyku/Desktop/iris3_data")
-  setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
+  # setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
+  wd=("d:/Users/flyku/Documents/IRIS3-data/test_meme")
+  # setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
   #srcFile = "single_cell.csv"
   srcFile = "iris3_example_expression_matrix.csv"
-  outFile <- "2019052895653"
+  jobid <- "2019052895653"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
   label_file<-1
-  param_k<-character()
+  param_k<-0
 }
 
 ##############################
@@ -94,13 +94,13 @@ thres_cells <- ncol(expFile) * 0.05
 # detect rownames gene list with identifer by the largest number of matches: 1) gene symbol 2)ensembl geneid 3) ncbi entrez id
 
 get_rowname_type <- function (l, db){
-  res1 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "SYMBOL")),error = function(e) 0)
-  res2 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENSEMBL")),error = function(e) 0)
-  res3 <- tryCatch(nrow(select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENTREZID")),error = function(e) 0)
+  res1 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "SYMBOL")),error = function(e) 0)
+  res2 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENSEMBL")),error = function(e) 0)
+  res3 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENTREZID")),error = function(e) 0)
   result <- c("error","SYMBOL","ENSEMBL","ENTREZID")
   result_vec <- c(1,res1,res2,res3)
   return(c(result[which.max(result_vec)],result_vec[which.max(result_vec)]))
-  #write("No matched gene identifier found, please check your data.",file=paste(outFile,"_error.txt",sep=""),append=TRUE)
+  #write("No matched gene identifier found, please check your data.",file=paste(jobid,"_error.txt",sep=""),append=TRUE)
 }
 
 # detect species
@@ -127,9 +127,9 @@ main_identifier <- as.character(gene_identifier[1,which.max(gene_identifier[2,])
 
 if(length(species_file) == 2) {
   second_species <- names(which.min(gene_identifier[2,]))
-  write(paste("second_species,",second_species,sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
+  write(paste("second_species,",second_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 }
-all_match <- select(main_db, keys = rownames(expFile), columns = c("SYMBOL","ENSEMBL"),keytype = main_identifier)
+all_match <- AnnotationDbi::select(main_db, keys = rownames(expFile), columns = c("SYMBOL","ENSEMBL"),keytype = main_identifier)
 expFile <- merge(expFile,all_match,by.x=0,by.y=main_identifier)
 expFile <- na.omit(expFile)
 
@@ -171,46 +171,46 @@ filter_cell_func <- function(this){
 # apply gene filtering
 if(is_gene_filter == "1"){
   gene_index <- as.vector(apply(expFile, 1, filter_gene_func))
-  new_exp <- expFile[which(gene_index == 1),]
+  my.object <- expFile[which(gene_index == 1),]
 } else {
-  new_exp <- expFile
+  my.object <- expFile
 }
 # apply cell filtering
 if(is_cell_filter == "1"){
-  cell_index <- as.vector(apply(new_exp, 2, filter_cell_func))
-  new_exp <- new_exp[,which(cell_index == 1)]
+  cell_index <- as.vector(apply(my.object, 2, filter_cell_func))
+  my.object <- my.object[,which(cell_index == 1)]
 } 
 
 # normalization using Seurat
-new_exp<-CreateSeuratObject(new_exp)
-#new_exp<-GetAssayData(object = my.object,slot = "counts")
+my.object<-CreateSeuratObject(my.object)
+#my.object<-GetAssayData(object = my.object,slot = "counts")
 
-new_exp<-NormalizeData(new_exp,normalization.method = "LogNormalize",scale.factor = 10000)
-new_exp<-SCTransform()
+my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+
 
 # calculate filtering rate
-#filter_gene_num <- nrow(expFile)-nrow(new_exp)
-filter_gene_num <- total_gene_num-nrow(new_exp)
+#filter_gene_num <- nrow(expFile)-nrow(my.object)
+filter_gene_num <- total_gene_num-nrow(my.object)
 filter_gene_rate <- formatC(filter_gene_num/total_gene_num,digits = 2)
-filter_cell_num <- ncol(expFile)-ncol(new_exp)
+filter_cell_num <- ncol(expFile)-ncol(my.object)
 filter_cell_rate <- formatC(filter_cell_num/total_cell_num,digits = 2)
 if(filter_cell_num == 0){
   filter_cell_rate <- '0'
 }
 
 
-new_exp <- GetAssayData(object = new_exp,slot = "counts")
+exp_data <- GetAssayData(object = my.object,slot = "counts")
 
-#write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(outFile,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
-write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("total_gene_num,",as.character(total_gene_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("filter_gene_rate,",as.character(filter_gene_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("filter_cell_num,",as.character(filter_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write(paste("main_species,",main_species,sep=""),file=paste(outFile,"_info.txt",sep=""),append=TRUE)
-write.table(expFile,paste(outFile,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-write.table(new_exp,paste(outFile,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+#write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(jobid,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("total_gene_num,",as.character(total_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("filter_gene_rate,",as.character(filter_gene_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("filter_cell_num,",as.character(filter_cell_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+write.table(expFile,paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+write.table(exp_data,paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 
 
 
@@ -290,9 +290,60 @@ silh_out <- silh_out[order(silh[,1]),]
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
 #apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
 
-a <- as.data.frame(colData(sce))
-a <- cbind(rownames(a),a[,ncol(a)])
-colnames(a) <- c("cell_name","label")
-write.table(a,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+cell_info <- as.data.frame(colData(sce))
+cell_info <- cbind(rownames(cell_info),cell_info[,ncol(cell_info)])
+colnames(cell_info) <- c("cell_name","label")
+write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+
+rownames(cell_info) <- cell_info[,1]
+cell_info <- cell_info[,-1]
+
+my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
+Idents(my.object)<-as.factor(my.object$Customized.idents)
+my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
+# before PCA, scale data to eliminate extreme value affect.
+all.gene<-rownames(my.object)
+my.object<-ScaleData(my.object,features = all.gene)
+# after scaling, perform PCA
+my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+###########################################
+# CORE part: Run TSNE and UMAP######################
+###########################################
+my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
+# run umap to get high dimension scatter plot at 2 dimensional coordinate system.
+my.object<-RunUMAP(object = my.object,dims = 1:30)
+#clustering by using Seurat KNN. 
+# clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
+# here has one problems: whether should we define the clustering number?
+my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+# find clustering, there will be changing the default cell type, if want to use customized cell type. 
+# use Idents() function.
+my.object<-FindClusters(my.object,resolution = 0.5)
+
+Get.MarkerGene<-function(my.object, customized=T){
+  if(customized){
+    Idents(my.object)<-my.object$Customized.idents
+    my.marker<-FindAllMarkers(my.object,only.pos = T)
+  } else {
+    Idents(my.object)<-my.object$seurat_clusters
+    my.marker<-FindAllMarkers(my.object,only.pos = T)
+  }
+  my.cluster<-unique(as.character(as.numeric(Idents(my.object))))
+  my.top.20<-c()
+  for( i in 1:length(my.cluster)){
+    my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
+    my.top.20.tmp<-list(my.cluster.data.frame$gene[1:100])
+    my.top.20<-append(my.top.20,my.top.20.tmp)
+  }
+  names(my.top.20)<-paste0("CT",my.cluster)
+  my.top.20<-as.data.frame(my.top.20)
+  return(my.top.20)
+}
+
+my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = F)
+write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
+
+
+saveRDS(my.object,file="seurat_obj.rds")
 
 
