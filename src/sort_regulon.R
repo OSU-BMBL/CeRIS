@@ -13,7 +13,7 @@ jobid <- args[2] # user job id
 
 ###test
 # wd <- "C:/Users/wan268/Documents/iris3_data/20190617154456"
-# jobid <-20190617154456 
+# jobid <-2019052895653 
 # expFile <- "20190617154456_filtered_expression.txt"
 # labelFile <- "20190617154456_cell_label.txt"
 
@@ -33,7 +33,7 @@ calc_jsd <- function(v1,v2) {
 #genes <- "BRCA2"
 calc_regulon_score <- function (cells_rankings=cells_rankings,genes,num_ct){
   geneSets <- list(geneSet1=genes)
-  cells_AUC <- AUCell_calcAUC(geneSets, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05)
+  cells_AUC <- AUCell_calcAUC(geneSets, cells_rankings, aucMaxRank=nrow(cells_rankings)*1)
   # get auc score vector
   auc_vec <- getAUC(cells_AUC)
   #normalize auc_vec to sum=1
@@ -105,10 +105,13 @@ for (i in 1:length(alldir)) {
   gene_id_list <- gene_id_list[rss_keep_index]
   motif_list <- motif_list[rss_keep_index]
   
-  rss_rank <- rank(unlist(rss_list),ties.method = "first")
-  gene_name_list <- gene_name_list[rss_rank]
-  gene_id_list <- gene_id_list[rss_rank]
-  motif_list <- motif_list[rss_rank]
+  rss_rank <- order(unlist(rss_list),decreasing = T)
+
+  rss_list <- rss_list[order(unlist(rss_list),decreasing = T)]
+  
+  gene_name_list <- gene_name_list[order(unlist(rss_list),decreasing = T)]
+  gene_id_list <- gene_id_list[order(unlist(rss_list),decreasing = T)]
+  motif_list <- motif_list[order(unlist(rss_list),decreasing = T)]
 
   #j=1
   for (j in 1:length(gene_name_list)) {
