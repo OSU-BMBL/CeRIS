@@ -1,5 +1,5 @@
 ####### preprocessing expression matrix based on SC3 ##########
-
+options(check.names=F)
 #removes genes/transcripts that are either expressed (expression value > 2) in less than X% of cells (rare genes/transcripts) 
 #or expressed (expression value > 0) in at least (100 ??? X)% of cells (ubiquitous genes/transcripts). 
 #By default, X is set at 6.
@@ -25,7 +25,7 @@ is_cell_filter <- args[5] #1 for enable cell filtering
 label_file <- 1
 label_file <- args[6] # user label file name or 1
 param_k <- character()
-param_k <- args[5] #k parameter for sc3
+param_k <- args[7] #k parameter for sc3
 
 
 if(delim == 'tab'){
@@ -37,7 +37,6 @@ if(delim == 'space'){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
-  wd=("d:/Users/flyku/Documents/IRIS3-data/test_meme")
   # setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
   #srcFile = "single_cell.csv"
   srcFile = "iris3_example_expression_matrix.csv"
@@ -181,6 +180,7 @@ if(is_cell_filter == "1"){
   my.object <- my.object[,which(cell_index == 1)]
 } 
 
+cell_names <- colnames(my.object)
 # normalization using Seurat
 my.object<-CreateSeuratObject(my.object)
 #my.object<-GetAssayData(object = my.object,slot = "counts")
@@ -200,7 +200,8 @@ if(filter_cell_num == 0){
 
 
 exp_data <- GetAssayData(object = my.object,slot = "counts")
-
+exp_data <- log1p(exp_data)
+colnames(exp_data) <- cell_names
 #write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(jobid,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_gene_num,",as.character(total_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
