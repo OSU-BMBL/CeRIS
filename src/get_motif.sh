@@ -4,8 +4,8 @@ dir=$1
 min_length=$2
 max_length=$3
 is_meme=$4
-files="$(find $dir -maxdepth 2 -name "*fa" -print)"
-meme_index="$(find $dir -maxdepth 2 -name "*fa" -print|wc -l)"
+files="$(find $dir -maxdepth 2 -name "bic*fa" -print)"
+meme_index="$(find $dir -maxdepth 2 -name "bic*fa" -print|wc -l)"
 echo "$files"
 while read -r species; do 
 	for file in $files ;
@@ -19,6 +19,7 @@ while read -r species; do
 		done
 		if [ "$is_meme" = "1" ]; then
 			ct_dir=$(dirname "${file}")
+			cp $file $ct_dir"/bic"$meme_index.txt.fa
 			/var/www/html/iris3/program/meme/bin/meme $file -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 3 -objfun de -neg /var/www/html/iris3/program/bg_data/Human.bg.fa -dna -text > $ct_dir"/bic"$meme_index.txt.fa.closures &
 			meme_index=$((meme_index+1))
 		else
