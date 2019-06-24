@@ -16,11 +16,12 @@ if (!require("Polychrome")) {
   install.packages("Polychrome")
   library(Polychrome)
 }
+library(AUCell)
 args <- commandArgs(TRUE)
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_zscore")
-#setwd("/var/www/html/iris3/data/2019052895653/")
+#setwd("C:/Users/wan268/Documents/iris3_data/0624")
 #srcDir <- getwd()
-#id <-"CT1S-R5" 
+#id <-"CT1S-R3" 
 srcDir <- args[1]
 id <- args[2]
 
@@ -91,6 +92,8 @@ Get.CellType<-function(cell.type=NULL,...){
   
 }
 
+
+
 Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
   my.regulon.number<-length(Get.CellType(cell.type = cell.type))
   if (regulon > my.regulon.number){
@@ -105,22 +108,24 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
       message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
     } 
     tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
-    # geneSets<-list(GeneSet1=rownames(tmp_data))
-    # cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
-    # cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
-    # my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
-    # my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
-    regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
+    geneSets<-list(GeneSet1=rownames(tmp_data))
+    cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.5)
+    cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
+    my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
+    my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
+    # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
+    regulon.score<-my.auc.data
     tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
     my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
-                                        regulon.score=regulon.score)
-    
+                                        regulon.score=regulon.score[,1])
     return(my.choose.regulon)
   }
 }
 
 setwd(srcDir)
 my.object <- readRDS("seurat_obj.rds")
+cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
+
 regulon_ct <-gsub( "-.*$", "", id)
 regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
@@ -137,6 +142,6 @@ quiet(dev.off())
 
 png(paste("regulon_id/",id,".png",sep = ""),width=700, height=700)
 Plot.regulon2D(reduction.method = "tsne",regulon = as.numeric(regulon_id),cell.type=as.numeric(regulon_ct),customized =T)  
-
 quiet(dev.off())
+
 
