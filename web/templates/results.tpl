@@ -252,7 +252,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 											<img style="width:100%"src="data/{{$jobid}}/saving_plot1.jpeg"></img>
 											</div>
 											{{/if}}
-											-->
+											
 											<div class="CT-result-img">
                                                 <div class="col-sm-4">
 												<h4 style="text-align:center;margin-top:50px"> PCA</h4>
@@ -267,6 +267,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                    <img style="width:100%"src="data/{{$jobid}}/umap.png"></img>
 												</div>
 											</div>
+											-->
                                             <div class="CT-result-img">
                                                 <div class="col-sm-12">
 												<hr>
@@ -433,7 +434,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
 																				
 																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="lozad" data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"/></a></span>
-																					
+									<input class="btn btn-submit" type="button" value="Motif details" onClick="window.open('motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}');"/>
 									<input class="btn btn-submit" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
 									<input class="btn btn-submit" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  />
 									{{assign var=motif_num_jaspar value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`_JASPAR"}}
@@ -547,7 +548,8 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 																								<th>Rate in regulon</th>
 																								<th>Species</th>
 																								<th>CistromeDB ID</th>
-																								<th>GEO accession</th>
+																								<th></th>
+																								<th>Overlapped genes</th>
 																							</tr>
 																						</thead>
 																					</table>
@@ -1132,16 +1134,34 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 				"order": [[ 3, "desc" ]],
 				columnDefs: [
 				{
-					targets: 6,
+					targets: 0,
 					render: function (data, type, row, meta)
 					{
 						if (type === 'display')
 						{
-							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +data+ '" target="_blank">'+data +'</a>';
+							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +row[6]+ '" target="_blank">'+data +'</a>';
 						}
 						return data;
 					}
-				}],
+				},{
+                "targets": [6],
+                "visible": false
+				},{
+                "targets": [7],
+                render: function (data, type, row, meta)
+					{	
+						var dat=new Array
+						if (type === 'display')
+						{
+							res=data.split(" ")
+							for(i=0;i < res.length;i++) {
+								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>';
+							}
+						}
+						return dat;
+					}
+				}
+				],
 		
 		});
 		}
@@ -1241,6 +1261,10 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 	function show_regulon_table(item) {
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
+	ct_id= regulon_id.substring(
+    regulon_id.lastIndexOf("CT") + 2, 
+    regulon_id.lastIndexOf("S")
+	);
 	table_id = "regulon-table-" + regulon_id
 	species = document.getElementById("species").innerHTML
 	match_species = species.match(/[^Species: ].+/gm)[0]
@@ -1253,7 +1277,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		data: {'id': regulon_id},
 		dataType: 'json',
 		success: function(response) {
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>t-SNE plot in this CT</p><img src="./data/'+jobid+'/regulon_id/overview_' + regulon_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_' + regulon_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
