@@ -92,7 +92,10 @@ write.table(my.expression.data,
 ##############################################
 # Add meta info(cell type) to seurat object###
 ##############################################
-my.meta.info<-read.table("./websiteoutput/test_zscore/2019052895653_cell_label.txt",sep = "\t",row.names = 1,header = T,stringsAsFactors = F)
+label_data<-read.table("./websiteoutput/test_zscore/2019062485208_cell_label.txt",sep = "\t",
+                       header = T,check.names = F,stringsAsFactors = F)
+my.meta.info<-read.table("./websiteoutput/test_zscore/2019062485208_cell_label.txt",row.names = 1,
+                         sep = "\t",header = T,check.names = F,stringsAsFactors = F)
 my.object<-AddMetaData(my.object,my.meta.info,col.name = "Customized.idents")
 # look at current cell type info
 Idents(my.object)
@@ -151,8 +154,7 @@ Generate.Regulon(cell.type = 1,regulon = 1)
 # read in motif score and 
 # next step will take 1min to generate the mixed matrix
 
-# cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
-
+ cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
 
 
 Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
@@ -169,20 +171,21 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
       message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
     } 
     tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
-    # geneSets<-list(GeneSet1=rownames(tmp_data))
-    # cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
-    # cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
-    # my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
-    # my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
-    regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
+    geneSets<-list(GeneSet1=rownames(tmp_data))
+    cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
+    cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
+    my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
+    my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
+   # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
+    regulon.score<-my.auc.data
     tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
     my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
-                                        regulon.score=regulon.score)
+                                        regulon.score=regulon.score[,1])
     
     return(my.choose.regulon)
   }
 }
-Get.RegulonScore(reduction.method = "tsne",cell.type = 2,regulon = 3,customized = T)
+Get.RegulonScore(reduction.method = "tsne",cell.type = 2,regulon = 1,customized = T)
 ##############################
 
 Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
@@ -274,7 +277,7 @@ write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = 
 
 # test plot cluster function. 
 Plot.cluster2D(reduction.method = "tsne",customized = T,cell.type=2)# "tsne" ,"pca","umap"
-Plot.regulon2D(reduction.method = "tsne",regulon = 12,customized = T,cell.type=1)  
+Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)  
 
 
 
