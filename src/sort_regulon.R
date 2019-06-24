@@ -12,8 +12,8 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 
 ###test
-# wd <- "C:/Users/wan268/Documents/iris3_data/20190617154456"
-# jobid <-2019052895653 
+# wd <- "C:/Users/wan268/Documents/iris3_data/0624"
+# jobid <-2019062485208 
 # expFile <- "20190617154456_filtered_expression.txt"
 # labelFile <- "20190617154456_cell_label.txt"
 
@@ -61,7 +61,6 @@ alldir <- list.dirs(path = wd)
 alldir <- grep("*_bic$",alldir,value=T)
 alldir <- sort_dir(alldir)
 
-
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
 cells_rankings <- AUCell_buildRankings(exp_data) 
@@ -106,12 +105,11 @@ for (i in 1:length(alldir)) {
   motif_list <- motif_list[rss_keep_index]
   
   rss_rank <- order(unlist(rss_list),decreasing = T)
-
-  rss_list <- rss_list[order(unlist(rss_list),decreasing = T)]
+  rss_list <- rss_list[rss_rank]
   
-  gene_name_list <- gene_name_list[order(unlist(rss_list),decreasing = T)]
-  gene_id_list <- gene_id_list[order(unlist(rss_list),decreasing = T)]
-  motif_list <- motif_list[order(unlist(rss_list),decreasing = T)]
+  gene_name_list <- gene_name_list[rss_rank]
+  gene_id_list <- gene_id_list[rss_rank]
+  motif_list <- motif_list[rss_rank]
 
   #j=1
   for (j in 1:length(gene_name_list)) {
