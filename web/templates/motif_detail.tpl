@@ -101,7 +101,7 @@
                                   <div style="width:600px;">
                                   <table class="table table-bordered" style="display: inline-block; overflow-y: scroll;max-height:400px;">
 	                                 <tr>
-	                                      <td>Seq</td>
+	                                      <!--<td>Seq</td>-->
 	                                      <td>Start</td>
 	                                      <td>Motif</td>
 	                                      <td>End</td>
@@ -112,7 +112,7 @@
                                   {{section name=sec2 loop=$ann[sec1].Motifs}}
                                         {{if $ann[sec1].Motifs[sec2].red==1}}
                                           <tr >
-                                         <td>{{$ann[sec1].Motifs[sec2].Seq}}</td>
+                                         <!--<td>{{$ann[sec1].Motifs[sec2].Seq}}</td>-->
                                          <td>{{$ann[sec1].Motifs[sec2].start}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Motif}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].end}}</td>
@@ -121,7 +121,7 @@
                                          </tr>
                                          {{else}}
                                            <tr>
-                                         <td>{{$ann[sec1].Motifs[sec2].Seq}}</td>
+                                         <!--<td>{{$ann[sec1].Motifs[sec2].Seq}}</td>-->
                                          <td>{{$ann[sec1].Motifs[sec2].start}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].Motif}}</td>
                                          <td>{{$ann[sec1].Motifs[sec2].end}}</td>
@@ -142,14 +142,14 @@
     
       <table  border="1" >
        <thead>
-       <th>No.seq</th>
+       <!--<th>No.seq</th>-->
 	   <th>Gene</th>
        <th width="1000px">Motif Mapping</th>
        </thead>
        <tbody>
        {{section name=sec1 loop=$src}}
           <tr>
-             <td>{{$src[sec1].id}}</td>
+             <!--<td>{{$src[sec1].id}}</td>-->
 			 <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$ann[0].Motifs[sec1].Info}}" style="font-size:14px; display: inline-block;">{{$ann[0].Motifs[sec1].Info}}</a></td>
              <td><img src="draw_scale.php?ScaleLen={{$src[sec1].ScaleLen}}&GridUnit={{$src[sec1].GridUnit}}&LabelUnit={{$src[sec1].LabelUnit}}&MinLabel={{$src[sec1].MinLabel}}&Unit={{$src[sec1].Unit}}&WinWidth={{$src[sec1].WinWidth}}&id={{$src[sec1].id}}&jobid1={{$src[sec1].jobid1}}&blank={{$src[sec1].blank}}&color=1"/></td>
           </tr>
