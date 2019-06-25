@@ -1,14 +1,1 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-*.closures
-*.MC
-*.similarity
-*.pdf
-*.json
 prepare_promoter.pl
-*.json
-*.zip
-*.conf
-*.meme
