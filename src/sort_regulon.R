@@ -16,7 +16,7 @@ jobid <- args[2] # user job id
 # jobid <-2019062485208 
 # expFile <- "20190617154456_filtered_expression.txt"
 # labelFile <- "20190617154456_cell_label.txt"
-# wd <- getwd()
+
 setwd(wd)
 # calculate Jensen-Shannon Divergence (JSD), used to calculate regulon specificity score (RSS)
 calc_jsd <- function(v1,v2) {
@@ -84,13 +84,10 @@ for (i in 1:length(alldir)) {
   close(regulon_motif_handle)
   
   
-  motif_rank <- read.table(paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""))
-
-  
   gene_name_list <- lapply(strsplit(regulon_gene_name,"\\t"), function(x){x[-1]})
   gene_id_list <- lapply(strsplit(regulon_gene_id,"\\t"), function(x){x[-1]})
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
-
+  
   
   rss_list <- lapply(gene_name_list, function(x){
     calc_regulon_score(cells_rankings,x,i)
@@ -114,7 +111,7 @@ for (i in 1:length(alldir)) {
   gene_id_list <- gene_id_list[rss_rank]
   motif_list <- motif_list[rss_rank]
 
-  #j=2
+  #j=1
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
     gene_name_list[[j]] <- append(regulon_tag,gene_name_list[[j]])
@@ -122,14 +119,6 @@ for (i in 1:length(alldir)) {
     motif_list[[j]] <- append(regulon_tag,motif_list[[j]])
     rss_list[[j]] <- append(regulon_tag,rss_list[[j]])
   }
-  motif_rank_result <- data.frame()
-  for (j in 1:length(gene_name_list)) {
-    regulon_tag <- paste("CT",i,"S-R",j,sep = "")
-    this_motif_value <- motif_rank[which(motif_rank[,1] == motif_list[[j]][2]),-1]
-    this_motif_value <- cbind(regulon_tag,this_motif_value)
-    motif_rank_result <- rbind(motif_rank_result,this_motif_value)
-  }
-  write.table(motif_rank_result,paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
   #lapply(gene_name_list, function(x) write_file(data.frame(x), 'test_regulon_gene_name.txt',append= T))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""))

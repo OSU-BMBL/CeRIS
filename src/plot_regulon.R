@@ -66,7 +66,7 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
   p.regulon<-ggplot(my.plot.regulon,
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
-  p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "white",high = "red")
+  p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #p.cluster<-theme_linedraw()
   p.regulon<-p.regulon + labs(col="regulon score")
   message("finish!")
@@ -121,23 +121,21 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
     return(my.choose.regulon)
   }
 }
-quiet <- function(x) { 
-  sink(tempfile()) 
-  on.exit(sink()) 
-  invisible(force(x)) 
-} 
-
 
 setwd(srcDir)
 my.object <- readRDS("seurat_obj.rds")
-cells_rankings<-quiet(AUCell_buildRankings(my.object@assays$RNA@data))
+cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
 
 regulon_ct <-gsub( "-.*$", "", id)
 regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 #save.image(file="plot_regulon.RData")
-
+quiet <- function(x) { 
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+} 
 png(paste("regulon_id/overview_",id,".png",sep = ""),width=700, height=700)
 Plot.cluster2D(reduction.method = "tsne",customized = T)
 quiet(dev.off())

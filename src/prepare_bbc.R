@@ -4,9 +4,9 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("d:/Users/flyku/Documents/IRIS3-data/test_dzscore")
+#setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
 #srcDir <- getwd()
-#jobid <-2019062485208 
+#jobid <-2019052895653 
 #motif_len <- 12
 srcDir <- args[1]
 motif_len <- args[2]
@@ -54,12 +54,11 @@ convert_motif <- function(filepath){
   # get pvalue and zscore and store it in motif_rank
   split_line <- unlist(strsplit(line," "))
   pval_value <- split_line[which(split_line == "Pvalue:")+2]
-  pval_original <- split_line[which(split_line == "Pvalue:")+1]
   zscore_value <- split_line[which(split_line == "Zscore:")+1]
   if(length(pval_value)>0){
     pval_value <- as.numeric(gsub("\\((.+)\\)","\\1",pval_value))
     pval_name <- paste(">",basename(filepath),"-",seq(1:length(pval_value)),sep="")
-    tmp_pval_df <- data.frame(pval_name,pval_value,zscore_value,pval_original)
+    tmp_pval_df <- data.frame(pval_name,pval_value,zscore_value)
     #motif_rank <- data.frame()
     motif_rank <<-rbind(motif_rank,tmp_pval_df)
   df <- line[substr(line,0,1) == ">"]
@@ -70,7 +69,7 @@ convert_motif <- function(filepath){
   return(df)
 }
 
-#i=1
+#i=3
 #j=1
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
@@ -136,9 +135,9 @@ for (i in 1:length(alldir)) {
   #motif_rank<-motif_rank_bc
   #test_motif_rank <- motif_rank[!duplicated(motif_rank$pval_name),] 
   if(nrow(motif_rank) > 0){
-  motif_rank[,5] <- seq(1:nrow(motif_rank))
+  motif_rank[,4] <- seq(1:nrow(motif_rank))
   motif_rank <- motif_rank[order(as.numeric(as.character(motif_rank$zscore_value)),motif_rank$pval_value,decreasing = T),] 
-  pval_idx <- motif_rank[,5]
+  pval_idx <- motif_rank[,4]
   #write.table(motif_rank,paste(alldir[i],".pval.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
   this_fasta <- read.fasta(paste(alldir[i],".bbc.txt",sep=""))
   this_fasta <- this_fasta[pval_idx]
@@ -147,11 +146,11 @@ for (i in 1:length(alldir)) {
   cat(">end", file=paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
 
 
- this_bic <- gsub(">bic","",motif_rank[,1])
- this_bic <- gsub(".txt.fa.*","",this_bic)
- this_id <- gsub(".*closures-","",motif_rank[,1])
- motif_rank[,6] <- paste(i,this_bic,this_id,sep=",")
- write.table(motif_rank[,c(6,4,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+ #this_bic <- gsub(">bic","",motif_rank[,1])
+ #this_bic <- gsub(".txt.fa.*","",this_bic)
+ #this_id <- gsub(".*closures-","",motif_rank[,1])
+ #motif_rank[,5] <- paste(i,this_bic,this_id,sep=",")
+ #write.table(motif_rank[,c(5,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
   }
 write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
