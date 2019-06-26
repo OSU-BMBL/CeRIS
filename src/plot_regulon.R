@@ -3,12 +3,6 @@ if(!require(Seurat)) {
   install.packages("Seurat")
 } 
 
-if(!require(Matrix)) {
-  install.packages("Matrix")
-}
-if(!require(plotly)){
-  install.packages("plotly")
-}
 if (!require("RColorBrewer")) {
   install.packages("RColorBrewer")
 }
@@ -110,7 +104,7 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
     tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
     geneSets<-list(GeneSet1=rownames(tmp_data))
     cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.5)
-    cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
+    #cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = F,nCores = 1,assign = T)
     my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
     my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
     # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
