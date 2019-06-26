@@ -63,7 +63,7 @@ alldir <- sort_dir(alldir)
 
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
-cells_rankings <- AUCell_buildRankings(exp_data) 
+cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 
