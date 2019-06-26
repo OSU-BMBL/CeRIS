@@ -199,8 +199,8 @@ if(filter_cell_num == 0){
 }
 
 
-exp_data <- GetAssayData(object = my.object,slot = "counts")
-exp_data <- log1p(exp_data)
+exp_data <- GetAssayData(object = my.object,slot = "data")
+#exp_data <- log1p(exp_data)
 colnames(exp_data) <- cell_names
 #write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(jobid,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
