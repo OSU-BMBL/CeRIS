@@ -25,9 +25,9 @@ if(delim_gene_module == 'space'){
 }
 getwd()
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
-# jobid <-2018122223516
-# expFile <- "2018122223516_filtered_expression.txt"
-# label_file <- "2018122223516_cell_label.txt"
+# jobid <-2019062485208
+# expFile <- "2019062485208_filtered_expression.txt"
+# label_file <- "2019062485208_cell_label.txt"
 # gene_module_file <- 'iris3_example_gene_module.csv'
 # delim_gene_module <- ','
 
@@ -69,11 +69,12 @@ get_pvalue <- function(df){
     k=length(B)-1
     tmp_pvalue <- 1 - phyper(x,m,n,k)
     result_pvalue[i] <- tmp_pvalue
+    
   }
+  ## use benjamini-Hochberg (B&H) correction?
+  #t1 <- sgof::BH(result_pvalue)
+  #result_pvalue <- t1$Adjusted.pvalues[order(match(t1$data,result_pvalue))]
   
-  #min_pvalue <- min(result_pvalue)
-  #min_i <- which(min_pvalue==result_pvalue)
-  #return (list(pvalue=min_pvalue,cell_type=min_i))
   return (list(pvalue=result_pvalue,cell_type=seq(1:count_cluster)))
 }
 
@@ -101,7 +102,7 @@ get_bic_in_ct <- function(lis,num){
   }
 }
 total_bic <- length(conds_file)
-#i=1;j=2
+#i=1;j=1
 for (j in 1:count_cluster) {
 pvalue_thres <- 0.05
 uniq_li <- sapply(pv, get_bic_in_ct,num=j)
@@ -172,3 +173,4 @@ if(length(gene_module_file) > 0 && !is.na(gene_module_file)){
     write.table(gene_module[,i],paste(jobid,"_module_",i,"_bic.txt",sep = ""),quote = F,col.names = F,row.names = F)
   }
 }
+
