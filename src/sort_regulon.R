@@ -5,7 +5,7 @@
 # cell label
 # regulon_gene_name, regulon, regulon_motif
 
-library(AUCell)
+
 
 args <- commandArgs(TRUE)
 wd <- args[1] # filtered expression file name
@@ -18,6 +18,15 @@ jobid <- args[2] # user job id
 # labelFile <- "20190617154456_cell_label.txt"
 # wd <- getwd()
 setwd(wd)
+
+
+quiet <- function(x) { 
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+} 
+
+
 # calculate Jensen-Shannon Divergence (JSD), used to calculate regulon specificity score (RSS)
 calc_jsd <- function(v1,v2) {
   H <- function(v) {
@@ -27,28 +36,53 @@ calc_jsd <- function(v1,v2) {
   return (H(v1/2+v2/2) - (H(v1)+H(v2))/2)
 }
 
+
 #num_ct <- 1
-#genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1","BRCA2")
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
-#genes <- "BRCA2"
-calc_regulon_score <- function (cells_rankings=cells_rankings,genes,num_ct){
-  geneSets <- list(geneSet1=genes)
-  cells_AUC <- AUCell_calcAUC(geneSets, cells_rankings, aucMaxRank=nrow(cells_rankings)*1)
-  # get auc score vector
-  auc_vec <- getAUC(cells_AUC)
-  #normalize auc_vec to sum=1
-  sum_auc_vec <- sum(auc_vec)
-  auc_vec <- auc_vec/sum_auc_vec
+# calculate regulon activity score (RAS) 
+#expr <- as.matrix(expr)
+calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea")) {
+  if (method=="aucell"){ #use top 10% cutoff
+    require(AUCell)
+    names(genes) <- 1:length(genes)
+    cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
+    cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.5)
+    score_vec <- cells_AUC@assays@.xData$data$AUC
+  } else if (method=="zscore"){
+    require("GSVA")
+    score_vec <- gsva(expr,gset=genes,method="zscore")
+  } else if (method=="plage"){
+    require("GSVA")
+    score_vec <- gsva(expr,gset=genes,method="plage")
+  } else if (method=="ssgsea"){
+    require("GSVA")
+    #score_vec <- quiet(gsva(expr,gset=geneSets,method="ssgsea"))
+    score_vec <- gsva(expr,gset=genes,method="ssgsea")
+  } 
+  
+  return(score_vec)
+}
+# calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
+calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
+  
+  #normalize score_vec(regulon activity score) to sum=1
+  score_vec <- t(apply(data.frame(score_vec), 1, function(x){
+    x <- x/sum(x)
+  }))
+  
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
   # also normalize ct_vec to sum=1
   sum_ct_vec <- sum(ct_vec)
   ct_vec <- ct_vec/sum_ct_vec
-  jsd_result <- calc_jsd(as.vector(auc_vec),ct_vec)
+  jsd_result <- apply(as.data.frame(score_vec), 1, function(x){
+    return (calc_jsd(x,ct_vec))
+  })
   #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
   rss <- 1- sqrt(jsd_result)
   return(rss)
 }
+
 sort_dir <- function(dir) {
   tmp <- sort(dir)
   split <- strsplit(tmp, "_CT_") 
@@ -63,12 +97,11 @@ alldir <- sort_dir(alldir)
 
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
-cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 
 #i=1
-# genes=x= gene_name_list[[2]]
+# genes=x= gene_name_list[[1]]
 for (i in 1:length(alldir)) {
   
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),"r")
@@ -91,21 +124,23 @@ for (i in 1:length(alldir)) {
   gene_id_list <- lapply(strsplit(regulon_gene_id,"\\t"), function(x){x[-1]})
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
   
+  ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "zscore")
   
-  rss_list <- lapply(gene_name_list, function(x){
-    calc_regulon_score(cells_rankings,x,i)
-  })
+  rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = 1)
+  rss_list <- as.list(rss_list)
   # calculate to be removed regulons index, if no auc score or less than 0.05
   rss_keep_index <- lapply(rss_list, function(x){
-    if(is.na(x) || x < 0.05)
+    if(is.na(x))
       return (1)
     else return(0)
   })
+  
   rss_keep_index <- which(unlist(rss_keep_index) == 0)
   rss_list <- rss_list[rss_keep_index]
   gene_name_list <- gene_name_list[rss_keep_index]
   gene_id_list <- gene_id_list[rss_keep_index]
   motif_list <- motif_list[rss_keep_index]
+  ras <- ras[rss_keep_index,]
   
   rss_rank <- order(unlist(rss_list),decreasing = T)
   rss_list <- rss_list[rss_rank]
@@ -113,6 +148,8 @@ for (i in 1:length(alldir)) {
   gene_name_list <- gene_name_list[rss_rank]
   gene_id_list <- gene_id_list[rss_rank]
   motif_list <- motif_list[rss_rank]
+  ras <- ras[rss_rank,]
+  write.table(ras,paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
   
   #j=2
   for (j in 1:length(gene_name_list)) {
@@ -125,7 +162,7 @@ for (i in 1:length(alldir)) {
   motif_rank_result <- data.frame()
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
-    this_motif_value <- motif_rank[which(motif_rank[,1] == motif_list[[j]][2]),-1]
+    this_motif_value <- motif_rank[which(motif_rank[,1] == motif_list[[j]][1]),-1]
     this_motif_value <- cbind(regulon_tag,this_motif_value)
     motif_rank_result <- rbind(motif_rank_result,this_motif_value)
   }
@@ -148,8 +185,8 @@ for (i in 1:length(alldir)) {
     cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""),append = T,sep = "\t")
     cat("\n",file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""),append = T)
   }
-  
 }
+
 #.AUC.geneSet_norm <- function(geneSet=genes, rankings=cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05, gSetName="")
 #{
 #  geneSet <- unique(geneSet)
