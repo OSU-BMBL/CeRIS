@@ -1,312 +1,706 @@
-library(RTN)
+library(AUCell)
 library(RTNsurvival)
 library(scales)
 library(viper)
 library(Fletcher2013b)
-
-data("rtni1st")
-#colAnnotation <- tni.get(rtni1st, what="colAnnotation")
-#head(colAnnotation)
-risk.tfs <- c("AFF3", "AR", "ARNT2", "BRD8", "CBFB", "CEBPB", "E2F2", "E2F3", "ENO1",
-              "ESR1", "FOSL1", "FOXA1", "GATA3", "GATAD2A", "LZTFL1", "MTA2", "MYB",
-              "MZF1", "NFIB", "PPARD", "RARA", "RB1", "RUNX3", "SNAPC2", "SOX10",
-              "SPDEF", "TBX19", "TCEAL1", "TRIM29", "XBP1", "YBX1", "YPEL3", "ZNF24",
-              "ZNF434", "ZNF552", "ZNF587")
-tns1st <- tni2tnsPreprocess(tni = rtni1st, regulatoryElements = risk.tfs,
-                            time = "time", event = "event", endpoint = 120,
-                            keycovar = c("Age","Grade"))
-#tnsPlotGSEA2(tns1st, "MB-5365", regs = "ESR1")
-#tns1st <- tnsGSEA2(tns1st)
-#
-#regact_gsea <- tnsGet(tns1st, "regulonActivity")$dif
-#sdata <- tnsGet(tns1st, "survivalData")
-#attribs <- c("ER+", "ER-","LumA","LumB","Basal","Her2","Normal")
-#pheatmap(t(regact_gsea), annotation_col = sdata[,attribs], show_colnames = FALSE,
-#         annotation_legend = FALSE, clustering_method = "ward.D2",
-#         clustering_distance_rows = "correlation",
-#         clustering_distance_cols = "correlation")
-tns1st_area <- tnsAREA3(tns1st)
-regact_area <- tnsGet(tns1st_area, "regulonActivity")$dif
-r_gsea <- apply(regact_gsea, 2, rank)
-r_area <- apply(regact_area, 2, rank)
-plot(r_gsea[,"ESR1"], r_area[,"ESR1"])
-tns1st_area <- tnsKM(tns1st_area)
-tnsPlotKM(tns1st_area, regs = "ESR1", attribs = attribs, panelWidths=c(3,1,4), width = 6)
-
-
-data(dt4rtn)
-
-# select 5 regulatoryElements for a quick demonstration!
-tfs4test <- dt4rtn$tfs[c("PTTG1","E2F2","FOXM1","E2F3","RUNX2")]
-
-## Not run: 
-
-rtni <- tni.constructor(expData=dt4rtn$gexp, regulatoryElements=tfs4test, 
-                        rowAnnotation=dt4rtn$gexpIDs)
-rtni <- tni.permutation(rtni)
-rtni <- tni.bootstrap(rtni)
-rtni <- tni.dpi.filter(rtni)
-genes <- c("APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1","SF1")
-itni <- tni.constructor(expData=exp_data, regulatoryElements=genes)
-itni <- tni.permutation(itni)
-#rtni <- tni.bootstrap(rtni)
-itni <- tni.dpi.filter(itni)
-#run aREA algorithm
-EScores <- tni.area3(itni)
-plot(EScores$dif)
-
-sc <- apply(EScores$dif, 2, rescale, to=c(-1.8, 1.8))
-sc <- as.data.frame(sc)
-sc2 <- colMeans(sc)
-sc2 <- apply(sc, 1, mean)
-
-barplot(sc2)
-
-###
-BiocManager::install("RTN")
-library(RTN)
-wd <- "d:/Users/flyku/Documents/IRIS3-data/test_dzscore"
-setwd(wd)
+library(GSVA)
+library(singscore)
+library(ggplot2)
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
-exp_data <- as.matrix(exp_data)
+rankData <- rankGenes(exp_data, tiesMethod = "max" )
 
-label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+colnames(tgfb_expr_10_se)
+head(rankData[,2,drop = FALSE])
+cells_rankings <- AUCell_buildRankings(as.matrix(exp_data),plotStats = F) 
 
-data(dt4rtn)
-# select 5 regulatoryElements for a quick demonstration!
-tfs4test <- dt4rtn$tfs[c("PTTG1","E2F2","FOXM1","E2F3","RUNX2")]
-## Not run:
-rtni <- tni.constructor(expData=dt4rtn$gexp, regulatoryElements=tfs4test,
-                        rowAnnotation=dt4rtn$gexpIDs)
-rtni <- tni.permutation(rtni)
-rtni <- tni.bootstrap(rtni)
-rtni <- tni.dpi.filter(rtni)
-#run aREA algorithm
-EScores <- tni.area3(rtni)
-
-object <- tni.constructor(expData=exp_data, regulatoryElements=genes)
-object <- tni.permutation(object)
-#rtni <- tni.bootstrap(rtni)
-object <- tni.dpi.filter(object)
-tf <-tfs4test
+barplot(rankData[,1])
+barplot(cells_rankings@assays@.xData$`.->data`$ranking[,1])
 genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
-rown=as.data.frame(rownames(exp))
+aucRanks <- cells_rankings[which(rownames(cells_rankings) %in% genes),,drop=FALSE]
+ssRanks <- rankData[which(rownames(rankData) %in% genes),,drop=FALSE]
+barplot(ssRanks[,1])
+barplot(aucRanks@assays@.xData$`.->data`$ranking[,1])
+
+data(c2BroadSets)
+gene.sets <- list(genes)
+
+geneSets <- list(set1=paste(genes,  sep=""))
 
 
-setMethod(
-  "tni.area3",
-  "TNI",function(object, minRegulonSize=1, doSizeFilter=FALSE, scale=FALSE, 
-                 tnet="dpi", tfs=NULL, samples=NULL, features=NULL, refsamp=NULL, 
-                 log=FALSE, verbose=TRUE){
-    if(object@status["Preprocess"]!="[x]")stop("NOTE: TNI object is not compleate: requires preprocessing!")
-    if(object@status["Permutation"]!="[x]")stop("NOTE: TNI object is not compleate: requires permutation/bootstrap and DPI filter!")  
-    if(object@status["DPI.filter"]!="[x]")stop("NOTE: TNI object is not compleate: requires DPI filter!")
-    
-    #---check compatibility
-    object <- upgradeTNI(object)
-    
-    ##-----check and assign parameters
-    tnai.checks(name="minRegulonSize",para=minRegulonSize)
-    tnai.checks(name="doSizeFilter",para=doSizeFilter)
-    tnai.checks(name="scale",para=scale)
-    tnai.checks(name="area.tnet",para=tnet)
-    tnai.checks(name="tfs",para=tfs)
-    tnai.checks(name="samples",para=samples)
-    tnai.checks(name="features",para=features)
-    tnai.checks(name="refsamp",para=refsamp)
-    tnai.checks(name="log",para=log) 
-    tnai.checks(name="verbose",para=verbose) 
-    object@para$area3 <- list(minRegulonSize=minRegulonSize, 
-                              doSizeFilter=doSizeFilter,
-                              scale=scale, tnet=tnet, log=log)
-    
-    ##------ compute reference gx vec
-    if(scale) object@gexp <- t(scale(t(object@gexp)))
-    if(is.null(refsamp)){
-      gxref <- apply(object@gexp,1,mean)
-    } else {
-      idx <- refsamp %in% colnames(object@gexp)
-      if(!all(idx)){
-        stop("NOTE: 'refsamp' should list only valid names!")
-      }
-      gxref <- apply(object@gexp[,refsamp],1,mean)
-    }
-    ##----- set samples
-    if(!is.null(samples)){
-      idx <- samples %in% colnames(object@gexp)
-      if(!all(idx)){
-        stop("NOTE: 'samples' should list only valid names!")
-      }
-      samples<-colnames(object@gexp)[colnames(object@gexp) %in% samples]
-    } else {
-      samples<-colnames(object@gexp)
-    }
-    ##----- set features
-    if(!is.null(features)){
-      col1<-sapply(1:ncol(object@rowAnnotation),function(i){
-        sum(features%in%object@rowAnnotation[,i],na.rm=TRUE)
-      })
-      col1<-which(col1==max(col1))[1]
-      idx<-object@rowAnnotation[[col1]]%in%features
-      object@results$tn.ref[!idx,] <- 0
-      object@results$tn.dpi[!idx,] <- 0
-    }
-    
-    ##-----get regulons
-    if(tnet=="ref"){
-      listOfRegulonsAndMode <- tni.get(object,what="refregulons.and.mode")
-    } else {
-      listOfRegulonsAndMode <- tni.get(object,what="regulons.and.mode")
-    }
-    
-    ##-----set regs
-    if(!is.null(tfs)){
-      if(sum(tfs%in%object@regulatoryElements) > sum(tfs%in%names(object@regulatoryElements) ) ){
-        tfs <- object@regulatoryElements[object@regulatoryElements%in%tfs]
-      } else {
-        tfs <- object@regulatoryElements[names(object@regulatoryElements)%in%tfs]
-      }
-      if(length(tfs)==0)stop("NOTE: 'tfs' argument has no valid names!")
-    } else {
-      tfs<-object@regulatoryElements
-    }
-    listOfRegulonsAndMode <- listOfRegulonsAndMode[tfs]
-    
-    ##-----remove partial regs, below the minRegulonSize
-    for(nm in names(listOfRegulonsAndMode)){
-      reg<-listOfRegulonsAndMode[[nm]]
-      if(sum(reg<0)<minRegulonSize){
-        reg<-reg[reg>0]
-      }
-      if(sum(reg>0)<minRegulonSize){
-        reg<-reg[reg<0]
-      }
-      listOfRegulonsAndMode[[nm]]<-reg
-    }
-    
-    ##-----check regulon size (both clouds)
-    gs.size.max <- unlist(lapply(listOfRegulonsAndMode, function(reg){
-      max(sum(reg>0),sum(reg<0))
-    }))
-    gs.size.min <- unlist(lapply(listOfRegulonsAndMode, function(reg){
-      min(sum(reg>0),sum(reg<0))
-    }))
-    ##-----stop when no subset passes the size requirement
-    if(all(gs.size.max<minRegulonSize)){
-      stop(paste("NOTE: no partial regulon has minimum >= ", minRegulonSize, sep=""))
-    }
-    ##-----get filtered list
-    if(doSizeFilter){
-      listOfRegulonsAndMode <- listOfRegulonsAndMode[which(gs.size.min>=minRegulonSize)]
-      tfs<-tfs[tfs%in%names(listOfRegulonsAndMode)]
-      if(length(listOfRegulonsAndMode)==0){
-        stop("NOTE: no regulon has passed the 'doSizeFilter' requirement!")
-      }
-    } else {
-      listOfRegulonsAndMode <- listOfRegulonsAndMode[which(gs.size.max>=minRegulonSize)]
-      tfs<-tfs[tfs%in%names(listOfRegulonsAndMode)]
-      if(length(listOfRegulonsAndMode)==0){
-        stop("NOTE: no regulon has passed the 'minRegulonSize' requirement!")
-      }
-    }
-    
-    #--- get phenotypes
-    if(log){
-      phenotypes <- log2(1+object@gexp)-log2(1+gxref)
-    } else {
-      phenotypes <- object@gexp-gxref
-    }
-    
-    #--- get regulons evaluated by EM algorithm
-    if (verbose) {
-      cat("Running EM algorithm... ")
-    }
-    if(tnet=="ref"){
-      listOfRegulonsAndModeGmm <- tni.get(object,what="refregulons.and.mode.gmm")
-    } else {
-      listOfRegulonsAndModeGmm <- tni.get(object,what="regulons.and.mode.gmm")
-    }
-    listOfRegulonsAndModeGmm <- listOfRegulonsAndModeGmm[tfs]
-    
-    #--- set regulons for aREA
-    arearegs <- list()
-    for(tf in tfs[1]){
-      arearegs[[tf]]$tfmode <- listOfRegulonsAndModeGmm[[tf]]$gmm
-      arearegs[[tf]]$likelihood <- listOfRegulonsAndModeGmm[[tf]]$mi
-    }
-    if (verbose) {
-      cat("Running aREA algorithm...\n")
-    }
-    
-    cors <- cor(t(exp_data[rownames(exp_data) %in% genes,]),method = "spearman")
-    nes <- t(aREA(eset=phenotypes, regulon=arearegs, minsize=0, verbose=FALSE)$nes)
-    nes <- nes[samples,tfs]
-    colnames(nes) <- names(tfs)
-    
-    #-- for compatibility, wrap up results into the same format
-    regulonActivity <- list(dif=nes)
-    regulonActivity <- .tni.stratification.area(regulonActivity)
-    return(regulonActivity)
+
+auc_auc <- .AUC.geneSet_norm(genes,rankings = as.data.frame(cells_rankings@assays@.xData$data$ranking),aucMaxRank=nrow(cells_rankings)*0.05)
+df <- as.data.frame(auc_auc)
+df[,2] <- rownames(df)
+ggplot(data=df,aes(x=V2,y=auc_auc))+ geom_bar(stat = "identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1.1))
+
+ss_auc <- .AUC.geneSet_norm(genes,rankings = as.data.frame(rankData),aucMaxRank=nrow(cells_rankings))
+df <- as.data.frame(ss_auc)
+df[,2] <- rownames(df)
+ggplot(data=df,aes(x=V2,y=ss_auc))+ geom_bar(stat = "identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ssgsea_score <- gsva(as.matrix(exp_data),gset=geneSets,method="ssgsea")
+#ssgsea_auc <- .AUC.geneSet_norm(genes,rankings = as.data.frame(ssgsea_score),aucMaxRank=nrow(cells_rankings))
+df <- as.data.frame(t(ssgsea_score))
+df[,2] <- rownames(df)
+ggplot(data=df,aes(x=V2,y=set1))+ geom_bar(stat = "identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+z_score <- gsva(as.matrix(exp_data),gset=genes,method="zscore")
+#ssgsea_auc <- .AUC.geneSet_norm(genes,rankings = as.data.frame(ssgsea_score),aucMaxRank=nrow(cells_rankings))
+df <- as.data.frame(t(z_score))
+df[,57] <- rownames(df)
+ggplot(data=df,aes(x=df[,57],y=df[,2]))+ geom_bar(stat = "identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plage_score <- gsva(as.matrix(exp_data),gset=geneSets,method="plage")
+#ssgsea_auc <- .AUC.geneSet_norm(genes,rankings = as.data.frame(ssgsea_score),aucMaxRank=nrow(cells_rankings))
+df <- as.data.frame(t(plage_score))
+df[,2] <- rownames(df)
+ggplot(data=df,aes(x=V2,y=set1))+ geom_bar(stat = "identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+.AUC.geneSet_norm <- function(geneSet, rankings, aucMaxRank, gSetName="")
+{
+  geneSet <- unique(geneSet)
+  nGenes <- length(geneSet)
+  geneSet <- geneSet[which(geneSet %in% rownames(rankings))]
+  missing <- nGenes-length(geneSet)
+  
+  gSetRanks <- rankings[which(rownames(rankings) %in% geneSet),,drop=FALSE]
+  rm(rankings)
+  
+  aucThreshold <- round(aucMaxRank)
+  ########### NEW version:  #######################
+  x_th <- 1:nrow(gSetRanks)
+  x_th <- sort(x_th[x_th<aucThreshold])
+  y_th <- seq_along(x_th)
+  maxAUC <- sum(diff(c(x_th, aucThreshold)) * y_th) 
+  ############################################
+  
+  # Apply by columns (i.e. to each ranking)
+  auc <- apply(gSetRanks, 2, .auc, aucThreshold, maxAUC)
+  
+  return(c(auc))
+}
+
+
+# oneRanking <- gSetRanks[,3, with=FALSE]
+.auc <- function(oneRanking, aucThreshold, maxAUC)
+{
+  x <- unlist(oneRanking)
+  
+  x <- sort(x[x<aucThreshold])
+  y <- seq_along(x)
+  sum(diff(c(x, aucThreshold)) * y)/maxAUC
+}
+
+
+expr=exp_data
+gset.idx.list <- geneSets<-list(r1=genes,r2=genes[-1])
+method="gsva"
+.gsva <- function(expr, gset.idx.list,
+                  method=c("gsva", "ssgsea", "zscore", "plage"),
+                  kcdf=c("Gaussian", "Poisson", "none"),
+                  rnaseq=FALSE,
+                  abs.ranking=FALSE,
+                  parallel.sz=0, 
+                  parallel.type="SOCK",
+                  mx.diff=TRUE,
+                  tau=1,
+                  kernel=TRUE,
+                  ssgsea.norm=TRUE,
+                  verbose=TRUE)
+{
+  if(length(gset.idx.list) == 0){
+    stop("The gene set list is empty!  Filter may be too stringent.")
   }
-)
+  
+  if (method == "ssgsea") {
+    if(verbose)
+      cat("Estimating ssGSEA scores for", length(gset.idx.list),"gene sets.\n")
+    
+    return(ssgsea(expr, gset.idx.list, alpha=tau, parallel.sz=parallel.sz,
+                  parallel.type=parallel.type, normalization=ssgsea.norm,
+                  verbose=verbose))
+  }
+  
+  if (method == "zscore") {
+    if (rnaseq)
+      stop("rnaseq=TRUE does not work with method='zscore'.")
+    
+    if(verbose)
+      cat("Estimating combined z-scores for", length(gset.idx.list),"gene sets.\n")
+    
+    return(zscore(expr, gset.idx.list, parallel.sz, parallel.type, verbose))
+  }
+  
+  if (method == "plage") {
+    if (rnaseq)
+      stop("rnaseq=TRUE does not work with method='plage'.")
+    
+    if(verbose)
+      cat("Estimating PLAGE scores for", length(gset.idx.list),"gene sets.\n")
+    
+    return(plage(expr, gset.idx.list, parallel.sz, parallel.type, verbose))
+  }
+  
+  if(verbose)
+    cat("Estimating GSVA scores for", length(gset.idx.list),"gene sets.\n")
+  
+  n.samples <- ncol(expr)
+  n.genes <- nrow(expr)
+  n.gset <- length(gset.idx.list)
+  
+  es.obs <- matrix(NaN, n.gset, n.samples, dimnames=list(names(gset.idx.list),colnames(expr)))
+  colnames(es.obs) <- colnames(expr)
+  rownames(es.obs) <- names(gset.idx.list)
+  
+  if (verbose)
+    cat("Computing observed enrichment scores\n")
+  es.obs <- compute.geneset.es(expr, gset.idx.list, 1:n.samples,
+                               rnaseq=rnaseq, abs.ranking=abs.ranking, parallel.sz=parallel.sz,
+                               parallel.type=parallel.type, mx.diff=mx.diff, tau=tau,
+                               kernel=kernel, verbose=verbose)
+  
+  colnames(es.obs) <- colnames(expr)
+  rownames(es.obs) <- names(gset.idx.list)
+  
+  es.obs
+}
 
-###test viper
 
-BiocManager::install("viper")
-# Load requeired packages
-require(viper) 
+compute.gene.density <- function(expr, sample.idxs, rnaseq=FALSE, kernel=TRUE){
+  n.test.samples <- ncol(expr)
+  n.genes <- nrow(expr)
+  n.density.samples <- length(sample.idxs)
+  
+  gene.density <- NA
+  if (kernel) {
+    A = .C("matrix_density_R",
+           as.double(t(expr[ ,sample.idxs, drop=FALSE])),
+           as.double(t(expr)),
+           R = double(n.test.samples * n.genes),
+           n.density.samples,
+           n.test.samples,
+           n.genes,
+           as.integer(rnaseq))$R
+    
+    gene.density <- t(matrix(A, n.test.samples, n.genes))
+  } else {
+    gene.density <- t(apply(expr, 1, function(x, sample.idxs) {
+      f <- ecdf(x[sample.idxs])
+      f(x)
+    }, sample.idxs))
+    gene.density <- log(gene.density / (1-gene.density))
+  }
+  
+  return(gene.density)	
+}
+
+compute.geneset.es <- function(expr, gset.idx.list, sample.idxs, rnaseq=FALSE,
+                               abs.ranking, parallel.sz=0, parallel.type="SOCK",
+                               mx.diff=TRUE, tau=1, kernel=TRUE, verbose=TRUE){
+  num_genes <- nrow(expr)
+  if (verbose) {
+    if (kernel) {
+      if (rnaseq)
+        cat("Estimating ECDFs with Poisson kernels\n")
+      else
+        cat("Estimating ECDFs with Gaussian kernels\n")
+    } else
+      cat("Estimating ECDFs directly\n")
+  }
+  gene.density <- compute.gene.density(expr, sample.idxs, rnaseq, kernel)
+  
+  compute_rank_score <- function(sort_idx_vec){
+    tmp <- rep(0, num_genes)
+    tmp[sort_idx_vec] <- abs(seq(from=num_genes,to=1) - num_genes/2)
+    return (tmp)
+  }
+  
+  rank.scores <- rep(0, num_genes)
+  sort.sgn.idxs <- apply(gene.density, 2, order, decreasing=TRUE) # n.genes * n.samples
+  
+  rank.scores <- apply(sort.sgn.idxs, 2, compute_rank_score)
+  
+  haveParallel <- .isPackageLoaded("parallel")
+  haveSnow <- .isPackageLoaded("snow")
+  
+  if (parallel.sz > 1 || haveParallel) {
+    if (!haveParallel && !haveSnow) {
+      stop("In order to run calculations in parallel either the 'snow', or the 'parallel' library, should be loaded first")
+    }
+    
+    if (haveSnow) {  ## use snow
+      ## copying ShortRead's strategy, the calls to the 'get()' are
+      ## employed to quieten R CMD check, and for no other reason
+      makeCl <- get("makeCluster", mode="function")
+      parSapp <- get("parSapply", mode="function")
+      clEvalQ <- get("clusterEvalQ", mode="function")
+      stopCl <- get("stopCluster", mode="function")
+      
+      if (verbose)
+        cat("Allocating cluster\n")
+      cl <- makeCl(parallel.sz, type = parallel.type) 
+      clEvalQ(cl, library(GSVA))
+      if (verbose) {
+        cat("Estimating enrichment scores in parallel\n")
+        if(mx.diff) {
+          cat("Taking diff of max KS.\n")
+        } else{
+          cat("Evaluting max KS.\n")
+        }
+      }
+      
+      m <- t(parSapp(cl, gset.idx.list, ks_test_m,
+                     gene.density=rank.scores, 
+                     sort.idxs=sort.sgn.idxs,
+                     mx.diff=mx.diff, abs.ranking=abs.ranking,
+                     tau=tau, verbose=FALSE))
+      if(verbose)
+        cat("Cleaning up\n")
+      stopCl(cl)
+      
+    } else if (haveParallel) {             ## use parallel
+      
+      mclapp <- get('mclapply', envir=getNamespace('parallel'))
+      detCor <- get('detectCores', envir=getNamespace('parallel'))
+      nCores <- detCor()
+      options(mc.cores=nCores)
+      if (parallel.sz > 0 && parallel.sz < nCores)
+        options(mc.cores=parallel.sz)
+      
+      pb <- NULL
+      if (verbose){
+        cat("Using parallel with", getOption("mc.cores"), "cores\n")
+        assign("progressBar", txtProgressBar(style=3), envir=globalenv()) ## show progress if verbose=TRUE
+        assign("nGeneSets", ceiling(length(gset.idx.list) / getOption("mc.cores")), envir=globalenv())
+        assign("iGeneSet", 0, envir=globalenv())
+      }
+      
+      m <- mclapp(gset.idx.list, ks_test_m,
+                  gene.density=rank.scores,
+                  sort.idxs=sort.sgn.idxs,
+                  mx.diff=mx.diff, abs.ranking=abs.ranking,
+                  tau=tau, verbose=verbose)
+      m <- do.call("rbind", m)
+      colnames(m) <- colnames(expr)
+      
+      if (verbose) {
+        close(get("progressBar", envir=globalenv()))
+      }
+    } else
+      stop("In order to run calculations in parallel either the 'snow', or the 'parallel' library, should be loaded first")
+    
+  } else {
+    if (verbose) {
+      cat("Estimating enrichment scores\n")
+      if (mx.diff) {
+        cat("Taking diff of max KS.\n")
+      } else{
+        cat("Evaluting max KS.\n")
+      }
+    }
+    pb <- NULL
+    if (verbose){
+      assign("progressBar", txtProgressBar(style=3), envir=globalenv()) ## show progress if verbose=TRUE
+      assign("nGeneSets", length(gset.idx.list), envir=globalenv())
+      assign("iGeneSet", 0, envir=globalenv())
+    }
+    
+    m <- t(sapply(gset.idx.list, ks_test_m, rank.scores, sort.sgn.idxs,
+                  mx.diff=mx.diff, abs.ranking=abs.ranking,
+                  tau=tau, verbose=verbose))
+    
+    if (verbose) {
+      setTxtProgressBar(get("progressBar", envir=globalenv()), 1)
+      close(get("progressBar", envir=globalenv()))
+    }
+  }
+  return (m)
+}
 
 
+ks_test_m <- function(gset_idxs, gene.density, sort.idxs, mx.diff=TRUE,
+                      abs.ranking=FALSE, tau=1, verbose=TRUE){
+  
+  n.genes <- nrow(gene.density)
+  n.samples <- ncol(gene.density)
+  n.geneset <- length(gset_idxs)
+  
+  geneset.sample.es = .C("ks_matrix_R",
+                         as.double(gene.density),
+                         R = double(n.samples),
+                         as.integer(sort.idxs),
+                         n.genes,
+                         as.integer(gset_idxs),
+                         n.geneset,
+                         as.double(tau),
+                         n.samples,
+                         as.integer(mx.diff),
+                         as.integer(abs.ranking))$R
+  
+  if (verbose) {
+    assign("iGeneSet", get("iGeneSet", envir=globalenv()) + 1, envir=globalenv())
+    setTxtProgressBar(get("progressBar", envir=globalenv()),
+                      get("iGeneSet", envir=globalenv()) / get("nGeneSets", envir=globalenv()))
+  }
+  
+  return(geneset.sample.es)
+}
 
-# Load TF regulon genesets in VIPER format
-load('data/TFregulons/consensus/Robjects_VIPERformat/normal/TOP10score_viperRegulon.rdata')
-# Clean TF names & explore object
-names(viper_regulon) = sapply(strsplit(names(viper_regulon), split = ' - '), head, 1)
-# Explore the regulons object
-names(viper_regulon)[1:10]
-viper_regulon[[1]]
 
+## ks-test in R code - testing only
+ks_test_Rcode <- function(gene.density, gset_idxs, tau=1, make.plot=FALSE){
+  
+  n.genes = length(gene.density)
+  n.gset = length(gset_idxs)
+  
+  sum.gset <- sum(abs(gene.density[gset_idxs])^tau)
+  
+  dec = 1 / (n.genes - n.gset)
+  
+  sort.idxs <- order(gene.density,decreasing=T)
+  offsets <- sort(match(gset_idxs, sort.idxs))
+  
+  last.idx = 0
+  values <- rep(NaN, length(gset_idxs))
+  current = 0
+  for(i in seq_along(offsets)){
+    current = current + abs(gene.density[sort.idxs[offsets[i]]])^tau / sum.gset - dec * (offsets[i]-last.idx-1)
+    
+    values[i] = current
+    last.idx = offsets[i]
+  }
+  check_zero = current - dec * (n.genes-last.idx)
+  #if(check_zero > 10^-15){ 
+  #	stop(paste=c("Expected zero sum for ks:", check_zero))
+  #}
+  if(make.plot){ plot(offsets, values,type="l") } 
+  
+  max.idx = order(abs(values),decreasing=T)[1]
+  mx.value <- values[max.idx]
+  
+  return (mx.value)
+}
 
+rndWalk <- function(gSetIdx, geneRanking, j, R, alpha) {
+  indicatorFunInsideGeneSet <- match(geneRanking, gSetIdx)
+  indicatorFunInsideGeneSet[!is.na(indicatorFunInsideGeneSet)] <- 1
+  indicatorFunInsideGeneSet[is.na(indicatorFunInsideGeneSet)] <- 0
+  stepCDFinGeneSet <- cumsum((abs(R[geneRanking, j]) * 
+                                indicatorFunInsideGeneSet)^alpha) /
+    sum((abs(R[geneRanking, j]) *
+           indicatorFunInsideGeneSet)^alpha)
+  stepCDFoutGeneSet <- cumsum(!indicatorFunInsideGeneSet) /
+    sum(!indicatorFunInsideGeneSet)
+  walkStat <- stepCDFinGeneSet - stepCDFoutGeneSet
+  
+  sum(walkStat) 
+}
 
+ssgsea <- function(X, geneSets, alpha=0.25, parallel.sz,
+                   parallel.type, normalization=TRUE, verbose) {
+  
+  p <- nrow(X)
+  n <- ncol(X)
+  
+  if (verbose) {
+    assign("progressBar", txtProgressBar(style=3), envir=globalenv()) ## show progress if verbose=TRUE
+    assign("nSamples", n, envir=globalenv())
+    assign("iSample", 0, envir=globalenv())
+  }
+  
+  R <- apply(X, 2, function(x,p) as.integer(rank(x)), p)
+  
+  haveParallel <- .isPackageLoaded("parallel")
+  haveSnow <- .isPackageLoaded("snow")
+  
+  cl <- makeCl <- parSapp <- stopCl <- mclapp <- detCor <- nCores <- NA
+  if (parallel.sz > 1 || haveParallel) {
+    if (!haveParallel && !haveSnow) {
+      stop("In order to run calculations in parallel either the 'snow', or the 'parallel' library, should be loaded first")
+    }
+    
+    if (!haveParallel) {  ## use snow
+      ## copying ShortRead's strategy, the calls to the 'get()' are
+      ## employed to quieten R CMD check, and for no other reason
+      makeCl <- get("makeCluster", mode="function")
+      parSapp <- get("parSapply", mode="function")
+      stopCl <- get("stopCluster", mode="function")
+      
+      if (verbose)
+        cat("Allocating cluster\n")
+      cl <- makeCl(parallel.sz, type = parallel.type) 
+    } else {             ## use parallel
+      
+      mclapp <- get('mclapply', envir=getNamespace('parallel'))
+      detCor <- get('detectCores', envir=getNamespace('parallel'))
+      nCores <- detCor()
+      options(mc.cores=nCores)
+      if (parallel.sz > 0 && parallel.sz < nCores)
+        options(mc.cores=parallel.sz)
+      if (verbose)
+        cat("Using parallel with", getOption("mc.cores"), "cores\n")
+    }
+  }
+  
+  es <- sapply(1:n, function(j, R, geneSets, alpha) {
+    if (verbose) {
+      assign("iSample", get("iSample", envir=globalenv()) + 1, envir=globalenv())
+      setTxtProgressBar(get("progressBar", envir=globalenv()),
+                        get("iSample", envir=globalenv()) / get("nSamples", envir=globalenv()))
+    }
+    geneRanking <- order(R[, j], decreasing=TRUE)
+    es_sample <- NA
+    if (parallel.sz == 1 || (is.na(cl) && !haveParallel))
+      es_sample <- sapply(geneSets, rndWalk, geneRanking, j, R, alpha)
+    else {
+      if (is.na(cl))
+        es_sample <- mclapp(geneSets, rndWalk, geneRanking, j, R, alpha)
+      else
+        es_sample <- parSapp(cl, geneSets, rndWalk, geneRanking, j, R, alpha)
+    }
+    
+    unlist(es_sample)
+  }, R, geneSets, alpha)
+  
+  if (length(geneSets) == 1)
+    es <- matrix(es, nrow=1)
+  
+  if (normalization) {
+    ## normalize enrichment scores by using the entire data set, as indicated
+    ## by Barbie et al., 2009, online methods, pg. 2
+    es <- apply(es, 2, function(x, es) x / (range(es)[2] - range(es)[1]), es)
+  }
+  
+  if (length(geneSets) == 1)
+    es <- matrix(es, nrow=1)
+  
+  rownames(es) <- names(geneSets)
+  colnames(es) <- colnames(X)
+  
+  if (verbose) {
+    setTxtProgressBar(get("progressBar", envir=globalenv()), 1)
+    close(get("progressBar", envir=globalenv()))
+  }
+  
+  if (!is.na(cl))
+    stopCl(cl)
+  
+  es
+}
 
+combinez <- function(gSetIdx, j, Z) sum(Z[gSetIdx, j]) / sqrt(length(gSetIdx))
 
-##########################################################################################
-## Example 1: Computing single-sample TF activities from a normalized gene expression matrix 
-##########################################################################################
-# Load expression matrix: NOTE that genes at comparable scales (e.g. zscores)
-load('data/expression/example_expressionMatrix_zscores.rdata')
-# Explore the matrix
-E[1:5, 1:5]
-# Estimate TF activities
-TF_activities = viper(eset = E, regulon = viper_regulon, nes = T, method = 'none', minsize = 4, eset.filter = F)
-# Save results
-write.csv(TF_activities, file = 'TFactivities_example1.csv')
+zscore <- function(X, geneSets, parallel.sz, parallel.type, verbose) {
+  
+  p <- nrow(X)
+  n <- ncol(X)
+  
+  if (verbose) {
+    assign("progressBar", txtProgressBar(style=3), envir=globalenv()) ## show progress if verbose=TRUE
+    assign("nSamples", n, envir=globalenv())
+    assign("iSample", 0, envir=globalenv())
+  }
+  
+  Z <- t(apply(X, 1, function(x) (x-mean(x))/sd(x)))
+  
+  haveParallel <- .isPackageLoaded("parallel")
+  haveSnow <- .isPackageLoaded("snow")
+  
+  cl <- makeCl <- parSapp <- stopCl <- mclapp <- detCor <- nCores <- NA
+  if (parallel.sz > 1 || haveParallel) {
+    if (!haveParallel && !haveSnow) {
+      stop("In order to run calculations in parallel either the 'snow', or the 'parallel' library, should be loaded first")
+    }
+    
+    if (!haveParallel) {  ## use snow
+      ## copying ShortRead's strategy, the calls to the 'get()' are
+      ## employed to quieten R CMD check, and for no other reason
+      makeCl <- get("makeCluster", mode="function")
+      parSapp <- get("parSapply", mode="function")
+      stopCl <- get("stopCluster", mode="function")
+      
+      if (verbose)
+        cat("Allocating cluster\n")
+      cl <- makeCl(parallel.sz, type = parallel.type) 
+    } else {             ## use parallel
+      
+      mclapp <- get('mclapply', envir=getNamespace('parallel'))
+      detCor <- get('detectCores', envir=getNamespace('parallel'))
+      nCores <- detCor()
+      options(mc.cores=nCores)
+      if (parallel.sz > 0 && parallel.sz < nCores)
+        options(mc.cores=parallel.sz)
+      if (verbose)
+        cat("Using parallel with", getOption("mc.cores"), "cores\n")
+    }
+  }
+  
+  es <- sapply(1:n, function(j, Z, geneSets) {
+    if (verbose) {
+      assign("iSample", get("iSample", envir=globalenv()) + 1, envir=globalenv())
+      setTxtProgressBar(get("progressBar", envir=globalenv()),
+                        get("iSample", envir=globalenv()) / get("nSamples", envir=globalenv()))
+    }
+    es_sample <- NA
+    if (parallel.sz == 1 || (is.na(cl) && !haveParallel))
+      es_sample <- sapply(geneSets, combinez, j, Z)
+    else {
+      if (is.na(cl))
+        es_sample <- mclapp(geneSets, combinez, j, Z)
+      else
+        es_sample <- parSapp(cl, geneSets, combinez, j, Z)
+    }
+    
+    unlist(es_sample)
+  }, Z, geneSets)
+  
+  if (length(geneSets) == 1)
+    es <- matrix(es, nrow=1)
+  
+  rownames(es) <- names(geneSets)
+  colnames(es) <- colnames(X)
+  
+  if (verbose) {
+    setTxtProgressBar(get("progressBar", envir=globalenv()), 1)
+    close(get("progressBar", envir=globalenv()))
+  }
+  
+  if (!is.na(cl))
+    stopCl(cl)
+  
+  es
+}
 
+rightsingularsvdvectorgset <- function(gSetIdx, Z) {
+  s <- svd(Z[gSetIdx, ])
+  s$v[, 1]
+}
 
+plage <- function(X, geneSets, parallel.sz, parallel.type, verbose) {
+  
+  p <- nrow(X)
+  n <- ncol(X)
+  
+  if (verbose) {
+    assign("progressBar", txtProgressBar(style=3), envir=globalenv()) ## show progress if verbose=TRUE
+    assign("nGeneSets", length(geneSets), envir=globalenv())
+    assign("iGeneSet", 0, envir=globalenv())
+  }
+  
+  Z <- t(apply(X, 1, function(x) (x-mean(x))/sd(x)))
+  
+  haveParallel <- .isPackageLoaded("parallel")
+  haveSnow <- .isPackageLoaded("snow")
+  
+  ## the masterDescriptor() calls are disabled since they are not available in windows
+  ## they would help to report progress by just one of the processors. now all processors
+  ## will reporting progress. while this might not be the right way to report progress in
+  ## parallel it should not affect a correct execution and progress should be more or less
+  ## being reported to some extent.
+  cl <- makeCl <- parSapp <- stopCl <- mclapp <- detCor <- nCores <- NA ## masterDesc <- NA
+  if(parallel.sz > 1 || haveParallel) {
+    if(!haveParallel && !haveSnow) {
+      stop("In order to run calculations in parallel either the 'snow', or the 'parallel' library, should be loaded first")
+    }
+    
+    if (!haveParallel) {  ## use snow
+      ## copying ShortRead's strategy, the calls to the 'get()' are
+      ## employed to quieten R CMD check, and for no other reason
+      makeCl <- get("makeCluster", mode="function")
+      parSapp <- get("parSapply", mode="function")
+      stopCl <- get("stopCluster", mode="function")
+      
+      if (verbose)
+        cat("Allocating cluster\n")
+      cl <- makeCl(parallel.sz, type = parallel.type) 
+    } else {             ## use parallel
+      
+      mclapp <- get('mclapply', envir=getNamespace('parallel'))
+      detCor <- get('detectCores', envir=getNamespace('parallel'))
+      ## masterDesc <- get('masterDescriptor', envir=getNamespace('parallel'))
+      nCores <- detCor()
+      options(mc.cores=nCores)
+      if (parallel.sz > 0 && parallel.sz < nCores)
+        options(mc.cores=parallel.sz)
+      if (verbose)
+        cat("Using parallel with", getOption("mc.cores"), "cores\n")
+    }
+  }
+  
+  if (parallel.sz == 1 || (is.na(cl) && !haveParallel))
+    es <- t(sapply(geneSets, function(gset, Z) {
+      if (verbose) {
+        assign("iGeneSet", get("iGeneSet", envir=globalenv()) + 1, envir=globalenv())
+        setTxtProgressBar(get("progressBar", envir=globalenv()),
+                          get("iGeneSet", envir=globalenv()) / get("nGeneSets", envir=globalenv()))
+      }
+      rightsingularsvdvectorgset(gset, Z)
+    }, Z))
+  else {
+    if (is.na(cl)) {
+      ## firstproc <- mclapp(as.list(1:(options("mc.cores")$mc.cores)), function(x) masterDesc())[[1]]
+      es <- mclapp(geneSets, function(gset, Z) { ##, firstproc) {
+        if (verbose) { ## && masterDesc() == firstproc) {
+          assign("iGeneSet", get("iGeneSet", envir=globalenv()) + 1, envir=globalenv())
+          setTxtProgressBar(get("progressBar", envir=globalenv()),
+                            get("iGeneSet", envir=globalenv()) / get("nGeneSets", envir=globalenv()))
+        }
+        rightsingularsvdvectorgset(gset, Z)
+      }, Z) ##, firstproc)
+      es <- do.call(rbind, es)
+    } else {
+      if (verbose)
+        message("Progress reporting for plage with a snow cluster not yet implemented")
+      
+      es <- parSapp(geneSets, function(gset, Z) {
+        if (verbose) {
+          assign("iGeneSet", get("iGeneSet", envir=globalenv()) + 1, envir=globalenv())
+          setTxtProgressBar(get("progressBar", envir=globalenv()),
+                            get("iGeneSet", envir=globalenv()) / get("nGeneSets", envir=globalenv()))
+        }
+        rightsingularsvdvectorgset(gset, Z)
+      }, Z)
+      es <- do.call(rbind, es)
+    }
+  }
+  
+  if (length(geneSets) == 1)
+    es <- matrix(es, nrow=1)
+  
+  rownames(es) <- names(geneSets)
+  colnames(es) <- colnames(X)
+  
+  if (verbose) {
+    setTxtProgressBar(get("progressBar", envir=globalenv()), 1)
+    close(get("progressBar", envir=globalenv()))
+  }
+  
+  if (!is.na(cl))
+    stopCl(cl)
+  
+  es
+}
 
+setGeneric("filterGeneSets", function(gSets, ...) standardGeneric("filterGeneSets"))
 
-##########################################################################################
-## Example 2: Computing TF activity changes from a differential gene expression signature
-##########################################################################################
-# Load differential expression signature
-load('data/expression/example_differentialExpression_results.rdata')
-# Explore the signature
-DEsignature[1:5, ]
-# Exclude probes with unknown or duplicated gene symbol
-DEsignature = subset(DEsignature, Symbol != "" )
-DEsignature = subset(DEsignature, ! duplicated(Symbol))
-# Estimatez-score values for the GES. Cheeck VIPER manual for details
-myStatistics = matrix(DEsignature$logFC, dimnames = list(DEsignature$Symbol, 'logFC') )
-myPvalue = matrix(DEsignature$P.Value, dimnames = list(DEsignature$Symbol, 'P.Value') )
-mySignature = (qnorm(myPvalue/2, lower.tail = FALSE) * sign(myStatistics))[, 1]
-mySignature = mySignature[order(mySignature, decreasing = T)]
-# Estimate TF activities
-mrs = msviper(ges = mySignature, regulon = viper_regulon, minsize = 4, ges.filter = F)
-TF_activities = data.frame(Regulon = names(mrs$es$nes),
-                           Size = mrs$es$size[ names(mrs$es$nes) ], 
-                           NES = mrs$es$nes, 
-                           p.value = mrs$es$p.value, 
-                           FDR = p.adjust(mrs$es$p.value, method = 'fdr'))
-TF_activities = TF_activities[ order(TF_activities$p.value), ]
-# Save results
-write.csv(TF_activities, file = 'TFactivities_example2.csv')
+setMethod("filterGeneSets", signature(gSets="list"),
+          function(gSets, min.sz=1, max.sz=Inf) {
+            gSetsLen <- sapply(gSets,length)
+            return (gSets[gSetsLen >= min.sz & gSetsLen <= max.sz])	
+          })
+
+setMethod("filterGeneSets", signature(gSets="GeneSetCollection"),
+          function(gSets, min.sz=1, max.sz=Inf) {
+            gSetsLen <- sapply(geneIds(gSets),length)
+            return (gSets[gSetsLen >= min.sz & gSetsLen <= max.sz])	
+          })
+
+.isPackageLoaded <- function(name) {
+  ## Purpose: is package 'name' loaded?
+  ## --------------------------------------------------
+  (paste("package:", name, sep="") %in% search()) ||
+    (name %in% loadedNamespaces())
+}
+
