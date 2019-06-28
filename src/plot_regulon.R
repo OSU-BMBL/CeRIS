@@ -10,12 +10,13 @@ if (!require("Polychrome")) {
   install.packages("Polychrome")
   library(Polychrome)
 }
-library(AUCell)
-args <- commandArgs(TRUE)
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_zscore")
+library(plotly)
+
+args <- commandArgs(TRUE) 
+#setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
 #setwd("C:/Users/wan268/Documents/iris3_data/0624")
 #srcDir <- getwd()
-#id <-"CT1S-R2" 
+#id <-"CT3S-R2" 
 #jobid <- "2019062485208"
 srcDir <- args[1]
 id <- args[2]
@@ -48,7 +49,6 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
                                     cell.type = cell.type,
                                     regulon = regulon,
                                     customized = customized)
-  print(my.plot.regulon)
   # if(!customized){
   #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
   #                                        Cell_type=my.object$seurat_clusters)
@@ -67,7 +67,6 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
   p.regulon<-p.regulon + labs(col="regulon score")
   message("finish!")
   p.regulon
-  
   
 }
 
@@ -110,19 +109,20 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
     #my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
     #my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
     #regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
-    regulon.score<-activity_score[regulon,]
+    regulon.score<-t(as.matrix(activity_score[regulon,]))
     tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
-    my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
-                                        regulon.score=as.numeric(regulon.score))
+    my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type)
+    my.choose.regulon <- cbind(my.choose.regulon, regulon.score=regulon.score[match(rownames(my.choose.regulon), rownames(regulon.score))])
+    
     return(my.choose.regulon)
   }
 }
-quiet <- function(x) { 
+
+quiet <- function(x) {
   sink(tempfile()) 
   on.exit(sink()) 
   invisible(force(x)) 
 } 
-
 
 setwd(srcDir)
 my.object <- readRDS("seurat_obj.rds")
@@ -132,7 +132,7 @@ regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
-activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.activity_score.txt",sep = ""),row.names = 1,header = T)
+activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 png(paste("regulon_id/overview_",id,".png",sep = ""),width=700, height=700)
 Plot.cluster2D(reduction.method = "tsne",customized = T)
 quiet(dev.off())
@@ -141,10 +141,5 @@ png(paste("regulon_id/",id,".png",sep = ""),width=700, height=700)
 Plot.regulon2D(reduction.method = "tsne",regulon = as.numeric(regulon_id),cell.type=as.numeric(regulon_ct),customized =T)  
 quiet(dev.off())
 
-
-df <- as.data.frame(t(activity_score[21,]))
-df[,2] <- rownames(df)
-colnames(df)[1] <- "V1"
-ggplot(data=df,aes(x=V2,y=V1))+ geom_bar(stat = "identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
