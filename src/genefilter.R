@@ -211,7 +211,7 @@ write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(jo
 write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write.table(expFile,paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-write.table(exp_data,paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 
 
 
@@ -341,7 +341,7 @@ Get.MarkerGene<-function(my.object, customized=T){
   return(my.top.20)
 }
 
-my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = F)
+my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = T)
 write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
 
 
