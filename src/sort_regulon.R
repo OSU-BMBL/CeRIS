@@ -3,14 +3,15 @@
 # used files:
 # filtered exp matrix
 # cell label
-# regulon_gene_name, regulon, regulon_motif
+# regulon_gene_name, regulon, regulon_motif, motif_ranks
 
-
+library(scales)
+library(sgof)
 
 args <- commandArgs(TRUE)
 wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
-
+#wd<-getwd()
 ###test
 # wd <- "C:/Users/wan268/Documents/iris3_data/0624"
 # jobid <-2019062485208 
@@ -59,19 +60,65 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     #score_vec <- quiet(gsva(expr,gset=geneSets,method="ssgsea"))
     score_vec <- gsva(expr,gset=genes,method="ssgsea")
   } 
+  else if (method=="gsva"){
+    require("GSVA")
+    #score_vec <- quiet(gsva(expr,gset=geneSets,method="ssgsea"))
+    score_vec <- gsva(expr,gset=genes,method="gsva")
+  } 
   
   return(score_vec)
 }
+
+#normalization
+normalize_ras <- function(score_vec){
+  #normalize score_vec(regulon activity score) to range(0,1) and sum=1
+  score_vec <- apply(ras, 1, rescale)
+  score_vec <- t(score_vec)
+  score_vec <- as.data.frame(t(apply(data.frame(score_vec), 1, function(x){
+    x <- x/sum(x)
+  })))
+  return(score_vec)
+}
+
+# test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
+calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
+  # get cell type vector, add 1 if in this cell type
+  ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
+  group1 <- score_vec[,which(ct_vec==1)]
+  group0 <- score_vec[,which(ct_vec==0)]
+  
+  pval <- apply(data.frame(1:nrow(group1)),1, function(x){
+    return (t.test(group1[x,],group0[x,])$p.value)
+  })
+  pval_correction <- sgof::BH(pval)
+  adj_pval <-pval_correction$Adjusted.pvalues[order(match(pval_correction$data,pval))]
+  return(adj_pval)
+  
+  ## plots for test 
+  #new_regulon_filter_by_fdr <- !which(adj_pval>0.05) %in% which(pval>0.05)
+  #if (isTRUE(any(new_regulon_filter_by_fdr))){
+  #  s1<-score_vec[which(result_pvalue>0.05)[!which(result_pvalue>0.05) %in% which(r1>0.05)],]
+  #  for (i in 1:16) {
+  #    barplot(as.matrix(s1[i,]))
+  #  }
+  #} else {
+  #  pval_order <- order(adj_pval)
+  #  
+  #  s2 <- score_vec[pval_order,]
+  #  for (i in 1:16) {
+  #    barplot(as.matrix(s2[i,]))
+  #  }
+  #}
+}
+
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   
-  #normalize score_vec(regulon activity score) to sum=1
-  score_vec <- t(apply(data.frame(score_vec), 1, function(x){
-    x <- x/sum(x)
-  }))
-  
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
+  group1 <- score_vec[,which(ct_vec==1)]
+  group0 <- score_vec[,which(ct_vec==0)]
+ 
   # also normalize ct_vec to sum=1
   sum_ct_vec <- sum(ct_vec)
   ct_vec <- ct_vec/sum_ct_vec
@@ -82,6 +129,7 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   rss <- 1- sqrt(jsd_result)
   return(rss)
 }
+
 
 sort_dir <- function(dir) {
   tmp <- sort(dir)
@@ -119,14 +167,22 @@ for (i in 1:length(alldir)) {
   
   motif_rank <- read.table(paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""))
   
-  
   gene_name_list <- lapply(strsplit(regulon_gene_name,"\\t"), function(x){x[-1]})
   gene_id_list <- lapply(strsplit(regulon_gene_id,"\\t"), function(x){x[-1]})
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
   
-  ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "zscore")
+  ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "gsva")
+  ras <- normalize_ras(ras)
+
+  adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = 1)
+  # remove regulons adjust pval >= 0.05
+  rss_keep_index <- which(adj_pval < 0.05)
+  ras <- ras[rss_keep_index,]
+  gene_name_list <- gene_name_list[rss_keep_index]
+  gene_id_list <- gene_id_list[rss_keep_index]
+  motif_list <- motif_list[rss_keep_index]
   
-  rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = 1)
+  rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = i)
   rss_list <- as.list(rss_list)
   # calculate to be removed regulons index, if no auc score or less than 0.05
   rss_keep_index <- lapply(rss_list, function(x){
@@ -149,8 +205,10 @@ for (i in 1:length(alldir)) {
   gene_id_list <- gene_id_list[rss_rank]
   motif_list <- motif_list[rss_rank]
   ras <- ras[rss_rank,]
-  write.table(ras,paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
-  
+  #barplot(ras[1,])
+  colnames(ras) <- label_data[,1]
+  write.table(as.data.frame(ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
+
   #j=2
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
