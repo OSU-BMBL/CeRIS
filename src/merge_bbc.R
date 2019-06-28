@@ -87,7 +87,7 @@ for (i in 1:length(alldir)) {
       }
       this_motif_label <- unique(this_motif_label)
       genes <- as.character(genes[!duplicated(genes)])
-      if(length(genes) > 100 | length(genes)<=1) {
+      if(length(genes) > 100 | length(genes) < 5) {
         next
       }
       if(module_type[i] == "CT"){
