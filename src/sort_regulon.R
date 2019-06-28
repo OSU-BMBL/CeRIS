@@ -20,7 +20,6 @@ jobid <- args[2] # user job id
 # wd <- getwd()
 setwd(wd)
 
-
 quiet <- function(x) { 
   sink(tempfile()) 
   on.exit(sink()) 
@@ -40,14 +39,15 @@ calc_jsd <- function(v1,v2) {
 
 #num_ct <- 1
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
-# calculate regulon activity score (RAS) 
-#expr <- as.matrix(expr)
+#calculate regulon activity score (RAS) 
+#expr <- as.matrix(exp_data)
+# genes <- gene_name_list
 calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea")) {
   if (method=="aucell"){ #use top 10% cutoff
     require(AUCell)
     names(genes) <- 1:length(genes)
     cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
-    cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.5)
+    cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.1)
     score_vec <- cells_AUC@assays@.xData$data$AUC
   } else if (method=="zscore"){
     require("GSVA")
@@ -57,12 +57,10 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     score_vec <- gsva(expr,gset=genes,method="plage")
   } else if (method=="ssgsea"){
     require("GSVA")
-    #score_vec <- quiet(gsva(expr,gset=geneSets,method="ssgsea"))
     score_vec <- gsva(expr,gset=genes,method="ssgsea")
   } 
   else if (method=="gsva"){
     require("GSVA")
-    #score_vec <- quiet(gsva(expr,gset=geneSets,method="ssgsea"))
     score_vec <- gsva(expr,gset=genes,method="gsva")
   } 
   
@@ -81,15 +79,23 @@ normalize_ras <- function(score_vec){
 }
 
 # test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
+#score_vec <- ras
 calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
   group1 <- score_vec[,which(ct_vec==1)]
   group0 <- score_vec[,which(ct_vec==0)]
   
+  ## two sample t-test
+  #pval <- apply(data.frame(1:nrow(group1)),1, function(x){
+  #  return (t.test(group1[x,],group0[x,])$p.value)
+  #})
+  
+  ## wilcox rank sum test
   pval <- apply(data.frame(1:nrow(group1)),1, function(x){
-    return (t.test(group1[x,],group0[x,])$p.value)
+    return (wilcox.test(as.numeric(group1[x,]),as.numeric(group0[x,]))$p.value)
   })
+  ##Benjamini-Hochberg procedure
   pval_correction <- sgof::BH(pval)
   adj_pval <-pval_correction$Adjusted.pvalues[order(match(pval_correction$data,pval))]
   return(adj_pval)
@@ -173,7 +179,6 @@ for (i in 1:length(alldir)) {
   
   ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "gsva")
   ras <- normalize_ras(ras)
-
   adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = 1)
   # remove regulons adjust pval >= 0.05
   rss_keep_index <- which(adj_pval < 0.05)
@@ -190,7 +195,6 @@ for (i in 1:length(alldir)) {
       return (1)
     else return(0)
   })
-  
   rss_keep_index <- which(unlist(rss_keep_index) == 0)
   rss_list <- rss_list[rss_keep_index]
   gene_name_list <- gene_name_list[rss_keep_index]
@@ -200,16 +204,14 @@ for (i in 1:length(alldir)) {
   
   rss_rank <- order(unlist(rss_list),decreasing = T)
   rss_list <- rss_list[rss_rank]
-  
   gene_name_list <- gene_name_list[rss_rank]
   gene_id_list <- gene_id_list[rss_rank]
   motif_list <- motif_list[rss_rank]
   ras <- ras[rss_rank,]
-  #barplot(ras[1,])
   colnames(ras) <- label_data[,1]
   write.table(as.data.frame(ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
 
-  #j=2
+  #j=1
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
     gene_name_list[[j]] <- append(regulon_tag,gene_name_list[[j]])
@@ -220,12 +222,12 @@ for (i in 1:length(alldir)) {
   motif_rank_result <- data.frame()
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
-    this_motif_value <- motif_rank[which(motif_rank[,1] == motif_list[[j]][1]),-1]
+    this_motif_value <- motif_rank[which(motif_rank[,1] == motif_list[[j]][2]),-1]
     this_motif_value <- cbind(regulon_tag,this_motif_value)
     motif_rank_result <- rbind(motif_rank_result,this_motif_value)
   }
   write.table(motif_rank_result,paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
-  #lapply(gene_name_list, function(x) write_file(data.frame(x), 'test_regulon_gene_name.txt',append= T))
+   #lapply(gene_name_list, function(x) write_file(data.frame(x), 'test_regulon_gene_name.txt',append= T))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
