@@ -61,7 +61,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   } 
   else if (method=="gsva"){
     require("GSVA")
-    score_vec <- gsva(expr,gset=genes,method="gsva")
+    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Poisson")
   } 
   
   return(score_vec)
@@ -178,11 +178,13 @@ for (i in 1:length(alldir)) {
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
   
   ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "gsva")
+  originak_ras <- ras
   ras <- normalize_ras(ras)
   adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = 1)
   # remove regulons adjust pval >= 0.05
   rss_keep_index <- which(adj_pval < 0.05)
   ras <- ras[rss_keep_index,]
+  originak_ras <- originak_ras[rss_keep_index,]
   gene_name_list <- gene_name_list[rss_keep_index]
   gene_id_list <- gene_id_list[rss_keep_index]
   motif_list <- motif_list[rss_keep_index]
@@ -201,6 +203,7 @@ for (i in 1:length(alldir)) {
   gene_id_list <- gene_id_list[rss_keep_index]
   motif_list <- motif_list[rss_keep_index]
   ras <- ras[rss_keep_index,]
+  originak_ras <- originak_ras[rss_keep_index,]
   
   rss_rank <- order(unlist(rss_list),decreasing = T)
   rss_list <- rss_list[rss_rank]
@@ -208,8 +211,10 @@ for (i in 1:length(alldir)) {
   gene_id_list <- gene_id_list[rss_rank]
   motif_list <- motif_list[rss_rank]
   ras <- ras[rss_rank,]
+  originak_ras <- originak_ras[rss_rank,]
   colnames(ras) <- label_data[,1]
-  write.table(as.data.frame(ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
+  colnames(originak_ras) <- label_data[,1]
+  write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
 
   #j=1
   for (j in 1:length(gene_name_list)) {
