@@ -13,8 +13,8 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 #wd<-getwd()
 ###test
-# wd <- "C:/Users/wan268/Documents/iris3_data/0624"
-# jobid <-2019062485208 
+ wd <- "C:/Users/wan268/Documents/iris3_data/0624"
+ jobid <-2019062485208 
 # expFile <- "20190617154456_filtered_expression.txt"
 # labelFile <- "20190617154456_cell_label.txt"
 # wd <- getwd()
@@ -35,6 +35,7 @@ calc_jsd <- function(v1,v2) {
   }
   return (H(v1/2+v2/2) - (H(v1)+H(v2))/2)
 }
+#BiocManager::install("GSVAdata")
 
 
 #num_ct <- 1
@@ -179,6 +180,7 @@ for (i in 1:length(alldir)) {
   
   ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "gsva")
   originak_ras <- ras
+  barplot(originak_ras[1,])
   ras <- normalize_ras(ras)
   adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = 1)
   # remove regulons adjust pval >= 0.05
