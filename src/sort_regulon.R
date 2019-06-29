@@ -61,9 +61,8 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   } 
   else if (method=="gsva"){
     require("GSVA")
-    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Poisson")
+    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T)
   } 
-  
   return(score_vec)
 }
 
@@ -215,7 +214,7 @@ for (i in 1:length(alldir)) {
   colnames(ras) <- label_data[,1]
   colnames(originak_ras) <- label_data[,1]
   write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
-
+  
   #j=1
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
@@ -232,7 +231,7 @@ for (i in 1:length(alldir)) {
     motif_rank_result <- rbind(motif_rank_result,this_motif_value)
   }
   write.table(motif_rank_result,paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
-   #lapply(gene_name_list, function(x) write_file(data.frame(x), 'test_regulon_gene_name.txt',append= T))
+  
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
