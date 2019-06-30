@@ -47,9 +47,9 @@ function make_clust(inst_network,root_id){
 
 function make_clust_main(inst_network,root_id){
 	file_size = get_filesize(inst_network, function(size) {
-		if (size > 800000 && window.location.pathname == "/iris3/results.php") {
-			console.log(inst_network +" file size: "+size+" bytes. The heatmap has been automatically disabled as page may crashes.")
-			document.getElementById(root_id.substr(1)).innerHTML = "<p>The heatmap has been automatically disabled as page may crashes. Click 'Open in new tab' if you would like to check the heatmap for details.</p>"
+		if (size > 5000000 && window.location.pathname == "/iris3/results.php") {
+			console.log(inst_network +" file size: "+size+" bytes. The heatmap has been automatically disabled as page may crash.")
+			document.getElementById(root_id.substr(1)).innerHTML = "<p>The heatmap has been automatically disabled as page may crash. Click 'Open in new tab' if you would like to check the heatmap for details.</p>"
 		} else {
 			d3.json(inst_network, function(network_data){
 
