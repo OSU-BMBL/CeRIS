@@ -24,8 +24,9 @@ is_gene_filter <- args[4] #1 for enable gene filtering
 is_cell_filter <- args[5] #1 for enable cell filtering
 label_file <- 1
 label_file <- args[6] # user label file name or 1
+delimiter <- args[7] 
 param_k <- character()
-param_k <- args[7] #k parameter for sc3
+param_k <- args[8] #k parameter for sc3
 
 
 if(delim == 'tab'){
@@ -34,6 +35,7 @@ if(delim == 'tab'){
 if(delim == 'space'){
   delim <- ' '
 }
+
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
