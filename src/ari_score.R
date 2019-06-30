@@ -55,7 +55,6 @@ user_cellname_index <- 1
 user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,user_label_index],stringsAsFactors = F)
 
 #test
-#user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,3])
 user_label_name <- user_label[,2]
 user_label[,2] <- factor(user_label[,2])
 label_order <- unique(user_label[,2])
@@ -63,11 +62,17 @@ levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
 colnames(sc3_cluster) <- c("cell_name","cluster")
 colnames(user_label) <- c("cell_name","label")
 
-#write.table(sc3_cluster, paste(jobid,"_sc3_cluster.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 if (label_use_sc3 == 2) {
   is_evaluation <- 'yes'
   #write.table(user_label_file,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+  if(!require(Seurat)) {
+    install.packages("Seurat")
+  } 
+  my.object <- readRDS("seurat_obj.rds")
+  my.object<-AddMetaData(my.object,user_label[,2],col.name = "Customized.idents")
+  Idents(my.object)<-as.factor(my.object$Customized.idents)
+  saveRDS(my.object,file="seurat_obj.rds")
   write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
@@ -90,6 +95,7 @@ if (label_use_sc3 == 2) {
 
 write(paste("is_evaluation,",is_evaluation,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 
+# prepare data for sankey plot
 if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   # sc3_cluster <- read.delim("123456_sc3_cluster.txt",header=T,sep=" ",check.names = FALSE)
   target <- merge(sc3_cluster,user_label,by.x = "cell_name",by.y = "cell_name" )
