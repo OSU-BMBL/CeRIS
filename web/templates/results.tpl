@@ -400,15 +400,20 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
-																		<tr><td style="display:inline-block; border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block; border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+																		<tr><td style="display:inline-block; border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block; border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block; border:none;">Regulon specificity score: {{$motif_rank_result[$sec0][sec1][4]}}</td><td style="display:inline-block; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr>
                                                                             <td style="display:inline-block; overflow-y: auto;width:49%;max-height:400px; border:none;">
                                                                                 <div style="width:100%; font-size:14px;">
 																				<table class="table table-hover" >
 	                                 
-	                                
+	                                <tr><td>Marker gene</td><td>Gene Symbol</td><td>ENSEMBL ID</td>
+									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
-                                          <tr >
+										  <tr > <td>
+										  {{if !empty($motif_rank_result[$sec0][sec1][5]) && $motif_rank_result[$sec0][sec1][5] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($motif_rank_result[$sec0][sec1][6]) && $motif_rank_result[$sec0][sec1][6] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($motif_rank_result[$sec0][sec1][7]) && $motif_rank_result[$sec0][sec1][7] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($motif_rank_result[$sec0][sec1][8]) && $motif_rank_result[$sec0][sec1][8] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
 										 									
                                          <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>
@@ -516,7 +521,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                         </button>
                                                         <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
                                                         </button>
-														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Regulon t-SNE
+														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">t-SNE plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon t-SNE
                                                         </button>
