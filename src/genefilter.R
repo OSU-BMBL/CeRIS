@@ -344,6 +344,13 @@ Get.MarkerGene<-function(my.object, customized=T){
 }
 
 my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = T)
+sort_column <- function(df) {
+  tmp <- colnames(df)
+  split <- strsplit(tmp, "CT") 
+  split <- as.numeric(sapply(split, function(x) x <- sub("", "", x[2])))
+  return(order(split))
+}
+my.cluster.uniq.marker <- my.cluster.uniq.marker[,sort_column(my.cluster.uniq.marker)]
 write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
 
 
