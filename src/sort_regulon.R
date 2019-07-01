@@ -152,6 +152,7 @@ exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.nam
 exp_data <- as.matrix(exp_data)
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 
 #i=1
 # genes=x= gene_name_list[[1]]
@@ -205,6 +206,21 @@ for (i in 1:length(alldir)) {
   originak_ras <- originak_ras[rss_keep_index,]
   
   rss_rank <- order(unlist(rss_list),decreasing = T)
+  # x <- gene_name_list[[1]]
+  gene_name_list <- gene_name_list[rss_rank]
+  gene_id_list <- gene_id_list[rss_rank]
+  motif_list <- motif_list[rss_rank]
+  ras <- ras[rss_rank,]
+  rss_list <- rss_list[rss_rank]
+  
+  marker<-lapply(gene_name_list, function(x){
+    x[which(x%in%marker_data[,i])]
+  })
+  
+  if(sum(sapply(marker, length))>0){
+    rss_rank<-order(sapply(marker,length),decreasing=T)
+  }
+  marker <- marker[rss_rank]
   rss_list <- rss_list[rss_rank]
   gene_name_list <- gene_name_list[rss_rank]
   gene_id_list <- gene_id_list[rss_rank]
@@ -221,8 +237,10 @@ for (i in 1:length(alldir)) {
     gene_name_list[[j]] <- append(regulon_tag,gene_name_list[[j]])
     gene_id_list[[j]] <- append(regulon_tag,gene_id_list[[j]])
     motif_list[[j]] <- append(regulon_tag,motif_list[[j]])
-    rss_list[[j]] <- append(regulon_tag,rss_list[[j]])
+    #rss_list[[j]] <- append(regulon_tag,rss_list[[j]])
+    rss_list[[j]] <- append(rss_list[[j]],marker[[j]])
   }
+  options(stringsAsFactors=FALSE)
   motif_rank_result <- data.frame()
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
@@ -230,12 +248,12 @@ for (i in 1:length(alldir)) {
     this_motif_value <- cbind(regulon_tag,this_motif_value)
     motif_rank_result <- rbind(motif_rank_result,this_motif_value)
   }
+
   write.table(motif_rank_result,paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
-  
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
-  cat("",file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""))
+  cat("",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""))
   for (j in 1:length(gene_name_list)) {
     cat(gene_name_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),append = T,sep = "\t")
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),append = T)
@@ -246,8 +264,10 @@ for (i in 1:length(alldir)) {
     cat(motif_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),append = T,sep = "\t")
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),append = T)
     
-    cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""),append = T,sep = "\t")
-    cat("\n",file=paste(jobid,"_CT_",i,"_rss.txt",sep = ""),append = T)
+    cat(as.character(motif_rank_result[j,]),file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T,sep = "\t")
+    cat("\t",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T)
+    cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T,sep = "\t")
+    cat("\n",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T)
   }
 }
 
