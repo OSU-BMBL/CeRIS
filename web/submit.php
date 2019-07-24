@@ -181,9 +181,13 @@ if (isset($_POST['submit']))
     system("cp $workdir2$expfile /var/www/html/iris3/storage");
 	}
 
-if ($labelfile != ''){
+if ($labelfile == ''){
+	$labelfile = '1';
+	$delim_label = ',';
+}
+
+
 fwrite($fp,"#!/bin/bash\n 
-#User uploaded cell label
 wd=/var/www/html/iris3/data/$jobid/
 exp_file=$expfile
 label_file=$labelfile
@@ -192,104 +196,53 @@ jobid=$jobid
 motif_min_length=12
 motif_max_length=12
 #perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
-Rscript /var/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter
-/var/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k $k_arg -o $o_arg
-for file in *blocks
-do
-grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
-done
-for file in *blocks
-do
-grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
-done
-Rscript /var/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label $param_k\n
-Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
-Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
-#perl /var/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
-/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
-Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
-/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
-wait
-cd \$wd\n
-find -name '*' -size 0 -delete\n
-Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd \$motif_min_length\n
-touch bg \n
-/var/www/html/iris3/program/get_bbc.sh \$wd\n
-Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
-cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
-Rscript /var/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
-mkdir json
-/var/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
-mkdir tomtom\n
-mkdir logo_tmp\n
-mkdir logo\n
-/var/www/html/iris3/program/get_logo.sh \$wd
-/var/www/html/iris3/program/get_tomtom.sh \$wd
-/var/www/html/iris3/program/get_atac_overlap.sh \$wd
-zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
-perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
-echo 'finish'> done\n  
-
+Rscript /var/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter \$label_file $delim_label $param_k
+#/var/www/html/iris3/program/qubic2/qubic -i \$wd\$jobid\_filtered_expression.txt -d
+#for file in *blocks
+#do
+#grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
+#done
+#for file in *blocks
+#do
+#grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
+#done
+##Rscript /var/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label $param_k\n
+#Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
+#Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
+#Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
+##perl /var/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
+#/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
+#Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
+#/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
+#wait
+#cd \$wd\n
+#find -name '*' -size 0 -delete\n
+#Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd \$motif_min_length\n
+#touch bg \n
+#/var/www/html/iris3/program/get_bbc.sh \$wd\n
+#Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
+#Rscript /var/www/html/iris3/program/sort_regulon.R \$wd \$jobid\n
+#cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
+#Rscript /var/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
+#mkdir json
+#/var/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
+#mkdir tomtom\n
+#mkdir logo_tmp\n
+#mkdir logo\n
+#mkdir regulon_id\n
+#/var/www/html/iris3/program/get_logo.sh \$wd
+#/var/www/html/iris3/program/get_tomtom.sh \$wd
+#/var/www/html/iris3/program/get_atac_overlap.sh \$wd
+#zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
+#perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
+#echo 'finish'> done\n  
 
 ");
-	} else {
-		fwrite($fp,"#!/bin/bash\n 
-#No label file
-wd=/var/www/html/iris3/data/$jobid/
-exp_file=$expfile
-label_file=$labelfile
-gene_module_file=$gene_module_file
-jobid=$jobid
-motif_min_length=12
-motif_max_length=12
-
-Rscript /var/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter
-/var/www/html/iris3/program/qubic/qubic -i \$wd\$jobid\_filtered_expression.txt -d -f $f_arg -c $c_arg -k $k_arg -o $o_arg
-for file in *blocks
-do
-grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
-done
-for file in *blocks
-do
-grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
-done
-Rscript /var/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid 1 , $param_k\n
-label_file=\$jobid\_sc3_label.txt
-Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid tab 0
-Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n
-#perl /var/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
-/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
-Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
-/var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
-
-wait
-cd \$wd\n
-find -name '*' -size 0 -delete\n
-Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd\n
-touch bg \n
-/var/www/html/iris3/program/get_bbc.sh \$wd\n
-Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_length\n
-cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
-Rscript /var/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid 0
-mkdir json
-/var/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid 0
-mkdir tomtom\n
-mkdir logo_tmp\n
-mkdir logo\n
-/var/www/html/iris3/program/get_logo.sh \$wd
-/var/www/html/iris3/program/get_tomtom.sh \$wd
-/var/www/html/iris3/program/get_atac_overlap.sh \$wd
-zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
-perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
-echo 'finish'> done\n 
-");}
 
 	fclose($fp);
 	session_destroy();
 	system("chmod -R 777 $workdir2");
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
