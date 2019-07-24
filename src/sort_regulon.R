@@ -14,9 +14,9 @@ jobid <- args[2] # user job id
 #wd<-getwd()
 ###test
 # wd <- "C:/Users/wan268/Documents/iris3_data/0624"
-# jobid <-2019062485208 
-# expFile <- "20190617154456_filtered_expression.txt"
-# labelFile <- "20190617154456_cell_label.txt"
+# jobid <-2019071194633 
+# expFile <- "2019071194633_filtered_expression.txt"
+# labelFile <- "2019071194633_cell_label.txt"
 # wd <- getwd()
 setwd(wd)
 
@@ -180,15 +180,17 @@ for (i in 1:length(alldir)) {
   ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "gsva")
   originak_ras <- ras
   ras <- normalize_ras(ras)
-  adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = 1)
+  adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = i)
   # remove regulons adjust pval >= 0.05
   rss_keep_index <- which(adj_pval < 0.05)
-  ras <- ras[rss_keep_index,]
-  originak_ras <- originak_ras[rss_keep_index,]
-  gene_name_list <- gene_name_list[rss_keep_index]
-  gene_id_list <- gene_id_list[rss_keep_index]
-  motif_list <- motif_list[rss_keep_index]
-  
+  if (length(rss_keep_index) > 100000) {
+    ras <- ras[rss_keep_index,]
+    originak_ras <- originak_ras[rss_keep_index,]
+    gene_name_list <- gene_name_list[rss_keep_index]
+    gene_id_list <- gene_id_list[rss_keep_index]
+    motif_list <- motif_list[rss_keep_index]
+    
+  }
   rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = i)
   rss_list <- as.list(rss_list)
   # calculate to be removed regulons index, if no auc score or less than 0.05
