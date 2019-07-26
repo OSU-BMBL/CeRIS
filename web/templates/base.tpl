@@ -15,7 +15,6 @@
     <script src="assets/js/wow.min.js"></script>
     <script src="assets/js/jquery.ajaxchimp.js"></script>
     <script src="assets/js/jquery.sticky.js"></script>
-    <script src="assets/js/main.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
