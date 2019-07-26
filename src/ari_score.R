@@ -47,7 +47,12 @@ sc3_cluster <- read.table(paste(jobid,"_sc3_label.txt",sep=""),header=T,sep='\t'
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-user_label_file <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
+if (srcFile == '1') {
+  user_label_file <- sc3_cluster
+} else {
+  user_label_file <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
+  
+}
 
 
 user_label_index <- 2
