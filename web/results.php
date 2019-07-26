@@ -166,6 +166,9 @@ foreach (glob("$DATAPATH/$jobid/*_bic.regulon.txt") as $file) {
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon_motif.txt") as $file) {
   $regulon_motif_file[] = $file;
 }
+foreach (glob("$DATAPATH/$jobid/*_bic.motif_rank.txt") as $file) {
+  $motif_rank_file[] = $file;
+}
 
 $tomtom_path = "$DATAPATH/$jobid/tomtom/";
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tomtom_path)) as $filename)
@@ -179,10 +182,12 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tomtom_pa
 natsort($regulon_gene_name_file);
 natsort($regulon_id_file);
 natsort($regulon_motif_file);
+natsort($motif_rank_file);
 natsort($tomtom_file);
 $regulon_gene_name_file = array_values($regulon_gene_name_file);
 $regulon_id_file = array_values($regulon_id_file);
 $regulon_motif_file = array_values($regulon_motif_file);
+$motif_rank_file = array_values($motif_rank_file);
 $tomtom_file = array_values($tomtom_file);
 
 $count_ct = range(1,count($regulon_gene_name_file));
@@ -370,6 +375,18 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	fclose($fp);
 	}
 	
+foreach ($motif_rank_file as $key=>$this_motif_rank_file){
+	$status = "1";
+	$fp = fopen("$this_motif_rank_file", 'r');
+	if ($fp){
+	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
+		if ($line) {$motif_rank_result[$key][] = array_map('trim',$line);}
+	} else{
+		die("Unable to open file");
+	}
+	fclose($fp);
+	}
+
 function getStringBetween($str,$from,$to)
 {
     $sub = substr($str, strpos($str,$from)+strlen($from),strlen($str));
@@ -391,7 +408,8 @@ foreach ($tomtom_file as $key=>$this_tomtom_file){
 			$tomtom_result[$motif_name][] = array_map('trim',$line);
 			#print_r($count);
 		}
-		if ($count > 4) {
+		# control number of tomtom rows to be presented
+		if ($count > 0) {
 			break;
 		}
 	}
@@ -487,6 +505,8 @@ $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
 $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('regulon_motif_result',$regulon_motif_result);
+$smarty->assign('motif_rank_result',$motif_rank_result);
+$smarty->assign('rss_result',$motif_rank_result);
 $smarty->assign('tomtom_result',$tomtom_result);
 $smarty->assign('module_result',$module_result);
 $smarty->assign('module_id_result',$module_id_result);
