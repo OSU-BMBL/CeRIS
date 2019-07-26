@@ -34,9 +34,9 @@ do
 	done
 	if grep -q $(basename "$file" .fsa) "total_motif_list.txt"; then
 	perl /var/www/html/iris3/program/dminda/motif_tools/align2uniprobe.pl $file | perl /var/www/html/iris3/program/dminda/motif_tools/uniprobe2meme > $file.meme &
-	mkdir tomtom/$(basename "$file" .fsa)
-	mkdir tomtom/$(basename "$file" .fsa)/HOCOMOCO
-	mkdir tomtom/$(basename "$file" .fsa)/JASPAR
+	#mkdir tomtom/$(basename "$file" .fsa)
+	#mkdir tomtom/$(basename "$file" .fsa)/HOCOMOCO
+	#mkdir tomtom/$(basename "$file" .fsa)/JASPAR
 	#/var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa)/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme 
 	#/var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa)/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /var/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /var/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme 
 
