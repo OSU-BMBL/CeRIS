@@ -7,7 +7,6 @@
 <script src="https://cdn.plot.ly/plotly-1.5.0.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script> -->
 
-<script src="assets/js/script.js"></script>
 <script>var flag = [];
 $(document).ready(function() {
 
@@ -367,7 +366,7 @@ $(document).ready(function() {
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
-																		<tr><td style="display:inline-block; border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block; border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block; border:none;">Regulon specificity score: {{$motif_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td style="display:inline-block; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+																		<tr><td style="display:inline-block; font-size:14px;border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Regulon specificity score: {{$motif_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td style="display:inline-block; font-size:14px; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr>
                                                                             <td style="display:inline-block; overflow-y: auto;width:49%;max-height:400px; border:none;">
                                                                                 <div style="width:100%; font-size:14px;">
@@ -409,11 +408,8 @@ $(document).ready(function() {
 									<td class="tomtom_pvalue">
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][3]|string_format:"%.2e"}}</td><td>
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][4]|string_format:"%.2e"}}</td><td>
-									{{$tomtom_result.$motif_num_homo[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>
-									{{/section}}
-									</tbody>
-									</table>
-									<hr></div>{{/section}}</td></tr>
+									{{$tomtom_result.$motif_num_homo[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>{{/section}}</tbody></table><hr></div>{{/section}}
+									</td></tr>
 														<tr><td style="border:none"><button type="button" class="btn btn-default" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
                                                         </button><button style="display:none;" type="button" class="btn-default" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
                                                         </button>&nbsp;
@@ -435,10 +431,7 @@ $(document).ready(function() {
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon t-SNE
                                                         </button>
-														</td></tr>
-																		<tr>
-																		<td colspan=2 style="border:none">
-																		
+														</td></tr><tr><td colspan=2 style="border:none">
 																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
 																					<div class="panel-body"><div class="flatPanel panel panel-default">
 																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
@@ -488,21 +481,15 @@ $(document).ready(function() {
                                                                                     </table>
 																					</div>
 																					<div id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
-                                                                                    <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
-                                                                                    </div>
+                                                                                    <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
-                                                                                        
                                                                                     </div>
                                                                                 </div>
 																		</td>
 																		</tr>
 
                                                                         {{/section}}
-                                                                    </tbody>
-                                                                </table>
-
-																					
-																	</div></div></div>
+                                                                    </tbody></table></div></div></div>
                                                             </div>	
 															{{/if}}
 															{{/foreach}}
@@ -936,22 +923,258 @@ $(document).ready(function() {
                 </div>
         </div>
     </div>
-    <!-- Required JS Libraries -->
 	<script src="assets/js/d3.js"></script>
     <script src="assets/js/underscore-min.js"></script>
-
-    <!-- Clustergrammer JS -->
     <script src='assets/js/clustergrammer.js'></script>
-
-    <!-- optional modules -->
     <script src='assets/js/Enrichrgram.js'></script>
     <script src='assets/js/hzome_functions.js'></script>
     <script src='assets/js/send_to_Enrichr.js'></script>
-
-    <!-- make clustergram -->
     <script src='assets/js/load_clustergram.js'></script>
-
     <script>
+	function show_peak_table(item){
+		match_id = $(item).attr("id").match(/\d+/gm)
+		regulon_id = $(item).attr("id").substring(8);
+		table_id = "table-"+regulon_id
+		species = document.getElementById("species").innerHTML
+		match_species =  species.match(/[^Species: ].+/gm)[0]
+		jobid = location.search.match(/\d+/gm)
+		table_content_id = "table-content-"+regulon_id
+		table_jquery_id="#"+table_content_id
+		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ) {
+		$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_peak'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_peak'
+				}
+				],
+				"ajax": "prepare_peak.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"order": [[ 3, "desc" ]],
+				columnDefs: [
+				{
+					targets: 0,
+					render: function (data, type, row, meta)
+					{
+						if (type === 'display')
+						{
+							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +row[6]+ '" target="_blank">'+data +'</a>';
+						}
+						return data;
+					}
+				},{
+                "targets": [6],
+                "visible": false
+				},{
+                "targets": [7],
+                render: function (data, type, row, meta)
+					{	
+						var dat=new Array
+						if (type === 'display')
+						{
+							res=data.split(" ")
+							for(i=0;i < res.length;i++) {
+								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>';
+							}
+						}
+						return dat;
+					}
+				}
+				],
+		
+		});
+		}
+		document.getElementById(table_id).innerHTML=""
+	}
+	
+	
+	function show_tad_table(item){
+		match_id = $(item).attr("id").match(/\d+/gm)
+		regulon_id = $(item).attr("id").substring(7);
+		table_id = "tad-table-"+regulon_id
+		species = document.getElementById("species").innerHTML
+		match_species =  species.match(/[^Species: ].+/gm)[0]
+		jobid = location.search.match(/\d+/gm)
+		table_content_id = "tad-table-content-"+regulon_id
+		table_jquery_id="#"+table_content_id
+		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
+			if(match_species=='Human'){
+			$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				}
+				],
+				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
+			"iDisplayLength": 5,
+		});
+			} else if (match_species == 'Mouse'){
+			$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				}
+				],
+				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[ -1], [ "All"]],
+				"iDisplayLength": -1,
+		});
+			}
+		}
+		document.getElementById(table_id).innerHTML=""
+	}
+	function show_similar_table(item) {
+	match_id = $(item).attr("id").match(/\d+/gm)
+	regulon_id = $(item).attr("id").substring(11)
+	table_id = "similar-table-" + regulon_id
+	species = document.getElementById("species").innerHTML
+	match_species = species.match(/[^Species: ].+/gm)[0]
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "similar-table-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	if (!$.fn.DataTable.isDataTable(table_jquery_id)) {
+	$(table_jquery_id).DataTable({
+		dom: 'lBfrtip',
+		buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_similar_regulon'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_similar_regulon'
+				}
+				],
+		"ajax": "prepare_similar_regulon.php?jobid=" + jobid + "&regulon_id=" + regulon_id + "&species=" + match_species + "&table=" + table_content_id,
+		"searching": false,
+		"paging": false,
+		"bInfo" : false,
+		"aLengthMenu": [
+			[10, -1],
+			[10, "All"]
+		],
+		"iDisplayLength": 10,
+		
+	});
+	}
+	document.getElementById(table_id).innerHTML = ""
+	}
+	
+	function show_regulon_table(item) {
+	match_id = $(item).attr("id").match(/\d+/gm)
+	regulon_id = $(item).attr("id").substring(11)
+	ct_id= regulon_id.substring(
+    regulon_id.lastIndexOf("CT") + 2, 
+    regulon_id.lastIndexOf("S")
+	);
+	table_id = "regulon-table-" + regulon_id
+	species = document.getElementById("species").innerHTML
+	match_species = species.match(/[^Species: ].+/gm)[0]
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "regulon-table-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	$.ajax({
+		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
+		type: 'POST',
+		beforeSend: function(){
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><p>Loading t-SNE plot...</p></div>'
+		},
+		data: {'id': regulon_id},
+		dataType: 'json',
+		success: function(response) {
+		document.getElementById(table_content_id).innerHTML = ''
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_' + regulon_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		},
+	})
+	document.getElementById(table_id).innerHTML = ""
+	}
+	
+	function get_gene_list(item){
+	match_id = $(item).attr("id").match(/\d+/gm);
+	if($(item).attr("id").includes("CT")) {
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_name.txt';
+	} else {
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_name.txt';
+	}
+	
+	
+	$.get(file_path,function(txt){
+        var lines = txt.split("\n");
+		gene_idx = match_id[1] - 1;
+		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n');
+		//
+		gene_list = lines[gene_idx].split("\t");
+		gene_list.shift();
+		
+		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true};
+	
+		//console.log(enrichr_info);
+          // defined globally - will improve
+          send_to_Enrichr(enrichr_info);
+    }); 
+	
+	}
+
+	function send_to_Enrichr(options) { // http://amp.pharm.mssm.edu/Enrichr/#help
+    var defaultOptions = {
+    description: "",
+    popup: false
+	};
+
+  if (typeof options.description == 'undefined')
+    options.description = defaultOptions.description;
+  if (typeof options.popup == 'undefined')
+    options.popup = defaultOptions.popup;
+  if (typeof options.list == 'undefined')
+    alert('No genes defined.');
+
+  var form = document.createElement('form');
+  form.setAttribute('method', 'post');
+  form.setAttribute('action', 'https://amp.pharm.mssm.edu/Enrichr/enrich');
+  if (options.popup)
+    form.setAttribute('target', '_blank');
+  form.setAttribute('enctype', 'multipart/form-data');
+
+  var listField = document.createElement('input');
+  listField.setAttribute('type', 'hidden');
+  listField.setAttribute('name', 'list');
+  listField.setAttribute('value', options.list);
+  form.appendChild(listField);
+
+  var descField = document.createElement('input');
+  descField.setAttribute('type', 'hidden');
+  descField.setAttribute('name', 'description');
+  descField.setAttribute('value', options.description);
+  form.appendChild(descField);
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();
 color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
@@ -977,7 +1200,6 @@ var trace{{$silh_trace[clust]}} = {
   },
   type: 'bar'
 };
-
 {{/section}}
 
 
@@ -1054,6 +1276,6 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
         Plotly.react('sankey_div', sankey_data, sankey_layout,score_config)
 		 </script>
 		{{/if}}
-	<div class="push"></div>
+<div class="push"></div>
 </main>
 {{/block}}
