@@ -314,7 +314,7 @@ my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.
 ###########################################
 my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
 # run umap to get high dimension scatter plot at 2 dimensional coordinate system.
-my.object<-RunUMAP(object = my.object,dims = 1:30)
+##my.object<-RunUMAP(object = my.object,dims = 1:30)
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
