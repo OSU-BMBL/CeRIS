@@ -1,5 +1,5 @@
 # set working directory, you may change the directory first.
-setwd("/home/cyz/Bigstore/BigData/runningdata/outs")
+setwd("/home/cyz/Bigstore/BigData/analysis_work/IRIS3/DataTest/scRNA-Seq/2.Yan/")
 # loading required packege
 if(!require(Seurat)) {
   install.packages("Seurat")
@@ -69,7 +69,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
 #|-----------------|---------------|
 
 #Read in data ###################################################
-my.raw.data<-read_data(x = "Yan_RPKM",read.method = "CellGene")
+my.raw.data<-read_data(x = "Yan_expression.csv",sep=",",read.method = "CellGene")
 ######################################################
 # create Seurat object
 my.object<-CreateSeuratObject(my.raw.data)
@@ -92,10 +92,10 @@ write.table(my.expression.data,
 ##############################################
 # Add meta info(cell type) to seurat object###
 ##############################################
-label_data<-read.table("./websiteoutput/test_zscore/2019062485208_cell_label.txt",sep = "\t",
+label_data<-read.delim("Yan_cell_label.csv",sep = ",",
                        header = T,check.names = F,stringsAsFactors = F)
-my.meta.info<-read.table("./websiteoutput/test_zscore/2019062485208_cell_label.txt",row.names = 1,
-                         sep = "\t",header = T,check.names = F,stringsAsFactors = F)
+my.meta.info<-read.delim("Yan_cell_label.csv",row.names = 1,
+                         sep = ",",header = T,check.names = F,stringsAsFactors = F)
 my.object<-AddMetaData(my.object,my.meta.info,col.name = "Customized.idents")
 # look at current cell type info
 Idents(my.object)
@@ -209,7 +209,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
 }
 
 # test plot cluster function. 
-Plot.cluster2D(reduction.method = "tsne",customized = T)
+Plot.cluster2D(reduction.method = "pca",customized = T)
 
 # plot CTS-R
 
@@ -278,6 +278,8 @@ write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = 
 # test plot cluster function. 
 Plot.cluster2D(reduction.method = "tsne",customized = T,cell.type=2)# "tsne" ,"pca","umap"
 Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)  
+
+
 
 
 
