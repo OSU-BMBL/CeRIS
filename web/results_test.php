@@ -549,6 +549,6 @@ $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
-$smarty->display('results.tpl');
+$smarty->display('results_test.tpl');
 #print_r($regulon_motif_file);
 ?>

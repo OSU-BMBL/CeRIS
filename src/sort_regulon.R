@@ -14,9 +14,9 @@ jobid <- args[2] # user job id
 #wd<-getwd()
 ###test
 # wd <- "C:/Users/wan268/Documents/iris3_data/0624"
-# jobid <-2019071194633 
-# expFile <- "2019071194633_filtered_expression.txt"
-# labelFile <- "2019071194633_cell_label.txt"
+# jobid <-2019062485208 
+# expFile <- "2019062485208_filtered_expression.txt"
+# labelFile <- "2019062485208_cell_label.txt"
 # wd <- getwd()
 setwd(wd)
 
@@ -153,7 +153,7 @@ exp_data <- as.matrix(exp_data)
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
-
+total_motif_list <- vector()
 #i=1
 # genes=x= gene_name_list[[1]]
 for (i in 1:length(alldir)) {
@@ -232,7 +232,7 @@ for (i in 1:length(alldir)) {
   colnames(ras) <- label_data[,1]
   colnames(originak_ras) <- label_data[,1]
   write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
-  
+  total_motif_list <- append(total_motif_list,unlist(motif_list))
   #j=1
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
@@ -272,7 +272,11 @@ for (i in 1:length(alldir)) {
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T)
   }
 }
-
+tmp_list <- strsplit(total_motif_list,",")
+tmp_list <- lapply(tmp_list, function(x){
+  paste("ct",x[1],"bic",x[2],"m",x[3],sep = "")
+})
+write.table(unlist(tmp_list),"total_motif_list.txt",quote = F,row.names = F,col.names = F)
 #.AUC.geneSet_norm <- function(geneSet=genes, rankings=cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05, gSetName="")
 #{
 #  geneSet <- unique(geneSet)
