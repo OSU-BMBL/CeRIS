@@ -226,11 +226,23 @@ for (i in 1:length(alldir)) {
   rss_list <- rss_list[rss_rank]
   gene_name_list <- gene_name_list[rss_rank]
   gene_id_list <- gene_id_list[rss_rank]
+  
+  # put marker genes on top
+  gene_id_list <- mapply(function(X,Y,Z){
+    id <- which(Y %in% X)
+    return(unique(append(Z[id],Z)))
+  },X=marker,Y=gene_name_list,Z=gene_id_list)
+  
+  gene_name_list <- mapply(function(X,Y){
+    return(unique(append(X,Y)))
+  },X=marker,Y=gene_name_list)
+  
   motif_list <- motif_list[rss_rank]
   ras <- ras[rss_rank,]
   originak_ras <- originak_ras[rss_rank,]
   colnames(ras) <- label_data[,1]
   colnames(originak_ras) <- label_data[,1]
+  
   write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
   total_motif_list <- append(total_motif_list,unlist(motif_list))
   #j=1
