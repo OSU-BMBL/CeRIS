@@ -305,7 +305,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -400,7 +400,10 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
-																		<tr><td style="display:inline-block; border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block; border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block; border:none;">Regulon specificity score: {{$motif_rank_result[$sec0][sec1][4]}}</td><td style="display:inline-block; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+																		<tr><td style="display:inline-block; font-size:14px; border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td>
+																		<td style="display:inline-block; font-size:14px;border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td>
+																		<td style="display:inline-block; font-size:14px;border:none;">Regulon specificity score: {{$motif_rank_result[$sec0][sec1][4]}}</td>
+																		<td style="display:inline-block; font-size:14px;border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr>
                                                                             <td style="display:inline-block; overflow-y: auto;width:49%;max-height:400px; border:none;">
                                                                                 <div style="width:100%; font-size:14px;">
@@ -849,7 +852,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -901,7 +904,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -953,7 +956,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -1005,7 +1008,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -1276,7 +1279,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		data: {'id': regulon_id},
 		dataType: 'json',
 		success: function(response) {
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_' + regulon_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""

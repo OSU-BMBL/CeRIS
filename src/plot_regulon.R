@@ -1,22 +1,16 @@
 #######  Plot regulon ##########
-if(!require(Seurat)) {
-  install.packages("Seurat")
-} 
 
-if (!require("RColorBrewer")) {
-  install.packages("RColorBrewer")
-}
-if (!require("Polychrome")) {
-  install.packages("Polychrome")
-  library(Polychrome)
-}
-library(plotly)
+library(Seurat)
+library(RColorBrewer)
+library(Polychrome)
+library(ggplot2)
+
 
 args <- commandArgs(TRUE) 
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
 #setwd("C:/Users/wan268/Documents/iris3_data/0624")
 #srcDir <- getwd()
-#id <-"CT3S-R2" 
+#id <-"CT4S-R7" 
 #jobid <- "2019062485208"
 srcDir <- args[1]
 id <- args[2]
@@ -133,13 +127,16 @@ regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-png(paste("regulon_id/overview_",id,".png",sep = ""),width=700, height=700)
-Plot.cluster2D(reduction.method = "tsne",customized = T)
+png(paste("regulon_id/overview_ct",regulon_ct,".png",sep = ""),width=700, height=700)
+if (!file.exists(paste("regulon_id/overview_",regulon_ct,".png",sep = ""))){
+  Plot.cluster2D(reduction.method = "tsne",customized = T)
+}
 quiet(dev.off())
 
 png(paste("regulon_id/",id,".png",sep = ""),width=700, height=700)
-Plot.regulon2D(reduction.method = "tsne",regulon = as.numeric(regulon_id),cell.type=as.numeric(regulon_ct),customized =T)  
+if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
+  Plot.regulon2D(reduction.method = "tsne",regulon = as.numeric(regulon_id),cell.type=as.numeric(regulon_ct),customized =T)  
+}
 quiet(dev.off())
-
 
 
