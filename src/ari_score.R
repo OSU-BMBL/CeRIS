@@ -51,7 +51,6 @@ if (srcFile == '1') {
   user_label_file <- sc3_cluster
 } else {
   user_label_file <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
-  
 }
 
 
@@ -71,42 +70,6 @@ if (label_use_sc3 == 2) {
   is_evaluation <- 'yes'
   #write.table(user_label_file,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
-  if(!require(Seurat)) {
-    install.packages("Seurat")
-  } 
-  my.object <- readRDS("seurat_obj.rds")
-  my.object<-AddMetaData(my.object,user_label[,2],col.name = "Customized.idents")
-  Idents(my.object)<-as.factor(my.object$Customized.idents)
-  Get.MarkerGene<-function(my.object, customized=T){
-    if(customized){
-      Idents(my.object)<-my.object$Customized.idents
-      my.marker<-FindAllMarkers(my.object,only.pos = T)
-    } else {
-      Idents(my.object)<-my.object$seurat_clusters
-      my.marker<-FindAllMarkers(my.object,only.pos = T)
-    }
-    my.cluster<-unique(as.character(as.numeric(Idents(my.object))))
-    my.top.20<-c()
-    for( i in 1:length(my.cluster)){
-      my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
-      my.top.20.tmp<-list(my.cluster.data.frame$gene[1:100])
-      my.top.20<-append(my.top.20,my.top.20.tmp)
-    }
-    names(my.top.20)<-paste0("CT",my.cluster)
-    my.top.20<-as.data.frame(my.top.20)
-    return(my.top.20)
-  }
-  sort_column <- function(df) {
-    tmp <- colnames(df)
-    split <- strsplit(tmp, "CT") 
-    split <- as.numeric(sapply(split, function(x) x <- sub("", "", x[2])))
-    return(order(split))
-  }
-  
-  my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = T)
-  my.cluster.uniq.marker <- my.cluster.uniq.marker[,sort_column(my.cluster.uniq.marker)]
-  write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
-  saveRDS(my.object,file="seurat_obj.rds")
   write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
