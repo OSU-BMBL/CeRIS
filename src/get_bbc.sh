@@ -25,4 +25,4 @@ do
 	perl /var/www/html/iris3/program/dminda/BBC.pl bg $fbname -1 0.4 0.8
 done
 
-perl /var/www/html/iris3/program/dminda/BBC.pl bg combine_bbc.bbc.txt -1 0.4 0.8
+#perl /var/www/html/iris3/program/dminda/BBC.pl bg combine_bbc.bbc.txt -1 0.4 0.8
