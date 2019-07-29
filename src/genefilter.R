@@ -27,6 +27,7 @@ label_file <- args[6] # user label file name or 1
 delimiter <- args[7] 
 param_k <- character()
 param_k <- args[8] #k parameter for sc3
+label_use_sc3 <- args[9] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 
 
 if(delim == 'tab'){
@@ -297,6 +298,11 @@ cell_info <- as.data.frame(colData(sce))
 cell_info <- cbind(rownames(cell_info),cell_info[,ncol(cell_info)])
 colnames(cell_info) <- c("cell_name","label")
 write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+
+if (label_use_sc3 =='2'){
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
+  cell_info[,2] <- as.factor(cell_info[,2])
+}
 
 rownames(cell_info) <- cell_info[,1]
 cell_info <- cell_info[,-1]
