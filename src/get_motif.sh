@@ -19,7 +19,8 @@ while read -r species; do
 		done
 		ct_dir=$(dirname "${file}")
 		if [ "$is_meme" == "1" ]; then
-			/var/www/html/iris3/program/meme/bin/meme $file -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 3 -objfun de -neg /var/www/html/iris3/program/bg_data/Human.bg.fa -dna -text > $ct_dir"/bic"$meme_index.txt.fa.closures &
+			/var/www/html/iris3/program/meme/bin/meme $file -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 10 -objfun classic -dna -text > $ct_dir"/bic"$meme_index.txt.fa.closures &
+			#/var/www/html/iris3/program/meme/bin/meme $file -nostatus -w 12 -allw -mod anr -revcomp -nmotifs 3 -objfun de -neg /var/www/html/iris3/program/bg_data/Human.bg.fa -dna -text > $ct_dir"/bic"$meme_index.txt.fa.closures &
 			meme_index=$((meme_index+1))
 		else
 			cp $file $ct_dir"/bic"$meme_index.txt.fa
