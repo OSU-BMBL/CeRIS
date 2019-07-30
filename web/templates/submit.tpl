@@ -13,9 +13,7 @@ function addPreviewTable(response, metadata=true, type) {
 			$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(label));
 			$.each(response['columns'][0], function(i, col) {
 			$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(col));
-			})
-		
-		
+		})
 	} else if (type == 'label'){
 		label = 'Cell label'
 		$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(label));
@@ -28,24 +26,26 @@ function addPreviewTable(response, metadata=true, type) {
 	
 	// Get row number
 	n = metadata ? 6 : response['index'].length
-
-	// Add rows
-	try {
-	for (i=0; i<n; i++) {
-		var $tr = $('<tr>').append($('<td>', {'class': 'bold text-center px-2 py-1'}).html(response['index'][i]));
-		$.each(response['data'][i], function(i, val) {
-			$tr.append($('<td>', {'class': 'light text-center tiny'}).html(val));
-		})
-		$table.find('tbody').append($tr);
-	}
-		// Add
-	$('#loader_'+type).addClass('d-none');
-	$('#preview_'+type).append($table);
-	document.getElementById("is_load_"+type).value = 1;
-	}
-		catch(err) {
+	
+	upload_type = response['type'][0]
+	console.log(upload_type);
+	switch (upload_type){
+	case 'text':
+		try {	// Add rows
+			for (i=0; i<n; i++) {
+			var $tr = $('<tr>').append($('<td>', {'class': 'bold text-center px-2 py-1'}).html(response['index'][i]));
+			$.each(response['data'][i], function(i, val) {
+				$tr.append($('<td>', {'class': 'light text-center tiny'}).html(val));
+			})
+			$table.find('tbody').append($tr);
+			}	// Add
+			$('#loader_'+type).addClass('d-none');
+			$('#preview_'+type).append($table);
+			document.getElementById("is_load_"+type).value = 1;
+		} catch(err) {
 		  $('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">ERROR: '+err.message+', please check your upload data format.</span></label>'))
 		}
+		
 		if (response['columns'][0].length != response['data'][0].length && type=='exp'){
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
 		}
@@ -68,10 +68,18 @@ function addPreviewTable(response, metadata=true, type) {
 				}
 			}
 		}
-
 		if (check_cell_name_start_with_number(response['columns'][0]) && type=='exp'){
 			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, IRIS3 will try to rename them in data pre-processing.  </span></label>'))
 		}
+		break;
+	case 'hdf':
+	$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Word on HDF.... ' + response['type'][0] + '</span></label>'))
+	break;
+	
+	}
+	$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Your upload file format is: ' + upload_type + '</span></label>'))
+	
+
 
 }
 
@@ -103,7 +111,7 @@ var exp_file_status = 0;
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5",
 	            url: "upload.php",
 	            maxFiles: 3,
-	            maxFilesize: 500,
+	            maxFilesize: 1000,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
 	                this.addFile(file);
@@ -128,7 +136,7 @@ var exp_file_status = 0;
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
 	            url: "upload.php",
 	            maxFiles: 1,
-	            maxFilesize: 500,
+	            maxFilesize: 50,
 				timeout: 1800000,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
@@ -151,7 +159,7 @@ var exp_file_status = 0;
 	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
 	            url: "upload.php",
 	            maxFiles: 1,
-	            maxFilesize: 500,
+	            maxFilesize: 50,
 				timeout: 300000,
 	            maxfilesexceeded: function(file) {
 	                this.removeAllFiles();
