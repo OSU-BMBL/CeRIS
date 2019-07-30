@@ -72,7 +72,7 @@ Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
 
 Get.CellType<-function(cell.type=NULL,...){
   if(!is.null(cell.type)){
-    my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_name.txt")
+    my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_symbol.txt")
     my.cell.regulon.indicator<-grep(paste0("_",as.character(cell.type),"_bic"),my.cell.regulon.filelist)
     my.cts.regulon.raw<-readLines(my.cell.regulon.filelist[my.cell.regulon.indicator])
     my.regulon.list<-strsplit(my.cts.regulon.raw,"\t")
@@ -126,7 +126,7 @@ regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
-activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
+activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 png(paste("regulon_id/overview_ct",regulon_ct,".png",sep = ""),width=700, height=700)
 if (!file.exists(paste("regulon_id/overview_",regulon_ct,".png",sep = ""))){
   Plot.cluster2D(reduction.method = "tsne",customized = T)

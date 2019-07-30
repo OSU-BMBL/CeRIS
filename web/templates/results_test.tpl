@@ -7,7 +7,8 @@
 <script src="https://cdn.plot.ly/plotly-1.5.0.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script> -->
 
-<script>var flag = [];
+<script>
+var flag = [];
 $(document).ready(function() {
 
     document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
@@ -351,22 +352,19 @@ $(document).ready(function() {
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h1 class='wait_message'>Please wait ...</h1>
-																					</div></div></div></div></div></div>
-
-																					</div> 
+																					</div></div></div></div></div></div></div> 
 																	<div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																		
+																	
 																	<table id="motiftable" class="table table-sm" cellpadding="0" cellspacing="0" width="100%">
-                                                                    <thead>
-                                                                        <tr>
-                                                                        </tr>
-                                                                    </thead>
+                                                                    <thead><tr></tr></thead>
                                                                     <tbody>
+																	<div class="list-wrapper">
+																	<div class="list-item">
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
-																		<tr><td style="display:inline-block; font-size:14px;border:none;">P-value: {{$motif_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Z-score: {{$motif_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Regulon specificity score: {{$motif_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td style="display:inline-block; font-size:14px; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+																		<tr><td style="display:inline-block; font-size:14px;border:none;">P-value: {{$regulon_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Z-score: {{$regulon_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td style="display:inline-block; font-size:14px; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr>
                                                                             <td style="display:inline-block; overflow-y: auto;width:49%;max-height:400px; border:none;">
                                                                                 <div style="width:100%; font-size:14px;">
@@ -375,10 +373,10 @@ $(document).ready(function() {
 									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
 										  <tr > <td>
-										  {{if !empty($motif_rank_result[$sec0][sec1][5]) && $motif_rank_result[$sec0][sec1][5] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($motif_rank_result[$sec0][sec1][6]) && $motif_rank_result[$sec0][sec1][6] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($motif_rank_result[$sec0][sec1][7]) && $motif_rank_result[$sec0][sec1][7] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($motif_rank_result[$sec0][sec1][8]) && $motif_rank_result[$sec0][sec1][8] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
+										  {{if !empty($regulon_rank_result[$sec0][sec1][5]) && $regulon_rank_result[$sec0][sec1][5] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][6]) && $regulon_rank_result[$sec0][sec1][6] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][8]) && $regulon_rank_result[$sec0][sec1][8] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>							
                                          <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>{{/section}}</tr></table></div></td>
 																			<td style="display:inline-block; overflow-y: auto;max-height:400px; border:none;width:49%;">
@@ -489,7 +487,8 @@ $(document).ready(function() {
 																		</tr>
 
                                                                         {{/section}}
-                                                                    </tbody></table></div></div></div>
+                                                                    </tbody></table></div></div><div id="pagination-container"></div></div></div>
+																	
                                                             </div>	
 															{{/if}}
 															{{/foreach}}
@@ -930,7 +929,28 @@ $(document).ready(function() {
     <script src='assets/js/hzome_functions.js'></script>
     <script src='assets/js/send_to_Enrichr.js'></script>
     <script src='assets/js/load_clustergram.js'></script>
+	<script src="assets/js/jquery.simplePagination.js" ></script>
     <script>
+	
+	var items = $(".list-wrapper .list-item");
+    var numItems = items.length;
+    var perPage = 4;
+
+    items.slice(perPage).hide();
+
+    $('#pagination-container').pagination({
+        items: numItems,
+        itemsOnPage: perPage,
+        prevText: "&laquo;",
+        nextText: "&raquo;",
+        onPageClick: function (pageNumber) {
+            var showFrom = perPage * (pageNumber - 1);
+            var showTo = showFrom + perPage;
+            items.hide().slice(showFrom, showTo).show();
+        }
+    });
+	
+	
 	function show_peak_table(item){
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(8);
@@ -1106,7 +1126,7 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_' + regulon_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""

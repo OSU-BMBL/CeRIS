@@ -206,11 +206,9 @@ for file in *blocks
 do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
-#Rscript /var/www/html/iris3/program/sc3.R \$wd\$jobid\_filtered_expression.txt \$jobid \$label_file $delim_label $param_k\n
 Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
 Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
 Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
-#perl /var/www/html/iris3/program/prepare_promoter.pl \$wd $promoter_arg\n
 /var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
 Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
 /var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
@@ -233,7 +231,7 @@ mkdir regulon_id\n
 /var/www/html/iris3/program/get_logo.sh \$wd
 /var/www/html/iris3/program/get_tomtom.sh \$wd
 /var/www/html/iris3/program/get_atac_overlap.sh \$wd
-zip -R \$wd\$jobid '*.regulon.txt' '*.regulon_gene_name.txt' '*_cell_label.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' \n
+zip -R \$wd\$jobid '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' \n
 perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
 echo 'finish'> done\n  
 chmod -R 777 .
@@ -242,7 +240,7 @@ chmod -R 777 .
 	fclose($fp);
 	session_destroy();
 	system("chmod -R 777 $workdir2");
-	system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);

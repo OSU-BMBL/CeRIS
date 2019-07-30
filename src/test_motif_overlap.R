@@ -5,8 +5,8 @@
 
 
 ###test
-wd <- "C:/Users/wan268/Documents/iris3_data/20190726151055"
-jobid <-20190726151055 
+wd <- "C:/Users/wan268/Documents/iris3_data/2019062485208"
+jobid <-2019062485208 
 # wd <- getwd()
 setwd(wd)
 
@@ -44,7 +44,7 @@ single_motif <- unlist(lapply(total_motif_list, function(x){
   length(x) >= 2
 })
 )
-
-
-which(single_motif == F)
+total_motif_list[single_motif]
+length(which(single_motif == F))
+length(single_motif)
 

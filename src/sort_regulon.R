@@ -3,7 +3,7 @@
 # used files:
 # filtered exp matrix
 # cell label
-# regulon_gene_name, regulon, regulon_motif, motif_ranks
+# regulon_gene_symbol, regulon_gene_id, regulon_motif, motif_ranks (from merge_bbc.R)
 
 library(scales)
 library(sgof)
@@ -158,11 +158,11 @@ total_motif_list <- vector()
 # genes=x= gene_name_list[[1]]
 for (i in 1:length(alldir)) {
   
-  regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),"r")
+  regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
   close(regulon_gene_name_handle)
   
-  regulon_gene_id_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""),"r")
+  regulon_gene_id_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""),"r")
   regulon_gene_id <- readLines(regulon_gene_id_handle)
   close(regulon_gene_id_handle)
   
@@ -243,7 +243,7 @@ for (i in 1:length(alldir)) {
   colnames(ras) <- label_data[,1]
   colnames(originak_ras) <- label_data[,1]
   
-  write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
+  write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.regulon_activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
   total_motif_list <- append(total_motif_list,unlist(motif_list))
   #j=1
   for (j in 1:length(gene_name_list)) {
@@ -255,33 +255,33 @@ for (i in 1:length(alldir)) {
     rss_list[[j]] <- append(rss_list[[j]],marker[[j]])
   }
   options(stringsAsFactors=FALSE)
-  motif_rank_result <- data.frame()
+  regulon_rank_result <- data.frame()
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
     this_motif_value <- motif_rank[which(motif_rank[,1] == motif_list[[j]][2]),-1]
     this_motif_value <- cbind(regulon_tag,this_motif_value)
-    motif_rank_result <- rbind(motif_rank_result,this_motif_value)
+    regulon_rank_result <- rbind(regulon_rank_result,this_motif_value)
   }
 
-  write.table(motif_rank_result,paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
-  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""))
-  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""))
+  #write.table(regulon_rank_result,paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
+  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""))
+  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
-  cat("",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""))
+  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""))
   for (j in 1:length(gene_name_list)) {
-    cat(gene_name_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),append = T,sep = "\t")
-    cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_name.txt",sep = ""),append = T)
+    cat(gene_name_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),append = T,sep = "\t")
+    cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),append = T)
     
-    cat(gene_id_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""),append = T,sep = "\t")
-    cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon.txt",sep = ""),append = T)
+    cat(gene_id_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""),append = T,sep = "\t")
+    cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""),append = T)
     
     cat(motif_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),append = T,sep = "\t")
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),append = T)
     
-    cat(as.character(motif_rank_result[j,]),file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T,sep = "\t")
-    cat("\t",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T)
-    cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T,sep = "\t")
-    cat("\n",file=paste(jobid,"_CT_",i,"_bic.motif_rank.txt",sep = ""),append = T)
+    cat(as.character(regulon_rank_result[j,]),file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T,sep = "\t")
+    cat("\t",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
+    cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T,sep = "\t")
+    cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
   }
 }
 tmp_list <- strsplit(total_motif_list,",")

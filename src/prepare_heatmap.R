@@ -28,7 +28,7 @@ sort_dir <- function(dir) {
   split <- as.numeric(sapply(split, function(x) x <- sub("_bic.*", "", x[2])))
   return(tmp[order(split)])
 }
-all_regulon <- sort_dir(list.files(path = workdir,pattern = "._bic.regulon_gene_name.txt$"))
+all_regulon <- sort_dir(list.files(path = workdir,pattern = "._bic.regulon_gene_symbol.txt$"))
 all_label <- sort_dir(list.files(path = workdir,pattern = ".+cell_label.txt$")[1])
 label_file <- read.table(all_label,header = T)
 exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
@@ -72,12 +72,12 @@ for (i in 1:length(all_regulon)) {
   name_idx <- 1
   if(length(regulon_file) > 0){
     for (j in 1:length(regulon_file)) {
-      regulon_gene_name <- regulon_file[[j]][-1]
-      regulon_gene_name <- regulon_gene_name[regulon_gene_name!=""]
-      if(length(regulon_gene_name)>100 | length(regulon_gene_name) <=1){
+      regulon_gene_symbol <- regulon_file[[j]][-1]
+      regulon_gene_symbol <- regulon_gene_symbol[regulon_gene_symbol!=""]
+      if(length(regulon_gene_symbol)>100 | length(regulon_gene_symbol) <=1){
         next
       }
-      regulon_heat_matrix <- subset(exp_file,rownames(exp_file) %in% regulon_gene_name)
+      regulon_heat_matrix <- subset(exp_file,rownames(exp_file) %in% regulon_gene_symbol)
       regulon_heat_matrix <- rbind(category,regulon_heat_matrix)
       if(i <= total_ct) {
       regulon_heat_matrix_filename <- paste("heatmap/CT",i,"S-R",name_idx,".heatmap.txt",sep="")
@@ -95,7 +95,7 @@ for (i in 1:length(all_regulon)) {
         write('\n',file=regulon_heat_matrix_filename,append=TRUE)
       }
       #save regulon label to one list
-      combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
+      combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_symbol)
       names(combine_regulon_label)[regulon_label_index] <- regulon_label
       regulon_label_index <- regulon_label_index + 1
       name_idx <- name_idx + 1
@@ -113,7 +113,7 @@ for (i in 1:length(all_regulon)) {
           write('\n',file=regulon_heat_matrix_filename,append=TRUE)
         }
         #save regulon label to one list
-        combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_name)
+        combine_regulon_label<-list.append(combine_regulon_label,regulon_gene_symbol)
         names(combine_regulon_label)[regulon_label_index] <- regulon_label
         regulon_label_index <- regulon_label_index + 1
         name_idx <- name_idx + 1

@@ -17,7 +17,7 @@ $big=intval($info['big']);
 $tempnam ="$DATAPATH/$jobid";	
 $done_file = "$DATAPATH/$jobid/done";
 
-$regulon_gene_name_file = array();
+$regulon_gene_symbol_file = array();
 $regulon_file = array();
 if (file_exists("$DATAPATH/$jobid/info.txt")){
 $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
@@ -100,7 +100,7 @@ if (file_exists("$DATAPATH/$jobid/saving_plot1.jpeg")){
 	$saving_plot1 = 1;
 }
 
-if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon_gene_name.txt")){
+if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon_gene_symbol.txt")){
 	if (file_exists("$DATAPATH/$jobid/$jobid"."_user_label_name.txt")){
 		$lines = file("$DATAPATH/$jobid/$jobid"."_user_label_name.txt", FILE_IGNORE_NEW_LINES);
 		$provided_cell_v = array_count_values($lines);
@@ -155,19 +155,19 @@ $evaluation_file = fopen("$DATAPATH/$jobid/$jobid"."_sc3_cluster_evaluation.txt"
 
 
 
-foreach (glob("$DATAPATH/$jobid/$jobid\_CT_*_bic.regulon_gene_name.txt") as $file) {
-  $regulon_gene_name_file[] = $file;
+foreach (glob("$DATAPATH/$jobid/$jobid\_CT_*_bic.regulon_gene_symbol.txt") as $file) {
+  $regulon_gene_symbol_file[] = $file;
 }
 
-foreach (glob("$DATAPATH/$jobid/*_bic.regulon.txt") as $file) {
+foreach (glob("$DATAPATH/$jobid/*regulon_gene_id.txt") as $file) {
   $regulon_id_file[] = $file;
 }
 
 foreach (glob("$DATAPATH/$jobid/*_bic.regulon_motif.txt") as $file) {
   $regulon_motif_file[] = $file;
 }
-foreach (glob("$DATAPATH/$jobid/*_bic.motif_rank.txt") as $file) {
-  $motif_rank_file[] = $file;
+foreach (glob("$DATAPATH/$jobid/*_bic.regulon_rank.txt") as $file) {
+  $regulon_rank_file[] = $file;
 }
 
 $tomtom_path = "$DATAPATH/$jobid/tomtom/";
@@ -179,23 +179,23 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tomtom_pa
 	
 }
 
-natsort($regulon_gene_name_file);
+natsort($regulon_gene_symbol_file);
 natsort($regulon_id_file);
 natsort($regulon_motif_file);
-natsort($motif_rank_file);
+natsort($regulon_rank_file);
 natsort($tomtom_file);
-$regulon_gene_name_file = array_values($regulon_gene_name_file);
+$regulon_gene_symbol_file = array_values($regulon_gene_symbol_file);
 $regulon_id_file = array_values($regulon_id_file);
 $regulon_motif_file = array_values($regulon_motif_file);
-$motif_rank_file = array_values($motif_rank_file);
+$regulon_rank_file = array_values($regulon_rank_file);
 $tomtom_file = array_values($tomtom_file);
 
-$count_ct = range(1,count($regulon_gene_name_file));
+$count_ct = range(1,count($regulon_gene_symbol_file));
 
-foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon_gene_name.txt") as $file) {
+foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon_gene_symbol.txt") as $file) {
   $module_gene_name_file[] = $file;
 }
-foreach (glob("$DATAPATH/$jobid/$jobid\_module_*_bic.regulon.txt") as $file) {
+foreach (glob("$DATAPATH/$jobid/$jobid\_module_*regulon_gene_id.txt") as $file) {
   $module_id_file[] = $file;
 }
 
@@ -268,7 +268,7 @@ $silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 if ($silh_file) {
 	$silh_trace = $silh_x = $silh_y  = $line_cell = $line_result = array(); 
 	
-	for ($i=1;$i <= count($regulon_gene_name_file);$i++){
+	for ($i=1;$i <= count($regulon_gene_symbol_file);$i++){
 		$silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 		$line_cell = $line_result = array(); 
 		while (($line = fgets($silh_file)) !== false) {
@@ -328,10 +328,10 @@ if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 }
 
 
-foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
+foreach ($regulon_gene_symbol_file as $key=>$this_regulon_gene_symbol_file){
 	
 	$status = "1";
-	$fp = fopen("$this_regulon_gene_name_file", 'r');
+	$fp = fopen("$this_regulon_gene_symbol_file", 'r');
 	 if ($fp){
 	 while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) if ($line) {
 		 $regulon_result[$key][] = array_map('trim',$line);
@@ -343,7 +343,7 @@ foreach ($regulon_gene_name_file as $key=>$this_regulon_gene_name_file){
 	 } else{
 		 die("Unable to open file");
 	 }
-	 if(!filesize($this_regulon_gene_name_file)) {
+	 if(!filesize($this_regulon_gene_symbol_file)) {
      $regulon_result[$key][0] = '0';
 	 }
 	fclose($fp);
@@ -375,12 +375,12 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	fclose($fp);
 	}
 	
-foreach ($motif_rank_file as $key=>$this_motif_rank_file){
+foreach ($regulon_rank_file as $key=>$this_regulon_rank_file){
 	$status = "1";
-	$fp = fopen("$this_motif_rank_file", 'r');
+	$fp = fopen("$this_regulon_rank_file", 'r');
 	if ($fp){
 	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
-		if ($line) {$motif_rank_result[$key][] = array_map('trim',$line);}
+		if ($line) {$regulon_rank_result[$key][] = array_map('trim',$line);}
 	} else{
 		die("Unable to open file");
 	}
@@ -470,11 +470,11 @@ function exception_handler($exception) {
 }
 
 set_exception_handler('exception_handler');
-}else if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt") && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic/bic1.txt.fa.closures")) {
+}else if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1regulon_gene_id.txt") && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic/bic1.txt.fa.closures")) {
 	$status= "error_bic";
 }else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_cell_label.txt")) {
 	$status= "error_num_cells";
-}else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic.regulon.txt")) {
+}else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1regulon_gene_id.txt")) {
 	$status= "error";
 }
 else if (!file_exists($tempnam)) {
@@ -505,8 +505,8 @@ $smarty->assign('count_regulon_in_ct',$count_regulon_in_ct);
 $smarty->assign('regulon_result',$regulon_result);
 $smarty->assign('regulon_id_result',$regulon_id_result);
 $smarty->assign('regulon_motif_result',$regulon_motif_result);
-$smarty->assign('motif_rank_result',$motif_rank_result);
-$smarty->assign('rss_result',$motif_rank_result);
+$smarty->assign('regulon_rank_result',$regulon_rank_result);
+$smarty->assign('rss_result',$regulon_rank_result);
 $smarty->assign('tomtom_result',$tomtom_result);
 $smarty->assign('module_result',$module_result);
 $smarty->assign('module_id_result',$module_id_result);

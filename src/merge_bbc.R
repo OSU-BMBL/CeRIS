@@ -36,11 +36,11 @@ module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 count_num_regulon<-0
 regulon_idx_module <- 0
 for (i in 1:length(alldir)) {
-  res <- paste(short_dir[i],".regulon.txt",sep="")
-  res_symbol<- paste(short_dir[i],".regulon_gene_name.txt",sep="")
+  res_id <- paste(short_dir[i],".regulon_gene_id.txt",sep="")
+  res_symbol<- paste(short_dir[i],".regulon_gene_symbol.txt",sep="")
   res_motif<- paste(short_dir[i],".regulon_motif.txt",sep="")
   file.create(res_motif,showWarnings = F)
-  cat("",file=res)
+  cat("",file=res_id)
   this_ct <- i
   
   cluster_filename <- paste("./bg.BBC/bg.",short_dir[i],".bbc.txt.MC",sep="")
@@ -114,9 +114,9 @@ for (i in 1:length(alldir)) {
       cat(as.character(gene_id_name[which(gene_id_name[,1] %in% genes),2]),file=res_symbol,sep = "\t",append = T)
       cat("\n",file=res_symbol,append = T)
       
-      cat(paste(regulon_idx_label,"\t",sep = ""),file=res,append = T)
-      cat(as.character(gene_id_name[which(gene_id_name[,1] %in% genes),1]),file=res,sep = "\t",append = T)
-      cat("\n",file=res,append = T)
+      cat(paste(regulon_idx_label,"\t",sep = ""),file=res_id,append = T)
+      cat(as.character(gene_id_name[which(gene_id_name[,1] %in% genes),1]),file=res_id,sep = "\t",append = T)
+      cat("\n",file=res_id,append = T)
       
       regulon_idx <- regulon_idx + 1
     }
@@ -128,8 +128,8 @@ for (i in 1:length(alldir)) {
 count_num_regulon <- count_num_regulon - length(alldir)
 write(paste("total_ct,",as.character(length(alldir)),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_regulon,",as.character(count_num_regulon),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-regulon_file <- list.files(srcDir,pattern = "*.regulon.txt")
 
+#regulon_file <- list.files(srcDir,pattern = "*.regulon_gene_id.txt")
 #i = regulon_file[1]
 #for ( i in regulon_file){
 #  read.table(i)
@@ -142,9 +142,9 @@ regulon_file <- list.files(srcDir,pattern = "*.regulon.txt")
 #j=1
 #max_column <- 0
 #for (i in 1:length(regulon_all_files)) {
-#  res <- paste(short_dir[i],".regulon.gene.txt",sep="")
+#  res_id <- paste(short_dir[i],".regulon.gene.txt",sep="")
 #  res_final <- paste(short_dir[i],".complex.regulon.txt",sep="")
-#  cat("",file=res)
+#  cat("",file=res_id)
 #  regulo <- readLines(regulon_all_files[i])
 #  combined_regulon <- read.table(text = regulo,sep = "\t",fill = T)
 #  all_genes <- as.character(unlist(combined_regulon[,-1]))
@@ -156,13 +156,13 @@ regulon_file <- list.files(srcDir,pattern = "*.regulon.txt")
 #      max_column <- length(belong_regulon)
 #    }
 #    tmp <- data.frame(all_genes[j],t(as.data.frame(belong_regulon)))
-#    cat(paste(all_genes[j],"\t",sep = ""),file=res,append = T)
-#    cat(belong_regulon,file=res,append = T,sep = "\t")
-#    cat("\n",file=res,append = T)
+#    cat(paste(all_genes[j],"\t",sep = ""),file=res_id,append = T)
+#    cat(belong_regulon,file=res_id,append = T,sep = "\t")
+#    cat("\n",file=res_id,append = T)
 #  }
 #  idx<-vector()
 #  tmp_final <- data.frame()
-#  sorted_res <- read.table(res,col.names = paste0("V",seq_len(max_column+1)),header = F,fill = T,comment.char = "")
+#  sorted_res <- read.table(res_id,col.names = paste0("V",seq_len(max_column+1)),header = F,fill = T,comment.char = "")
 #  tmp_res <- tmp_idx<- character()
 #  index <- unique(sorted_res[,-1])
 #  for (j in 1:nrow(sorted_res)) {
