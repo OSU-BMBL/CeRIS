@@ -1,5 +1,5 @@
 # set working directory, you may change the directory first.
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/6.Kolodziejczyk/")
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2.Yan/")
 # loading required packege
 # loading Seurat version 2, you need reinstall the version 2
 
@@ -100,11 +100,12 @@ write.table(my.expression.data,
 ##############################################
 # Add meta info(cell type) to seurat object###
 ##############################################
-label_data<-read.delim("Yan_cell_label.csv",sep = ",",
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
+label_data<-read.delim("2019062485208_cell_label.txt",sep = "\t",
                        header = T)
 # read cell label file
-my.meta.info<-read.delim("Yan_cell_label.csv",row.names = 1,
-                         sep = ",",header = T,check.names = F,stringsAsFactors = F)
+my.meta.info<-read.delim("2019062485208_cell_label.txt",row.names = 1,
+                         sep = "\t",header = T,check.names = F,stringsAsFactors = F)
 #rownames(my.meta.info)<-paste0(rownames(my.meta.info),"s")
 
 my.idents.index<-match(colnames(my.object@raw.data),rownames(my.meta.info))
@@ -270,10 +271,21 @@ cds<-reduceDimension(cds,max_components = 2, method='DDRTree')
 cds<-orderCells(cds)
 plot_cell_trajectory(cds,color_by="Customized.idents")
 #customized the color by regulon score
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
 
 
-Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1,customized=T){
+Plot.TrajectoryByCellType<-function(customized=T){
+  if (customized==TRUE){
+    g<-plot_cell_trajectory(cds,color_by = "Customized.idents")
+  }
+  if (customized==FALSE){
+    tmp.colname.phenoData<-colnames(cds@phenoData@data)
+    color_by<-grep("^res.*",tmp.colname.phenoData,value = T)[1]
+    g<-plot_cell_trajectory(cds,color_by = color_by )
+  }
+  g
+}
+Plot.TrajectoryByCellType()  
+Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1){
   tmp.FileList<-list.files(pattern = "regulon_activity_score")
   tmp.RegulonScore<-read.delim(tmp.filelist[cell.type],sep = "\t",check.names = F)[regulon,]
   tmp.NameIndex<-match(rownames(cds@phenoData@data),names(tmp.RegulonScore))
@@ -283,10 +295,9 @@ Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1,customized=T){
   plot_cell_trajectory(cds,color_by = "RegulonScore")+ scale_color_gradient(low = "grey",high = "red")
 }
 
+Plot.TrajectoryByCellType(customized = T)
+Plot.TrajectoryByRegulon(cell.type = 6,regulon = 1)
 
-
-plot_cell_trajectory(cds)+scale_color_continuous()
-+ scale_colour_manual(values = tmp.RegulonScore.Numeric)
 
 
 
