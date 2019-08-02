@@ -3,7 +3,7 @@ library(tidyverse)
 args <- commandArgs(TRUE)
 #setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
 #srcDir <- getwd()
-#jobid <-2019052895653 
+#jobid <-20190731144519 
 #motif_len <- 12
 srcDir <- args[1]
 motif_len <- args[2]
@@ -35,6 +35,8 @@ sort_short_closure <- function(dir){
 }
 
 alldir <- sort_dir(alldir)
+#filepath <- all_closure[22]
+# i <- 1
 convert_meme <- function(filepath){
   this_line <- matrix(0,ncol = 6)
   this_line <- data.frame(this_line)
@@ -43,12 +45,11 @@ convert_meme <- function(filepath){
   motif_file <- file(filepath,"r")
   line = readLines(motif_file)
   close(motif_file)
-  if (nchar(line[1]) != 57) {
+  if (nchar(line[1]) != 57 & !is.na(line[1])) {
     df <- line[substr(line,0,3) == "ENS"|substr(line,0,3) == "ens"]
     for (i in 1:length(df)) {
       this_line <- strsplit(df[i],"\\s+")[[1]]
-      
-      if(length(grep(".+[ATCG]",this_line[5])) == 1){
+      if(length(grep("[ATCG]",this_line[5])) == 1 | grepl("^\\.", this_line[5])){
         tmp_bind <- t(data.frame(this_line))
         if(ncol(tmp_bind) < 7) {
           if (nchar(as.character(tmp_bind[6])) < motif_len){
@@ -68,7 +69,7 @@ convert_meme <- function(filepath){
     all_motif_index <- 1
     #filepath=paste(filepath,".test",sep = "")
     cat("", file=filepath)
-    #i=1
+    #i=j=1
     for (i in 1:length(df_info)) {
       this_info <- strsplit(df_info[i],"\\s+")[[1]]
       this_consensus <- this_info[2]
@@ -109,7 +110,8 @@ module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
 #module_type <- rep("CT",6)
 regulon_idx_module <- 0
 result_gene_pos <- data.frame()
-
+#i=j=1
+#
 for (i in 1:length(alldir)) {
   combined_seq <- data.frame()
   combined_gene <- data.frame()
@@ -126,3 +128,4 @@ for (i in 1:length(alldir)) {
     cat("", file= paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
   }
 }
+
