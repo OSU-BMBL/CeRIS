@@ -1,233 +1,304 @@
 {{extends file="base.tpl"}} {{block name="extra_style"}} form div.fieldWrapper label { min-width: 5%; } {{/block}} {{block name="extra_js"}} {{/block}} {{block name="main"}}
 	<script src="vendor/bootstrap/js/bootstrap-select.min.js"></script>
 <script>
+function addPreviewTable(response, metadata = true, type) {
 
-function addPreviewTable(response, metadata=true, type) {
+    // Define table
+    var $table = $('<table>', {
+        'class': 'table-striped w-100'
+    }).append($('<thead>').append($('<tr>', {
+        'class': ' very-small text-center border-grey border-left-0 border-right-0'
+    }))).append($('<tbody>'));
+    // Add headers
+    //label = metadata ? 'Gene' : 'Cell Label'
+	
+    upload_type = response['type'][0];
+    console.log(upload_type);
+    if (type == 'exp' && upload_type == 'text') {
+        label = 'Gene'
+        $table.find('tr').append($('<th>', {
+            'class': 'px-2 py-1 text-center'
+        }).html(label));
+        $.each(response['columns'][0], function(i, col) {
+            $table.find('tr').append($('<th>', {
+                'class': 'px-2 py-1 text-center'
+            }).html(col));
+        })
+    } else if (type == 'label') {
+        label = 'Cell label'
+        $table.find('tr').append($('<th>', {
+            'class': 'px-2 py-1 text-center'
+        }).html(label));
+        $.each(response['columns'][0], function(i, col) {
+            $table.find('tr').append($('<th>', {
+                'class': 'px-2 py-1 text-center'
+            }).html(col));
+        })
+    } else if (type == 'module') {
+        label = 'Module';
+    }
 
-	// Define table
-	var $table = $('<table>', {'class': 'table-striped w-100'}).append($('<thead>').append($('<tr>', {'class': ' very-small text-center border-grey border-left-0 border-right-0'}))).append($('<tbody>'));
-	// Add headers
-	//label = metadata ? 'Gene' : 'Cell Label'
-	if (type == 'exp') {
-		label = 'Gene'
-			$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(label));
-			$.each(response['columns'][0], function(i, col) {
-			$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(col));
-		})
-	} else if (type == 'label'){
-		label = 'Cell label'
-		$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(label));
-		$.each(response['columns'][0], function(i, col) {
-		$table.find('tr').append($('<th>', {'class': 'px-2 py-1 text-center'}).html(col));
-	})
-	} else if (type == 'module'){
-		label = 'Module'
-	} 
-	
-	// Get row number
-	n = metadata ? 6 : response['index'].length
-	
-	upload_type = response['type'][0]
-	console.log(upload_type);
-	switch (upload_type){
-	case 'text':
-		try {	// Add rows
-			for (i=0; i<n; i++) {
-			var $tr = $('<tr>').append($('<td>', {'class': 'bold text-center px-2 py-1'}).html(response['index'][i]));
-			$.each(response['data'][i], function(i, val) {
-				$tr.append($('<td>', {'class': 'light text-center tiny'}).html(val));
-			})
-			$table.find('tbody').append($tr);
-			}	// Add
-			$('#loader_'+type).addClass('d-none');
-			$('#preview_'+type).append($table);
-			document.getElementById("is_load_"+type).value = 1;
-		} catch(err) {
-		  $('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="highlight">ERROR: '+err.message+', please check your upload data format.</span></label>'))
-		}
-		
-		if (response['columns'][0].length != response['data'][0].length && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: The number of cells in your first row('+response['columns'][0].length+') does not match the number in the other rows('+response['data'][0].length+').</span></label>'))
-		}
-		percent_gene_num = response['gene_num'][0]>1000 ? 1000 : response['gene_num'][0]
-		percent = (1 - response['count_zero'][0]/(response['columns'][0].length*percent_gene_num)).toFixed(6)
-		
-		if (percent > 0.85 && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset ('+percent*100+'%), errors are likely to occur when you submit job to IRIS3.</span></label>'))
-		}
-		if (response['columns'][0].length < 40 && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">WARNING: Your dataset has ('+response['columns'][0].length+') cells, errors may occur when you submit to IRIS3. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
-			document.getElementById("k_arg").value = 5;
-		}
-		var check_cell_name_start_with_number = function (array) {
-			for (var i = 0; i < array.length; i += 1) {
-				// Use the index i here
-				console.log();
-				if ('0123456789'.indexOf(array[i].charAt(0)) !== -1) {
-					return true;
-				}
-			}
-		}
-		if (check_cell_name_start_with_number(response['columns'][0]) && type=='exp'){
-			$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, IRIS3 will try to rename them in data pre-processing.  </span></label>'))
-		}
-		break;
-	case 'hdf':
-	$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Word on HDF.... ' + response['type'][0] + '</span></label>'))
-	break;
-	
-	}
-	$('#preview_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('<span class="bold highlight">NOTE: Your upload file format is: ' + upload_type + '</span></label>'))
-	
+    // Get row number
+    n = metadata ? 6 : response['index'].length;
+
+    switch (upload_type) {
+        case 'text':
+            try { // Add rows
+                for (i = 0; i < n; i++) {
+                    var $tr = $('<tr>').append($('<td>', {
+                        'class': 'bold text-center px-2 py-1'
+                    }).html(response['index'][i]));
+                    $.each(response['data'][i], function(i, val) {
+                        $tr.append($('<td>', {
+                            'class': 'light text-center tiny'
+                        }).html(val));
+                    })
+                    $table.find('tbody').append($tr);
+                } // Add
+                $('#loader_' + type).addClass('d-none');
+                $('#preview_' + type).append($table);
+                document.getElementById("is_load_" + type).value = 1;
+            } catch (err) {
+                $('#preview_' + type).append($('<label>', {
+                    'class': 'px-2 py-1'
+                }).html('<span class="highlight">ERROR: ' + err.message + ', please check your upload data format.</span></label>'));
+            }
+
+            if (response['columns'][0].length != response['data'][0].length && type == 'exp') {
+                $('#preview_' + type).append($('<label>', {
+                    'class': 'px-2 py-1'
+                }).html('<span class="bold highlight">WARNING: The number of cells in your first row(' + response['columns'][0].length + ') does not match the number in the other rows(' + response['data'][0].length + ').</span></label>'));
+            }
+            percent_gene_num = response['gene_num'][0] > 1000 ? 1000 : response['gene_num'][0];
+            percent = (1 - response['count_zero'][0] / (response['columns'][0].length * percent_gene_num)).toFixed(6);
+
+            if (percent > 0.85 && type == 'exp') {
+                $('#preview_' + type).append($('<label>', {
+                    'class': 'px-2 py-1'
+                }).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset (' + percent * 100 + '%), errors are likely to occur when you submit job to IRIS3.</span></label>'));
+            }
+            if (response['columns'][0].length < 40 && type == 'exp') {
+                $('#preview_' + type).append($('<label>', {
+                    'class': 'px-2 py-1'
+                }).html('<span class="bold highlight">WARNING: Your dataset has (' + response['columns'][0].length + ') cells, errors may occur when you submit to IRIS3. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
+                document.getElementById("k_arg").value = 5;
+            }
+            var check_cell_name_start_with_number = function(array) {
+                for (var i = 0; i < array.length; i += 1) {
+                    // Use the index i here
+                    console.log();
+                    if ('0123456789'.indexOf(array[i].charAt(0)) !== -1) {
+                        return true;
+                    }
+                }
+            }
+            if (check_cell_name_start_with_number(response['columns'][0]) && type == 'exp') {
+                $('#preview_' + type).append($('<label>', {
+                    'class': 'px-2 py-1'
+                }).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, IRIS3 will try to rename them in data pre-processing.  </span></label><br/>'));
+            }
+            break;
+        case 'hdf':
+            $('#preview_' + type).append($('<label>', {
+                'class': 'px-2 py-1'
+            }).html('<span class="bold highlight">NOTE: Word on HDF.... ' + response['type'][0] + '</span></label>'));
+            break;
+
+    }
+    $('#preview_' + type).append($('<label>', {
+        'class': 'px-2 py-1'
+    }).html('<span class="bold highlight">NOTE: Your upload file type: ' + upload_type + '</span></label><br/>'))
+
 
 
 }
 
 
 var addTable = function(dataset, type) {
-	// method from biojupies/upload/table
-	$('#expression').val(JSON.stringify(dataset));
-	// Toggle Interfaces
-	//$('button[form="upload-expression-form"]').prop('disabled', false);
-	//$('button[form="upload-expression-form"]').toggleClass('black white bg-white bg-blue');
-	$('#dropzone_'+type).hide();
-	$('#formats').hide();
-	$('#drop_exp').hide();
-	$('#drop_label').hide();
-	addPreviewTable(dataset, true ,type);
-	$('#intro_'+type).append($('<label>', {'class': 'px-2 py-1'}).html('Your uploaded gene expression file contains <span class="highlight">'+dataset['columns'][0].length+' cells</span> and <span class="highlight">'+dataset['gene_num'][0]+' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
+    // method from biojupies/upload/table
+    $('#expression').val(JSON.stringify(dataset));
+    // Toggle Interfaces
+    //$('button[form="upload-expression-form"]').prop('disabled', false);
+    //$('button[form="upload-expression-form"]').toggleClass('black white bg-white bg-blue');
+	if(dataset['type'][0] == 'text') {
+		$('#dropzone_' + type).hide();
+		$('#formats').hide();
+		$('#drop_exp').hide();
+		$('#drop_label').hide();
 	}
+    addPreviewTable(dataset, true, type);
+	if(dataset['type'][0] == 'text') {
+	    $('#intro_' + type).append($('<label>', {
+        'class': 'px-2 py-1'
+		}).html('Your uploaded gene expression file contains <span class="highlight">' + dataset['columns'][0].length + ' cells</span> and <span class="highlight">' + dataset['gene_num'][0] + ' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
+	} else if (dataset['type'][0] == 'hdf') {
+		$('#intro_' + type).append($('<label>', {
+        'class': 'px-2 py-1'
+		}).html('You uploaded <span class="highlight">HDF format </span>gene expression file, select the species then click submit button or upload additional files in the advanced options.</label>'))
+	}
+	
+}
 var exp_file_status = 0;
-	$(document).ready(function() {
-	        $('.selectpicker').selectpicker();
-	        $('#tooltip1').tooltip();
-	        $('[data-toggle="tooltip"]').tooltip({
-	            placement: 'top'
-	        });
-	        $('.dropdown-toggle').dropdown();
-			
-	        dz_exp = $("#dropzone_exp").dropzone({
-	            dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
-	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5",
-	            url: "upload.php",
-	            maxFiles: 3,
-	            maxFilesize: 1000,
-	            maxfilesexceeded: function(file) {
-	                this.removeAllFiles();
-	                this.addFile(file);
-	            },
-				timeout: 1800000,
-	            sending: function(file, xhr, formData) {
-	                formData.append('filetype', 'dropzone_exp');
-	            },
-	            success: function(file, response) {
-	                if ($('select[name=species_arg]').val()) {
-					$('#submit_btn').attr("disabled", false);
-					}
-					exp_file_status = 1;
-	                response = JSON.parse(response);
-	                console.log(response);
-	                addTable(response,'exp');
-	            }
-	        });
-	
-	        $("div#dropzone_label").dropzone({
-	            dictDefaultMessage: "Drag or click to upload your cell label file. <br> Accepted files: .txt,.csv,.tsv",
-	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
-	            url: "upload.php",
-	            maxFiles: 1,
-	            maxFilesize: 50,
-				timeout: 1800000,
-	            maxfilesexceeded: function(file) {
-	                this.removeAllFiles();
-	                this.addFile(file);
-	            },
-	            sending: function(file, xhr, formData) {
-	                formData.append('filetype', 'dropzone_label');
-	            },
-	            success: function(file, response) {
-					$('#enable_labelfile').attr("disabled", false);
-	                response = JSON.parse(response);
-	                console.log(response);
-	                addTable(response,'label');
-	
-	            }
-	        });
-			
-			$("div#dropzone_gene_module").dropzone({
-	            dictDefaultMessage: "Drag or click to upload your gene module file. <br> Accepted files: .txt,.csv,.tsv",
-	            acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
-	            url: "upload.php",
-	            maxFiles: 1,
-	            maxFilesize: 50,
-				timeout: 300000,
-	            maxfilesexceeded: function(file) {
-	                this.removeAllFiles();
-	                this.addFile(file);
-	            },
-	            sending: function(file, xhr, formData) {
-	                formData.append('filetype', 'dropzone_gene_module');
-	            },
-	            success: function(file, response) {
-					$('#enable_gene_module').attr("disabled", false);
-	                response = JSON.parse(response);
-	                console.log(response);
-	                addTable(response,'gene_module');
-	            }
-	        });
-			
-			$('.dz-message').css({'font-size': '18px'});
-	// Load Example expression file
-	$('#load_exp').click(function(evt) {
-	exp_file_status = 1;
-	$('#enable_labelfile').attr("disabled", false);
-	$('#submit_btn').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table_remove.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
-	$('#dropzone_exp').hide();
-	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
-	$('#dropzone_label').hide();
-	$("#species_arg option[value='Human']").prop('selected', true);
-	$('.selectpicker').selectpicker('refresh')
-	// load example data
-	$.ajax({
-		url: "upload.php",
-		type: 'POST',
-		data: {'filename': 'expression'},
-		dataType: 'json',
-		success: function(response) {
-		},
-        error: function(e){
-            console.log(e.message);
-        }
-	})
-});
-	// load example cell label
-	$('#load_label').click(function(evt) {
-	exp_file_status = 1;
-	$('#submit_btn').attr("disabled", false);
-	$('#enable_labelfile').attr("disabled", false);
-	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
-	$('#dropzone_exp').hide();
-	$('#loader_label').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
-	$('#dropzone_label').hide();
-	$("#species_arg option[value='Human']").prop('selected', true);
-	$('.selectpicker').selectpicker('refresh')
-	// AJAX upload example
-	$.ajax({
-		url: "upload.php",
-		type: 'POST',
-		data: {'filename': 'label'},
-		dataType: 'json',
-		success: function(response) {
-		},
-        error: function(e){
-            console.log(e.message);
-        }
-	})
-});
+$(document).ready(function() {
+    $('.selectpicker').selectpicker();
+    $('#tooltip1').tooltip();
+    $('[data-toggle="tooltip"]').tooltip({
+        placement: 'top'
+    });
+    $('.dropdown-toggle').dropdown();
 
-	// load example gene module
-	/*$('#load_gene_module').click(function(evt) {
+    dz_exp = $("#dropzone_exp").dropzone({
+        dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
+        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5",
+        url: "upload.php",
+        maxFiles: 3,
+        maxFilesize: 1000,
+        maxfilesexceeded: function(file) {
+            this.removeFile(this.files[0]);
+            this.addFile(file);
+        },
+        timeout: 1800000,
+        sending: function(file, xhr, formData) {
+            formData.append('filetype', 'dropzone_exp');
+        },
+        success: function(file, response) {
+            if ($('select[name=species_arg]').val()) {
+                $('#submit_btn').attr("disabled", false);
+            }
+            exp_file_status = 1;
+            response = JSON.parse(response);
+            console.log(this.getAcceptedFiles().length);
+			if (this.getAcceptedFiles().length <= 1){
+            addTable(response, 'exp');
+			}
+        }
+    });
+
+    $("div#dropzone_label").dropzone({
+        dictDefaultMessage: "Drag or click to upload your cell label file. <br> Accepted files: .txt,.csv,.tsv",
+        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
+        url: "upload.php",
+        maxFiles: 1,
+        maxFilesize: 50,
+        timeout: 1800000,
+        maxfilesexceeded: function(file) {
+            this.removeAllFiles();
+            this.addFile(file);
+        },
+        sending: function(file, xhr, formData) {
+            formData.append('filetype', 'dropzone_label');
+        },
+        success: function(file, response) {
+            $('#enable_labelfile').attr("disabled", false);
+            response = JSON.parse(response);
+            console.log(response);
+            addTable(response, 'label');
+
+        }
+    });
+
+    $("div#dropzone_gene_module").dropzone({
+        dictDefaultMessage: "Drag or click to upload your gene module file. <br> Accepted files: .txt,.csv,.tsv",
+        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx",
+        url: "upload.php",
+        maxFiles: 1,
+        maxFilesize: 50,
+        timeout: 300000,
+        maxfilesexceeded: function(file) {
+            this.removeAllFiles();
+            this.addFile(file);
+        },
+        sending: function(file, xhr, formData) {
+            formData.append('filetype', 'dropzone_gene_module');
+        },
+        success: function(file, response) {
+            $('#enable_gene_module').attr("disabled", false);
+            response = JSON.parse(response);
+            console.log(response);
+            addTable(response, 'gene_module');
+        }
+    });
+
+    $('.dz-message').css({
+        'font-size': '18px'
+    });
+    // Load Example expression file
+    $('#load_exp').click(function(evt) {
+        exp_file_status = 1;
+        $('#enable_labelfile').attr("disabled", false);
+        $('#submit_btn').attr("disabled", false);
+        $('#loader_exp').html($('<div>', {
+            'class': 'text-center medium regular py-5 border-grey rounded',
+            'style': "background-image: url(assets/img/expression_table_remove.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"
+        }).html($('<div>', {
+            'class': 'dz-default dz-message',
+            'style': 'margin:2em 0;font-weight:600;color:#00AA90'
+        }).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+        $('#dropzone_exp').hide();
+        $('#loader_label').html($('<div>', {
+            'class': 'text-center medium regular py-5 border-grey rounded',
+            'style': "background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"
+        }).html($('<div>', {
+            'class': 'dz-default dz-message',
+            'style': 'margin:2em 0;font-weight:600;color:#00AA90'
+        }).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+        $('#dropzone_label').hide();
+        $("#species_arg option[value='Human']").prop('selected', true);
+        $('.selectpicker').selectpicker('refresh')
+        // load example data
+        $.ajax({
+            url: "upload.php",
+            type: 'POST',
+            data: {
+                'filename': 'expression'
+            },
+            dataType: 'json',
+            success: function(response) {},
+            error: function(e) {
+                console.log(e.message);
+            }
+        })
+    });
+    // load example cell label
+    $('#load_label').click(function(evt) {
+        exp_file_status = 1;
+        $('#submit_btn').attr("disabled", false);
+        $('#enable_labelfile').attr("disabled", false);
+        $('#loader_exp').html($('<div>', {
+            'class': 'text-center medium regular py-5 border-grey rounded',
+            'style': "background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"
+        }).html($('<div>', {
+            'class': 'dz-default dz-message',
+            'style': 'margin:2em 0;font-weight:600;color:#00AA90'
+        }).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
+        $('#dropzone_exp').hide();
+        $('#loader_label').html($('<div>', {
+            'class': 'text-center medium regular py-5 border-grey rounded',
+            'style': "background-image: url(assets/img/expression_label.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"
+        }).html($('<div>', {
+            'class': 'dz-default dz-message',
+            'style': 'margin:2em 0;font-weight:600;color:#00AA90'
+        }).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example cell label file loaded')));
+        $('#dropzone_label').hide();
+        $("#species_arg option[value='Human']").prop('selected', true);
+        $('.selectpicker').selectpicker('refresh')
+        // AJAX upload example
+        $.ajax({
+            url: "upload.php",
+            type: 'POST',
+            data: {
+                'filename': 'label'
+            },
+            dataType: 'json',
+            success: function(response) {},
+            error: function(e) {
+                console.log(e.message);
+            }
+        })
+    });
+
+    // load example gene module
+    /*$('#load_gene_module').click(function(evt) {
 	$('#submit_btn').attr("disabled", false);
 	$('#enable_labelfile').attr("disabled", false);
 	$('#loader_exp').html($('<div>', {'class': 'text-center medium regular py-5 border-grey rounded', 'style':"background-image: url(assets/img/expression_table.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"}).html($('<div>', {'class': 'dz-default dz-message','style':'margin:2em 0;font-weight:600;font-size:2em;color:#00AA90'}).html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Example gene expression file loaded')));
@@ -247,20 +318,18 @@ var exp_file_status = 0;
         }
 	})
 	});*/
-$("select#species_arg").on("change", function(value){
-   var This      = $(this);
-   var selectedD = $(this).val();
-	console.log(selectedD)
-   if(selectedD && exp_file_status ){
-	$('#submit_btn').attr("disabled", false);
-   } else {
-	$('#submit_btn').attr("disabled", true);
-   }
-	});
+    $("select#species_arg").on("change", function(value) {
+        var This = $(this);
+        var selectedD = $(this).val();
+        console.log(selectedD)
+        if (selectedD && exp_file_status) {
+            $('#submit_btn').attr("disabled", false);
+        } else {
+            $('#submit_btn').attr("disabled", true);
+        }
+    });
 
-	    });
-		
-		
+});
 </script>
 <main role="main" class="container" style="min-height: calc(100vh - 182px);">
 	<hr>
