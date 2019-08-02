@@ -362,20 +362,20 @@ $(document).ready(function() {
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																	
 																	<table class="regulon_table" cellpadding="0" cellspacing="0" width="100%">
-																	<thead><tr><th>Regulon</th></tr></thead>
+																	<thead><tr><th></th></tr></thead>
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td>
 																		<table class="table table-sm" cellpadding="0" cellspacing="0" width="100%"><tbody>
-																		<tr><td colspan=2 style="font-weight:600;text-align:center">{{$regulon_result[$sec0][sec1][0]}}</td></tr>
-																		<tr><td style="display:inline-block; font-size:14px;border:none;">P-value: {{$regulon_rank_result[$sec0][sec1][1]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Z-score: {{$regulon_rank_result[$sec0][sec1][3]}}</td><td style="display:inline-block;  font-size:14px;border:none;">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td style="display:inline-block; font-size:14px; border:none;">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
-                                                                        <tr><td style="display:inline-block; overflow-y: auto;max-height:200px;">
+																		<tr><td colspan="2"> <div class='regulon-heading'> {{$regulon_result[$sec0][sec1][0]}}</div></td></tr>
+																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+                                                                        <tr><td class="gene-table">
                                                                             <div style="width:100%; font-size:14px;">
 																				<table class="table table-hover " >
 	                                <tr><td>Marker gene</td><td>Gene Symbol</td><td>Enesmbl ID</td>
 									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
-										  <tr > <td>
+										  <tr><td>
 										  {{if !empty($regulon_rank_result[$sec0][sec1][5]) && $regulon_rank_result[$sec0][sec1][5] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][6]) && $regulon_rank_result[$sec0][sec1][6] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
@@ -383,19 +383,48 @@ $(document).ready(function() {
 										  {{if !empty($regulon_rank_result[$sec0][sec1][9]) && $regulon_rank_result[$sec0][sec1][9] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][10]) && $regulon_rank_result[$sec0][sec1][10] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][11]) && $regulon_rank_result[$sec0][sec1][11] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][12]) && $regulon_rank_result[$sec0][sec1][12] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>							
-                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}" style="font-size:14px; display: inline-block;">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>{{/section}}</tr></table></div></td>
-																			<td style="display:inline-block; overflow-y: auto;max-height:400px; border:none;width:49%;"><div class="col-sm-12">
+										  {{if !empty($regulon_rank_result[$sec0][sec1][12]) && $regulon_rank_result[$sec0][sec1][12] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][13]) && $regulon_rank_result[$sec0][sec1][13] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][14]) && $regulon_rank_result[$sec0][sec1][14] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][15]) && $regulon_rank_result[$sec0][sec1][15] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>							
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>{{/section}}</tr></table></div></td>
+																			<td rowspan="2" class="vert-aligned">
+														<button type="button" class="btn btn-default extra-button" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
+                                                        </button><button style="display:none;" type="button" class="btn btn-default extra-button" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
+                                                        </button>
+														<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to Enrichr
+                                                        </button>
+														<button type="button" id="peakbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_peak_table(this);$('#peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peak-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peakbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >ATAC-seq peak enrichment
+                                                        </button>
+														<button type="button" style="display:none;" id="peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#peakbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#peak-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide ATAC-seq peak enrichment
+                                                        </button>
+														<button type="button" id="tadbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_tad_table(this);$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Additional TAD covered genes
+                                                        </button>
+														<button type="button" style="display:none;" id="tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide additional TAD covered genes
+                                                        </button>
+														<!--<button type="button" id="similarbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_similar_table(this);$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Similar CTS-Rs
+                                                        </button>
+                                                        <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
+                                                        </button>-->
+														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">t-SNE plot
+                                                        </button>
+                                                        <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon t-SNE
+                                                        </button>
+														</td></tr>
+														
+														<tr><td class="motif-table">
 																				{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
 																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
-																					<span>{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="lozad" data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png" style="display:block;margin-left: auto;margin-right: auto;width: 50%;"/></a></span>
+																				<div class="row">
+																					<div class="col-md-3"><p class="motif-text">{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}</p><a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="motif-logo lozad " data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png"/></a><p class="motif-score">P-value: {{$regulon_rank_result[$sec0][sec1][1]}}</p><p class="motif-score">Z-score: {{$regulon_rank_result[$sec0][sec1][3]|string_format:"%.2f"}}</p></div>
+																					<div class="col-md-9">
 									<input class="btn btn-default" type="button" value="Motif details" onClick="window.open('motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}');"/>
 									<input class="btn btn-default" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
 									<input class="btn btn-default" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  />
 									{{assign var=motif_num_jaspar value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`_JASPAR"}}
 									{{assign var=motif_num_homo value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`_HOCOMOCO"}}
-									<table id="tomtom_table" class="table table-hover" cellpadding="0" cellspacing="0" width="100%">
+									<table id="tomtom_table" class="table table-hover tomtom_table" cellpadding="0" cellspacing="0" width="100%">
 									<thead><tr><td>Database</td><td>Matched TF</td><td>P-value</td><td>E-value</td><td>Q-value</td></tr></thead>
 									<tbody>
 									{{section name=tomtom_idx start=0 loop=$tomtom_result.$motif_num_jaspar}}
@@ -412,30 +441,9 @@ $(document).ready(function() {
 									<td class="tomtom_pvalue">
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][3]|string_format:"%.2e"}}</td><td>
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][4]|string_format:"%.2e"}}</td><td>
-									{{$tomtom_result.$motif_num_homo[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>{{/section}}</tbody></table><hr></div>{{/section}}
+									{{$tomtom_result.$motif_num_homo[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>{{/section}}</tbody></table><hr></div></div>{{/section}}
 									</td></tr>
-														<tr><td style="border:none"><button type="button" class="btn btn-default" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
-                                                        </button><button style="display:none;" type="button" class="btn-default" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
-                                                        </button>&nbsp;
-														<button type="button" id="enrichr-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="get_gene_list(this)" >Send gene list to Enrichr
-                                                        </button>
-														<button type="button" id="peakbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_peak_table(this);$('#peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peak-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peakbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >ATAC-seq peak enrichment
-                                                        </button>
-														<button type="button" style="display:none;" id="peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#peakbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#peak_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#peak-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide ATAC-seq peak enrichment
-                                                        </button>
-														<button type="button" id="tadbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_tad_table(this);$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Additional TAD covered genes
-                                                        </button>
-														<button type="button" style="display:none;" id="tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide additional TAD covered genes
-                                                        </button>
-														<button type="button" id="similarbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_similar_table(this);$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Similar CTS-Rs
-                                                        </button>
-                                                        <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
-                                                        </button>
-														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">t-SNE plot
-                                                        </button>
-                                                        <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon t-SNE
-                                                        </button>
-														</td></tr><tr><td colspan=2 style="border:none">
+														<tr><td colspan=2 style="border:none">
 																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
 																					<div class="panel-body"><div class="flatPanel panel panel-default">
 																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
@@ -1107,7 +1115,7 @@ $(document).ready(function() {
 		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><p>Loading t-SNE plot...</p></div>'
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading t-SNE plot...</h3></div>'
 		},
 		data: {'id': regulon_id},
 		dataType: 'json',
