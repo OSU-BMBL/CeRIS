@@ -1,8 +1,9 @@
 # set working directory, you may change the directory first.
-setwd("/home/cyz/Bigstore/BigData/analysis_work/IRIS3/DataTest/scRNA-Seq/2.Yan/")
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/6.Kolodziejczyk/")
 # loading required packege
 # loading Seurat version 2, you need reinstall the version 2
-library(Seurat,lib.loc = "~/R/x86_64-pc-linux-gnu-library/3.6/Seurat/Seurat.v.2.3")
+
+library(Seurat, lib.loc="~/R/Seurat/Seurat2.3/")
 if(!require(hdf5r)) {
   install.packages("hdf5r")
 } 
@@ -33,7 +34,7 @@ library(monocle)
 # import monocle version2
 if(!require("monocle")){
   source("http://bioconductor.org/biocLite.R")
-  biocLite("monocle")
+  BiocManager::install("monocle")
 }
 
 #pre-optional
@@ -104,6 +105,7 @@ label_data<-read.delim("Yan_cell_label.csv",sep = ",",
 # read cell label file
 my.meta.info<-read.delim("Yan_cell_label.csv",row.names = 1,
                          sep = ",",header = T,check.names = F,stringsAsFactors = F)
+#rownames(my.meta.info)<-paste0(rownames(my.meta.info),"s")
 
 my.idents.index<-match(colnames(my.object@raw.data),rownames(my.meta.info))
 Customized.idents<-as.factor(my.meta.info[my.idents.index,1])
@@ -140,7 +142,7 @@ TSNEPlot(my.object)
 # M3  G5  G6.....#
 #----------------#
 
-setwd("/BigData/analysis_work/IRIS3/DataTest/scRNA-Seq/2.Yan/2019062485208/")
+setwd("//fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
 Get.CellType<-function(cell.type=NULL,...){
   if(!is.null(cell.type)){
     my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_symbol.txt")
@@ -258,9 +260,33 @@ Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)
 
 # import monocle
 cds<-importCDS(my.object,import_all = T)
+cds<- estimateSizeFactors(cds)
 cds<-reduceDimension(cds,max_components = 2, method='DDRTree')
+# test time and RAM
+# library(profvis)
+# profvis({
+#   cds<-reduceDimension(cds,max_components = 2, method='DDRTree')
+# })
 cds<-orderCells(cds)
-plot_cell_trajectory(cds,color_by="")
+plot_cell_trajectory(cds,color_by="Customized.idents")
+#customized the color by regulon score
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
+
+
+Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1,customized=T){
+  tmp.FileList<-list.files(pattern = "regulon_activity_score")
+  tmp.RegulonScore<-read.delim(tmp.filelist[cell.type],sep = "\t",check.names = F)[regulon,]
+  tmp.NameIndex<-match(rownames(cds@phenoData@data),names(tmp.RegulonScore))
+  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
+  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
+  cds@phenoData@data$RegulonScore<-tmp.RegulonScore.Numeric
+  plot_cell_trajectory(cds,color_by = "RegulonScore")+ scale_color_gradient(low = "grey",high = "red")
+}
+
+
+
+plot_cell_trajectory(cds)+scale_color_continuous()
++ scale_colour_manual(values = tmp.RegulonScore.Numeric)
 
 
 
