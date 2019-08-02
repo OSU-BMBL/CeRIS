@@ -124,16 +124,14 @@ all.gene<-rownames(my.object@raw.data)
 my.object<-ScaleData(my.object,genes.use= all.gene)
 # after scaling, perform PCA
 my.object<-RunPCA(my.object)
-DimPlot(my.object,reduction.use = "pca",group.by = "Customized.idents")
 ###########################################
 # CORE part: Run TSNE and UMAP######################
 ###########################################
 my.object<-RunTSNE(my.object,dims.use = 1:10,perplexity=10,do.fast=F)
-TSNEPlot(my.object,group.by="Customized.idents")
 # find clustering, there will be changing the default cell type, if want to use customized cell type. 
-# use Idents() function.
+# cluster by KNN enbeded in Seurat
 my.object<-FindClusters(my.object)
-TSNEPlot(my.object)
+
 
 # input website CTS-R under a specific cell type
 # in this example I let my.cts.regulon read in specific cell type 1 
@@ -142,7 +140,7 @@ TSNEPlot(my.object)
 # M2  G3  G4.....#
 # M3  G5  G6.....#
 #----------------#
-
+# generate regulon
 setwd("//fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
 Get.CellType<-function(cell.type=NULL,...){
   if(!is.null(cell.type)){
@@ -168,16 +166,20 @@ Generate.Regulon(cell.type = 1,regulon = 1)
 
 ##############################
 
-Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
+Plot.cluster2D<-function(customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  if(!customized){
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=my.object$seurat_clusters)
+  tmp.dim<-as.data.frame(my.object@dr$tsne@cell.embeddings)
+  tmp.MatchIndex<- match(my.object@cell.names,rownames(tmp.dim))
+  tmp.dim<-tmp.dim[tmp.MatchIndex,]
+  if(customized==FALSE){
+    tmp.colname<-grep("^res.",colnames(my.object@meta.data),value = T)[1]
+    my.plot.all.source<-cbind.data.frame(tmp.dim,
+                                         Cell_type=my.object@meta.data[,tmp.colname])
   }else{
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=as.factor(my.object$Customized.idents))
+    my.plot.all.source<-cbind.data.frame(tmp.dim,
+                                         Cell_type=as.factor(my.object@meta.data$Customized.idents))
   }
   p.cluster<-ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
@@ -189,11 +191,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
 }
 
 # test plot cluster function. 
-Plot.cluster2D(reduction.method = "pca",customized = T)
-
-# plot CTS-R
-
-
+Plot.cluster2D(customized = T)
 
 # test Get.RegulonScore, output is matrix
 
@@ -229,14 +227,14 @@ Plot.regulon2D(cell.type=1,regulon=5,customized = T)
 
 
 Get.MarkerGene<-function(customized=T){
-  if(customized){
-    Idents(my.object)<-my.object$Customized.idents
+  if(customized==T){
+    my.object<-SetIdent(my.object,ident.use = my.object@meta.data$Customized.idents)
     my.marker<-FindAllMarkers(my.object,only.pos = T)
   } else {
-    Idents(my.object)<-my.object$seurat_clusters
+    my.object<-SetIdent(my.object,ident.use = my.object@meta.data$res.0.8)
     my.marker<-FindAllMarkers(my.object,only.pos = T)
   }
-  my.cluster<-unique(as.character(Idents(my.object)))
+  my.cluster<-unique(as.character(my.object@ident))
   my.top.20<-c()
   for( i in 1:length(my.cluster)){
     my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
@@ -282,8 +280,9 @@ Plot.TrajectoryByCellType<-function(customized=T){
     color_by<-grep("^res.*",tmp.colname.phenoData,value = T)[1]
     g<-plot_cell_trajectory(cds,color_by = color_by )
   }
-  g
+  g+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
 }
+
 Plot.TrajectoryByCellType()  
 Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1){
   tmp.FileList<-list.files(pattern = "regulon_activity_score")
