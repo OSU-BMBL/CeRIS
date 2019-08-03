@@ -52,6 +52,278 @@ $(document).ready(function() {
         }
     });
 });
+	function show_peak_table(item){
+		match_id = $(item).attr("id").match(/\d+/gm)
+		regulon_id = $(item).attr("id").substring(8);
+		table_id = "table-"+regulon_id
+		species = document.getElementById("species").innerHTML
+		match_species =  species.match(/[^Species: ].+/gm)[0]
+		jobid = location.search.match(/\d+/gm)
+		table_content_id = "table-content-"+regulon_id
+		table_jquery_id="#"+table_content_id
+		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ) {
+		$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_peak'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_peak'
+				}
+				],
+				"ajax": "prepare_peak.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"order": [[ 3, "desc" ]],
+				columnDefs: [
+				{
+					targets: 0,
+					render: function (data, type, row, meta)
+					{
+						if (type === 'display')
+						{
+							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +row[6]+ '" target="_blank">'+data +'</a>';
+						}
+						return data;
+					}
+				},{
+                "targets": [6],
+                "visible": false
+				},{
+                "targets": [7],
+                render: function (data, type, row, meta)
+					{	
+						var dat=new Array
+						if (type === 'display')
+						{
+							res=data.split(" ")
+							for(i=0;i < res.length;i++) {
+								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>';
+							}
+						}
+						return dat;
+					}
+				}
+				],
+		
+		});
+		}
+		document.getElementById(table_id).innerHTML=""
+	}
+	
+	
+	function show_tad_table(item){
+		match_id = $(item).attr("id").match(/\d+/gm)
+		regulon_id = $(item).attr("id").substring(7);
+		table_id = "tad-table-"+regulon_id
+		species = document.getElementById("species").innerHTML
+		match_species =  species.match(/[^Species: ].+/gm)[0]
+		jobid = location.search.match(/\d+/gm)
+		table_content_id = "tad-table-content-"+regulon_id
+		table_jquery_id="#"+table_content_id
+		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
+			if(match_species=='Human'){
+			$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				}
+				],
+				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
+			"iDisplayLength": 5,
+		});
+			} else if (match_species == 'Mouse'){
+			$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
+				}
+				],
+				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[ -1], [ "All"]],
+				"iDisplayLength": -1,
+		});
+			}
+		}
+		document.getElementById(table_id).innerHTML=""
+	}
+	function show_similar_table(item) {
+	match_id = $(item).attr("id").match(/\d+/gm)
+	regulon_id = $(item).attr("id").substring(11)
+	table_id = "similar-table-" + regulon_id
+	species = document.getElementById("species").innerHTML
+	match_species = species.match(/[^Species: ].+/gm)[0]
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "similar-table-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	if (!$.fn.DataTable.isDataTable(table_jquery_id)) {
+	$(table_jquery_id).DataTable({
+		dom: 'lBfrtip',
+		buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_similar_regulon'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_similar_regulon'
+				}
+				],
+		"ajax": "prepare_similar_regulon.php?jobid=" + jobid + "&regulon_id=" + regulon_id + "&species=" + match_species + "&table=" + table_content_id,
+		"searching": false,
+		"paging": false,
+		"bInfo" : false,
+		"aLengthMenu": [
+			[10, -1],
+			[10, "All"]
+		],
+		"iDisplayLength": 10,
+		
+	});
+	}
+	document.getElementById(table_id).innerHTML = ""
+	}
+	
+	function show_regulon_table(item) {
+	match_id = $(item).attr("id").match(/\d+/gm)
+	regulon_id = $(item).attr("id").substring(11)
+	ct_id= regulon_id.substring(
+    regulon_id.lastIndexOf("CT") + 2, 
+    regulon_id.lastIndexOf("S")
+	);
+	table_id = "regulon-table-" + regulon_id
+	species = document.getElementById("species").innerHTML
+	match_species = species.match(/[^Species: ].+/gm)[0]
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "regulon-table-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	$.ajax({
+		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
+		type: 'POST',
+		beforeSend: function(){
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading t-SNE plot...</h3></div>'
+		},
+		data: {'id': regulon_id},
+		dataType: 'json',
+		success: function(response) {
+		document.getElementById(table_content_id).innerHTML = ''
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.png" /></div><div class="col-sm-6"><p>'+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		},
+	})
+	document.getElementById(table_id).innerHTML = ""
+	}
+	
+	function show_trajectory_table(item) {
+	match_id = $(item).attr("id").match(/\d+/gm)
+	regulon_id = $(item).attr("id").substring(14)
+	ct_id= regulon_id.substring(
+    regulon_id.lastIndexOf("CT") + 2, 
+    regulon_id.lastIndexOf("S")
+	);
+	table_id = "trajectory-table-" + regulon_id
+	species = document.getElementById("species").innerHTML
+	match_species = species.match(/[^Species: ].+/gm)[0]
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "trajectory-table-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	$.ajax({
+		url: "prepare_trajectory.php?jobid=" + jobid + "&id=" + regulon_id,
+		type: 'POST',
+		beforeSend: function(){
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading trajectory plot...</h3></div>'
+		},
+		data: {'id': regulon_id},
+		dataType: 'json',
+		success: function(response) {
+		document.getElementById(table_content_id).innerHTML = ''
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.trajectory.png" /></div><div class="col-sm-6"><p> '+ regulon_id +' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		},
+	})
+	document.getElementById(table_id).innerHTML = ""
+	}
+	function get_gene_list(item){
+	match_id = $(item).attr("id").match(/\d+/gm);
+	if($(item).attr("id").includes("CT")) {
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
+	} else {
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
+	}
+	
+	
+	$.get(file_path,function(txt){
+        var lines = txt.split("\n");
+		gene_idx = match_id[1] - 1;
+		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n');
+		//
+		gene_list = lines[gene_idx].split("\t");
+		gene_list.shift();
+		
+		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true};
+	
+		//console.log(enrichr_info);
+          // defined globally - will improve
+          send_to_Enrichr(enrichr_info);
+    }); 
+	
+	}
+
+	function send_to_Enrichr(options) { // http://amp.pharm.mssm.edu/Enrichr/#help
+    var defaultOptions = {
+    description: "",
+    popup: false
+	};
+
+  if (typeof options.description == 'undefined')
+    options.description = defaultOptions.description;
+  if (typeof options.popup == 'undefined')
+    options.popup = defaultOptions.popup;
+  if (typeof options.list == 'undefined')
+    alert('No genes defined.');
+
+  var form = document.createElement('form');
+  form.setAttribute('method', 'post');
+  form.setAttribute('action', 'https://amp.pharm.mssm.edu/Enrichr/enrich');
+  if (options.popup)
+    form.setAttribute('target', '_blank');
+  form.setAttribute('enctype', 'multipart/form-data');
+
+  var listField = document.createElement('input');
+  listField.setAttribute('type', 'hidden');
+  listField.setAttribute('name', 'list');
+  listField.setAttribute('value', options.list);
+  form.appendChild(listField);
+
+  var descField = document.createElement('input');
+  descField.setAttribute('type', 'hidden');
+  descField.setAttribute('name', 'description');
+  descField.setAttribute('value', options.description);
+  form.appendChild(descField);
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
  </script>
 <main role="main" class="container" style="min-height: calc(100vh - 182px);">
     <div id="content">
@@ -366,7 +638,7 @@ $(document).ready(function() {
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td>
-																		<table class="table table-sm" cellpadding="0" cellspacing="0" width="100%"><tbody>
+																		<table class="table table-sm" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
 																		<tr><td colspan="2"> <div class='regulon-heading'> {{$regulon_result[$sec0][sec1][0]}}</div></td></tr>
 																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr><td class="gene-table">
@@ -410,6 +682,10 @@ $(document).ready(function() {
 														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">t-SNE plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon t-SNE
+                                                        </button>
+														<button type="button" id="trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_trajectory_table(this);$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Trajectory plot
+                                                        </button>
+                                                        <button type="button" style="display:none;" id="trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Trajectory plot
                                                         </button>
 														</td></tr>
 														
@@ -497,6 +773,11 @@ $(document).ready(function() {
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
                                                                                     </div>
                                                                                 </div>
+																				<div id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+                                                                                    <div id='trajectory-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
+                                                                                    <div id="trajectory-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+                                                                                    </div>
+                                                                                </div>
 																		</td>
 																		</tr>
 																		</tbody></table>
@@ -541,7 +822,7 @@ $(document).ready(function() {
                                                                         {{section name=sec1 loop=$module_result[$sec0]}}
 																		<tr ><td colspan=2 style="font-weight:600;text-align:center">{{$module_result[$sec0][sec1][0]}}</td></tr>
 																		
-                                                                        <tr >
+                                                                        <tr>
                                                                             <td style="display:inline-block; overflow-y: auto;width:49%;max-height:400px;">
                                                                                 <div style="width:100%; font-size:14px;">
 																				<table class="table table-bordered table-hover" >
@@ -946,249 +1227,6 @@ $(document).ready(function() {
     <script src='assets/js/load_clustergram.js'></script>
 	<script src="assets/js/jquery.simplePagination.js" ></script>
     <script>
-	function show_peak_table(item){
-		match_id = $(item).attr("id").match(/\d+/gm)
-		regulon_id = $(item).attr("id").substring(8);
-		table_id = "table-"+regulon_id
-		species = document.getElementById("species").innerHTML
-		match_species =  species.match(/[^Species: ].+/gm)[0]
-		jobid = location.search.match(/\d+/gm)
-		table_content_id = "table-content-"+regulon_id
-		table_jquery_id="#"+table_content_id
-		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ) {
-		$(table_jquery_id).DataTable( {
-				dom: 'lBfrtip',
-				buttons: [
-				{
-				extend:'copy',
-				title: jobid+'_'+regulon_id+'_peak'
-				},
-				{
-				extend:'csv',
-				title: jobid+'_'+regulon_id+'_peak'
-				}
-				],
-				"ajax": "prepare_peak.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
-				"searching": false,
-				"bInfo" : false,
-				"order": [[ 3, "desc" ]],
-				columnDefs: [
-				{
-					targets: 0,
-					render: function (data, type, row, meta)
-					{
-						if (type === 'display')
-						{
-							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +row[6]+ '" target="_blank">'+data +'</a>';
-						}
-						return data;
-					}
-				},{
-                "targets": [6],
-                "visible": false
-				},{
-                "targets": [7],
-                render: function (data, type, row, meta)
-					{	
-						var dat=new Array
-						if (type === 'display')
-						{
-							res=data.split(" ")
-							for(i=0;i < res.length;i++) {
-								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>';
-							}
-						}
-						return dat;
-					}
-				}
-				],
-		
-		});
-		}
-		document.getElementById(table_id).innerHTML=""
-	}
-	
-	
-	function show_tad_table(item){
-		match_id = $(item).attr("id").match(/\d+/gm)
-		regulon_id = $(item).attr("id").substring(7);
-		table_id = "tad-table-"+regulon_id
-		species = document.getElementById("species").innerHTML
-		match_species =  species.match(/[^Species: ].+/gm)[0]
-		jobid = location.search.match(/\d+/gm)
-		table_content_id = "tad-table-content-"+regulon_id
-		table_jquery_id="#"+table_content_id
-		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
-			if(match_species=='Human'){
-			$(table_jquery_id).DataTable( {
-				dom: 'lBfrtip',
-				buttons: [
-				{
-				extend:'copy',
-				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
-				},
-				{
-				extend:'csv',
-				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
-				}
-				],
-				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
-				"searching": false,
-				"bInfo" : false,
-				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
-			"iDisplayLength": 5,
-		});
-			} else if (match_species == 'Mouse'){
-			$(table_jquery_id).DataTable( {
-				dom: 'lBfrtip',
-				buttons: [
-				{
-				extend:'copy',
-				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
-				},
-				{
-				extend:'csv',
-				title: jobid+'_'+regulon_id+'_TAD_covered_genes'
-				}
-				],
-				"ajax": "prepare_tad.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
-				"searching": false,
-				"bInfo" : false,
-				"aLengthMenu": [[ -1], [ "All"]],
-				"iDisplayLength": -1,
-		});
-			}
-		}
-		document.getElementById(table_id).innerHTML=""
-	}
-	function show_similar_table(item) {
-	match_id = $(item).attr("id").match(/\d+/gm)
-	regulon_id = $(item).attr("id").substring(11)
-	table_id = "similar-table-" + regulon_id
-	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)[0]
-	jobid = location.search.match(/\d+/gm)
-	table_content_id = "similar-table-content-" + regulon_id
-	table_jquery_id = "#" + table_content_id
-	if (!$.fn.DataTable.isDataTable(table_jquery_id)) {
-	$(table_jquery_id).DataTable({
-		dom: 'lBfrtip',
-		buttons: [
-				{
-				extend:'copy',
-				title: jobid+'_'+regulon_id+'_similar_regulon'
-				},
-				{
-				extend:'csv',
-				title: jobid+'_'+regulon_id+'_similar_regulon'
-				}
-				],
-		"ajax": "prepare_similar_regulon.php?jobid=" + jobid + "&regulon_id=" + regulon_id + "&species=" + match_species + "&table=" + table_content_id,
-		"searching": false,
-		"paging": false,
-		"bInfo" : false,
-		"aLengthMenu": [
-			[10, -1],
-			[10, "All"]
-		],
-		"iDisplayLength": 10,
-		
-	});
-	}
-	document.getElementById(table_id).innerHTML = ""
-	}
-	
-	function show_regulon_table(item) {
-	match_id = $(item).attr("id").match(/\d+/gm)
-	regulon_id = $(item).attr("id").substring(11)
-	ct_id= regulon_id.substring(
-    regulon_id.lastIndexOf("CT") + 2, 
-    regulon_id.lastIndexOf("S")
-	);
-	table_id = "regulon-table-" + regulon_id
-	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)[0]
-	jobid = location.search.match(/\d+/gm)
-	table_content_id = "regulon-table-content-" + regulon_id
-	table_jquery_id = "#" + table_content_id
-	$.ajax({
-		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
-		type: 'POST',
-		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading t-SNE plot...</h3></div>'
-		},
-		data: {'id': regulon_id},
-		dataType: 'json',
-		success: function(response) {
-		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.png" /></div><div class="col-sm-6"><p>Regulon '+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
-		},
-	})
-	document.getElementById(table_id).innerHTML = ""
-	}
-	
-	function get_gene_list(item){
-	match_id = $(item).attr("id").match(/\d+/gm);
-	if($(item).attr("id").includes("CT")) {
-		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
-	} else {
-		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
-	}
-	
-	
-	$.get(file_path,function(txt){
-        var lines = txt.split("\n");
-		gene_idx = match_id[1] - 1;
-		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n');
-		//
-		gene_list = lines[gene_idx].split("\t");
-		gene_list.shift();
-		
-		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true};
-	
-		//console.log(enrichr_info);
-          // defined globally - will improve
-          send_to_Enrichr(enrichr_info);
-    }); 
-	
-	}
-
-	function send_to_Enrichr(options) { // http://amp.pharm.mssm.edu/Enrichr/#help
-    var defaultOptions = {
-    description: "",
-    popup: false
-	};
-
-  if (typeof options.description == 'undefined')
-    options.description = defaultOptions.description;
-  if (typeof options.popup == 'undefined')
-    options.popup = defaultOptions.popup;
-  if (typeof options.list == 'undefined')
-    alert('No genes defined.');
-
-  var form = document.createElement('form');
-  form.setAttribute('method', 'post');
-  form.setAttribute('action', 'https://amp.pharm.mssm.edu/Enrichr/enrich');
-  if (options.popup)
-    form.setAttribute('target', '_blank');
-  form.setAttribute('enctype', 'multipart/form-data');
-
-  var listField = document.createElement('input');
-  listField.setAttribute('type', 'hidden');
-  listField.setAttribute('name', 'list');
-  listField.setAttribute('value', options.list);
-  form.appendChild(listField);
-
-  var descField = document.createElement('input');
-  descField.setAttribute('type', 'hidden');
-  descField.setAttribute('name', 'description');
-  descField.setAttribute('value', options.description);
-  form.appendChild(descField);
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-}
 
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();
