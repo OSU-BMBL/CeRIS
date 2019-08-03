@@ -23,7 +23,7 @@
 }
 
 .slide-bg-overlay::after {
-    background: #000 none repeat scroll 0 0;
+    /*background: #000 none repeat scroll 0 0;*/
     content: "";
     height: 100%;
     left: 0;

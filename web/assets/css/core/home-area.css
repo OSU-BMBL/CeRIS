@@ -13,7 +13,7 @@
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
-    height: 75%;
+    height: 60%;
     -webkit-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
@@ -59,10 +59,10 @@
 
 .home-button form {
     border-radius: 50px;
-    height: 60px;
+    height: 45px;
     overflow: hidden;
     position: relative;
-    width: 70%;
+    width: 50%;
 }
 
 .home-button form input {
@@ -77,7 +77,7 @@
 }
 
 .home-button form button {
-    background: #00AA90 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     border: 0 none;
     font-size: 25px;
     height: 100%;

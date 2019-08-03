@@ -18,13 +18,13 @@
 }
 
 a {
-    color: #00AA90;
+    color: #2775b6;
     -webkit-transition: 0.3s;
     transition: 0.3s;
 }
 
 a:hover {
-    color: #00AA90;
+    color: #2775b6;
 }
 
 a:hover,

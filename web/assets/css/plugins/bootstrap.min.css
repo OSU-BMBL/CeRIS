@@ -7,8 +7,8 @@
 
 .btn-submit { 
   color: #FFFFFF; 
-  background-color: #00AA90; 
-  border-color: #00AA90; 
+  background-color: #2775b6; 
+  border-color: #2775b6; 
 } 
  
 .btn-submit:hover, 
@@ -17,8 +17,8 @@
 .btn-submit.active, 
 .open .dropdown-toggle.btn-submit { 
   color: #FFFFFF; 
-  background-color: #31dc89; 
-  border-color: #00AA90; 
+  background-color: #5698c3; 
+  border-color: #2775b6; 
 } 
  
 .btn-submit:active, 
@@ -42,11 +42,11 @@ fieldset[disabled] .btn-submit:active,
 .btn-submit.disabled.active, 
 .btn-submit[disabled].active, 
 fieldset[disabled] .btn-submit.active { 
-  background-color: #00AA90; 
-  border-color: #00AA90; 
+  background-color: #2775b6; 
+  border-color: #2775b6; 
 } 
  
 .btn-submit .badge { 
-  color: #00AA90; 
+  color: #2775b6; 
   background-color: #FFFFFF; 
 }

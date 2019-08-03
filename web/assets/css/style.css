@@ -1,26 +1,3 @@
-/*--------------------------------------------------------------------------------------
-Theme Name: EDUCROWN
-Theme URI: http://quomodosoft.com
-Author URI: http://quomodosoft.com
-Description: 100% Responsive, Highly Customizable, SEO Friendly Education Based HTML5 template using Twitter Bootstrap Latest, Search Engine Friendly.
-Author: Mehedi Hasan Nahid
-Author Email: mehedidb@gmail.com
-Version: 1.0
-----------------------------------------------------------------------------------------
-    1. SLIDER AREA
-    2. FEATURES AREA
-    3. FUN FACT AREA
-    4. COURSE AERA
-    5. VIDEO AREA
-    6. TESTMONIAL AREA
-    7. BLOG AREA
-    8. FAQS AREA
-    9. CONTACT AREA
-    10. CLIENT AREA
-    11. FOOTER AREA
-    12. SCROLL TO TOP AREA
-----------------------------------------------------------------------------------------*/
-
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700');
 
 /*--------------------------
@@ -49,7 +26,7 @@ Version: 1.0
 }
 
 .features-box-icon {
-    background: #00AA90 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     border-radius: 5px;
     color: #31dc89;
     height: 70px;
@@ -84,7 +61,7 @@ Version: 1.0
 }
 
 a.enroll-button {
-    background: #00AA90 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     border-radius: 50px;
     color: #fff;
     padding: 10px 15px;
@@ -440,7 +417,7 @@ a.enroll-button:hover {
 }
 
 .subscriber-form button {
-    background: #00AA90 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     border: 0 none;
     border-radius: 0 50px 50px 0;
     color: #171932;

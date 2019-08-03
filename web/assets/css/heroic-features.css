@@ -432,7 +432,7 @@ body{
 .d3-tip {
   line-height: 1.25;
   font-weight: bold;
-  padding: 12px;
+  padding: 14px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   border-radius: 2px;
@@ -528,7 +528,7 @@ body{
 .btn {
   font-family: inherit;
   display: inline-block;
-  /*padding: 6px 12px;*/
+  /*padding: 6px 14px;*/
   margin-bottom: 0;
   /*font-size: 14px;*/
   /*font-weight: normal;*/
@@ -613,7 +613,7 @@ div.awesomplete > ul {
   display: block;
   width: 100%;
   height: 34px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 14px;
   line-height: 1.42857143;
   color: #555;
@@ -650,27 +650,33 @@ textarea {
 
 .dropzone span {
 	font-weight:600;
-	color:#00AA90;
+	color:#2775b6;
 }
 
 #tomtom_table  {
-	font-size:12px;
+	font-size:14px;
 }
 #tomtom_module_table{
-	font-size:12px;
+	font-size:14px;
 }
 
 .dt-button{
-	font-size:12px !important;
+	font-size:14px !important;
 }
 .dataTables_paginate {
-	font-size:12px !important;
+	font-size:14px !important;
+}
+.dataTables_filter{
+	font-size:14px !important;
+	margin-right:1em;
 }
 .dataTables_length{
-	font-size:12px !important;
-	margin-right: 1em;
+	font-size:14px !important;
+	margin: 1em;
 }
-
+.dataTables_wrapper table thead{
+    display:none;
+}
 #preview_exp {
   overflow-x: auto;
 }
@@ -722,4 +728,86 @@ textarea {
 .px-2 {padding-right:1.5rem!important; padding-left:1.5rem!important;}
 .py-1 {padding-bottom:.5rem!important;padding-top:.5rem!important;}
 .w-100 {width:100%!important;}
-.highlight { font-weight: 500; font-style: normal; color: #00AA90; }
+.highlight { font-weight: 500; font-style: normal; color: #2775b6; }
+.table tbody > tr > td.vert-aligned {
+	border:none;
+	width:17%;
+}
+
+.table tbody > tr > td >button.extra-button {
+	width:100%;
+	margin-top:6px;
+	margin-bottom:6px;
+}
+
+.regulon-heading {
+	border-color:#ddd;
+    border: 5px solid transparent;
+	border-radius:5px;
+	font-weight:600;
+	background-color: #2775b6;
+    color: white;
+    width: 100%;
+    margin-bottom: 0;
+    padding: 0;
+}
+.motif-score {
+display:inline-block; 
+font-size:14px;
+border:none;
+margin:3px;
+}
+.table tbody > tr > td.gene-score {
+display:inline-block; 
+font-size:14px;
+border:none;
+}
+
+.table tbody > tr > td.gene-table {
+display:inline-block; 
+overflow-y: auto;
+max-height:200px;
+width:95%;
+margin-bottom:20px;
+padding-top:0px;
+}
+
+.table tbody > tr > td.motif-table {
+display:inline-block; 
+overflow-y: auto;
+overflow-x: hidden;
+max-height:300px;
+width:95%;
+}
+.tomtom-table {
+	margin-left:-20px;
+}
+.motif-text {
+font-size:16px;
+}
+
+.table tbody > tr >td.motif-logo {
+	margin-left: auto;
+	margin-right: -15px !important;
+	max-width: 75%;
+}
+
+.table a:hover {
+  text-decoration: underline !important;
+  font-size:14px;
+  display:inline-block;
+}
+
+.regulon-plot {
+	
+	
+}
+@media (max-width:1367px){
+	#tomtom_table {
+	  font-size:12px;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  
+}
