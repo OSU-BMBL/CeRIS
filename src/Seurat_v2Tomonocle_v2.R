@@ -198,21 +198,12 @@ Plot.cluster2D(customized = T)
 
 Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=F,...){
   message("plotting regulon ",regulon," of cell type ",cell.type,"...")
-  my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
-                                    cell.type = cell.type,
-                                    regulon = regulon,
-                                    customized = customized)
-  # if(!customized){
-  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-  #                                        Cell_type=my.object$seurat_clusters)
-  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
-  # }else{
-  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-  #                                        Cell_type=as.factor(my.object$Customized.idents))
-  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
-  # }
-  # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
-  # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
+  tmp.FileList<-list.files(pattern = "regulon_activity_score")
+  tmp.RegulonScore<-read.delim(tmp.filelist[cell.type],sep = "\t",check.names = F)[regulon,]
+  tmp.NameIndex<-match(rownames(my.object@dr$tsne@cell.embeddings),names(tmp.RegulonScore))
+  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
+  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
+  my.plot.regulon<-cbind.data.frame(my.object@dr$tsne@cell.embeddings,regulon.score=tmp.RegulonScore.Numeric)
   p.regulon<-ggplot(my.plot.regulon,
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
