@@ -129,7 +129,7 @@ if (isset($_POST['submit']))
 	
 	if($is_gene_filter == '1' && $is_cell_filter == '1' && $c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
 		
-		header("Location: results.php?jobid=20190408191738#");
+		header("Location: results.php?jobid=20190802103754#");
 	}
 	
 	else {
