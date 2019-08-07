@@ -140,7 +140,7 @@ function resize_container(args){
 function resize_container_small(args){
 
   var screen_width = window.innerHeight-20;
-  var screen_height = 550;
+  var screen_height = window.innerHeight-200;
 
   d3.select(args.root)
     .style('width', screen_width+'px')
