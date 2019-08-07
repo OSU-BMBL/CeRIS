@@ -8,14 +8,15 @@ options(check.names=F)
 #library(ensembldb)
 #BiocManager::install("SC3")
 suppressPackageStartupMessages(library(stringr))
-suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(hdf5r))
 suppressPackageStartupMessages(library(stringr))
-library(SingleCellExperiment)
-library(SC3)
-library(scater)
-library(devEMF)
-library(dplyr)
+suppressPackageStartupMessages(library(SingleCellExperiment))
+suppressPackageStartupMessages(library(SC3))
+suppressPackageStartupMessages(library(scater))
+suppressPackageStartupMessages(library(devEMF))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(monocle))
+suppressPackageStartupMessages(library(Seurat))
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 jobid <- args[2] # user job id
@@ -43,12 +44,15 @@ load_test_data <- function(){
   # setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
   #srcFile = "single_cell.csv"
   srcFile = "iris3_example_expression_matrix.csv"
-  jobid <- "2019052895653"
+  jobid <- "20190802103754"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-1
+  label_file<-'iris3_example_expression_label.csv'
+  delimiter <- ','
   param_k<-0
+  label_use_sc3 <- 1
+  
 }
 
 ##############################
@@ -149,7 +153,7 @@ expFile <- expFile[,c(-1,-(ncol(expFile)))]
 if(length(which(rownames(expFile)=="")) > 0){
   expFile <- expFile[-which(rownames(expFile)==""),]
 }
-expFile<-as.sparse(expFile)
+#expFile<-as.sparse(expFile)
 
 #this <- expFile[1,]
 # keep the gene with number of non-0 expression value cells >= 5%
@@ -193,9 +197,9 @@ my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.f
 
 # calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
-filter_gene_num <- total_gene_num-nrow(my.object)
+filter_gene_num <- total_gene_num-nrow(my.object@raw.data)
 filter_gene_rate <- formatC(filter_gene_num/total_gene_num,digits = 2)
-filter_cell_num <- ncol(expFile)-ncol(my.object)
+filter_cell_num <- ncol(expFile)-ncol(my.object@raw.data)
 filter_cell_rate <- formatC(filter_cell_num/total_cell_num,digits = 2)
 if(filter_cell_num == 0){
   filter_cell_rate <- '0'
@@ -214,7 +218,7 @@ write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(jo
 write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write.table(as.data.frame(expFile),paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+write.table(as.matrix(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 
 
 
@@ -307,37 +311,42 @@ if (label_use_sc3 =='2'){
 rownames(cell_info) <- cell_info[,1]
 cell_info <- cell_info[,-1]
 
-my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
-Idents(my.object)<-as.factor(my.object$Customized.idents)
-my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
+my.idents.index<-match(colnames(my.object@raw.data),names(cell_info))
+Customized.idents<-as.factor(cell_info[my.idents.index])
+my.object@meta.data$Customized.idents<-Customized.idents
+my.object<-SetIdent(my.object,ident.use = my.object@meta.data$Customized.idents)
+
+my.object<-FindVariableGenes(my.object,do.plot=F)
 # before PCA, scale data to eliminate extreme value affect.
-all.gene<-rownames(my.object)
-my.object<-ScaleData(my.object,features = all.gene)
+all.gene<-rownames(my.object@raw.data)
+my.object<-ScaleData(my.object,genes.use= all.gene)
 # after scaling, perform PCA
-my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+my.object<-RunPCA(my.object)
 ###########################################
 # CORE part: Run TSNE and UMAP######################
 ###########################################
-my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
+my.object<-RunTSNE(my.object,dims = 1:10,perplexity=10,do.fast=F)
 # run umap to get high dimension scatter plot at 2 dimensional coordinate system.
 ##my.object<-RunUMAP(object = my.object,dims = 1:30)
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
-my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+#my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
 # find clustering, there will be changing the default cell type, if want to use customized cell type. 
 # use Idents() function.
-my.object<-FindClusters(my.object,resolution = 0.5)
 
-Get.MarkerGene<-function(my.object, customized=T){
-  if(customized){
-    Idents(my.object)<-my.object$Customized.idents
+
+#my.object<-FindClusters(my.object)
+
+Get.MarkerGene<-function(customized=T){
+  if(customized==T){
+    my.object<-SetIdent(my.object,ident.use = my.object@meta.data$Customized.idents)
     my.marker<-FindAllMarkers(my.object,only.pos = T)
   } else {
-    Idents(my.object)<-my.object$seurat_clusters
+    my.object<-SetIdent(my.object,ident.use = my.object@meta.data$res.0.8)
     my.marker<-FindAllMarkers(my.object,only.pos = T)
   }
-  my.cluster<-unique(as.character(as.numeric(Idents(my.object))))
+  my.cluster<-unique(as.character(my.object@ident))
   my.top.20<-c()
   for( i in 1:length(my.cluster)){
     my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
@@ -348,8 +357,8 @@ Get.MarkerGene<-function(my.object, customized=T){
   my.top.20<-as.data.frame(my.top.20)
   return(my.top.20)
 }
+my.cluster.uniq.marker<-Get.MarkerGene(customized = T)
 
-my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = T)
 sort_column <- function(df) {
   tmp <- colnames(df)
   split <- strsplit(tmp, "CT") 
@@ -358,8 +367,17 @@ sort_column <- function(df) {
 }
 my.cluster.uniq.marker <- my.cluster.uniq.marker[,sort_column(my.cluster.uniq.marker)]
 write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
-
-
 saveRDS(my.object,file="seurat_obj.rds")
+cds<-importCDS(my.object,import_all = T)
+cds<- estimateSizeFactors(cds)
+cds<-reduceDimension(cds,max_components = 2, method='DDRTree')
+# test time and RAM
+# library(profvis)
+# profvis({
+#   monocle_obj<-reduceDimension(monocle_obj,max_components = 2, method='DDRTree')
+# })
+cds<-orderCells(cds)
+
+saveRDS(cds,file="monocle_obj.rds")
 
 

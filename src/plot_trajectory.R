@@ -97,8 +97,7 @@ quiet <- function(x) {
 } 
 
 setwd(srcDir)
-#my.object <- readRDS("seurat_obj2.rds")
-cds <- readRDS("cds.rds")
+cds <- readRDS("monocle_obj.rds")
 regulon_ct <-gsub( "-.*$", "", id)
 regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
