@@ -214,7 +214,7 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
   
   
 }
-Plot.regulon2D(cell.type=1,regulon=5,customized = T)
+Plot.regulon2D(cell.type=5,regulon=4,customized = T)
 
 
 Get.MarkerGene<-function(customized=T){
@@ -287,6 +287,39 @@ Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1){
 
 Plot.TrajectoryByCellType(customized = T)
 Plot.TrajectoryByRegulon(cell.type = 6,regulon = 1)
+
+##############################################
+##gene expression in t-SNE####################
+##############################################
+# input gene name = rowname( raw data) 
+Plot.GeneTSNE<-function(gene.name=NULL){
+  tmp.gene.expression<- my.object@data
+  tmp.dim<-as.data.frame(my.object@dr$tsne@cell.embeddings)
+  tmp.MatchIndex<- match(my.object@cell.names,rownames(tmp.dim))
+  tmp.dim<-tmp.dim[tmp.MatchIndex,]
+  tmp.gene.name<-paste0("^",gene.name,"$")
+  tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
+  tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
+  g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
+  g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
+  g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue"))
+  g
+}
+Plot.GeneTSNE("CA8")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
