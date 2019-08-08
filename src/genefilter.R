@@ -32,7 +32,7 @@ label_use_sc3 <- args[9] # 1 for have label use sc3, 2 for have label use label,
 
 
 if(delim == 'tab'){
-	delim <- '\t'
+  delim <- '\t'
 }
 if(delim == 'space'){
   delim <- ' '
@@ -43,16 +43,15 @@ load_test_data <- function(){
   # setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
   # setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
   #srcFile = "single_cell.csv"
-  srcFile = "iris3_example_expression_matrix.csv"
-  jobid <- "20190802103754"
+  srcFile = "Yan_expression.csv"
+  jobid <- "20190807125051"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'iris3_example_expression_label.csv'
+  label_file<-'Yan_cell_label.csv'
   delimiter <- ','
   param_k<-0
-  label_use_sc3 <- 1
-  
+  label_use_sc3 <- 2
 }
 
 ##############################
@@ -123,7 +122,7 @@ suppressPackageStartupMessages(library(org.Ce.eg.db))
 suppressPackageStartupMessages(library(org.Sc.sgd.db))
 suppressPackageStartupMessages(library(org.Dr.eg.db))
 db <- c("Worm"=org.Ce.eg.db, "Fruit_fly"=org.Dm.eg.db, "Zebrafish"=org.Dr.eg.db,
-"Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
+        "Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
 
 select_db <- db[which(names(db)%in%species_file)]
 gene_identifier <- sapply(select_db, get_rowname_type, l=rownames(expFile))
@@ -306,13 +305,20 @@ write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names
 if (label_use_sc3 =='2'){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   cell_info[,2] <- as.factor(cell_info[,2])
+  rownames(cell_info) <- cell_info[,1]
+  cell_info[,1] <- NULL
+  my.idents.index<-match(colnames(my.object@raw.data),rownames(cell_info))
+  Customized.idents<-as.factor(cell_info[my.idents.index,1])
+} else {
+  rownames(cell_info) <- cell_info[,1]
+  cell_info <- cell_info[,-1]
+  my.idents.index<-match(colnames(my.object@raw.data),names(cell_info))
+  Customized.idents<-as.factor(cell_info[my.idents.index])
 }
 
-rownames(cell_info) <- cell_info[,1]
-cell_info <- cell_info[,-1]
 
-my.idents.index<-match(colnames(my.object@raw.data),names(cell_info))
-Customized.idents<-as.factor(cell_info[my.idents.index])
+
+
 my.object@meta.data$Customized.idents<-Customized.idents
 my.object<-SetIdent(my.object,ident.use = my.object@meta.data$Customized.idents)
 
