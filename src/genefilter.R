@@ -32,7 +32,7 @@ label_use_sc3 <- args[9] # 1 for have label use sc3, 2 for have label use label,
 
 
 if(delim == 'tab'){
-	delim <- '\t'
+  delim <- '\t'
 }
 if(delim == 'space'){
   delim <- ' '
@@ -122,7 +122,7 @@ suppressPackageStartupMessages(library(org.Ce.eg.db))
 suppressPackageStartupMessages(library(org.Sc.sgd.db))
 suppressPackageStartupMessages(library(org.Dr.eg.db))
 db <- c("Worm"=org.Ce.eg.db, "Fruit_fly"=org.Dm.eg.db, "Zebrafish"=org.Dr.eg.db,
-"Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
+        "Yeast"=org.Sc.sgd.db,"Mouse"=org.Mm.eg.db,"Human"=org.Hs.eg.db)
 
 select_db <- db[which(names(db)%in%species_file)]
 gene_identifier <- sapply(select_db, get_rowname_type, l=rownames(expFile))

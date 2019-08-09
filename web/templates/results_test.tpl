@@ -212,8 +212,6 @@ $(document).ready(function() {
     regulon_id.lastIndexOf("S")
 	);
 	table_id = "regulon-table-" + regulon_id
-	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)[0]
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "regulon-table-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id
@@ -227,7 +225,7 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.png" /></div><div class="col-sm-6"><p>'+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>'+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -241,8 +239,6 @@ $(document).ready(function() {
     regulon_id.lastIndexOf("S")
 	);
 	table_id = "trajectory-table-" + regulon_id
-	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)[0]
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "trajectory-table-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id
@@ -256,7 +252,34 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.trajectory.png" /></div><div class="col-sm-6"><p> '+ regulon_id +' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>Trajectory plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p> '+ regulon_id +' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		},
+	})
+	document.getElementById(table_id).innerHTML = ""
+	}
+	function show_gene_tsne(item) {
+	console.log($(item).attr("id"))
+	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
+	ct_id= regulon_id.substring(
+    regulon_id.lastIndexOf("CT") + 2, 
+    regulon_id.lastIndexOf("S")
+	)
+	gene_symbol = $(item).attr("id").substring($(item).attr("id").lastIndexOf("_")+1)
+	table_id = "gene-tsne-" + regulon_id
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "gene-tsne-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	$.ajax({
+		url: "prepare_gene_tsne.php?jobid=" + jobid + "&id=" + gene_symbol,
+		type: 'POST',
+		beforeSend: function(){
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading gene t-SNE plot...</h3></div>'
+		},
+		data: {'id': gene_symbol},
+		dataType: 'json',
+		success: function(response) {
+		document.getElementById(table_content_id).innerHTML = ''
+		document.getElementById(table_id).innerHTML += '<div class="col-sm-6"><p>t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p> '+ gene_symbol +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -264,26 +287,26 @@ $(document).ready(function() {
 	function get_gene_list(item){
 	match_id = $(item).attr("id").match(/\d+/gm);
 	if($(item).attr("id").includes("CT")) {
-		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt'
 	} else {
-		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt'
 	}
 	
 	
 	$.get(file_path,function(txt){
-        var lines = txt.split("\n");
-		gene_idx = match_id[1] - 1;
-		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n');
+        var lines = txt.split("\n")
+		gene_idx = match_id[1] - 1
+		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
 		//
-		gene_list = lines[gene_idx].split("\t");
-		gene_list.shift();
+		gene_list = lines[gene_idx].split("\t")
+		gene_list.shift()
 		
-		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true};
+		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true}
 	
 		//console.log(enrichr_info);
           // defined globally - will improve
-          send_to_Enrichr(enrichr_info);
-    }); 
+          send_to_Enrichr(enrichr_info)
+    })
 	
 	}
 
@@ -663,7 +686,8 @@ $(document).ready(function() {
 										  {{if !empty($regulon_rank_result[$sec0][sec1][17]) && $regulon_rank_result[$sec0][sec1][17]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][18]) && $regulon_rank_result[$sec0][sec1][18]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
-                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="gene-btn-{{$regulon_result[$sec0][sec1][0]}}-{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="show_gene_tsne(this);$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}-{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}-{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}-{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="show_gene_tsne(this);$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
+                                                        </button><button type="button" style="display:none;" id="gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide
                                                         </button></td>{{/section}}</tr></table></div></td>
 																			<td rowspan="2" class="vert-aligned">
 														<button type="button" class="btn btn-default extra-button" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
@@ -772,14 +796,19 @@ $(document).ready(function() {
                                                                                         </thead>
                                                                                     </table>
 																					</div>
-																					<div id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																					<div class="col-md-12" id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
                                                                                     </div>
                                                                                 </div>
-																				<div id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																				<div class="col-md-12"  id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='trajectory-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="trajectory-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+                                                                                    </div>
+                                                                                </div>
+																				<div class="col-md-12"  id="gene-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+                                                                                    <div id='gene-tsne-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
+                                                                                    <div id="gene-tsne-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
                                                                                     </div>
                                                                                 </div>
 																		</td>
