@@ -1,11 +1,10 @@
 #######  Plot gene expression value for a gene in tsne map##########
 
-#library(Seurat)
-#library(RColorBrewer)
-#library(Polychrome)
-#library(ggplot2)
-#library(monocle)
 
+library(RColorBrewer)
+library(Polychrome)
+library(ggplot2)
+#library(monocle)
 args <- commandArgs(TRUE) 
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
 #setwd("/var/www/html/iris3/data/20190802103754")
@@ -28,6 +27,30 @@ Plot.GeneTSNE<-function(gene.name=NULL){
   g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
   g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue"))
   g
+}
+
+Plot.cluster2D<-function(customized=F,...){
+  # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
+  # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
+  # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
+  tmp.dim<-as.data.frame(my.object@dr$tsne@cell.embeddings)
+  tmp.MatchIndex<- match(my.object@cell.names,rownames(tmp.dim))
+  tmp.dim<-tmp.dim[tmp.MatchIndex,]
+  if(customized==FALSE){
+    tmp.colname<-grep("^res.",colnames(my.object@meta.data),value = T)[1]
+    my.plot.all.source<-cbind.data.frame(tmp.dim,
+                                         Cell_type=my.object@meta.data[,tmp.colname])
+  }else{
+    my.plot.all.source<-cbind.data.frame(tmp.dim,
+                                         Cell_type=as.factor(my.object@meta.data$Customized.idents))
+  }
+  p.cluster<-ggplot(my.plot.all.source,
+                    aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
+  p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+  #p.cluster<-theme_linedraw()
+  p.cluster<-p.cluster + labs(col="cell type")
+  p.cluster+theme_light()+scale_fill_continuous(name="cell type")
+  
 }
 
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
@@ -88,12 +111,24 @@ quiet <- function(x) {
 } 
 
 setwd(srcDir)
-my.object <- readRDS("seurat_obj.rds")
 
 png(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""),width=700, height=700)
 if (!file.exists(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""))){
+  if(!exists("my.object")){
+    library(Seurat)
+    my.object <- readRDS("seurat_obj.rds")
+  }
   Plot.GeneTSNE(gene_symbol)
 }
 quiet(dev.off())
 
 
+png(paste("regulon_id/overview_ct.png",sep = ""),width=700, height=700)
+if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
+  if(!exists("my.object")){
+    library(Seurat)
+    my.object <- readRDS("seurat_obj.rds")
+  }
+  Plot.cluster2D(reduction.method = "tsne",customized = T)
+}
+quiet(dev.off())
