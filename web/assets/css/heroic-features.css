@@ -674,7 +674,7 @@ textarea {
 	font-size:14px !important;
 	margin: 1em;
 }
-.dataTables_wrapper table thead{
+.regulon_table  > thead{
     display:none;
 }
 #preview_exp {
