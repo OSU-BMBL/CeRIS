@@ -731,13 +731,18 @@ textarea {
 .highlight { font-weight: 500; font-style: normal; color: #2775b6; }
 .table tbody > tr > td.vert-aligned {
 	border:none;
-	width:17%;
+	width:17% !important;
+	max-width:17% !important;
 }
 
 .table tbody > tr > td >button.extra-button {
 	width:100%;
 	margin-top:6px;
 	margin-bottom:6px;
+}
+
+.table tbody > tr > td >button.gene-button {
+	width:50%;
 }
 
 .regulon-heading {
@@ -766,9 +771,8 @@ border:none;
 .table tbody > tr > td.gene-table {
 display:inline-block; 
 overflow-y: auto;
-max-height:200px;
+max-height:250px;
 width:95%;
-margin-bottom:20px;
 padding-top:0px;
 }
 
@@ -792,9 +796,8 @@ font-size:16px;
 	max-width: 75%;
 }
 
-.table a:hover {
+.table a {
   text-decoration: underline !important;
-  font-size:14px;
   display:inline-block;
 }
 
