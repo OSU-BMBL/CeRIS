@@ -103,7 +103,7 @@ regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=700, height=700)
+png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=1600, height=1200,res = 300)
 if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
   #Plot.cluster2D(reduction.method = "tsne",customized = T)
   #Plot.TrajectoryByCellType(customized = T)
@@ -115,7 +115,7 @@ if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
 }
 quiet(dev.off())
 
-png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=700, height=700)
+png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=1600, height=1200,res = 300)
 if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
   if(!exists("cds")){
     library(monocle)
