@@ -87,6 +87,9 @@ if (!empty($_FILES)) {
 		$new_array['count_zero'][] = $count_zero;
 		$new_array['type'][] = 'text';
 		fclose($fp);
+		$fp = fopen("$workdir/upload_type.txt", 'w');
+		fwrite($fp,"CellGene\n");
+		fclose($fp);
 		break;
 	case "application/x-hdf":
 		$new_array['index'][] = '1';
@@ -94,6 +97,9 @@ if (!empty($_FILES)) {
 		$new_array['gene_num'][] = 100;
 		$new_array['count_zero'][] = 50;
 		$new_array['type'][] = 'hdf';
+		$fp = fopen("$workdir/upload_type.txt", 'w');
+		fwrite($fp,"TenX.h5\n");
+		fclose($fp);
 		break;
 	case "text/plainss":
 		$new_array['type'][] = 'other';

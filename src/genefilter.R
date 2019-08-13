@@ -77,8 +77,9 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
 }
 
 getwd()
+upload_type <- as.character(read.table("upload_type.txt",stringsAsFactors = F)[1,1])
 
-expFile <- read_data(x = srcFile,read.method = "CellGene",sep = delim)
+expFile <- read_data(x = srcFile,read.method = upload_type,sep = delim)
 colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
 #check if [1,1] is empty
 if(colnames(expFile)[1] == ""){
