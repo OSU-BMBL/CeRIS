@@ -1,5 +1,5 @@
 # set working directory, you may change the directory first.
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2.Yan/")
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/1.Biase/")
 # loading required packege
 # loading Seurat version 2, you need reinstall the version 2
 
@@ -31,12 +31,17 @@ if (!require("dplyr")) {
 }
 # require monocle2
 library(monocle)
+if(!require("Linnorm")){
+  BiocManager::install("Linnorm")
+}
 # import monocle version2
 if(!require("monocle")){
   source("http://bioconductor.org/biocLite.R")
   BiocManager::install("monocle")
 }
-
+if(!require("Rmagic")){
+  install.packages("Rmagic")
+}
 #pre-optional
 options(stringsAsFactors = F)
 options(check.names = F)
@@ -77,7 +82,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
 #|-----------------|---------------|
 
 #Read in data ###################################################
-my.raw.data<-read_data(x = "Yan_expression.csv",sep=",",read.method = "CellGene")
+my.raw.data<-read_data(x = "Biase_expression.csv",sep=",",read.method = "CellGene")
 ######################################################
 # create Seurat object
 my.object<-CreateSeuratObject(my.raw.data)
@@ -101,11 +106,11 @@ write.table(my.expression.data,
 # Add meta info(cell type) to seurat object###
 ##############################################
 setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
-label_data<-read.delim("2019062485208_cell_label.txt",sep = "\t",
+label_data<-read.delim("Biase_cell_label.csv",sep = "\t",
                        header = T)
 # read cell label file
-my.meta.info<-read.delim("2019062485208_cell_label.txt",row.names = 1,
-                         sep = "\t",header = T,check.names = F,stringsAsFactors = F)
+my.meta.info<-read.delim("Biase_cell_label.csv",row.names = 1,
+                         sep = ",",header = T,check.names = F,stringsAsFactors = F)
 #rownames(my.meta.info)<-paste0(rownames(my.meta.info),"s")
 
 my.idents.index<-match(colnames(my.object@raw.data),rownames(my.meta.info))
@@ -116,6 +121,11 @@ my.object@meta.data$Customized.idents
 # activate customized cell type info
 my.object<-SetIdent(my.object,ident.use = my.object@meta.data$Customized.idents)
 ############################################## normalize data 
+my.unnormalized.data<-GetAssayData(object = my.object,assay.type = "RNA",slot = "raw.data")
+
+my.normalized.data<-
+my.object<-SetAssayData(object = my.object,assay.type = "RNA",slot = "data",new.data =my.normalized.data )
+######################################################################
 my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
 # find high variable gene
 my.object<-FindVariableGenes(my.object)
@@ -308,7 +318,7 @@ Plot.GeneTSNE<-function(gene.name=NULL){
 Plot.GeneTSNE("CA8")
 
 
-
+cds@phenoData@data
 
 
 
