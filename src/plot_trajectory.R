@@ -4,7 +4,6 @@
 #library(RColorBrewer)
 #library(Polychrome)
 #library(ggplot2)
-library(monocle)
 
 args <- commandArgs(TRUE) 
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
@@ -97,24 +96,31 @@ quiet <- function(x) {
 } 
 
 setwd(srcDir)
-#my.object <- readRDS("seurat_obj2.rds")
-cds <- readRDS("cds.rds")
+
 regulon_ct <-gsub( "-.*$", "", id)
 regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-png(paste("regulon_id/overview_ct",regulon_ct,".trajectory.png",sep = ""),width=700, height=700)
-if (!file.exists(paste("regulon_id/overview_",regulon_ct,".trajectory.png",sep = ""))){
+png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=1600, height=1200,res = 300)
+if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
   #Plot.cluster2D(reduction.method = "tsne",customized = T)
   #Plot.TrajectoryByCellType(customized = T)
+  if(!exists("cds")){
+    library(monocle)
+    cds <- readRDS("monocle_obj.rds")
+  }
   plot_cell_trajectory(cds,color_by="Customized.idents")
 }
 quiet(dev.off())
 
-png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=700, height=700)
+png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=1600, height=1200,res = 300)
 if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
+  if(!exists("cds")){
+    library(monocle)
+    cds <- readRDS("monocle_obj.rds")
+  }
   Plot.TrajectoryByRegulon(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id))
 }
 quiet(dev.off())

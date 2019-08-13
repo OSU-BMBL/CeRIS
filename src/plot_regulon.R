@@ -1,17 +1,16 @@
 #######  Plot regulon ##########
 
-library(Seurat)
 library(RColorBrewer)
 library(Polychrome)
 library(ggplot2)
 
-
 args <- commandArgs(TRUE) 
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
+#setwd("D:/Users/flyku/Documents/IRIS3-data/20190802103754")
 #setwd("C:/Users/wan268/Documents/iris3_data/0624")
+#wd <- "D:/Users/flyku/Documents/IRIS3-data/20190802103754"
 #srcDir <- getwd()
 #id <-"CT4S-R7" 
-#jobid <- "2019062485208"
+#jobid <- "20190802103754"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -36,17 +35,15 @@ Plot.cluster2D<-function(customized=F,...){
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
   p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
   #p.cluster<-theme_linedraw()
-  p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_light()+scale_fill_continuous(name="cell type")
-  
+  p.cluster<-p.cluster+labs(col="cell type")+theme_light()+scale_fill_continuous(name="cell type")+coord_fixed(1)
+  p.cluster
 }
-
 # test Get.RegulonScore, output is matrix
 
 
 
-Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=F,...){
-  message("plotting regulon ",regulon," of cell type ",cell.type,"...")
+Plot.regulon2D<<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=F,...){
+  #message("plotting regulon ",regulon," of cell type ",cell.type,"...")
   tmp.FileList<-list.files(pattern = "regulon_activity_score")
   tmp.RegulonScore<-read.delim(tmp.FileList[cell.type],sep = "\t",check.names = F)[regulon,]
   tmp.NameIndex<-match(rownames(my.object@dr$tsne@cell.embeddings),names(tmp.RegulonScore))
@@ -57,11 +54,9 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #p.cluster<-theme_linedraw()
-  p.regulon<-p.regulon + labs(col="regulon score")
-  message("finish!")
+  p.regulon<-p.regulon +theme_light()+labs(col="regulon score")+ coord_fixed(1)
+  #message("finish!")
   p.regulon
-  
-  
 }
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
@@ -147,7 +142,6 @@ quiet <- function(x) {
 } 
 
 setwd(srcDir)
-my.object <- readRDS("seurat_obj.rds")
 
 regulon_ct <-gsub( "-.*$", "", id)
 regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
@@ -155,18 +149,73 @@ regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-png(paste("regulon_id/overview_ct",regulon_ct,".png",sep = ""),width=700, height=700)
-if (!file.exists(paste("regulon_id/overview_",regulon_ct,".png",sep = ""))){
+
+png(paste("regulon_id/overview_ct.png",sep = ""),width=1600, height=1200,res = 300)
+if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
+  if(!exists("my.object")){
+    library(Seurat)
+    my.object <- readRDS("seurat_obj.rds")
+  }
+  
   Plot.cluster2D(reduction.method = "tsne",customized = T)
+  
+  #pdf(paste("regulon_id/overview_ct.pdf",sep = ""))
+  #Plot.cluster2D(reduction.method = "tsne",customized = T)
+  #quiet(dev.off())
 }
 quiet(dev.off())
-
-png(paste("regulon_id/",id,".png",sep = ""),width=700, height=700)
+png(paste("regulon_id/",id,".png",sep = ""),width=1600, height=1200,res = 300)
 if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
-  #Plot.regulon2D(reduction.method = "tsne",regulon = as.numeric(regulon_id),cell.type=as.numeric(regulon_ct),customized =T)  
+  if(!exists("my.object")){
+    library(Seurat)
+    my.object <- readRDS("seurat_obj.rds")
+  }
+  
   Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T)
   
+  #pdf(paste("regulon_id/",id,".pdf",sep = ""))
+  #Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T)
+  #quiet(dev.off())
 }
 quiet(dev.off())
+#type=pdf
+#filetype="pdf"
+#plot="overview"
+#id="1"
+#save_image(png,"png","overview","1",my.object)
+
+#jpeg(paste("regulon_id/overview_ct.jpeg",sep = ""),width=1200, height=1200,res=300)
+#if (!file.exists(paste("regulon_id/overview_ct.jpeg",sep = ""))){
+#  if(!exists("my.object")){
+#    library(Seurat)
+#    my.object <- readRDS("seurat_obj.rds")
+#  }
+#  Plot.cluster2D(reduction.method = "tsne",customized = T)
+#}
+#quiet(dev.off())
+#
+#pdf(paste("regulon_id/overview_ct.png",sep = ""))
+#if (!file.exists(paste("regulon_id/overview_ct.pdf",sep = ""))){
+#  if(!exists("my.object")){
+#    library(Seurat)
+#    my.object <- readRDS("seurat_obj.rds")
+#  }
+#  Plot.cluster2D(reduction.method = "tsne",customized = T)
+#}
+#quiet(dev.off())
+#
+#
+#emf(file=paste("regulon_id/overview_ct.emf",sep = ""), emfPlus = FALSE)
+#if (!file.exists(paste("regulon_id/overview_ct.emf",sep = ""))){
+#  if(!exists("my.object")){
+#    library(Seurat)
+#    my.object <- readRDS("seurat_obj.rds")
+#  }
+#  Plot.cluster2D(reduction.method = "tsne",customized = T)
+#}
+#quiet(dev.off())
+
+
+
 
 

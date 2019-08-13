@@ -128,7 +128,7 @@ my.object<-SetAssayData(object = my.object,assay.type = "RNA",slot = "data",new.
 ######################################################################
 my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
 # find high variable gene
-my.object<-FindVariableGenes(my.object)
+my.object<-FindVariableGenes(my.object,do.plot=F)
 # before PCA, scale data to eliminate extreme value affect.
 all.gene<-rownames(my.object@raw.data)
 my.object<-ScaleData(my.object,genes.use= all.gene)

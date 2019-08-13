@@ -10,15 +10,17 @@
 <script>
 var flag = [];
 $(document).ready(function() {
-	$('.regulon_table').DataTable({
-	"aaSorting": []
-	})
-    document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
-    $('#tablePreview').DataTable({
+	
+	$('#tablePreview').DataTable({
         "searching": false,
         "paging": false,
         "bInfo": false,
     })
+	$('.regulon_table').DataTable({
+	"aaSorting": []
+	})
+    document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
+    
 
     $("#to_enrichr").click(function() {
         get_gene_list(1, 2);
@@ -212,8 +214,6 @@ $(document).ready(function() {
     regulon_id.lastIndexOf("S")
 	);
 	table_id = "regulon-table-" + regulon_id
-	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)[0]
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "regulon-table-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id
@@ -227,7 +227,7 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.png" /></div><div class="col-sm-6"><p>'+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>'+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -241,8 +241,6 @@ $(document).ready(function() {
     regulon_id.lastIndexOf("S")
 	);
 	table_id = "trajectory-table-" + regulon_id
-	species = document.getElementById("species").innerHTML
-	match_species = species.match(/[^Species: ].+/gm)[0]
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "trajectory-table-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id
@@ -256,7 +254,36 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct' + ct_id + '.trajectory.png" /></div><div class="col-sm-6"><p> '+ regulon_id +' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>Trajectory plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p> '+ regulon_id +' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		},
+	})
+	document.getElementById(table_id).innerHTML = ""
+	}
+	function show_gene_tsne(item) {
+	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
+	ct_id= regulon_id.substring(
+    regulon_id.lastIndexOf("CT") + 2, 
+    regulon_id.lastIndexOf("S")
+	)
+	gene_symbol = $(item).attr("id").substring($(item).attr("id").lastIndexOf("_")+1)
+	table_id = "gene-tsne-" + regulon_id
+	jobid = location.search.match(/\d+/gm)
+	table_content_id = "gene-tsne-content-" + regulon_id
+	table_jquery_id = "#" + table_content_id
+	$.ajax({
+		url: "prepare_gene_tsne.php?jobid=" + jobid + "&id=" + gene_symbol,
+		type: 'POST',
+		beforeSend: function(){
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading gene t-SNE plot...</h3></div>'
+		},
+		data: {'id': gene_symbol},
+		dataType: 'json',
+		success: function(response) {
+		document.getElementById(table_content_id).innerHTML = ''
+		let tmp = document.getElementById(table_id).innerHTML
+		console.log(tmp)
+		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p> '+ gene_symbol +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
+		console.log(document.getElementById(table_id).innerHTML)
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -264,26 +291,26 @@ $(document).ready(function() {
 	function get_gene_list(item){
 	match_id = $(item).attr("id").match(/\d+/gm);
 	if($(item).attr("id").includes("CT")) {
-		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt'
 	} else {
-		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt';
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt'
 	}
 	
 	
 	$.get(file_path,function(txt){
-        var lines = txt.split("\n");
-		gene_idx = match_id[1] - 1;
-		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n');
+        var lines = txt.split("\n")
+		gene_idx = match_id[1] - 1
+		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
 		//
-		gene_list = lines[gene_idx].split("\t");
-		gene_list.shift();
+		gene_list = lines[gene_idx].split("\t")
+		gene_list.shift()
 		
-		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true};
+		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true}
 	
 		//console.log(enrichr_info);
           // defined globally - will improve
-          send_to_Enrichr(enrichr_info);
-    }); 
+          send_to_Enrichr(enrichr_info)
+    })
 	
 	}
 
@@ -638,29 +665,34 @@ $(document).ready(function() {
                                                                     <tbody>
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td>
-																		<table class="table table-sm" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
+																		<table class="table table-sm " cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
 																		<tr><td colspan="2"> <div class='regulon-heading'> {{$regulon_result[$sec0][sec1][0]}}</div></td></tr>
 																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr><td class="gene-table">
                                                                             <div style="width:100%; font-size:14px;">
-																				<table class="table table-hover " >
-	                                <tr><td>Marker gene</td><td>Gene Symbol</td><td>Enesmbl ID</td>
+																				<table class="table table-hover table-sm" >
+	                                <tr><td>Marker gene</td><td>Gene Symbol</td><td>Enesmbl ID</td><td>Gene t-SNE plot</td>
 									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
 										  <tr><td>
-										  {{if !empty($regulon_rank_result[$sec0][sec1][5]) && $regulon_rank_result[$sec0][sec1][5] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][6]) && $regulon_rank_result[$sec0][sec1][6] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][8]) && $regulon_rank_result[$sec0][sec1][8] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][9]) && $regulon_rank_result[$sec0][sec1][9] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][10]) && $regulon_rank_result[$sec0][sec1][10] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][11]) && $regulon_rank_result[$sec0][sec1][11] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][12]) && $regulon_rank_result[$sec0][sec1][12] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][13]) && $regulon_rank_result[$sec0][sec1][13] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][14]) && $regulon_rank_result[$sec0][sec1][14] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][15]) && $regulon_rank_result[$sec0][sec1][15] ==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}&nbsp;</a></td>							
-                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}&nbsp;</a></td>{{/section}}</tr></table></div></td>
+										  {{if !empty($regulon_rank_result[$sec0][sec1][5]) && $regulon_rank_result[$sec0][sec1][5]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][6]) && $regulon_rank_result[$sec0][sec1][6]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][8]) && $regulon_rank_result[$sec0][sec1][8]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][9]) && $regulon_rank_result[$sec0][sec1][9]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][10]) && $regulon_rank_result[$sec0][sec1][10]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][11]) && $regulon_rank_result[$sec0][sec1][11]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][12]) && $regulon_rank_result[$sec0][sec1][12]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][13]) && $regulon_rank_result[$sec0][sec1][13]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][14]) && $regulon_rank_result[$sec0][sec1][14]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][15]) && $regulon_rank_result[$sec0][sec1][15]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][16]) && $regulon_rank_result[$sec0][sec1][16]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][17]) && $regulon_rank_result[$sec0][sec1][17]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][18]) && $regulon_rank_result[$sec0][sec1][18]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
+                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="show_gene_tsne(this);$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
+                                                        </button><button type="button" style="display:none;" id="gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide
+                                                        </button></td>{{/section}}</tr></table></div></td>
 																			<td rowspan="2" class="vert-aligned">
 														<button type="button" class="btn btn-default extra-button" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
                                                         </button><button style="display:none;" type="button" class="btn btn-default extra-button" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
@@ -694,13 +726,13 @@ $(document).ready(function() {
 																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
 																				<div class="row">
 																					<div class="col-md-3"><p class="motif-text">{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}</p><a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="motif-logo lozad " data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png"/></a><p class="motif-score">P-value: {{$regulon_rank_result[$sec0][sec1][1]}}</p><p class="motif-score">Z-score: {{$regulon_rank_result[$sec0][sec1][3]|string_format:"%.2f"}}</p></div>
-																					<div class="col-md-9">
+																					<div class="col-md-9"> 
 									<input class="btn btn-default" type="button" value="Motif details" onClick="window.open('motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}');"/>
 									<input class="btn btn-default" type="button" value="JASPAR" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=JASPAR');"  />
 									<input class="btn btn-default" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  />
 									{{assign var=motif_num_jaspar value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`_JASPAR"}}
 									{{assign var=motif_num_homo value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`_HOCOMOCO"}}
-									<table id="tomtom_table" class="table table-hover tomtom_table" cellpadding="0" cellspacing="0" width="100%">
+									<table id="tomtom_table" class="table table-hover tomtom_table table-sm" cellpadding="0" cellspacing="0" width="100%">
 									<thead><tr><td>Database</td><td>Matched TF</td><td>P-value</td><td>E-value</td><td>Q-value</td></tr></thead>
 									<tbody>
 									{{section name=tomtom_idx start=0 loop=$tomtom_result.$motif_num_jaspar}}
@@ -768,14 +800,19 @@ $(document).ready(function() {
                                                                                         </thead>
                                                                                     </table>
 																					</div>
-																					<div id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																					<div class="col-md-12" id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
                                                                                     </div>
                                                                                 </div>
-																				<div id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																				<div class="col-md-12"  id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='trajectory-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="trajectory-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+                                                                                    </div>
+                                                                                </div>
+																				<div class="col-md-12"  id="gene-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+                                                                                    <div id='gene-tsne-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
+                                                                                    <div id="gene-tsne-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
                                                                                     </div>
                                                                                 </div>
 																		</td>
@@ -1225,7 +1262,6 @@ $(document).ready(function() {
     <script src='assets/js/hzome_functions.js'></script>
     <script src='assets/js/send_to_Enrichr.js'></script>
     <script src='assets/js/load_clustergram.js'></script>
-	<script src="assets/js/jquery.simplePagination.js" ></script>
     <script>
 
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'

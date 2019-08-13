@@ -69,7 +69,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
 #normalization
 normalize_ras <- function(score_vec){
   #normalize score_vec(regulon activity score) to range(0,1) and sum=1
-  score_vec <- apply(ras, 1, rescale)
+  score_vec <- apply(score_vec, 1, rescale)
   score_vec <- t(score_vec)
   score_vec <- as.data.frame(t(apply(data.frame(score_vec), 1, function(x){
     x <- x/sum(x)
