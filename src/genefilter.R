@@ -16,6 +16,10 @@ suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(devEMF))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(Seurat))
+suppressPackageStartupMessages(library(DrImpute))
+suppressPackageStartupMessages(library(scran))
+suppressPackageStartupMessages(library(slingshot))
+
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 jobid <- args[2] # user job id
@@ -82,6 +86,8 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
 
 getwd()
 upload_type <- as.character(read.table("upload_type.txt",stringsAsFactors = F)[1,1])
+#expFile <- read_data(x = getwd(),read.method = "TenX.folder",sep = delim)
+#expFile <- read_data(x = srcFile,read.method = "TenX.h5",sep = delim)
 
 expFile <- read_data(x = srcFile,read.method = upload_type,sep = delim)
 colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
@@ -98,7 +104,6 @@ if (upload_type == "CellGene"){
   rownames(expFile) <- expFile[,1]
   expFile<- expFile[,-1]
 }
-
 
 total_cell_num <- ncol(expFile)
 thres_genes <- nrow(expFile) * 0.01
@@ -198,9 +203,26 @@ cell_names <- colnames(my.object)
 # normalization using Seurat
 my.object<-CreateSeuratObject(my.object)
 #my.object<-GetAssayData(object = my.object,slot = "counts")
+my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
+sce<-SingleCellExperiment(list(counts=my.count.data))
+is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
+if (is.ercc.empty(sce)){
+  isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
+  sce<-computeSpikeFactors(sce)
+} else {sce<-computeSumFactors(sce)}
 
-my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+sce<-scater::normalize(sce,return_log=F)
 
+my.normalized.data <-sce@assays@.xData$data@listData$normcounts
+#my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+
+
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
+colnames(my.imputated.data)<-colnames(my.count.data)
+rownames(my.imputated.data)<-rownames(my.count.data)
+my.imputated.data<- as.sparse(my.imputated.data)
+my.imputatedLog.data<-log1p(my.imputated.data)
+my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
 
 # calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
@@ -313,10 +335,7 @@ if(label_use_sc3 == 3){
   
 } 
 
-if (label_use_sc3 =='2'){
-  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
-  cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
-} 
+
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
 
 # before PCA, scale data to eliminate extreme value affect.
@@ -324,20 +343,23 @@ all.gene<-rownames(my.object)
 my.object<-ScaleData(my.object,features = all.gene)
 # after scaling, perform PCA
 my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+my.object<-FindClusters(my.object)
+cell_info <-  my.object$seurat_clusters
+cell_label <- cbind(cell_names,cell_info)
+colnames(cell_label) <- c("cell_name","label")
+write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+#write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 
-if (label_use_sc3 =='0' | label_use_sc3 =='1'){
-  my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
-  my.object<-FindClusters(my.object)
-  cell_info <-  my.object$seurat_clusters
-  cell_label <- cbind(cell_names,cell_info)
-  colnames(cell_label) <- c("cell_name","label")
-  write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
-  write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
-} else {
+if (label_use_sc3 =='2'){
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
+  cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
   rownames(cell_info) <- cell_info[,1]
   cell_info <- cell_info[,-1]
-}
-
+} 
+silh_out <- cbind(cell_info,cell_names,1)
+silh_out <- silh_out[order(silh_out[,1]),]
+write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
 my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
 Idents(my.object)<-as.factor(my.object$Customized.idents)
 
