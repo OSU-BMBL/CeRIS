@@ -42,7 +42,7 @@ if(is.na(delim)){
 
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
-  # setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
+  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
   #srcFile = "single_cell.csv"
   srcFile = "iris3_example_expression_matrix.csv"
@@ -307,7 +307,7 @@ write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names
 
 if (label_use_sc3 =='2'){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
-  cell_info[,2] <- as.factor(cell_info[,2])
+  cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
 } 
 rownames(cell_info) <- cell_info[,1]
 cell_info <- cell_info[,-1]
