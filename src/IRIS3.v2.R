@@ -388,8 +388,10 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   my.classification.color<-as.character(palette36.colors(36))[-2]
   par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
-  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),pch=20,asp=1)
-  
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
+       col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),
+       pch=20,frame.plot = FALSE,
+       asp=1)
   tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),Color=my.classification.color[tmp.trajectory.cluster$cell.label])
   tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
   # add legend
@@ -415,7 +417,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   val<-tmp.regulon.score$regulon.score
   grPal<-colorRampPalette(c('grey','red'))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
-  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1)
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1,frame.plot = FALSE)
   lines(SlingshotDataSet(tmp.trajectory.cluster))
 }
 Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = NULL,end.cluster = NULL)
