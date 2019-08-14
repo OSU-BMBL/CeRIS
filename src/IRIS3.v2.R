@@ -127,6 +127,41 @@ my.object<-AddMetaData(my.object,my.meta.info,col.name = "Customized.idents")
 Idents(my.object)
 # activate customized cell type info
 Idents(my.object)<-as.factor(my.object$Customized.idents)
+
+
+
+
+
+#######Cankun modification: first imputation, then normalization#########
+
+my.object<-CreateSeuratObject(expFile)
+#my.object<-GetAssayData(object = my.object,slot = "counts")
+my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
+my.imputated.data <- DrImpute(as.matrix(my.count.data))
+colnames(my.imputated.data)<-colnames(my.count.data)
+rownames(my.imputated.data)<-rownames(my.count.data)
+my.imputated.data<- as.sparse(my.imputated.data)
+
+sce<-SingleCellExperiment(list(counts=my.imputated.data))
+is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
+if (is.ercc.empty(sce)){
+  isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
+  sce<-computeSpikeFactors(sce)
+} else {
+  sce<-computeSumFactors(sce)
+}
+
+#my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+sce <- scater::normalize(sce,return_log=F)
+my.normalized.data <-normcounts(sce)
+my.normalized.data<-log1p(my.normalized.data)
+#######Cankun modification: first imputation, then normalization#########
+
+
+
+
+
+
 # get raw data################################  
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 # normalization##############################
