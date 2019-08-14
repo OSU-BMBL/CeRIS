@@ -49,7 +49,12 @@ if (!require("slingshot")){
   BiocManager::install("kstreet13/slingshot")
   library(slingshot)
 }
-
+if (!require("destiny")){
+  BiocManager::install("destiny")
+}
+if(!require(gam)){
+  install.packages("gam")
+}
 #pre-optional
 options(stringsAsFactors = F)
 options(check.names = F)
@@ -288,7 +293,7 @@ Plot.cluster2D(customized = T)
 # test Get.RegulonScore, output is matrix
 
 
-Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=F,...){
+Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=T,...){
   message("plotting regulon ",regulon," of cell type ",cell.type,"...")
   my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
                                     cell.type = cell.type,
@@ -351,6 +356,90 @@ Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)
 
 # trajectory with slingshot. 
 
+my.trajectory<-SingleCellExperiment(assays=List(counts=my.count.data))
+SummarizedExperiment::assays(my.trajectory)$norm<-GetAssayData(object = my.object,assay = "RNA",slot = "data")
+
+pca <- prcomp(t(SummarizedExperiment::assays(my.trajectory)$norm), scale. = FALSE)
+rd1 <- pca$x[,1:2]
+dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
+rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
+reducedDims(my.trajectory) <- SimpleList(PCA = rd1, DiffMap = rd2)
+
+
+Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
+  #labeling cell
+  if(customized==TRUE){
+    tmp.cell.type<-my.object$Customized.idents
+  }
+  if(customized==FALSE){
+    tmp.cell.type<-my.object$seurat_clusters
+  }
+  tmp.cell.name.index<-match(colnames(my.trajectory),names(tmp.cell.type))
+  tmp.cell.type<-tmp.cell.type[tmp.cell.name.index]
+  colData(my.trajectory)$cell.label<-tmp.cell.type
+  # run trajectory, first run the lineage inference
+  my.trajectory <- slingshot(my.trajectory, clusterLabels = 'cell.label', reducedDim = 'DiffMap',
+                             start.clus=start.cluster,end.clus=end.cluster)
+  #summary(my.trajectory$slingPseudotime_1)
+  return(my.trajectory)
+}
+
+Plot.Cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
+  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
+  my.classification.color<-as.character(palette36.colors(36))[-2]
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),pch=20,asp=1)
+  lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=T)
+
+}
+Plot.Cluster.Trajectory()
+
+Get.regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,...){
+  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized)
+  tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
+  tmp.cell.name<-names(tmp.trajectory.cluster$cell.label)
+  tmp.cell.name.index<-match(tmp.cell.name,rownames(tmp.regulon.score))
+  tmp.regulon.score<-tmp.regulon.score[tmp.cell.name.index,]
+  val<-tmp.regulon.score$regulon.score
+  grPal<-colorRampPalette(c('grey','red'))
+  tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=tmp.color,pch=20,asp=1)
+  lines(SlingshotDataSet(tmp.trajectory.cluster))
+}
+Get.regulon.Trajectory(cell.type = 7,regulon = 1)
+
+######color indicator#############################################
+color.bar <- function(val, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), title='') {
+  scale = round((length(val)-1)/(max-min),0)
+  dev.new(width=1.75, height=5)
+  plot(c(0,10), c(min,max), type='n', bty='n', xaxt='n', xlab='', yaxt='n', ylab='', main=title)
+  axis(2, ticks, las=1)
+  for (i in 1:(length(val)-1)) {
+    y = (i-1)/scale + min
+    rect(0,y,10,y+1/scale, col=val[i], border=NA)
+  }	
+}
+
+val.around<- round(val,digits = 1)
+color.bar(val.around,min=min(val.around),max=max(val.around))
+
+###########################
+###########################
+### gene TSNE plot#########
+###########################
+Plot.GeneTSNE<-function(gene.name=NULL){
+  tmp.gene.expression<- my.object@assays$RNA@data
+  tmp.dim<-as.data.frame(my.object@reductions$tsne@cell.embeddings)
+  tmp.MatchIndex<- match(colnames(tmp.gene.expression),rownames(tmp.dim))
+  tmp.dim<-tmp.dim[tmp.MatchIndex,]
+  tmp.gene.name<-paste0("^",gene.name,"$")
+  tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
+  tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
+  g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
+  g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
+  g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue"))
+  g
+}
+Plot.GeneTSNE("CA8")
 
 
 
