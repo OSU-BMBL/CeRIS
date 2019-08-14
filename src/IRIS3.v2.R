@@ -166,11 +166,12 @@ my.object<-FindClusters(my.object,resolution = 0.5)
 # M2  G3  G4.....#
 # M3  G5  G6.....#
 #----------------#
-
-setwd("/home/cyz/Bigstore/BigData/runningdata/outs/websiteoutput/test_zscore")
-Get.CellType<-function(cell.type=NULL,...){
+## test data, input data path
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
+# get cell and regulon information
+Get.CellType<-function(cell.type=1,...){
   if(!is.null(cell.type)){
-    my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_name.txt")
+    my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_symbol.txt")
     my.cell.regulon.indicator<-grep(paste0("_",as.character(cell.type),"_bic"),my.cell.regulon.filelist)
     my.cts.regulon.raw<-readLines(my.cell.regulon.filelist[my.cell.regulon.indicator])
     my.regulon.list<-strsplit(my.cts.regulon.raw,"\t")
@@ -178,60 +179,88 @@ Get.CellType<-function(cell.type=NULL,...){
   }else{stop("please input a cell type")}
   
 }
-Get.CellType(cell.type = 1,regulon=1)
-
+Get.CellType(cell.type = 1)
+# get each regulon gene and corresponding expression data. 
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
-  tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
+  my.rowname<-rownames(my.object)
+  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
+  # my.object@data stores normalized data
+  tmp.regulon<-my.object@assays$RNA@data[gene.index,]
   return(tmp.regulon)
 }
-Generate.Regulon(cell.type = 1,regulon = 1)
+Generate.Regulon(cell.type = 1)
+
+#######################################################
+## here you need to calculate Regulon score outside R##
+#######################################################
+
+
+# get Regulon score from external folder. 
+Get.RegulonScore<-function(cell.type=1,regulon=1,...){
+  # recognize the regulon file pattern.
+  tmp.FileList<-list.files(pattern = "regulon_activity_score")
+  cell.type.index<-grep(paste0("_CT_",cell.type,"_bic"),tmp.FileList)
+  tmp.RegulonScore<-read.delim(tmp.FileList[cell.type.index],sep = "\t",check.names = F)[regulon,]
+  tmp.NameIndex<-match(rownames(my.object@reductions$tsne@cell.embeddings),names(tmp.RegulonScore))
+  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
+  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
+  my.plot.regulon<-cbind.data.frame(my.object@reductions$tsne@cell.embeddings[,c(1,2)],regulon.score=tmp.RegulonScore.Numeric)
+  return(my.plot.regulon)
+}
+
+# Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
+#   x<-Get.CellType(cell.type = cell.type)
+#   tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
+#   return(tmp.regulon)
+# }
+# Generate.Regulon(cell.type = 1,regulon = 1)
 # read in motif score and 
 # next step will take 1min to generate the mixed matrix
 
- cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
+# cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
 
 
-Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
-  my.regulon.number<-length(Get.CellType(cell.type = cell.type))
-  if (regulon > my.regulon.number){
-    stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
-  } else {
-    my.cts.regulon.S4<-Generate.Regulon(cell.type = cell.type,regulon=regulon)
-    if(customized){
-      my.cell.type<-my.cts.regulon.S4$Customized.idents
-      message(c("using customized cell label: ","|", paste0(unique(as.character(my.cts.regulon.S4$Customized.idents)),"|")))
-    }else{
-      my.cell.type<-my.cts.regulon.S4$seurat_clusters
-      message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
-    } 
-    tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
-    geneSets<-list(GeneSet1=rownames(tmp_data))
-    cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
-    cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
-    my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
-    my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
-   # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
-    regulon.score<-my.auc.data
-    tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
-    my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
-                                        regulon.score=regulon.score[,1])
-    
-    return(my.choose.regulon)
-  }
-}
-Get.RegulonScore(reduction.method = "tsne",cell.type = 2,regulon = 1,customized = T)
+# Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
+#   my.regulon.number<-length(Get.CellType(cell.type = cell.type))
+#   if (regulon > my.regulon.number){
+#     stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
+#   } else {
+#     my.cts.regulon.S4<-Generate.Regulon(cell.type = cell.type,regulon=regulon)
+#     if(customized){
+#       my.cell.type<-my.cts.regulon.S4$Customized.idents
+#       message(c("using customized cell label: ","|", paste0(unique(as.character(my.cts.regulon.S4$Customized.idents)),"|")))
+#     }else{
+#       my.cell.type<-my.cts.regulon.S4$seurat_clusters
+#       message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
+#     } 
+#     tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
+#     geneSets<-list(GeneSet1=rownames(tmp_data))
+#     cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
+#     cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
+#     my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
+#     my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
+#    # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
+#     regulon.score<-my.auc.data
+#     tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
+#     my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
+#                                         regulon.score=regulon.score[,1])
+#     
+#     return(my.choose.regulon)
+#   }
+# }
+# Get.RegulonScore(reduction.method = "tsne",cell.type = 2,regulon = 1,customized = T)
 ##############################
 
-Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
+Plot.cluster2D<-function(customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
   if(!customized){
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
                                          Cell_type=my.object$seurat_clusters)
   }else{
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
                                          Cell_type=as.factor(my.object$Customized.idents))
   }
   p.cluster<-ggplot(my.plot.all.source,
@@ -244,7 +273,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
 }
 
 # test plot cluster function. 
-Plot.cluster2D(reduction.method = "pca",customized = T)
+Plot.cluster2D(customized = T)
 
 # plot CTS-R
 
@@ -280,8 +309,8 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
   
 
 }
-Plot.regulon2D(cell.type=1,regulon=5,customized = T)
-
+Plot.regulon2D(cell.type=3,regulon=5,customized = T)
+Plot.cluster2D(customized = T)
 
 Get.MarkerGene<-function(customized=T){
   if(customized){
