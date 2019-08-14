@@ -274,7 +274,7 @@ Plot.cluster2D<-function(customized=F,...){
   p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
   #p.cluster<-theme_linedraw()
   p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_light()+scale_fill_continuous(name="cell type")
+  p.cluster+theme_light()+scale_fill_continuous(name="cell type") + coord_fixed(1)
   
 }
 
@@ -309,7 +309,7 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #p.cluster<-theme_linedraw()
-  p.regulon<-p.regulon + labs(col="regulon score")
+  p.regulon<-p.regulon + labs(col="regulon score") + coord_fixed(1)
   message("finish!")
   p.regulon
   

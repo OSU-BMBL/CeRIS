@@ -674,7 +674,11 @@ textarea {
 	font-size:14px !important;
 	margin: 1em;
 }
-.regulon_table  > thead{
+#tablePreview table thead{
+    display:block !important;
+}
+
+.dataTables_wrapper > thead{
     display:none;
 }
 #preview_exp {
@@ -762,6 +766,10 @@ font-size:14px;
 border:none;
 margin:3px;
 }
+.regulon_table > thead {
+	display:none;
+}
+
 .table tbody > tr > td.gene-score {
 display:inline-block; 
 font-size:14px;
@@ -774,6 +782,7 @@ overflow-y: auto;
 max-height:250px;
 width:95%;
 padding-top:0px;
+vertical-align:middle;
 }
 
 .table tbody > tr > td.motif-table {

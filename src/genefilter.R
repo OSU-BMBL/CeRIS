@@ -36,24 +36,26 @@ if(is.na(delim)){
   delim <- '\t'
 } else if(delim == 'space'){
   delim <- ' '
-} else {
+} else if(delim == 'semicolon'){
+  delim <- ';'
+}else {
   delim <- ','
 }
 
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
-  # setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
+  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
   #srcFile = "single_cell.csv"
-  srcFile = "iris3_example_expression_matrix.csv"
+  srcFile = "iris3_example_hdf5.h5"
   jobid <- "20190802103754"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'iris3_example_expression_label.csv'
+  label_file<-'1'
   delimiter <- ','
   param_k<-0
-  label_use_sc3 <- 2
+  label_use_sc3 <- 0
 }
 
 ##############################
@@ -89,11 +91,14 @@ if(colnames(expFile)[1] == ""){
 }
 total_gene_num <- nrow(expFile)
 #remove duplicated rows with same gene 
-if(length(which(duplicated.default(expFile[,1]))) > 0 ){
-  expFile <- expFile[-which(duplicated.default(expFile[,1])==T),]
-}	
-rownames(expFile) <- expFile[,1]
-expFile<- expFile[,-1]
+if (upload_type == "CellGene"){
+  if(length(which(duplicated.default(expFile[,1]))) > 0 ){
+    expFile <- expFile[-which(duplicated.default(expFile[,1])==T),]
+  }	
+  rownames(expFile) <- expFile[,1]
+  expFile<- expFile[,-1]
+}
+
 
 total_cell_num <- ncol(expFile)
 thres_genes <- nrow(expFile) * 0.01
@@ -237,82 +242,81 @@ if (label_file == 0 | label_file==1){
   cell_info[,2] <- as.factor(cell_info[,2])
 }
 
-# create a SingleCellExperiment object
-sce <- SingleCellExperiment(
-  assays = list(
-    counts = as.matrix(exp_data),
-    logcounts = log2(as.matrix(exp_data) + 1)
-  ), 
-  colData = cell_info
-)
-
-# define feature names in feature_symbol column
-rowData(sce)$feature_symbol <- rownames(sce)
-# remove features with duplicated names
-sce <- sce[!duplicated(rowData(sce)$feature_symbol), ]
-sce <- sc3_prepare(sce)
-
-if (as.numeric(param_k)>0){
-  sce <- sc3_calc_dists(sce)
-  sce <- sc3_calc_transfs(sce)
-  sce <- sc3_kmeans(sce, ks = as.numeric(param_k))
-} else {
-  sce <- sc3_estimate_k(sce)
-  sce <- sc3_calc_dists(sce)
-  sce <- sc3_calc_transfs(sce)
-  sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
-}
-
-sce <- sc3_calc_consens(sce)
-# get row data for section 5.2 Silhouette Plot
-# silh stores the bar width
-# modify k to the number of cluster
-silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
-#silh[,2] = seq(1:nrow(silh))
-save_image <- function(type,filetype){
-  if(filetype == "jpeg" || filetype == "png"){
-    type(file=paste("saving_plot1.",as.character(filetype),sep=""),width=1200, height=1200)
-  } else if (filetype == "pdf"){
-    type(file=paste("saving_plot1.",as.character(filetype),sep=""))
-  } else if (filetype == "emf"){
-    library(devEMF)
-    emf(file="saving_plot1.emf", emfPlus = FALSE)
-  }
+if(label_use_sc3 == 3){
+  # create a SingleCellExperiment object
+  sce <- SingleCellExperiment(
+    assays = list(
+      counts = as.matrix(exp_data),
+      logcounts = log2(as.matrix(exp_data) + 1)
+    ), 
+    colData = cell_info
+  )
+  
+  # define feature names in feature_symbol column
+  rowData(sce)$feature_symbol <- rownames(sce)
+  # remove features with duplicated names
+  sce <- sce[!duplicated(rowData(sce)$feature_symbol), ]
+  sce <- sc3_prepare(sce)
+  
   if (as.numeric(param_k)>0){
-    sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2]))
+    sce <- sc3_calc_dists(sce)
+    sce <- sc3_calc_transfs(sce)
+    sce <- sc3_kmeans(sce, ks = as.numeric(param_k))
   } else {
-    sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
+    sce <- sc3_estimate_k(sce)
+    sce <- sc3_calc_dists(sce)
+    sce <- sc3_calc_transfs(sce)
+    sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
   }
-  dev.off()
-}
-
-if (label_file == 1){
-  silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
-} else {
-  silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
-}
-
-save_image(pdf,"pdf")
-save_image(emf,"emf")
-save_image(png,"png")
-save_image(jpeg,"jpeg")
-silh_out <- silh_out[order(silh[,1]),]
-write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
-#apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
-
-cell_info <- as.data.frame(colData(sce))
-cell_info <- cbind(rownames(cell_info),cell_info[,ncol(cell_info)])
-colnames(cell_info) <- c("cell_name","label")
-write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+  
+  sce <- sc3_calc_consens(sce)
+  # get row data for section 5.2 Silhouette Plot
+  # silh stores the bar width
+  # modify k to the number of cluster
+  silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
+  #silh[,2] = seq(1:nrow(silh))
+  save_image <- function(type,filetype){
+    if(filetype == "jpeg" || filetype == "png"){
+      type(file=paste("saving_plot1.",as.character(filetype),sep=""),width=1200, height=1200)
+    } else if (filetype == "pdf"){
+      type(file=paste("saving_plot1.",as.character(filetype),sep=""))
+    } else if (filetype == "emf"){
+      library(devEMF)
+      emf(file="saving_plot1.emf", emfPlus = FALSE)
+    }
+    if (as.numeric(param_k)>0){
+      sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2]))
+    } else {
+      sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
+    }
+    dev.off()
+  }
+  
+  if (label_file == 1){
+    silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
+  } else {
+    silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
+  }
+  
+  save_image(pdf,"pdf")
+  save_image(emf,"emf")
+  save_image(png,"png")
+  save_image(jpeg,"jpeg")
+  silh_out <- silh_out[order(silh[,1]),]
+  write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
+  #apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
+  
+  cell_info <- as.data.frame(colData(sce))
+  cell_info <- cbind(rownames(cell_info),cell_info[,ncol(cell_info)])
+  colnames(cell_info) <- c("cell_name","label")
+  write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+  
+} 
 
 if (label_use_sc3 =='2'){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
-  cell_info[,2] <- as.factor(cell_info[,2])
+  cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
 } 
-rownames(cell_info) <- cell_info[,1]
-cell_info <- cell_info[,-1]
-my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
-Idents(my.object)<-as.factor(my.object$Customized.idents)
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
 
 # before PCA, scale data to eliminate extreme value affect.
@@ -320,6 +324,22 @@ all.gene<-rownames(my.object)
 my.object<-ScaleData(my.object,features = all.gene)
 # after scaling, perform PCA
 my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+
+if (label_use_sc3 =='0' | label_use_sc3 =='1'){
+  my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+  my.object<-FindClusters(my.object)
+  cell_info <-  my.object$seurat_clusters
+  cell_label <- cbind(cell_names,cell_info)
+  colnames(cell_label) <- c("cell_name","label")
+  write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+  write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+} else {
+  rownames(cell_info) <- cell_info[,1]
+  cell_info <- cell_info[,-1]
+}
+
+my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
+Idents(my.object)<-as.factor(my.object$Customized.idents)
 
 ###########################################
 # CORE part: Run TSNE and UMAP######################
@@ -330,12 +350,10 @@ my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
-#my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+
 # find clustering, there will be changing the default cell type, if want to use customized cell type. 
 # use Idents() function.
 
-
-#my.object<-FindClusters(my.object)
 
 Get.MarkerGene<-function(my.object, customized=T){
   if(customized){

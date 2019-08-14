@@ -55,10 +55,7 @@ Plot.cluster2D<-function(customized=F,...){
 
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
-  my.rowname<-rownames(my.object@data)
-  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
-  # my.object@data stores normalized data
-  tmp.regulon<-my.object@data[,][gene.index,]
+  tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
   return(tmp.regulon)
 }
 
