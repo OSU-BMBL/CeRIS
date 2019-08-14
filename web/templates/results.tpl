@@ -381,7 +381,7 @@ $(document).ready(function() {
                                     <p id="species">Species: {{$species}} {{$main_species}}{{if $second_species != ''}},{{/if}} {{$second_species}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p>Number of cells: {{$total_label}}</p>
+                                    <p>Number of cells: {{$total_cell_num}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of genes: {{$total_gene_num}}</p>
