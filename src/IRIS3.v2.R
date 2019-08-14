@@ -1,3 +1,4 @@
+
 # set working directory, you may change the directory first.
 setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2.Yan/")
 # loading required packege
@@ -44,6 +45,11 @@ if (!require("scran")) {
   BiocManager::install("scran")
   library(scran)
 }
+if (!require("slingshot")){
+  BiocManager::install("kstreet13/slingshot")
+  library(slingshot)
+}
+
 #pre-optional
 options(stringsAsFactors = F)
 options(check.names = F)
@@ -343,7 +349,7 @@ write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = 
 Plot.cluster2D(reduction.method = "tsne",customized = T,cell.type=2)# "tsne" ,"pca","umap"
 Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)  
 
-
+# trajectory with slingshot. 
 
 
 
