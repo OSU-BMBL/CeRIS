@@ -388,10 +388,10 @@ Plot.Cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NU
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   my.classification.color<-as.character(palette36.colors(36))[-2]
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),pch=20,asp=1)
-  lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=T)
+  lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=show.constraints)
 
 }
-Plot.Cluster.Trajectory(start.cluster=1,end.cluster=7,show.constraints=T)
+Plot.Cluster.Trajectory(start.cluster=1,end.cluster=3,show.constraints=F)
 
 Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
@@ -405,7 +405,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1)
   lines(SlingshotDataSet(tmp.trajectory.cluster))
 }
-Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = 1,end.cluster = 7)
+Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = NULL,end.cluster = NULL)
 
 ######color indicator#############################################
 color.bar <- function(val, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), title='') {
