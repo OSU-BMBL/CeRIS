@@ -293,7 +293,7 @@ if ($silh_file) {
     // error opening the file.
 } 
 } else {
-	print_r("Silh file not found");
+	//print_r("Silh file not found");
 }
 if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 	$sankey_file = fopen("$DATAPATH/$jobid/$jobid"."_sankey.txt", "r");
@@ -549,6 +549,7 @@ $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
+$smarty->setCacheLifetime(3600000);
 $smarty->display('results.tpl');
 #print_r($regulon_motif_file);
 ?>
