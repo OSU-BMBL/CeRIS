@@ -58,7 +58,7 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #p.cluster<-theme_linedraw()
-  p.regulon<-p.regulon+theme_light() + labs(col="regulon score") +coord_fixed(1)
+  p.regulon<-p.regulon+theme_light() + labs(col="regulon score") + coord_fixed(1)
   #message("finish!")
   p.regulon
 }
