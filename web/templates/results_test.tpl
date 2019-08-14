@@ -10,15 +10,17 @@
 <script>
 var flag = [];
 $(document).ready(function() {
-	$('.regulon_table').DataTable({
-	"aaSorting": []
-	})
-    document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
-    $('#tablePreview').DataTable({
+	
+	$('#tablePreview').DataTable({
         "searching": false,
         "paging": false,
         "bInfo": false,
     })
+	$('.regulon_table').DataTable({
+	"aaSorting": []
+	})
+    document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
+    
 
     $("#to_enrichr").click(function() {
         get_gene_list(1, 2);
@@ -258,7 +260,6 @@ $(document).ready(function() {
 	document.getElementById(table_id).innerHTML = ""
 	}
 	function show_gene_tsne(item) {
-	console.log($(item).attr("id"))
 	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
 	ct_id= regulon_id.substring(
     regulon_id.lastIndexOf("CT") + 2, 
@@ -279,7 +280,10 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML += '<div class="col-sm-6"><p>t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p> '+ gene_symbol +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
+		let tmp = document.getElementById(table_id).innerHTML
+		console.log(tmp)
+		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p> '+ gene_symbol +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
+		console.log(document.getElementById(table_id).innerHTML)
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -377,7 +381,7 @@ $(document).ready(function() {
                                     <p id="species">Species: {{$species}} {{$main_species}}{{if $second_species != ''}},{{/if}} {{$second_species}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
-                                    <p>Number of cells: {{$total_label}}</p>
+                                    <p>Number of cells: {{$total_cell_num}}</p>
                                 </div>
                                 <div class="form-group col-md-4 col-sm-4">
                                     <p>Number of genes: {{$total_gene_num}}</p>
@@ -1258,7 +1262,6 @@ $(document).ready(function() {
     <script src='assets/js/hzome_functions.js'></script>
     <script src='assets/js/send_to_Enrichr.js'></script>
     <script src='assets/js/load_clustergram.js'></script>
-	<script src="assets/js/jquery.simplePagination.js" ></script>
     <script>
 
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
