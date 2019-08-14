@@ -384,14 +384,27 @@ Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NUL
   return(my.trajectory)
 }
 
-Plot.Cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
+Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   my.classification.color<-as.character(palette36.colors(36))[-2]
+  par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),pch=20,asp=1)
-  lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=show.constraints)
-
+  
+  tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),Color=my.classification.color[tmp.trajectory.cluster$cell.label])
+  tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
+  # add legend
+  legend("topright",legend = tmp.color.cat$CellName,
+         inset=c(-0.2,0),
+         col = tmp.color.cat$Color,pch = 20,
+         cex=0.8,title="cluster",bty='n')
+  if(add.line==T){
+    lines(SlingshotDataSet(tmp.trajectory.cluster), 
+          lwd=1,pch=3, col=alpha('black',0.7),
+          type="l",show.constraints=show.constraints)
+  }
 }
-Plot.Cluster.Trajectory(start.cluster=1,end.cluster=3,show.constraints=F)
+
+Plot.Cluster.Trajectory(start.cluster=1,add.line = T,end.cluster=3,show.constraints=T)
 
 Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
