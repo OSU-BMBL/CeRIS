@@ -391,10 +391,10 @@ Plot.Cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NU
   lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=T)
 
 }
-Plot.Cluster.Trajectory()
+Plot.Cluster.Trajectory(start.cluster=1,end.cluster=7,show.constraints=T)
 
-Get.regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,...){
-  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized)
+Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
+  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
   tmp.cell.name<-names(tmp.trajectory.cluster$cell.label)
   tmp.cell.name.index<-match(tmp.cell.name,rownames(tmp.regulon.score))
@@ -402,10 +402,10 @@ Get.regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,...){
   val<-tmp.regulon.score$regulon.score
   grPal<-colorRampPalette(c('grey','red'))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
-  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=tmp.color,pch=20,asp=1)
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1)
   lines(SlingshotDataSet(tmp.trajectory.cluster))
 }
-Get.regulon.Trajectory(cell.type = 7,regulon = 1)
+Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = 1,end.cluster = 7)
 
 ######color indicator#############################################
 color.bar <- function(val, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), title='') {
@@ -421,6 +421,8 @@ color.bar <- function(val, min, max=-min, nticks=11, ticks=seq(min, max, len=nti
 
 val.around<- round(val,digits = 1)
 color.bar(val.around,min=min(val.around),max=max(val.around))
+
+
 
 ###########################
 ###########################
