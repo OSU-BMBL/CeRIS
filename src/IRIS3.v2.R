@@ -1,7 +1,8 @@
 # set working directory, you may change the directory first.
-setwd("/home/cyz/Bigstore/BigData/analysis_work/IRIS3/DataTest/scRNA-Seq/2.Yan/")
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2.Yan/")
 # loading required packege
-library(Seurat,lib.loc = "~/R/x86_64-pc-linux-gnu-library/3.6/Seurat/Seurat.v.3.0")
+library(Seurat,lib.loc = "/users/PAS1475/cyz931123/R/Seurat/Seurat3.0/")
+
 if(!require(hdf5r)) {
   install.packages("hdf5r")
 } 
@@ -19,17 +20,33 @@ if (!require("Polychrome")) {
   install.packages("Polychrome")
   library(Polychrome)
 }
-if (!require("AUCell")) {
-  BiocManager::install("AUCell")
-  library(AUCell)
-}
+# if (!require("AUCell")) {
+#   BiocManager::install("AUCell")
+#   library(AUCell)
+# }
 if (!require("dplyr")) {
   install.packages("dplyr")
   library(dplyr)
 }
+# if(!require("Rmagic")){
+#   install.packages("Rmagic")
+#   library("Rmagic")
+#   install.magic(envname = "r-reticulate", 
+#                 method = "auto",
+#                 conda = "auto", pip = TRUE)
+# }
+if(!require("DrImpute")){
+  install.packages("DrImpute")
+  library("DrImpute")
+}
 
+if (!require("scran")) {
+  BiocManager::install("scran")
+  library(scran)
+}
 #pre-optional
 options(stringsAsFactors = F)
+options(check.names = F)
 ##############################
 # define a fucntion for reading in 10X hd5f data and cell gene matrix by input (TenX) or (CellGene)
 read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
@@ -79,11 +96,11 @@ dim(my.object)
 ##################################
 # export data from seurat object.#
 ##################################
-my.expression.data<-GetAssayData(object = my.object,slot = "counts")
-write.table(my.expression.data,
-            file = "RNA_RAW_EXPRESSION.txt",
-            quote = F,
-            sep = "\t")
+# my.expression.data<-GetAssayData(object = my.object,slot = "counts")
+# write.table(my.expression.data,
+#             file = "RNA_RAW_EXPRESSION.txt",
+#             quote = F,
+#             sep = "\t")
 #################################
 
 # Key part for customizing cell type: 
@@ -99,8 +116,28 @@ my.object<-AddMetaData(my.object,my.meta.info,col.name = "Customized.idents")
 Idents(my.object)
 # activate customized cell type info
 Idents(my.object)<-as.factor(my.object$Customized.idents)
-############################################## normalize data 
-my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+# get raw data################################  
+my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
+# normalization##############################
+sce<-SingleCellExperiment(list(counts=my.count.data))
+is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
+if (is.ercc.empty(sce)){
+  isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
+  sce<-computeSpikeFactors(sce)
+} else {sce<-computeSumFactors(sce)}
+
+sce<-scater::normalize(sce,return_log=F)
+
+my.normalized.data <-sce@assays@.xData$data@listData$normcounts
+# imputation#################################
+
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
+colnames(my.imputated.data)<-colnames(my.count.data)
+rownames(my.imputated.data)<-rownames(my.count.data)
+my.imputated.data<- as.sparse(my.imputated.data)
+my.imputatedLog.data<-log1p(my.imputated.data)
+my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
+#my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
 # find high variable gene
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
 # before PCA, scale data to eliminate extreme value affect.

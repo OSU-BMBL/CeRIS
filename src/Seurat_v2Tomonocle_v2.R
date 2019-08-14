@@ -1,5 +1,5 @@
 # set working directory, you may change the directory first.
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/1.Biase/")
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2.Yan/")
 # loading required packege
 # loading Seurat version 2, you need reinstall the version 2
 
