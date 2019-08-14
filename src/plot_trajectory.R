@@ -1,9 +1,9 @@
 #######  Plot regulon ##########
 #
 #library(Seurat)
-#library(RColorBrewer)
-#library(Polychrome)
-#library(ggplot2)
+library(RColorBrewer)
+library(Polychrome)
+library(ggplot2)
 
 args <- commandArgs(TRUE) 
 #setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
@@ -15,35 +15,48 @@ srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
 
-Plot.TrajectoryByCellType<-function(customized=T){
-  if (customized==TRUE){
-    g<-plot_cell_trajectory(cds,color_by = "Customized.idents")
+Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
+  #labeling cell
+  if(customized==TRUE){
+    tmp.cell.type<-my.object$Customized.idents
   }
-  if (customized==FALSE){
-    tmp.colname.phenoData<-colnames(cds@phenoData@data)
-    color_by<-grep("^res.*",tmp.colname.phenoData,value = T)[1]
-    g<-plot_cell_trajectory(cds,color_by = color_by,cell_size = 2)
+  if(customized==FALSE){
+    tmp.cell.type<-my.object$seurat_clusters
   }
-  g+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+  tmp.cell.name.index<-match(colnames(my.trajectory),names(tmp.cell.type))
+  tmp.cell.type<-tmp.cell.type[tmp.cell.name.index]
+  colData(my.trajectory)$cell.label<-tmp.cell.type
+  # run trajectory, first run the lineage inference
+  my.trajectory <- slingshot(my.trajectory, clusterLabels = 'cell.label', reducedDim = 'DiffMap',
+                             start.clus=start.cluster,end.clus=end.cluster)
+  #summary(my.trajectory$slingPseudotime_1)
+  return(my.trajectory)
 }
 
-Plot.TrajectoryByRegulon<-function(cell.type=1,regulon=1){
-  tmp.FileList<-list.files(pattern = "regulon_activity_score")
-  tmp.RegulonScore<-read.delim(tmp.FileList[cell.type],sep = "\t",check.names = F)[regulon,]
-  tmp.NameIndex<-match(rownames(cds@phenoData@data),names(tmp.RegulonScore))
-  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
-  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
-  cds@phenoData@data$RegulonScore<-tmp.RegulonScore.Numeric
-  plot_cell_trajectory(cds,color_by = "RegulonScore",cell_size = 2)+ scale_color_gradient(low = "grey",high = "red")
+Plot.Cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
+  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
+  my.classification.color<-as.character(palette36.colors(36))[-2]
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),pch=20,asp=1)
+  lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=T)
+  
 }
 
+Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
+  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
+  tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
+  tmp.cell.name<-names(tmp.trajectory.cluster$cell.label)
+  tmp.cell.name.index<-match(tmp.cell.name,rownames(tmp.regulon.score))
+  tmp.regulon.score<-tmp.regulon.score[tmp.cell.name.index,]
+  val<-tmp.regulon.score$regulon.score
+  grPal<-colorRampPalette(c('grey','red'))
+  tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1)
+  lines(SlingshotDataSet(tmp.trajectory.cluster)) 
+}
 
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
-  my.rowname<-rownames(my.object@data)
-  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
-  # my.object@data stores normalized data
-  tmp.regulon<-my.object@data[,][gene.index,]
+  tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
   return(tmp.regulon)
 }
 
@@ -108,10 +121,10 @@ if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
   #Plot.cluster2D(reduction.method = "tsne",customized = T)
   #Plot.TrajectoryByCellType(customized = T)
   if(!exists("cds")){
-    library(monocle)
-    cds <- readRDS("monocle_obj.rds")
+    library(slingshot)
+    cds <- readRDS("trajectory_obj.rds")
   }
-  plot_cell_trajectory(cds,color_by="Customized.idents")
+  Plot.Cluster.Trajectory(start.cluster=1,end.cluster=7,show.constraints=T)
 }
 quiet(dev.off())
 
@@ -119,9 +132,11 @@ png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=1600, height=1200,r
 if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
   if(!exists("cds")){
     library(monocle)
-    cds <- readRDS("monocle_obj.rds")
+    cds <- readRDS("trajectory_obj.rds")
   }
-  Plot.TrajectoryByRegulon(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id))
+  
+  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = 1,end.cluster = 7)
+  
 }
 quiet(dev.off())
 
