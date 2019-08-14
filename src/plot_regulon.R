@@ -16,54 +16,56 @@ id <- args[2]
 jobid <- args[3]
 
 
-Plot.cluster2D<-function(customized=F,...){
+Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  tmp.dim<-as.data.frame(my.object@dr$tsne@cell.embeddings)
-  tmp.MatchIndex<- match(my.object@cell.names,rownames(tmp.dim))
-  tmp.dim<-tmp.dim[tmp.MatchIndex,]
-  if(customized==FALSE){
-    tmp.colname<-grep("^res.",colnames(my.object@meta.data),value = T)[1]
-    my.plot.all.source<-cbind.data.frame(tmp.dim,
-                                         Cell_type=my.object@meta.data[,tmp.colname])
+  if(!customized){
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+                                         Cell_type=my.object$seurat_clusters)
   }else{
-    my.plot.all.source<-cbind.data.frame(tmp.dim,
-                                         Cell_type=as.factor(my.object@meta.data$Customized.idents))
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+                                         Cell_type=as.factor(my.object$Customized.idents))
   }
   p.cluster<-ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
   p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
   #p.cluster<-theme_linedraw()
-  p.cluster<-p.cluster+labs(col="cell type")+theme_light()+scale_fill_continuous(name="cell type")+coord_fixed(1)
-  p.cluster
+  p.cluster<-p.cluster + labs(col="cell type")
+  p.cluster+theme_light()+scale_fill_continuous(name="cell type")+coord_fixed(1)
+  
 }
-# test Get.RegulonScore, output is matrix
 
 
-
-Plot.regulon2D<<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=F,...){
+Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=F,...){
   #message("plotting regulon ",regulon," of cell type ",cell.type,"...")
-  tmp.FileList<-list.files(pattern = "regulon_activity_score")
-  tmp.RegulonScore<-read.delim(tmp.FileList[cell.type],sep = "\t",check.names = F)[regulon,]
-  tmp.NameIndex<-match(rownames(my.object@dr$tsne@cell.embeddings),names(tmp.RegulonScore))
-  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
-  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
-  my.plot.regulon<-cbind.data.frame(my.object@dr$tsne@cell.embeddings,regulon.score=tmp.RegulonScore.Numeric)
+  my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
+                                    cell.type = cell.type,
+                                    regulon = regulon,
+                                    customized = customized)
+  # if(!customized){
+  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+  #                                        Cell_type=my.object$seurat_clusters)
+  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
+  # }else{
+  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+  #                                        Cell_type=as.factor(my.object$Customized.idents))
+  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
+  # }
+  # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
+  # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
   p.regulon<-ggplot(my.plot.regulon,
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #p.cluster<-theme_linedraw()
-  p.regulon<-p.regulon +theme_light()+labs(col="regulon score")+ coord_fixed(1)
+  p.regulon<-p.regulon+theme_light() + labs(col="regulon score") +coord_fixed(1)
   #message("finish!")
   p.regulon
 }
+
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
-  my.rowname<-rownames(my.object@data)
-  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
-  # my.object@data stores normalized data
-  tmp.regulon<-my.object@data[,][gene.index,]
+  tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
   return(tmp.regulon)
 }
 
@@ -77,6 +79,7 @@ Get.CellType<-function(cell.type=NULL,...){
   }else{stop("please input a cell type")}
   
 }
+
 
 
 Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
@@ -103,34 +106,6 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
     tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
     my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type)
     my.choose.regulon <- cbind(my.choose.regulon, regulon.score=regulon.score[match(rownames(my.choose.regulon), rownames(regulon.score))])
-    
-    return(my.choose.regulon)
-  }
-}
-Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
-  my.regulon.number<-length(Get.CellType(cell.type = cell.type))
-  if (regulon > my.regulon.number){
-    stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
-  } else {
-    my.cts.regulon.S4<-Generate.Regulon(cell.type = cell.type,regulon=regulon)
-    if(customized){
-      my.cell.type<-my.cts.regulon.S4$Customized.idents
-      message(c("using customized cell label: ","|", paste0(unique(as.character(my.cts.regulon.S4$Customized.idents)),"|")))
-    }else{
-      my.cell.type<-my.cts.regulon.S4$seurat_clusters
-      message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
-    } 
-    tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
-    geneSets<-list(GeneSet1=rownames(tmp_data))
-    #cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
-    #cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
-    #my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
-    #my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
-    # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
-    regulon.score<-t(as.matrix(activity_score[regulon,]))
-    tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
-    my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
-                                        regulon.score=regulon.score[,1])
     
     return(my.choose.regulon)
   }
