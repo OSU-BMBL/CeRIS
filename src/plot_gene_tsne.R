@@ -16,33 +16,30 @@ gene_symbol <- args[2]
 jobid <- args[3]
 
 Plot.GeneTSNE<-function(gene.name=NULL){
-  tmp.gene.expression<- my.object@data
-  tmp.dim<-as.data.frame(my.object@dr$tsne@cell.embeddings)
-  tmp.MatchIndex<- match(my.object@cell.names,rownames(tmp.dim))
+  tmp.gene.expression<- my.object@assays$RNA@data
+  tmp.dim<-as.data.frame(my.object@reductions$tsne@cell.embeddings)
+  tmp.MatchIndex<- match(colnames(tmp.gene.expression),rownames(tmp.dim))
   tmp.dim<-tmp.dim[tmp.MatchIndex,]
   tmp.gene.name<-paste0("^",gene.name,"$")
   tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
   g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
-  g<-g+theme_light()+labs(color=paste0(gene.name,"\nexpression\nvalue"))+coord_fixed(1)
+  g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
 
-Plot.cluster2D<-function(customized=F,...){
+
+Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  tmp.dim<-as.data.frame(my.object@dr$tsne@cell.embeddings)
-  tmp.MatchIndex<- match(my.object@cell.names,rownames(tmp.dim))
-  tmp.dim<-tmp.dim[tmp.MatchIndex,]
-  if(customized==FALSE){
-    tmp.colname<-grep("^res.",colnames(my.object@meta.data),value = T)[1]
-    my.plot.all.source<-cbind.data.frame(tmp.dim,
-                                         Cell_type=my.object@meta.data[,tmp.colname])
+  if(!customized){
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+                                         Cell_type=my.object$seurat_clusters)
   }else{
-    my.plot.all.source<-cbind.data.frame(tmp.dim,
-                                         Cell_type=as.factor(my.object@meta.data$Customized.idents))
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+                                         Cell_type=as.factor(my.object$Customized.idents))
   }
   p.cluster<-ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
@@ -52,6 +49,8 @@ Plot.cluster2D<-function(customized=F,...){
   p.cluster+theme_light()+scale_fill_continuous(name="cell type")+coord_fixed(1)
   
 }
+
+
 
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
@@ -100,7 +99,6 @@ Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customi
     return(my.choose.regulon)
   }
 }
-
 quiet <- function(x) {
   sink(tempfile()) 
   on.exit(sink()) 

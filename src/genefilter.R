@@ -19,6 +19,9 @@ suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(DrImpute))
 suppressPackageStartupMessages(library(scran))
 suppressPackageStartupMessages(library(slingshot))
+suppressPackageStartupMessages(library(destiny))
+suppressPackageStartupMessages(library(gam))
+
 
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
@@ -48,18 +51,20 @@ if(is.na(delim)){
 
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
+  # 
+  # setwd("C:/Users/wan268/Documents/iris3_data/MM")
   # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
-  #srcFile = "single_cell.csv"
-  srcFile = "iris3_example_hdf5.h5"
-  jobid <- "20190802103754"
-  delim <- ","
+  #srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
+  srcFile = "GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
+  jobid <- "20190814172441"
+  delim <- "\t"
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'1'
-  delimiter <- ','
+  label_file<-'label-GSE110499.txt'
+  delimiter <- '\t'
   param_k<-0
-  label_use_sc3 <- 0
+  label_use_sc3 <- 2
 }
 
 ##############################
@@ -106,8 +111,7 @@ if (upload_type == "CellGene"){
 }
 
 total_cell_num <- ncol(expFile)
-thres_genes <- nrow(expFile) * 0.01
-thres_cells <- ncol(expFile) * 0.05
+
 
 # detect rownames gene list with identifer by the largest number of matches: 1) gene symbol 2)ensembl geneid 3) ncbi entrez id
 
@@ -186,22 +190,7 @@ filter_cell_func <- function(this){
   }
 }
 
-# apply gene filtering
-if(is_gene_filter == "1"){
-  gene_index <- as.vector(apply(expFile, 1, filter_gene_func))
-  my.object <- expFile[which(gene_index == 1),]
-} else {
-  my.object <- expFile
-}
-# apply cell filtering
-if(is_cell_filter == "1"){
-  cell_index <- as.vector(apply(my.object, 2, filter_cell_func))
-  my.object <- my.object[,which(cell_index == 1)]
-} 
-
-cell_names <- colnames(my.object)
-# normalization using Seurat
-my.object<-CreateSeuratObject(my.object)
+my.object<-CreateSeuratObject(expFile)
 #my.object<-GetAssayData(object = my.object,slot = "counts")
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 sce<-SingleCellExperiment(list(counts=my.count.data))
@@ -211,18 +200,37 @@ if (is.ercc.empty(sce)){
   sce<-computeSpikeFactors(sce)
 } else {sce<-computeSumFactors(sce)}
 
-sce<-scater::normalize(sce,return_log=F)
+which(as.matrix(my.count.data) < 0)
 
-my.normalized.data <-sce@assays@.xData$data@listData$normcounts
+my.normalized.data <-normcounts(sce)
 #my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
 
 
-my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data) )
 colnames(my.imputated.data)<-colnames(my.count.data)
 rownames(my.imputated.data)<-rownames(my.count.data)
 my.imputated.data<- as.sparse(my.imputated.data)
 my.imputatedLog.data<-log1p(my.imputated.data)
+
+thres_genes <- nrow(my.imputatedLog.data) * 0.01
+thres_cells <- ncol(my.imputatedLog.data) * 0.05
+# apply gene filtering
+if(is_gene_filter == "1"){
+  gene_index <- as.vector(apply(my.imputatedLog.data, 1, filter_gene_func))
+  my.imputatedLog.data <- my.imputatedLog.data[which(gene_index == 1),]
+  expFile <- expFile[which(gene_index == 1),]
+} 
+# apply cell filtering
+if(is_cell_filter == "1"){
+  cell_index <- as.vector(apply(my.imputatedLog.data, 2, filter_cell_func))
+  my.imputatedLog.data <- my.imputatedLog.data[,which(cell_index == 1)]
+  expFile <- expFile[,which(cell_index == 1)]
+} 
+dim(my.imputatedLog.data)
+dim(expFile)
+my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
+cell_names <- colnames(my.imputatedLog.data)
 
 # calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
@@ -236,8 +244,6 @@ if(filter_cell_num == 0){
 
 
 exp_data <- GetAssayData(object = my.object,slot = "data")
-#exp_data <- log1p(exp_data)
-colnames(exp_data) <- cell_names
 #write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(jobid,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_gene_num,",as.character(total_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
@@ -263,7 +269,7 @@ if (label_file == 0 | label_file==1){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   cell_info[,2] <- as.factor(cell_info[,2])
 }
-
+## sc3 disabled
 if(label_use_sc3 == 3){
   # create a SingleCellExperiment object
   sce <- SingleCellExperiment(
@@ -353,6 +359,7 @@ write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.name
 
 if (label_use_sc3 =='2'){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
+  original_cell_info <- as.factor(cell_info[,2])
   cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
   rownames(cell_info) <- cell_info[,1]
   cell_info <- cell_info[,-1]
@@ -421,3 +428,15 @@ saveRDS(my.object,file="seurat_obj.rds")
 #cds<-orderCells(cds)
 #saveRDS(cds,file="monocle_obj.rds")
 ###### Remove Monocle trajectory ###########
+
+
+my.trajectory<-SingleCellExperiment(assays=List(counts=GetAssayData(object = my.object[['RNA']],slot="counts")))
+SummarizedExperiment::assays(my.trajectory)$norm<-exp_data
+
+pca <- prcomp(t(SummarizedExperiment::assays(my.trajectory)$norm), scale. = FALSE)
+rd1 <- pca$x[,1:2]
+dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
+rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
+reducedDims(my.trajectory) <- SimpleList(PCA = rd1, DiffMap = rd2)
+saveRDS(my.trajectory,file="trajectory_obj.rds")
+

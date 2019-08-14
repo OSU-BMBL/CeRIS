@@ -46,7 +46,7 @@ if (!require("scran")) {
   library(scran)
 }
 if (!require("slingshot")){
-  BiocManager::install("kstreet13/slingshot")
+  BiocManager::install("slingshot")
   library(slingshot)
 }
 if (!require("destiny")){
@@ -453,7 +453,7 @@ Plot.GeneTSNE<-function(gene.name=NULL){
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
   g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
-  g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue"))
+  g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
 Plot.GeneTSNE("CA8")
