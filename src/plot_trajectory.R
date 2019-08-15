@@ -120,22 +120,32 @@ png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=1600, height=1
 if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
   #Plot.cluster2D(reduction.method = "tsne",customized = T)
   #Plot.TrajectoryByCellType(customized = T)
-  if(!exists("cds")){
+  if(!exists("my.trajectory")){
     library(slingshot)
-    cds <- readRDS("trajectory_obj.rds")
+    library(Seurat)
+    library(SummarizedExperiment)
+    suppressPackageStartupMessages(library(destiny))
+    suppressPackageStartupMessages(library(gam))
+    my.trajectory <- readRDS("trajectory_obj.rds")
+    my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.Cluster.Trajectory(start.cluster=1,end.cluster=7,show.constraints=T)
+  Plot.Cluster.Trajectory(start.cluster=NULL,end.cluster=NULL,show.constraints=T)
 }
 quiet(dev.off())
 
 png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=1600, height=1200,res = 300)
 if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
-  if(!exists("cds")){
-    library(monocle)
-    cds <- readRDS("trajectory_obj.rds")
+  if(!exists("my.trajectory")){
+    library(slingshot)
+    library(Seurat)
+    library(SummarizedExperiment)
+    suppressPackageStartupMessages(library(destiny))
+    suppressPackageStartupMessages(library(gam))
+    my.trajectory <- readRDS("trajectory_obj.rds")
+    my.object <- readRDS("seurat_obj.rds")
   }
   
-  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = 1,end.cluster = 7)
+  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = 1,end.cluster = 1)
   
 }
 quiet(dev.off())
