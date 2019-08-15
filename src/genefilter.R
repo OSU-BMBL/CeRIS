@@ -6,7 +6,7 @@ options(check.names=F)
 
 #library(GenomicAlignments)
 #library(ensembldb)
-#BiocManager::install("SC3")
+#BiocManager::install("scran")
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(hdf5r))
 suppressPackageStartupMessages(library(stringr))
@@ -53,7 +53,7 @@ load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
   # setwd("C:/Users/wan268/Documents/iris3_data/MM")
-  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
+  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190814191406")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
   #srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
@@ -191,46 +191,49 @@ filter_cell_func <- function(this){
 }
 
 my.object<-CreateSeuratObject(expFile)
-#my.object<-GetAssayData(object = my.object,slot = "counts")
+# get raw data################################  
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
-my.imputated.data <- DrImpute(as.matrix(my.count.data))
-colnames(my.imputated.data)<-colnames(my.count.data)
-rownames(my.imputated.data)<-rownames(my.count.data)
-my.imputated.data<- as.sparse(my.imputated.data)
-
-sce<-SingleCellExperiment(list(counts=my.imputated.data))
+# normalization##############################
+sce<-SingleCellExperiment(list(counts=my.count.data))
 is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
 if (is.ercc.empty(sce)){
   isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
   sce<-computeSpikeFactors(sce)
 } else {
-  sce<-computeSumFactors(sce)
+  sce<-computeSumFactors(sce, sizes=seq(21, 201, 5))
 }
 
-#my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
-sce <- scater::normalize(sce,return_log=F)
+sce<-scater::normalize(sce,return_log=F)
 my.normalized.data <-normcounts(sce)
-my.normalized.data<-log1p(my.normalized.data)
 
-thres_genes <- nrow(my.normalized.data) * 0.01
-thres_cells <- ncol(my.normalized.data) * 0.05
+# imputation#################################
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
+colnames(my.imputated.data)<-colnames(my.count.data)
+rownames(my.imputated.data)<-rownames(my.count.data)
+my.imputated.data<- as.sparse(my.imputated.data)
+my.imputatedLog.data<-log1p(my.imputated.data)
+
+thres_genes <- nrow(my.imputatedLog.data) * 0.01
+thres_cells <- ncol(my.imputatedLog.data) * 0.05
+
 # apply gene filtering
 if(is_gene_filter == "1"){
-  gene_index <- as.vector(apply(my.normalized.data, 1, filter_gene_func))
-  my.normalized.data <- my.normalized.data[which(gene_index == 1),]
+  gene_index <- as.vector(apply(my.imputatedLog.data, 1, filter_gene_func))
+  my.imputatedLog.data <- my.imputatedLog.data[which(gene_index == 1),]
   expFile <- expFile[which(gene_index == 1),]
 } 
 # apply cell filtering
 if(is_cell_filter == "1"){
-  cell_index <- as.vector(apply(my.normalized.data, 2, filter_cell_func))
-  my.normalized.data <- my.normalized.data[,which(cell_index == 1)]
+  cell_index <- as.vector(apply(my.imputatedLog.data, 2, filter_cell_func))
+  my.imputatedLog.data <- my.imputatedLog.data[,which(cell_index == 1)]
   expFile <- expFile[,which(cell_index == 1)]
 } 
-dim(my.normalized.data)
+
+dim(my.imputatedLog.data)
 dim(expFile)
-my.object <- 0 
+
 my.object<-CreateSeuratObject(expFile)
-my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.normalized.data,assay="RNA")
+my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
 cell_names <- colnames(my.normalized.data)
 
 # calculate filtering rate
