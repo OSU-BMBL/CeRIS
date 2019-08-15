@@ -371,14 +371,13 @@
     font-size: 13px;
     font-weight: normal;
 }
-
+/*
 .tooltip-inner {
     max-width: 400px !important;
-    /* If max-width does not work, try using width instead */
     width: 400px ; 
 	text-align: justify !important;
 }
-
+*/
 .dropdown-toggle {
 	max-height: 2em !important;
     /* If max-width does not work, try using width instead */
@@ -733,10 +732,14 @@ textarea {
 .py-1 {padding-bottom:.5rem!important;padding-top:.5rem!important;}
 .w-100 {width:100%!important;}
 .highlight { font-weight: 500; font-style: normal; color: #2775b6; }
+.table>tbody>tr>td {
+	vertical-align: middle !important;
+}
 .table tbody > tr > td.vert-aligned {
 	border:none;
 	width:17% !important;
 	max-width:17% !important;
+	vertical-align: top !important;
 }
 
 .table tbody > tr > td >button.extra-button {
@@ -746,7 +749,7 @@ textarea {
 }
 
 .table tbody > tr > td >button.gene-button {
-	width:50%;
+	/*width:50%;*/
 }
 
 .regulon-heading {
@@ -775,7 +778,9 @@ display:inline-block;
 font-size:14px;
 border:none;
 }
-
+.veritcal-tbody{
+	vertical-align:middle !important;
+}
 .table tbody > tr > td.gene-table {
 display:inline-block; 
 overflow-y: auto;
