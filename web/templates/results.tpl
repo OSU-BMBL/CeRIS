@@ -2,7 +2,6 @@
 
 <!-- Latest compiled and minified plotly.js JavaScript -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
 <!-- OR use a specific plotly.js release (e.g. version 1.5.0)
 <script src="https://cdn.plot.ly/plotly-1.5.0.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script> -->
@@ -20,8 +19,6 @@ $(document).ready(function() {
 	"aaSorting": []
 	})
     document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
-    
-
     $("#to_enrichr").click(function() {
         get_gene_list(1, 2);
     });
@@ -29,18 +26,18 @@ $(document).ready(function() {
     flag.push("#container-id-1")
 
     function arrayContains(needle, arrhaystack) {
-        return (arrhaystack.indexOf(needle) > -1);
+        return (arrhaystack.indexOf(needle) > -1)
     }
 
     $('a[tabtype="main"]').on('shown.bs.tab', function(e) {
         var json_file = $(e.target).attr("json")
         var root_id = $(e.target).attr("root")
         if (!arrayContains(root_id, flag)) {
-            make_clust_main(json_file, root_id);
+            make_clust_main(json_file, root_id)
             flag.push(root_id)
             //var element_group = document.getElementsByClassName('row_slider_group');
             //for (i in element_group)
-            //	i.style.display='none';
+            //	i.style.display='none'
         }
     });
     $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
@@ -53,10 +50,11 @@ $(document).ready(function() {
             flag.push(root_id)
         }
     });
+
 });
 	function show_peak_table(item){
 		match_id = $(item).attr("id").match(/\d+/gm)
-		regulon_id = $(item).attr("id").substring(8);
+		regulon_id = $(item).attr("id").substring(8)
 		table_id = "table-"+regulon_id
 		species = document.getElementById("species").innerHTML
 		match_species =  species.match(/[^Species: ].+/gm)[0]
@@ -89,7 +87,7 @@ $(document).ready(function() {
 						{
 							data = '<a  href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=' +row[6]+ '" target="_blank">'+data +'</a>';
 						}
-						return data;
+						return data
 					}
 				},{
                 "targets": [6],
@@ -103,10 +101,10 @@ $(document).ready(function() {
 						{
 							res=data.split(" ")
 							for(i=0;i < res.length;i++) {
-								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>';
+								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>'
 							}
 						}
-						return dat;
+						return dat
 					}
 				}
 				],
@@ -119,7 +117,7 @@ $(document).ready(function() {
 	
 	function show_tad_table(item){
 		match_id = $(item).attr("id").match(/\d+/gm)
-		regulon_id = $(item).attr("id").substring(7);
+		regulon_id = $(item).attr("id").substring(7)
 		table_id = "tad-table-"+regulon_id
 		species = document.getElementById("species").innerHTML
 		match_species =  species.match(/[^Species: ].+/gm)[0]
@@ -145,7 +143,7 @@ $(document).ready(function() {
 				"bInfo" : false,
 				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
 			"iDisplayLength": 5,
-		});
+		})
 			} else if (match_species == 'Mouse'){
 			$(table_jquery_id).DataTable( {
 				dom: 'lBfrtip',
@@ -164,7 +162,7 @@ $(document).ready(function() {
 				"bInfo" : false,
 				"aLengthMenu": [[ -1], [ "All"]],
 				"iDisplayLength": -1,
-		});
+		})
 			}
 		}
 		document.getElementById(table_id).innerHTML=""
@@ -201,7 +199,7 @@ $(document).ready(function() {
 		],
 		"iDisplayLength": 10,
 		
-	});
+	})
 	}
 	document.getElementById(table_id).innerHTML = ""
 	}
@@ -212,7 +210,7 @@ $(document).ready(function() {
 	ct_id= regulon_id.substring(
     regulon_id.lastIndexOf("CT") + 2, 
     regulon_id.lastIndexOf("S")
-	);
+	)
 	table_id = "regulon-table-" + regulon_id
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "regulon-table-content-" + regulon_id
@@ -239,7 +237,7 @@ $(document).ready(function() {
 	ct_id= regulon_id.substring(
     regulon_id.lastIndexOf("CT") + 2, 
     regulon_id.lastIndexOf("S")
-	);
+	)
 	table_id = "trajectory-table-" + regulon_id
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "trajectory-table-content-" + regulon_id
@@ -288,15 +286,14 @@ $(document).ready(function() {
 	})
 	document.getElementById(table_id).innerHTML = ""
 	}
+	
 	function get_gene_list(item){
-	match_id = $(item).attr("id").match(/\d+/gm);
+	match_id = $(item).attr("id").match(/\d+/gm)
 	if($(item).attr("id").includes("CT")) {
 		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_id[0]+'_bic.regulon_gene_symbol.txt'
 	} else {
 		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_id[0]+'_bic.regulon_gene_symbol.txt'
 	}
-	
-	
 	$.get(file_path,function(txt){
         var lines = txt.split("\n")
 		gene_idx = match_id[1] - 1
@@ -307,50 +304,109 @@ $(document).ready(function() {
 		
 		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true}
 	
-		//console.log(enrichr_info);
+		//console.log(enrichr_info)
           // defined globally - will improve
           send_to_Enrichr(enrichr_info)
     })
+	}	
 	
-	}
-
 	function send_to_Enrichr(options) { // http://amp.pharm.mssm.edu/Enrichr/#help
     var defaultOptions = {
     description: "",
     popup: false
-	};
-
+	}
+	
   if (typeof options.description == 'undefined')
-    options.description = defaultOptions.description;
+    options.description = defaultOptions.description
   if (typeof options.popup == 'undefined')
-    options.popup = defaultOptions.popup;
+    options.popup = defaultOptions.popup
   if (typeof options.list == 'undefined')
-    alert('No genes defined.');
+    alert('No genes defined.')
 
-  var form = document.createElement('form');
-  form.setAttribute('method', 'post');
-  form.setAttribute('action', 'https://amp.pharm.mssm.edu/Enrichr/enrich');
+  var form = document.createElement('form')
+  form.setAttribute('method', 'post')
+  form.setAttribute('action', 'https://amp.pharm.mssm.edu/Enrichr/enrich')
   if (options.popup)
-    form.setAttribute('target', '_blank');
-  form.setAttribute('enctype', 'multipart/form-data');
+    form.setAttribute('target', '_blank')
+  form.setAttribute('enctype', 'multipart/form-data')
 
-  var listField = document.createElement('input');
-  listField.setAttribute('type', 'hidden');
-  listField.setAttribute('name', 'list');
-  listField.setAttribute('value', options.list);
+  var listField = document.createElement('input')
+  listField.setAttribute('type', 'hidden')
+  listField.setAttribute('name', 'list')
+  listField.setAttribute('value', options.list)
   form.appendChild(listField);
 
-  var descField = document.createElement('input');
-  descField.setAttribute('type', 'hidden');
-  descField.setAttribute('name', 'description');
-  descField.setAttribute('value', options.description);
-  form.appendChild(descField);
+  var descField = document.createElement('input')
+  descField.setAttribute('type', 'hidden')
+  descField.setAttribute('name', 'description')
+  descField.setAttribute('value', options.description)
+  form.appendChild(descField)
 
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
+  document.body.appendChild(form)
+  form.submit()
+  document.body.removeChild(form)
+}
+function copyToClipboard(text){
+    const ele = document.createElement('textarea'); 
+    ele.value = text; 
+    ele.setAttribute('readonly', true)
+  // Following styling is to avoid flashing textarea on screen 
+    ele.style.position = 'absolute';
+    ele.style.padding = 0;
+    ele.style.background = 'transparent';
+    ele.style.outline = 'none'; 
+    ele.style.left = '-100%';
+  document.body.appendChild(ele); 
+  ele.select(); 
+    document.execCommand('copy');
+    document.body.removeChild(ele); 
+  }
+ 
+function copy_list(item){
+$(item).tooltip({
+  trigger: 'click',
+  placement: 'bottom'
+})
+function setTooltip(message) {
+  $(item).tooltip('show')
+	.attr('data-original-title', message)
+	.tooltip('show')
+}
+function hideTooltip() {
+  setTimeout(function() {
+	$(item).tooltip('hide')
+  }, 3000)
+}
+match_ct = $(item).attr("id").match(/\d+/gm)
+match_type = ($(item).attr("id")[0] == "s") ? '_bic.regulon_gene_symbol.txt' : '_bic.regulon_gene_id.txt'
+//match_type = '_bic.regulon_gene_symbol.txt'
+if($(item).attr("id").includes("CT")) {
+	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_ct[0] + match_type
+} else {
+	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_ct[0] + match_type
 }
 
+var xmlhttp = new XMLHttpRequest();
+ xmlhttp.open("GET", file_path, false);
+ xmlhttp.send();
+  if (xmlhttp.status==200) {
+	txt = xmlhttp.responseText;
+	var lines = txt.split("\n")
+	gene_idx = match_ct[1] - 1
+	lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
+	gene_list = lines[gene_idx].split("\t")
+	gene_list.shift()
+	//console.log(gene_list.join("\n"))
+	copyToClipboard(gene_list.join("\n"))
+	setTooltip('Copied!')
+	hideTooltip()
+  } else {
+	setTooltip('Failed!')
+	hideTooltip()
+  }
+}
+	
+	
  </script>
 <main role="main" class="container" style="min-height: calc(100vh - 182px);">
     <div id="content">
@@ -670,8 +726,8 @@ $(document).ready(function() {
 																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.8f"}}</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr><td class="gene-table">
                                                                             <div style="width:100%; font-size:14px;">
-																				<table class="table table-hover table-sm" >
-	                                <tr><td>Marker gene</td><td>Gene Symbol</td><td>Enesmbl ID</td><td>Gene t-SNE plot</td>
+																				<table class="table table-hover table-sm" ><tbody>
+	                                <tr><td>Marker gene</td><td>Gene Symbol  <button class="btn btn-default" id="symbol-{{$regulon_result[$sec0][sec1][0]}}" onclick="copy_list(this)">Copy</button></td><td>Enesmbl ID  <button class="btn btn-default" id="id-{{$regulon_result[$sec0][sec1][0]}}"onclick="copy_list(this)">Copy</button></td><td>Gene t-SNE plot</td>
 									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
 										  <tr><td>
@@ -692,7 +748,7 @@ $(document).ready(function() {
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
                                          <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="show_gene_tsne(this);$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
                                                         </button><button type="button" style="display:none;" id="gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide
-                                                        </button></td>{{/section}}</tr></table></div></td>
+                                                        </button></td>{{/section}}</tr></tbody></table></div></td>
 																			<td rowspan="2" class="vert-aligned">
 														<button type="button" class="btn btn-default extra-button" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
                                                         </button><button style="display:none;" type="button" class="btn btn-default extra-button" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
@@ -745,19 +801,17 @@ $(document).ready(function() {
 									{{/section}}
 									{{section name=tomtom_idx  start=0 loop=$tomtom_result.$motif_num_homo}}
 									<tr><td>HOCOMOCO</td><td>
-									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_homo[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_homo[tomtom_idx][1]}} </a></td>
+									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_homo[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_homo[tomtom_idx][1]|regex_replace:"/_.+/":""}} </a></td>
 									<td class="tomtom_pvalue">
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][3]|string_format:"%.2e"}}</td><td>
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][4]|string_format:"%.2e"}}</td><td>
 									{{$tomtom_result.$motif_num_homo[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>{{/section}}</tbody></table><hr></div></div>{{/section}}
 									</td></tr>
 														<tr><td colspan=2 style="border:none">
-																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
-																					<div class="panel-body"><div class="flatPanel panel panel-default">
-																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
+																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" class="col-md-12" style="display:none;">
+																						<div id='ci-{{$regulon_result[$sec0][sec1][0]}}'>
 																						<h1 class='wait_message'>Loading heatmap ...</h1>
-																					</div>
-																					</div></div> </div> 
+																					</div></div> 
 																					<div id="peak-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
 																						<div id='table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																					</div>
@@ -789,7 +843,7 @@ $(document).ready(function() {
 																						</thead>
 																					</table>
 																					</div>
-																					<div id="similar-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																					<!--<div id="similar-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='similar-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
                                                                                     </div>
                                                                                     <table id="similar-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
@@ -799,7 +853,7 @@ $(document).ready(function() {
                                                                                             </tr>
                                                                                         </thead>
                                                                                     </table>
-																					</div>
+																					</div>-->
 																					<div class="col-md-12" id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
@@ -975,10 +1029,10 @@ $(document).ready(function() {
 																		<td colspan=2>
 																		
 																					<div id="heatmap-{{$module_result[$sec0][sec1][0]}}" style="display:none;">
-																					<div class="panel-body"><div class="flatPanel panel panel-default">
+																					
 																						<div id='ci-{{$module_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																						<h1 class='wait_message'>Loading heatmap ...</h1>
-																					</div></div></div> </div> 
+																					</div></div> 
 																					<div id="peak-{{$module_result[$sec0][sec1][0]}}" style="display:none;">
 																						<div id='table-{{$module_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																					</div>
