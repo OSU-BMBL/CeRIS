@@ -98,7 +98,7 @@ a.enroll-button:hover {
 ---------------------------------*/
 
 .video-area .area-bg::before {
-    background: #3ee792 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     opacity: 0.75;
 }
 
@@ -120,7 +120,7 @@ a.enroll-button:hover {
 .video-area-popup {
     background: #ffffff none repeat scroll 0 0;
     border-radius: 50%;
-    color: #3ee792;
+    color: #2775b6;
     cursor: pointer;
     display: inline-block;
     font-size: 30px;
@@ -134,7 +134,7 @@ a.enroll-button:hover {
 }
 
 .video-area-popup:hover {
-    background: #3ee792 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     -webkit-box-shadow: 0 0 10px 10px #ffffff;
     box-shadow: 0 0 10px 10px #ffffff;
     color: #ffffff;
@@ -151,7 +151,7 @@ a.enroll-button:hover {
 }
 
 .author-content::before {
-    color: #3ee792;
+    color: #2775b6;
     content: "\f10e";
     font-family: fontawesome;
     font-size: 41px;
@@ -178,7 +178,7 @@ a.enroll-button:hover {
 }
 
 .testmonial-area .owl-nav > div {
-    background: #3ee792 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     border-radius: 50%;
     color: #ffffff;
     font-size: 30px;
@@ -240,8 +240,8 @@ a.enroll-button:hover {
 }
 
 .testmonial-area .owl-dots > div.active {
-    background: #3ee792 none repeat scroll 0 0;
-    border-color: #3ee792;
+    background: #2775b6 none repeat scroll 0 0;
+    border-color: #2775b6;
 }
 
 /*--------------------------------
@@ -324,12 +324,12 @@ a.enroll-button:hover {
 
 .contact-form input:focus,
 .contact-form textarea:focus {
-    -webkit-box-shadow: 0 0 0 1px #3ee792;
-    box-shadow: 0 0 0 1px #3ee792;
+    -webkit-box-shadow: 0 0 0 1px #2775b6;
+    box-shadow: 0 0 0 1px #2775b6;
 }
 
 .contact-form button {
-    background: #3ee792 none repeat scroll 0 0;
+    background: #2775b6 none repeat scroll 0 0;
     border: 0 none;
     border-radius: 50px;
     color: #ffffff;
@@ -469,7 +469,7 @@ label.mt10.valid {
 ----------------------------------*/
 
 .scrolltotop {
-    background: #404873 none repeat scroll 0 0;
+    background: #747b8c none repeat scroll 0 0;
     bottom: 20px;
     color: #ffffff;
     display: none;
@@ -481,10 +481,11 @@ label.mt10.valid {
     text-align: center;
     width: 40px;
     z-index: 9;
+	display:block;
 }
 
 .scrolltotop:hover {
-    background: #3ee792;
+    background: #2775b6;
     color: #ffffff;
 }
 
