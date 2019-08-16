@@ -809,9 +809,23 @@ font-size:16px;
 	margin-right: -15px !important;
 	max-width: 75%;
 }
-
+.ct-panel {
+	border-top:none !important;
+}
+.ct-panel-a {
+	text-decoration:none;
+	margin-left:15px;
+}
+.ct-panel-a:hover{
+	text-decoration:none;
+	margin-left:15px;
+}
+.ct-panel-description{
+	margin:0;
+	padding:15px;
+	font-weight:600;
+}
 .table a {
-  text-decoration: underline !important;
   display:inline-block;
 }
 
