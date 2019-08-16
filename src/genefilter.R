@@ -7,11 +7,12 @@ options(check.names=F)
 #library(GenomicAlignments)
 #library(ensembldb)
 #BiocManager::install("scran")
+
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(hdf5r))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(SingleCellExperiment))
-suppressPackageStartupMessages(library(SC3))
+#suppressPackageStartupMessages(library(SC3))
 suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(devEMF))
 suppressPackageStartupMessages(library(dplyr))
@@ -21,7 +22,6 @@ suppressPackageStartupMessages(library(scran))
 suppressPackageStartupMessages(library(slingshot))
 suppressPackageStartupMessages(library(destiny))
 suppressPackageStartupMessages(library(gam))
-
 
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
@@ -53,16 +53,16 @@ load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
   # setwd("C:/Users/wan268/Documents/iris3_data/MM")
-  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190814191406")
+  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
   #srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
-  jobid <- "20190814172441"
-  delim <- "\t"
+  srcFile = "iris3_example_expression_matrix.csv"
+  jobid <- "20190802103754"
+  delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'label-GSE110499.txt'
-  delimiter <- '\t'
+  label_file<-'iris3_example_expression_matrix.csv'
+  delimiter <- ','
   param_k<-0
   label_use_sc3 <- 2
 }
@@ -93,16 +93,28 @@ getwd()
 upload_type <- as.character(read.table("upload_type.txt",stringsAsFactors = F)[1,1])
 #expFile <- read_data(x = getwd(),read.method = "TenX.folder",sep = delim)
 #expFile <- read_data(x = srcFile,read.method = "TenX.h5",sep = delim)
-
+#upload_type <- "CellGene"
+#expFile <- read_data(x = srcFile,read.method = "CellGene",sep = delim)
 expFile <- read_data(x = srcFile,read.method = upload_type,sep = delim)
 colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
-#check if [1,1] is empty
+
+##check if [1,1] is empty
 if(colnames(expFile)[1] == ""){
   colnames(expFile)[1] = "Gene_ID"
 }
+
 total_gene_num <- nrow(expFile)
-#remove duplicated rows with same gene 
+
+##remove duplicated rows with same gene 
 if (upload_type == "CellGene"){
+  # case: gene with id with ENSG########.X, remove part after dot, e.g:
+  # a <- c("ENSG00000064545.10","ENSG000031230064545","ENMUSG00003213004545.31234s")
+  match_index <- grep("^ENS.+\\.[0-9]",ignore.case = T,expFile[,1])
+  if (length(match_index) > 0){
+    match_rownames <- expFile[match_index,1]
+    expFile[,1] <- as.character(expFile[,1])
+    expFile[match_index,1] <- gsub('\\..+','',match_rownames)
+  }
   if(length(which(duplicated.default(expFile[,1]))) > 0 ){
     expFile <- expFile[-which(duplicated.default(expFile[,1])==T),]
   }	
@@ -128,7 +140,6 @@ get_rowname_type <- function (l, db){
 # detect species
 # detect which types of identifer in rownames, 1)HGNC gene symbol 2)ensembl geneid 3) ncbi entrez id
 # convert to symbol
-
 species_file <- as.character(read.table("species.txt",header = F,stringsAsFactors = F)[,1])
 
 # deprecated databases, about 10% of the gene id missing which cause a lot of genes filtered
@@ -195,14 +206,15 @@ my.object<-CreateSeuratObject(expFile)
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 # normalization##############################
 sce<-SingleCellExperiment(list(counts=my.count.data))
-is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
-if (is.ercc.empty(sce)){
-  isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
-  sce<-computeSpikeFactors(sce)
-} else {
-  sce<-computeSumFactors(sce, sizes=seq(21, 201, 5))
-}
-
+###
+###is.ercc<-function(x) {return(length(grep("^ERCC",ignore.case = T,rownames(x)))>0)}
+###if (is.ercc(sce)){
+###  isSpike(sce,"MySpike")<-grep("^ERCC",ignore.case = T,rownames(sce))
+###  sce<-computeSpikeFactors(sce)
+###} else {
+###  sce<-computeSumFactors(sce, sizes=seq(21, 201, 5))
+###}
+sce<-computeSumFactors(sce, sizes=seq(21, 201, 5))
 sce<-scater::normalize(sce,return_log=F)
 my.normalized.data <-normcounts(sce)
 
@@ -232,11 +244,12 @@ if(is_cell_filter == "1"){
 dim(my.imputatedLog.data)
 dim(expFile)
 
+## 
 my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
 cell_names <- colnames(my.normalized.data)
 
-# calculate filtering rate
+## calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
 filter_gene_num <- total_gene_num-nrow(my.object)
 filter_gene_rate <- formatC(filter_gene_num/total_gene_num,digits = 2)
@@ -353,7 +366,13 @@ all.gene<-rownames(my.object)
 my.object<-ScaleData(my.object,features = all.gene)
 # after scaling, perform PCA
 my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
-my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+head(Embeddings(my.object, reduction = "pca")[, 1:5])
+
+num_pca <- which(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))) > 0.8)[1]
+
+plot(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))),type='o')
+
+my.object<-FindNeighbors(my.object,dims = 1:30)
 my.object<-FindClusters(my.object)
 cell_info <-  my.object$seurat_clusters
 cell_label <- cbind(cell_names,cell_info)
@@ -363,10 +382,15 @@ write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.name
 
 if (label_use_sc3 =='2'){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
-  original_cell_info <- as.factor(cell_info[,2])
-  cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
-  rownames(cell_info) <- cell_info[,1]
-  cell_info <- cell_info[,-1]
+  ## check if user's label has valid number of rows, if not just use predicted value
+  if (nrow(cell_info) == nrow(cell_label)){
+    original_cell_info <- as.factor(cell_info[,2])
+    cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
+    rownames(cell_info) <- cell_info[,1]
+    cell_info <- cell_info[,-1]
+  } else {
+    cell_info <-  my.object$seurat_clusters
+  }
 } 
 silh_out <- cbind(cell_info,cell_names,1)
 silh_out <- silh_out[order(silh_out[,1]),]
