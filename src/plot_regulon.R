@@ -27,13 +27,14 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=as.factor(my.object$Customized.idents))
   }
-  p.cluster<-ggplot(my.plot.all.source,
+  p.cluster <- ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+  p.cluster <- p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
   #p.cluster<-theme_linedraw()
-  p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_light()+scale_fill_continuous(name="cell type")+coord_fixed(1)
-  
+  p.cluster <- p.cluster + labs(col="cell type")
+  p.cluster <- p.cluster + theme_classic()+scale_fill_continuous(name="cell type")
+  p.cluster <- p.cluster + coord_fixed(ratio=1)
+  p.cluster
 }
 
 
@@ -54,12 +55,13 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
   # }
   # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
-  p.regulon<-ggplot(my.plot.regulon,
+  p.regulon <- ggplot(my.plot.regulon,
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
-  p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
+  p.regulon <- p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #p.cluster<-theme_linedraw()
-  p.regulon<-p.regulon+theme_light() + labs(col="regulon score") + coord_fixed(1)
+  p.regulon <- p.regulon+theme_classic() + labs(col="regulon score") 
   #message("finish!")
+  p.regulon <- p.regulon + coord_fixed(ratio=1)
   p.regulon
 }
 

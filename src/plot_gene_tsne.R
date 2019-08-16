@@ -25,7 +25,7 @@ Plot.GeneTSNE<-function(gene.name=NULL){
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
   g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
-  g<-g+theme_bw()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
+  g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
 
@@ -46,7 +46,7 @@ Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
   p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
   #p.cluster<-theme_linedraw()
   p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_light()+scale_fill_continuous(name="cell type")+coord_fixed(1)
+  p.cluster+theme_classic()+scale_fill_continuous(name="cell type")+coord_fixed(1)
   
 }
 
