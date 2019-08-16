@@ -8,8 +8,11 @@ session_start();
 require("config/common.php");
 require("config/smarty.php");
 
+
 $smarty->caching = true;
 $smarty->assign('section', 'Homepage');
+$_SESSION['labelfile'] = '';
+$_SESSION['gene_module_file'] = '';
 
 function get_client_ip_server() {
     $ipaddress = '';
@@ -125,10 +128,13 @@ if (isset($_POST['submit']))
 	} else { #no label use sc3
 		$label_use_sc3 = '0';
 	}
-
-	
+	if($expfile=='iris3_example_expression_matrix.csv'){
+		$fp = fopen("$workdir/upload_type.txt", 'w');
+		fwrite($fp,"CellGene\n");
+		fclose($fp);
+	}
 	if($is_gene_filter == '1' && $is_cell_filter == '1' && $c_arg == '1.0' && $f_arg == '0.5' && $o_arg == '100' && $label_use_sc3 == '1' && $expfile=='iris3_example_expression_matrix.csv' && $labelfile == 'iris3_example_expression_label.csv'){
-		
+
 		header("Location: results.php?jobid=20190802103754#");
 	}
 	
@@ -156,6 +162,9 @@ if (isset($_POST['submit']))
 	}
 	if($delim==" "){
 		$delim = "space";
+	}
+	if($delim==";"){
+		$delim = "semicolon";
 	}
 	$delim_label = detectDelimiter("$workdir2/$labelfile");
 		if($delim_label=="\t"){
@@ -240,7 +249,7 @@ chmod -R 777 .
 	fclose($fp);
 	session_destroy();
 	system("chmod -R 777 $workdir2");
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
