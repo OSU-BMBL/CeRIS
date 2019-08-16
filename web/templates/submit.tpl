@@ -1,5 +1,5 @@
 {{extends file="base.tpl"}} {{block name="extra_style"}} form div.fieldWrapper label { min-width: 5%; } {{/block}} {{block name="extra_js"}} {{/block}} {{block name="main"}}
-	<script src="vendor/bootstrap/js/bootstrap-select.min.js"></script>
+	<script src="assets/js/bootstrap-select.min.js"></script>
 <script>
 function addPreviewTable(response, metadata = true, type) {
 
@@ -384,12 +384,12 @@ $(document).ready(function() {
 		 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Specify the species belongs to your gene expression matrix."> </span> 
 				</label>
 		<select class="selectpicker" id="species_arg" name="species_arg[]" multiple data-max-options="2">
-  <option value="Human">Human</option>
-  <option value="Mouse">Mouse</option>
-  <option value="Zebrafish">Zebrafish</option>
+  <option value="Human">Human (hg38)</option>
+  <option value="Mouse">Mouse (mm10)</option>
+  <!--<option value="Zebrafish">Zebrafish</option>
   <option value="Fruit_fly">Fruit fly</option>
   <option value="Yeast">Yeast</option>
-  <option value="Worm">Worm</option>
+  <option value="Worm">Worm</option>-->
 </select>
 </div>
 		<br/>
@@ -477,6 +477,7 @@ $(document).ready(function() {
 									</div>
 								</div>
 							</div>
+							<!--
 							<h4 class="font-italic text-left">SC3 option 
 							<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By default, cell types are predicted in SC3 by gene distance calculation, PCA dimension reduction, tSNE-k-means clustering, and consensus clustering. You may also manually specify the nubmer of cell types in SC3."> </span> 
 							</h4>
@@ -488,7 +489,7 @@ $(document).ready(function() {
 									</div>
 									<div class="col-md-2">
 										<input type="radio" value="estimate" id="enable_sc3_k" name="enable_sc3_k" class="custom-control-input" checked required>
-									<label class="custom-control-label" for="enable_sc3_estimate">Estimated by SC3
+									<label class="custom-control-label" for="enable_sc3_estimate">Estimated by Seurat
 									</label>
 									</div>
 									<div class="col-md-5">
@@ -496,7 +497,7 @@ $(document).ready(function() {
     onchange="try{setCustomValidity('')}catch(e){}"/></label>
 									
 									</div>
-								</div>
+								</div>-->
 							<h4 class="font-italic text-left">Upload cell label: (Optional) <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A table contains cell infomation. The file should includes a cell names in the first column match with the expression file, and the second column indicating the cell clusters. Cell clusters are used in two ways: (i) assess the cell-type prediction results from SC3, and (ii) assign Cell-type-specific regulons. If no cell label file uploaded, the pipeline will automatically use the predicted clusters from SC3 for the following regulon predictions. Accept both txt and csv format."> </span></h4>
 							
 							<div id="upload_label">
@@ -522,7 +523,7 @@ $(document).ready(function() {
 							<div class="row">
 								<div class="form-check col-sm-2 ">
 									<input type="radio" value="1" id="enable_sc3" name="bicluster_inference" class="custom-control-input" checked="">
-									<label class="custom-control-label" for="enable_sc3">SC3 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
+									<label class="custom-control-label" for="enable_sc3">Seurat <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
 									</label>
 									
 								</div>
