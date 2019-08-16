@@ -689,18 +689,17 @@ var xmlhttp = new XMLHttpRequest();
 																	</div></div> </div> </div> 
 															{{else}}	
 															<div class="tab-pane {{if {{$sec0+1}} eq '1'}}active{{/if}}" id="main_CT{{$sec0+1}}" role="tabpanel">
-																<div class="flatPanel panel panel-default">
+																<div class="flatPanel panel panel-default ct-panel">
 																			<div class="row">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<strong>CTS Cell-Gene-Regulon Heatmap for Cell Type {{$sec0+1}}</strong><br>
-																			
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
+																			<p class="ct-panel-description" >CTS Cell-Gene-Regulon Heatmap for Cell Type {{$sec0+1}}</p>
+																			<a class="ct-panel-a" href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
                                                                         <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Open in new tab
                                                                         </button>
-                                                                    </a>&nbsp;<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_symbol.txt" target="_blank">
+                                                                    </a><a class="ct-panel-a"  href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_symbol.txt" target="_blank">
                                                                         <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Download CT-{{$sec0+1}} regulon-gene list (Gene Symbol) 
                                                                         </button> </a>
-																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_id.txt" target="_blank">
+																		<a class="ct-panel-a"  href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_id.txt" target="_blank">
 																		<button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Download CT-{{$sec0+1}} regulon-gene list (Ensembl gene ID)
                                                                         </button>
                                                                     </a>
@@ -708,7 +707,7 @@ var xmlhttp = new XMLHttpRequest();
 																	<div class="panel-body"><div class="flatPanel panel panel-default">
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
-																						<h1 class='wait_message'>Please wait ...</h1>
+																						<h2 class='wait_message'>Loading heatmap ...</h2>
 																					</div></div></div></div></div></div></div> 
 																					
 																					
