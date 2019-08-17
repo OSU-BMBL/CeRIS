@@ -21,21 +21,12 @@ if (!require("Polychrome")) {
   install.packages("Polychrome")
   library(Polychrome)
 }
-# if (!require("AUCell")) {
-#   BiocManager::install("AUCell")
-#   library(AUCell)
-# }
+
 if (!require("dplyr")) {
   install.packages("dplyr")
   library(dplyr)
 }
-# if(!require("Rmagic")){
-#   install.packages("Rmagic")
-#   library("Rmagic")
-#   install.magic(envname = "r-reticulate", 
-#                 method = "auto",
-#                 conda = "auto", pip = TRUE)
-# }
+
 if(!require("DrImpute")){
   install.packages("DrImpute")
   library("DrImpute")
@@ -95,24 +86,31 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
 #|-----------------|---------------|
 
 #Read in data ###################################################
-my.raw.data<-read_data(x = "Yan_expression.csv",sep=",",read.method = "CellGene")
+my.raw.data<-read_data(x = "Yan_expression.txt",sep="\t",read.method = "CellGene")
 ######################################################
 # create Seurat object
 my.object<-CreateSeuratObject(my.raw.data)
 # check how many cell and genes
 dim(my.object)
+VlnPlot(my.object, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+plot(log(1:length(my.object$nCount_RNA)),log(sort(my.object$nCount_RNA,decreasing = T)))
+#################################################################
+# filter some outlier gene, only for 10X data####################
+#################################################################
+
+
+Data.Preprocessing<-function(TenX = FALSE) {
+  if(TenX== TRUE){
+    my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
+    my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
+  }
+  return(my.object)
+}
+my.object<-Data.Preprocessing(TenX = F)
+#################################################################
 #####################################################
 # get data in terms of "counts"(raw data), "data"(normalized data), "scale.data"(scaling the data)
 # neglect quality check, may add on in the future
-##################################
-# export data from seurat object.#
-##################################
-# my.expression.data<-GetAssayData(object = my.object,slot = "counts")
-# write.table(my.expression.data,
-#             file = "RNA_RAW_EXPRESSION.txt",
-#             quote = F,
-#             sep = "\t")
-#################################
 
 # Key part for customizing cell type: 
 ##############################################
@@ -128,34 +126,30 @@ Idents(my.object)
 # activate customized cell type info
 Idents(my.object)<-as.factor(my.object$Customized.idents)
 
-
-
-
-
-#######Cankun modification: first imputation, then normalization#########
-
-my.object<-CreateSeuratObject(expFile)
-#my.object<-GetAssayData(object = my.object,slot = "counts")
-my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
-my.imputated.data <- DrImpute(as.matrix(my.count.data))
-colnames(my.imputated.data)<-colnames(my.count.data)
-rownames(my.imputated.data)<-rownames(my.count.data)
-my.imputated.data<- as.sparse(my.imputated.data)
-
-sce<-SingleCellExperiment(list(counts=my.imputated.data))
-is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
-if (is.ercc.empty(sce)){
-  isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
-  sce<-computeSpikeFactors(sce)
-} else {
-  sce<-computeSumFactors(sce)
-}
-
-#my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
-sce <- scater::normalize(sce,return_log=F)
-my.normalized.data <-normcounts(sce)
-my.normalized.data<-log1p(my.normalized.data)
-#######Cankun modification: first imputation, then normalization#########
+# #######Cankun modification: first imputation, then normalization#########
+# 
+# my.object<-CreateSeuratObject(expFile)
+# #my.object<-GetAssayData(object = my.object,slot = "counts")
+# my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
+# my.imputated.data <- DrImpute(as.matrix(my.count.data))
+# colnames(my.imputated.data)<-colnames(my.count.data)
+# rownames(my.imputated.data)<-rownames(my.count.data)
+# my.imputated.data<- as.sparse(my.imputated.data)
+# 
+# sce<-SingleCellExperiment(list(counts=my.imputated.data))
+# is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
+# if (is.ercc.empty(sce)){
+#   isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
+#   sce<-computeSpikeFactors(sce)
+# } else {
+#   sce<-computeSumFactors(sce)
+# }
+# 
+# #my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+# sce <- scater::normalize(sce,return_log=F)
+# my.normalized.data <-normcounts(sce)
+# my.normalized.data<-log1p(my.normalized.data)
+# #######Cankun modification: first imputation, then normalization#########
 
 
 
@@ -166,11 +160,18 @@ my.normalized.data<-log1p(my.normalized.data)
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 # normalization##############################
 sce<-SingleCellExperiment(list(counts=my.count.data))
-is.ercc.empty<-function(x) {return(length(grep("^ERCC",rownames(x)))==0)}
-if (is.ercc.empty(sce)){
-  isSpike(sce,"MySpike")<-grep("^ERCC",rownames(sce))
-  sce<-computeSpikeFactors(sce)
-} else {sce<-computeSumFactors(sce)}
+# is.ercc<-function(x) {
+#   tmp.ercc.index<-grep("^ERCC",ignore.case=T,rownames(x))
+#   is.ercc<-length(grep("^ERCC",ignore.case=T,rownames(x)))>0
+#   tmp.data<-sce@assays@.xData$data@listData$counts
+#   is.exist<-rowSums(tmp.data[grep("^ERCC",ignore.case=T,rownames(x)),]>0) == 0
+#   return(is.ercc & is.exist)
+#   }
+# if (is.ercc(sce)){
+#   isSpike(sce,"MySpike")<-grep("^ERCC",ignore.case = T,rownames(sce))
+#   sce<-computeSpikeFactors(sce)
+# } else {sce<-computeSumFactors(sce)}
+sce<-computeSumFactors(sce,positive=T)
 
 sce<-scater::normalize(sce,return_log=F)
 
@@ -183,20 +184,30 @@ rownames(my.imputated.data)<-rownames(my.count.data)
 my.imputated.data<- as.sparse(my.imputated.data)
 my.imputatedLog.data<-log1p(my.imputated.data)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
-#my.object<-NormalizeData(my.object,normalization.method = "LogNormalize",scale.factor = 10000)
+#######################################################################
+# export data from seurat object.######################################
+#######################################################################
+my.export.for_LFMG<-GetAssayData(object = my.object,slot = "data")
+# you can write table. 
+# write.table(my.expression.data,
+#             file = "RNA_RAW_EXPRESSION.txt",
+#             quote = F,
+#             sep = "\t")
+#################################
 # find high variable gene
-my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
+my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 2000)
 # before PCA, scale data to eliminate extreme value affect.
-all.gene<-rownames(my.object)
+all.gene<-my.object@assays$RNA@var.features
 my.object<-ScaleData(my.object,features = all.gene)
 # after scaling, perform PCA
 my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+ElbowPlot(object = my.object)
 ###########################################
 # CORE part: Run TSNE and UMAP######################
 ###########################################
-my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
+my.object<-RunTSNE(my.object,dims = 1:10,perplexity=10,dim.embed = 3)
 # run umap to get high dimension scatter plot at 2 dimensional coordinate system.
-my.object<-RunUMAP(object = my.object,dims = 1:30)
+# my.object<-RunUMAP(object = my.object,dims = 1:30)
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
@@ -255,54 +266,11 @@ Get.RegulonScore<-function(cell.type=1,regulon=1,...){
   return(my.plot.regulon)
 }
 
-# Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
-#   x<-Get.CellType(cell.type = cell.type)
-#   tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
-#   return(tmp.regulon)
-# }
-# Generate.Regulon(cell.type = 1,regulon = 1)
-# read in motif score and 
-# next step will take 1min to generate the mixed matrix
 
-# cells_rankings<-AUCell_buildRankings(my.object@assays$RNA@data)
-
-
-# Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
-#   my.regulon.number<-length(Get.CellType(cell.type = cell.type))
-#   if (regulon > my.regulon.number){
-#     stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
-#   } else {
-#     my.cts.regulon.S4<-Generate.Regulon(cell.type = cell.type,regulon=regulon)
-#     if(customized){
-#       my.cell.type<-my.cts.regulon.S4$Customized.idents
-#       message(c("using customized cell label: ","|", paste0(unique(as.character(my.cts.regulon.S4$Customized.idents)),"|")))
-#     }else{
-#       my.cell.type<-my.cts.regulon.S4$seurat_clusters
-#       message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
-#     } 
-#     tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
-#     geneSets<-list(GeneSet1=rownames(tmp_data))
-#     cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.05)
-#     cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = T,nCores = 1,assign = T)
-#     my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
-#     my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
-#    # regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
-#     regulon.score<-my.auc.data
-#     tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
-#     my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type,
-#                                         regulon.score=regulon.score[,1])
-#     
-#     return(my.choose.regulon)
-#   }
-# }
-# Get.RegulonScore(reduction.method = "tsne",cell.type = 2,regulon = 1,customized = T)
 ##############################
 
 Plot.cluster2D<-function(customized=F,...){
-  # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
-  # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
-  # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  if(!customized){
+  if(!customized==TRUE){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
                                          Cell_type=my.object$seurat_clusters)
   }else{
@@ -322,9 +290,6 @@ Plot.cluster2D<-function(customized=F,...){
 Plot.cluster2D(customized = T)
 
 # plot CTS-R
-
-
-
 # test Get.RegulonScore, output is matrix
 
 
@@ -334,21 +299,10 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
                                     cell.type = cell.type,
                                     regulon = regulon,
                                     customized = customized)
-  # if(!customized){
-  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-  #                                        Cell_type=my.object$seurat_clusters)
-  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
-  # }else{
-  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-  #                                        Cell_type=as.factor(my.object$Customized.idents))
-  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
-  # }
-  # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
-  # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
+
   p.regulon<-ggplot(my.plot.regulon,
                     aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-  #p.cluster<-theme_linedraw()
   p.regulon<-p.regulon + labs(col="regulon score") + coord_fixed(1)
   message("finish!")
   p.regulon
@@ -356,7 +310,7 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
 
 }
 Plot.regulon2D(cell.type=3,regulon=5,customized = T)
-Plot.cluster2D(customized = T)
+Plot.cluster2D(customized = F)
 
 Get.MarkerGene<-function(customized=T){
   if(customized){
@@ -394,11 +348,11 @@ Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)
 my.trajectory<-SingleCellExperiment(assays=List(counts=my.count.data))
 SummarizedExperiment::assays(my.trajectory)$norm<-GetAssayData(object = my.object,assay = "RNA",slot = "data")
 
-pca <- prcomp(t(SummarizedExperiment::assays(my.trajectory)$norm), scale. = FALSE)
-rd1 <- pca$x[,1:2]
+# pca <- prcomp(t(SummarizedExperiment::assays(my.trajectory)$norm), scale. = FALSE)
+# rd1 <- pca$x[,1:2]
 dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
 rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
-reducedDims(my.trajectory) <- SimpleList(PCA = rd1, DiffMap = rd2)
+reducedDims(my.trajectory) <- SimpleList( DiffMap = rd2)
 
 
 Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
@@ -407,9 +361,9 @@ Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NUL
     tmp.cell.type<-my.object$Customized.idents
   }
   if(customized==FALSE){
-    tmp.cell.type<-my.object$seurat_clusters
+    tmp.cell.type<-as.character(my.object$seurat_clusters)
   }
-  tmp.cell.name.index<-match(colnames(my.trajectory),names(tmp.cell.type))
+  tmp.cell.name.index<-match(colnames(my.trajectory),colnames(my.object))
   tmp.cell.type<-tmp.cell.type[tmp.cell.name.index]
   colData(my.trajectory)$cell.label<-tmp.cell.type
   # run trajectory, first run the lineage inference
@@ -424,11 +378,14 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   my.classification.color<-as.character(palette36.colors(36))[-2]
   par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
-       col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),
+       col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
        pch=20,frame.plot = FALSE,
        asp=1)
-  tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),Color=my.classification.color[tmp.trajectory.cluster$cell.label])
+  grid()
+  tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
+                                  Color=my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)])
   tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
+  tmp.color.cat<-tmp.color.cat[order(as.numeric(tmp.color.cat$CellName)),]
   # add legend
   legend("topright",legend = tmp.color.cat$CellName,
          inset=c(-0.2,0),
@@ -441,43 +398,56 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   }
 }
 
-Plot.Cluster.Trajectory(start.cluster=1,add.line = T,end.cluster=3,show.constraints=T)
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 
 Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
-  tmp.cell.name<-names(tmp.trajectory.cluster$cell.label)
+  tmp.cell.name<-colnames(tmp.trajectory.cluster)
   tmp.cell.name.index<-match(tmp.cell.name,rownames(tmp.regulon.score))
   tmp.regulon.score<-tmp.regulon.score[tmp.cell.name.index,]
   val<-tmp.regulon.score$regulon.score
-  grPal<-colorRampPalette(c('grey','red'))
+  #
+  layout(matrix(1:2,nrow=1),widths=c(0.8,0.2))
+  grPal <- colorRampPalette(c("grey","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
-  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1,frame.plot = FALSE)
-  lines(SlingshotDataSet(tmp.trajectory.cluster))
+  
+  par(mar=c(5.1,4.1,4.1,2.1))
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
+       col=alpha(tmp.color,0.7),
+       pch=20,frame.plot = FALSE,
+       asp=1)
+  grid()
+  xl <- 1
+  yb <- 1
+  xr <- 1.5
+  yt <- 2
+  
+  par(mar=c(5.1,2.1,4.1,0.5))
+  plot(NA,type="n",ann=F,xlim=c(1,2),ylim=c(1,2),xaxt="n",yaxt="n",bty="n")
+  rect(
+    xl,
+    head(seq(yb,yt,(yt-yb)/50),-1),
+    xr,
+    tail(seq(yb,yt,(yt-yb)/50),-1),
+    col=grPal(50),border=NA
+  )
+  tmp.min<-round(min(val),1)
+  tmp.Nmean<-round(tmp.min/2,1)
+  tmp.max<-round(max(val),1)
+  tmp.Pmean<-round(tmp.max/2,1)
+  tmp.cor<-seq(yb,yt,(yt-yb)/50)
+  mtext(c(tmp.min,tmp.Nmean,0,tmp.Pmean,tmp.max),
+                 at=c(tmp.cor[5],tmp.cor[15],tmp.cor[25],tmp.cor[35],tmp.cor[45]),
+                 side=2,las=1,cex=0.7)
 }
 Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = NULL,end.cluster = NULL)
 
-######color indicator#############################################
-color.bar <- function(val, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), title='') {
-  scale = round((length(val)-1)/(max-min),0)
-  dev.new(width=1.75, height=5)
-  plot(c(0,10), c(min,max), type='n', bty='n', xaxt='n', xlab='', yaxt='n', ylab='', main=title)
-  axis(2, ticks, las=1)
-  for (i in 1:(length(val)-1)) {
-    y = (i-1)/scale + min
-    rect(0,y,10,y+1/scale, col=val[i], border=NA)
-  }	
-}
 
-val.around<- round(val,digits = 1)
-color.bar(val.around,min=min(val.around),max=max(val.around))
-
-
-
-###########################
 ###########################
 ### gene TSNE plot#########
 ###########################
+# input as normalized data
 Plot.GeneTSNE<-function(gene.name=NULL){
   tmp.gene.expression<- my.object@assays$RNA@data
   tmp.dim<-as.data.frame(my.object@reductions$tsne@cell.embeddings)
@@ -493,5 +463,6 @@ Plot.GeneTSNE<-function(gene.name=NULL){
 }
 Plot.GeneTSNE("CA8")
 
+############
 
 
