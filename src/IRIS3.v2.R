@@ -388,7 +388,7 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   tmp.color.cat<-tmp.color.cat[order(as.numeric(tmp.color.cat$CellName)),]
   # add legend
   legend("topright",legend = tmp.color.cat$CellName,
-         inset=c(-0.2,0),
+         inset=c(-0.2,0), ncol=2,
          col = tmp.color.cat$Color,pch = 20,
          cex=0.8,title="cluster",bty='n')
   if(add.line==T){
@@ -408,11 +408,12 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   tmp.regulon.score<-tmp.regulon.score[tmp.cell.name.index,]
   val<-tmp.regulon.score$regulon.score
   #
+  plot.new()
   layout(matrix(1:2,nrow=1),widths=c(0.8,0.2))
   grPal <- colorRampPalette(c("grey","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
   
-  par(mar=c(5.1,4.1,4.1,2.1))
+  par(mar=c(5.1,2.1,1.1,2.1))
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
        col=alpha(tmp.color,0.7),
        pch=20,frame.plot = FALSE,
@@ -424,7 +425,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   xr <- 1.5
   yt <- 2
   
-  par(mar=c(5.1,2.1,4.1,0.5))
+  par(mar=c(5.1,1.1,1.1,4.1))
   plot(NA,type="n",ann=F,xlim=c(1,2),ylim=c(1,2),xaxt="n",yaxt="n",bty="n")
   rect(
     xl,
@@ -436,15 +437,15 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   tmp.min<-round(min(val),1)
   tmp.Nmean<-round(tmp.min/2,1)
   tmp.max<-round(max(val),1)
-  tmp.Pmean<-round(tmp.max/2,1)
+    tmp.Pmean<-round(tmp.max/2,1)
   tmp.cor<-seq(yb,yt,(yt-yb)/50)
+  mtext("Relugon Score", cex=1,side=1)
   mtext(c(tmp.min,tmp.Nmean,0,tmp.Pmean,tmp.max),
                  at=c(tmp.cor[5],tmp.cor[15],tmp.cor[25],tmp.cor[35],tmp.cor[45]),
                  side=2,las=1,cex=0.7)
   
 }
 Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = NULL,end.cluster = NULL)
-
 
 ###########################
 ### gene TSNE plot#########
