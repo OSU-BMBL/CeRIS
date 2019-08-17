@@ -216,22 +216,23 @@ filter_cell_func <- function(this){
 my.object<-CreateSeuratObject(expFile)
 # get raw data################################  
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
-# normalization##############################
 sce<-SingleCellExperiment(list(counts=my.count.data))
-###
-###is.ercc<-function(x) {return(length(grep("^ERCC",ignore.case = T,rownames(x)))>0)}
-###if (is.ercc(sce)){
-###  isSpike(sce,"MySpike")<-grep("^ERCC",ignore.case = T,rownames(sce))
-###  sce<-computeSpikeFactors(sce)
-###} else {
-###  sce<-computeSumFactors(sce, sizes=seq(21, 201, 5))
-###}
-sce<-computeSumFactors(sce, sizes=seq(21, 201, 5))
-sce<-scater::normalize(sce,return_log=F)
-my.normalized.data <-normcounts(sce)
+## if all values are integers, perform normalization, otherwise skip to imputation
+if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
+  
+  # normalization##############################
+
+  sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
+  sce<-scater::normalize(sce,return_log=F)
+  my.normalized.data <- normcounts(sce)
+} else {
+  my.normalized.data <- my.count.data
+}
 
 # imputation#################################
-my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
+
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
+
 colnames(my.imputated.data)<-colnames(my.count.data)
 rownames(my.imputated.data)<-rownames(my.count.data)
 my.imputated.data<- as.sparse(my.imputated.data)
