@@ -262,6 +262,7 @@ my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
 cell_names <- colnames(my.normalized.data)
 
+
 ## calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
 filter_gene_num <- total_gene_num-nrow(my.object)
@@ -285,6 +286,10 @@ write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",se
 write.table(as.data.frame(expFile),paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 
+rm(my.imputated.data)
+rm(my.normalized.data)
+rm(expFile)
+rm(my.imputatedLog.data)
 
 
 if (label_file == 0 | label_file==1){
