@@ -381,7 +381,7 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
        col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
        pch=20,frame.plot = FALSE,
        asp=1)
-  grid()
+  #grid()
   tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
                                   Color=my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)])
   tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
@@ -417,7 +417,8 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
        col=alpha(tmp.color,0.7),
        pch=20,frame.plot = FALSE,
        asp=1)
-  grid()
+  lines(SlingshotDataSet(tmp.trajectory.cluster))
+  #grid()
   xl <- 1
   yb <- 1
   xr <- 1.5
@@ -440,6 +441,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   mtext(c(tmp.min,tmp.Nmean,0,tmp.Pmean,tmp.max),
                  at=c(tmp.cor[5],tmp.cor[15],tmp.cor[25],tmp.cor[35],tmp.cor[45]),
                  side=2,las=1,cex=0.7)
+  
 }
 Plot.Regulon.Trajectory(cell.type = 6,regulon = 1,start.cluster = NULL,end.cluster = NULL)
 
