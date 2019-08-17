@@ -109,7 +109,15 @@ total_gene_num <- nrow(expFile)
 if (upload_type == "CellGene"){
   ## case: gene with id with ENSG########.X, remove part after dot, e.g:
   ## a <- c("ENSG00000064545.10","ENSG000031230064545","ENMUSG00003213004545.31234s")
-  match_index <- grep("^ENS.+\\.[0-9]",ignore.case = T,expFile[,1])
+  match_index <- grep("^ENSG.+\\.[0-9]",ignore.case = T,expFile[,1])
+  if (length(match_index) > 0){
+    match_rownames <- expFile[match_index,1]
+    expFile[,1] <- as.character(expFile[,1])
+    expFile[match_index,1] <- gsub('\\..+','',match_rownames)
+  }
+  
+  ## case above but for mouse: ENSMUSGXXXXX.X
+  match_index <- grep("^ENSMUSG.+\\.[0-9]",ignore.case = T,expFile[,1])
   if (length(match_index) > 0){
     match_rownames <- expFile[match_index,1]
     expFile[,1] <- as.character(expFile[,1])
@@ -137,14 +145,15 @@ if (upload_type == "CellGene"){
 total_cell_num <- ncol(expFile)
 
 
-# detect rownames gene list with identifer by the largest number of matches: 1) gene symbol 2)ensembl geneid 3) ncbi entrez id
+# detect rownames gene list with identifer by the largest number of matches: 1) gene symbol. 2)ensembl geneid. 3) ncbi entrez id. 4)
 
 get_rowname_type <- function (l, db){
-  res1 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "SYMBOL")),error = function(e) 0)
-  res2 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENSEMBL")),error = function(e) 0)
-  res3 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL"),keytype = "ENTREZID")),error = function(e) 0)
-  result <- c("error","SYMBOL","ENSEMBL","ENTREZID")
-  result_vec <- c(1,res1,res2,res3)
+  res1 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL","ENSEMBLTRANS"),keytype = "SYMBOL")),error = function(e) 0)
+  res2 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL","ENSEMBLTRANS"),keytype = "ENSEMBL")),error = function(e) 0)
+  res3 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL","ENSEMBLTRANS"),keytype = "ENTREZID")),error = function(e) 0)
+  res4 <- tryCatch(nrow(AnnotationDbi::select(db, keys = l, columns = c("ENTREZID", "SYMBOL","ENSEMBL","ENSEMBLTRANS"),keytype = "ENSEMBLTRANS")),error = function(e) 0)
+  result <- c("error","SYMBOL","ENSEMBL","ENTREZID","ENSEMBLTRANS")
+  result_vec <- c(1,res1,res2,res3,res4)
   return(c(result[which.max(result_vec)],result_vec[which.max(result_vec)]))
   #write("No matched gene identifier found, please check your data.",file=paste(jobid,"_error.txt",sep=""),append=TRUE)
 }
@@ -175,27 +184,31 @@ if(length(species_file) == 2) {
   write(paste("second_species,",second_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 }
 all_match <- AnnotationDbi::select(main_db, keys = rownames(expFile), columns = c("SYMBOL","ENSEMBL"),keytype = main_identifier)
+
 expFile <- merge(expFile,all_match,by.x=0,by.y=main_identifier)
 expFile <- na.omit(expFile)
 
+## merge expression values with same gene names
 if (main_identifier == "ENSEMBL") {
-  expFile <- expFile[!duplicated(expFile[,ncol(expFile)]),]
-  rownames(expFile) <- expFile[,ncol(expFile)]
+  expFile <- expFile[,-1]
+  expFile <- aggregate(. ~ SYMBOL, expFile, sum)
+} else if (main_identifier == "ENSEMBLTRANS") {
+  expFile <- expFile[,c(-1,-(ncol(expFile)))]
+  expFile <- aggregate(. ~ SYMBOL, expFile, sum)
 } else {
-  expFile <- expFile[!duplicated(expFile[,1]),]
-  rownames(expFile) <- expFile[,1]
+  expFile <- expFile[,-(ncol(expFile))]
+  expFile <- aggregate(. ~ Row.names, expFile, sum)
 }
-
-expFile <- expFile[,c(-1,-(ncol(expFile)))]
+expFile <- expFile[!duplicated(expFile[,1]),]
+rownames(expFile) <- expFile[,1]
+expFile <- expFile[,-1]
 
 ## remove rows with empty gene name
 if(length(which(rownames(expFile)=="")) > 0){
   expFile <- expFile[-which(rownames(expFile)==""),]
 }
-#expFile<-as.sparse(expFile)
 
-#this <- expFile[1,]
-# keep the gene with number of non-0 expression value cells >= 5%
+## keep the gene with number of non-0 expression value cells >= 5%
 filter_gene_func <- function(this){
   if(length(which(this>0)) >= thres_cells){
     return (1)
@@ -204,7 +217,7 @@ filter_gene_func <- function(this){
   }
 }
 # this <- expFile[,1]
-# keep the cell with number of non-0 expression value gene >= 1%
+## keep the cell with number of non-0 expression value gene >= 1%
 filter_cell_func <- function(this){
   if(length(which(this>0)) >= thres_genes){
     return (1)
@@ -214,13 +227,13 @@ filter_cell_func <- function(this){
 }
 
 my.object<-CreateSeuratObject(expFile)
-# get raw data################################  
+## get raw data################################  
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 sce<-SingleCellExperiment(list(counts=my.count.data))
 ## if all values are integers, perform normalization, otherwise skip to imputation
 if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
   
-  # normalization##############################
+## normalization##############################
 
   sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
   sce<-scater::normalize(sce,return_log=F)
@@ -229,7 +242,7 @@ if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
   my.normalized.data <- my.count.data
 }
 
-# imputation#################################
+## imputation#################################
 
 my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
 
@@ -241,13 +254,13 @@ my.imputatedLog.data<-log1p(my.imputated.data)
 thres_genes <- nrow(my.imputatedLog.data) * 0.01
 thres_cells <- ncol(my.imputatedLog.data) * 0.05
 
-# apply gene filtering
+## apply gene filtering
 if(is_gene_filter == "1"){
   gene_index <- as.vector(apply(my.imputatedLog.data, 1, filter_gene_func))
   my.imputatedLog.data <- my.imputatedLog.data[which(gene_index == 1),]
   expFile <- expFile[which(gene_index == 1),]
 } 
-# apply cell filtering
+## apply cell filtering
 if(is_cell_filter == "1"){
   cell_index <- as.vector(apply(my.imputatedLog.data, 2, filter_cell_func))
   my.imputatedLog.data <- my.imputatedLog.data[,which(cell_index == 1)]
