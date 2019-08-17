@@ -78,7 +78,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
         tmp_x<-Read10X_h5(x)
         return(tmp_x)
       }else if(read.method =="TenX.folder"){
-        tmp_x<-Read10X(x)
+        tmp_x<-Read10X(getwd())
         return(tmp_x)
       } else if(read.method == "CellGene"){# read in cell * gene matrix, if there is error report, back to 18 line to run again.
         tmp_x<-read.delim(x,header = T,row.names = NULL,check.names = F,sep=sep,...)
@@ -365,7 +365,12 @@ my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5
 all.gene<-rownames(my.object)
 my.object<-ScaleData(my.object,features = all.gene)
 # after scaling, perform PCA
-my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+
+if(ncol(my.object) < 50) {
+  my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object), npcs = ncol(my.object)-1)
+} else {
+  my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+}
 head(Embeddings(my.object, reduction = "pca")[, 1:5])
 
 num_pca <- which(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))) > 0.8)[1]
