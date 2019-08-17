@@ -11,8 +11,8 @@ require("config/smarty.php");
 
 $smarty->caching = true;
 $smarty->assign('section', 'Homepage');
-$_SESSION['labelfile'] = '';
-$_SESSION['gene_module_file'] = '';
+#$_SESSION['labelfile'] = '';
+#$_SESSION['gene_module_file'] = '';
 
 function get_client_ip_server() {
     $ipaddress = '';
