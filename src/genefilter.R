@@ -105,19 +105,31 @@ if(colnames(expFile)[1] == ""){
 
 total_gene_num <- nrow(expFile)
 
-##remove duplicated rows with same gene 
+## deal with some edge cases on gene symbols/id 
 if (upload_type == "CellGene"){
-  # case: gene with id with ENSG########.X, remove part after dot, e.g:
-  # a <- c("ENSG00000064545.10","ENSG000031230064545","ENMUSG00003213004545.31234s")
+  ## case: gene with id with ENSG########.X, remove part after dot, e.g:
+  ## a <- c("ENSG00000064545.10","ENSG000031230064545","ENMUSG00003213004545.31234s")
   match_index <- grep("^ENS.+\\.[0-9]",ignore.case = T,expFile[,1])
   if (length(match_index) > 0){
     match_rownames <- expFile[match_index,1]
     expFile[,1] <- as.character(expFile[,1])
     expFile[match_index,1] <- gsub('\\..+','',match_rownames)
   }
+  
+  ## case: genes with format like (AADACL3|chr1|12776118), remove part after |, e.g:
+  ## a <- c("AADACL3|chr1|12776118","KLHDC8A|chr1|205305648","KIF21B|chr1|200938514")
+  match_index <- grep("^[a-z].+\\|",ignore.case = T,expFile[,1])
+  if (length(match_index) > 0){
+    match_rownames <- expFile[match_index,1]
+    expFile[,1] <- as.character(expFile[,1])
+    expFile[match_index,1] <- gsub('\\|.+','',match_rownames)
+  }
+  
+  ##remove duplicated rows with same gene 
   if(length(which(duplicated.default(expFile[,1]))) > 0 ){
     expFile <- expFile[-which(duplicated.default(expFile[,1])==T),]
   }	
+  
   rownames(expFile) <- expFile[,1]
   expFile<- expFile[,-1]
 }
