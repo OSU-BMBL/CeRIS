@@ -211,7 +211,7 @@ my.object<-RunTSNE(my.object,dims = 1:10,perplexity=10,dim.embed = 3)
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
-my.object<-FindNeighbors(my.object,k.param = 6,dims = 1:30)
+my.object<-FindNeighbors(my.object,dims = 1:30)
 # find clustering, there will be changing the default cell type, if want to use customized cell type. 
 # use Idents() function.
 my.object<-FindClusters(my.object,resolution = 0.5)
@@ -387,10 +387,18 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
   tmp.color.cat<-tmp.color.cat[order(as.numeric(tmp.color.cat$CellName)),]
   # add legend
-  legend("topright",legend = tmp.color.cat$CellName,
-         inset=c(-0.2,0), ncol=2,
-         col = tmp.color.cat$Color,pch = 20,
-         cex=0.8,title="cluster",bty='n')
+  if (length(tmp.color.cat$CellName) > 10) {
+    legend("topright",legend = tmp.color.cat$CellName,
+           inset=c(-0.2,0), ncol=2,
+           col = tmp.color.cat$Color,pch = 20,
+           cex=0.8,title="cluster",bty='n')
+  } else {
+    legend("topright",legend = tmp.color.cat$CellName,
+           inset=c(-0.2,0), ncol=1,
+           col = tmp.color.cat$Color,pch = 20,
+           cex=0.8,title="cluster",bty='n')
+  }
+  
   if(add.line==T){
     lines(SlingshotDataSet(tmp.trajectory.cluster), 
           lwd=1,pch=3, col=alpha('black',0.7),
