@@ -15,15 +15,16 @@ srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
 
+
 Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
   #labeling cell
   if(customized==TRUE){
     tmp.cell.type<-my.object$Customized.idents
   }
   if(customized==FALSE){
-    tmp.cell.type<-my.object$seurat_clusters
+    tmp.cell.type<-as.character(my.object$seurat_clusters)
   }
-  tmp.cell.name.index<-match(colnames(my.trajectory),names(tmp.cell.type))
+  tmp.cell.name.index<-match(colnames(my.trajectory),colnames(my.object))
   tmp.cell.type<-tmp.cell.type[tmp.cell.name.index]
   colData(my.trajectory)$cell.label<-tmp.cell.type
   # run trajectory, first run the lineage inference
@@ -33,27 +34,85 @@ Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NUL
   return(my.trajectory)
 }
 
-Plot.Cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
+Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   my.classification.color<-as.character(palette36.colors(36))[-2]
-  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(my.classification.color[tmp.trajectory.cluster$cell.label],0.7),pch=20,asp=1)
-  lines(SlingshotDataSet(tmp.trajectory.cluster), lwd=1,pch=3, col=alpha('black',0.7),type="l",show.constraints=T)
+  par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
+       col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
+       pch=20,frame.plot = FALSE,
+       asp=1)
+  #grid()
+  tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
+                                  Color=my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)])
+  tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
+  tmp.color.cat<-tmp.color.cat[order(as.numeric(tmp.color.cat$CellName)),]
+  # add legend
+  if (length(tmp.color.cat$CellName) > 10) {
+    legend("topright",legend = tmp.color.cat$CellName,
+           inset=c(-0.2,0), ncol=2,
+           col = tmp.color.cat$Color,pch = 20,
+           cex=0.8,title="cluster",bty='n')
+  } else {
+    legend("topright",legend = tmp.color.cat$CellName,
+           inset=c(-0.2,0), ncol=1,
+           col = tmp.color.cat$Color,pch = 20,
+           cex=0.8,title="cluster",bty='n')
+  }
   
+  if(add.line==T){
+    lines(SlingshotDataSet(tmp.trajectory.cluster), 
+          lwd=1,pch=3, col=alpha('black',0.7),
+          type="l",show.constraints=show.constraints)
+  }
 }
+
 
 Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
-  tmp.cell.name<-names(tmp.trajectory.cluster$cell.label)
+  tmp.cell.name<-colnames(tmp.trajectory.cluster)
   tmp.cell.name.index<-match(tmp.cell.name,rownames(tmp.regulon.score))
   tmp.regulon.score<-tmp.regulon.score[tmp.cell.name.index,]
   val<-tmp.regulon.score$regulon.score
-  grPal<-colorRampPalette(c('grey','red'))
+  #
+  plot.new()
+  layout(matrix(1:2,nrow=1),widths=c(0.8,0.2))
+  grPal <- colorRampPalette(c("grey","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
-  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,col=alpha(tmp.color,0.8),pch=20,asp=1)
-  lines(SlingshotDataSet(tmp.trajectory.cluster)) 
+  
+  par(mar=c(5.1,2.1,1.1,2.1))
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
+       col=alpha(tmp.color,0.7),
+       pch=20,frame.plot = FALSE,
+       asp=1)
+  lines(SlingshotDataSet(tmp.trajectory.cluster))
+  #grid()
+  xl <- 1
+  yb <- 1
+  xr <- 1.5
+  yt <- 2
+  
+  par(mar=c(5.1,1.1,1.1,4.1))
+  plot(NA,type="n",ann=F,xlim=c(1,2),ylim=c(1,2),xaxt="n",yaxt="n",bty="n")
+  rect(
+    xl,
+    head(seq(yb,yt,(yt-yb)/50),-1),
+    xr,
+    tail(seq(yb,yt,(yt-yb)/50),-1),
+    col=grPal(50),border=NA
+  )
+  tmp.min<-round(min(val),1)
+  tmp.Nmean<-round(tmp.min/2,1)
+  tmp.max<-round(max(val),1)
+  tmp.Pmean<-round(tmp.max/2,1)
+  tmp.cor<-seq(yb,yt,(yt-yb)/50)
+  mtext("Relugon Score", cex=1,side=1)
+  mtext(c(tmp.min,tmp.Nmean,0,tmp.Pmean,tmp.max),
+        at=c(tmp.cor[5],tmp.cor[15],tmp.cor[25],tmp.cor[35],tmp.cor[45]),
+        side=2,las=1,cex=0.7)
+  
 }
-
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
   tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
@@ -125,11 +184,10 @@ if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
     library(Seurat)
     library(SummarizedExperiment)
     suppressPackageStartupMessages(library(destiny))
-    suppressPackageStartupMessages(library(gam))
     my.trajectory <- readRDS("trajectory_obj.rds")
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.Cluster.Trajectory(start.cluster=NULL,end.cluster=NULL,show.constraints=T)
+  Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 }
 quiet(dev.off())
 
@@ -140,13 +198,11 @@ if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
     library(Seurat)
     library(SummarizedExperiment)
     suppressPackageStartupMessages(library(destiny))
-    suppressPackageStartupMessages(library(gam))
     my.trajectory <- readRDS("trajectory_obj.rds")
     my.object <- readRDS("seurat_obj.rds")
   }
   
-  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = 1,end.cluster = 1)
-  
+  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = NULL,end.cluster = NULL)
 }
 quiet(dev.off())
 
