@@ -269,13 +269,14 @@ if(is_gene_filter == "1"){
 if(is_cell_filter == "1"){
   cell_index <- as.vector(apply(my.imputatedLog.data, 2, filter_cell_func))
   my.imputatedLog.data <- my.imputatedLog.data[,which(cell_index == 1)]
-  expFile <- expFile[,which(cell_index == 1)]
+  expFile <- expFile[,colnames(my.imputatedLog.data)]
 } 
 
 dim(my.imputatedLog.data)
 dim(expFile)
 
 ## 
+my.object<-0
 my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
 cell_names <- colnames(my.normalized.data)
@@ -285,7 +286,7 @@ cell_names <- colnames(my.normalized.data)
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
 filter_gene_num <- total_gene_num-nrow(my.object)
 filter_gene_rate <- formatC(filter_gene_num/total_gene_num,digits = 2)
-filter_cell_num <- ncol(expFile)-ncol(my.object)
+filter_cell_num <- total_cell_num-ncol(my.object)
 filter_cell_rate <- formatC(filter_cell_num/total_cell_num,digits = 2)
 if(filter_cell_num == 0){
   filter_cell_rate <- '0'
