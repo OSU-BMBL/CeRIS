@@ -12,11 +12,11 @@ args <- commandArgs(TRUE)
 wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 #wd<-getwd()
-###test
-# wd <- "C:/Users/wan268/Documents/iris3_data/0624"
-# jobid <-2019062485208 
-# expFile <- "2019062485208_filtered_expression.txt"
-# labelFile <- "2019062485208_cell_label.txt"
+####test
+ wd <- "D:/Users/flyku/Documents/IRIS3-data/2019081740810"
+ jobid <-20190816205310 
+ expFile <- "20190816205310_filtered_expression.txt"
+ labelFile <- "20190816205310_cell_label.txt"
 # wd <- getwd()
 setwd(wd)
 
@@ -48,7 +48,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     names(genes) <- 1:length(genes)
     cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
     cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.1)
-    score_vec <- cells_AUC@assays@.xData$data$AUC
+    score_vec <- cells_AUC@assays@data@listData[['AUC']]
   } else if (method=="zscore"){
     require("GSVA")
     score_vec <- gsva(expr,gset=genes,method="zscore")
@@ -61,7 +61,8 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   } 
   else if (method=="gsva"){
     require("GSVA")
-    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T)
+    require("snow")
+    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T,parallel.sz=8)
   } 
   return(score_vec)
 }
@@ -121,9 +122,7 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
-  group1 <- score_vec[,which(ct_vec==1)]
-  group0 <- score_vec[,which(ct_vec==0)]
- 
+
   # also normalize ct_vec to sum=1
   sum_ct_vec <- sum(ct_vec)
   ct_vec <- ct_vec/sum_ct_vec
@@ -154,6 +153,19 @@ exp_data <- as.matrix(exp_data)
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
+total_gene_list <- vector()
+total_gene_index <- 1
+#i=1
+## to speed up gsva process, read all genes  to one list
+for (i in 1:length(alldir)) {
+  regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
+  regulon_gene_name <- readLines(regulon_gene_name_handle)
+  close(regulon_gene_name_handle)
+  total_gene_list <- append(total_gene_list,regulon_gene_name)
+}
+total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
+total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
+
 #i=1
 # genes=x= gene_name_list[[1]]
 for (i in 1:length(alldir)) {
@@ -177,20 +189,21 @@ for (i in 1:length(alldir)) {
   gene_id_list <- lapply(strsplit(regulon_gene_id,"\\t"), function(x){x[-1]})
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
   
-  ras <- calc_ras(expr = exp_data,genes=gene_name_list,method = "gsva")
+  ras <- total_ras[total_gene_index:(total_gene_index + length(gene_name_list) - 1),]
+  total_gene_index <- total_gene_index + length(gene_name_list) 
   originak_ras <- ras
   ras <- normalize_ras(ras)
-  adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = i)
-  # remove regulons adjust pval >= 0.05
-  rss_keep_index <- which(adj_pval < 0.05)
-  if (length(rss_keep_index) > 100000) {
-    ras <- ras[rss_keep_index,]
-    originak_ras <- originak_ras[rss_keep_index,]
-    gene_name_list <- gene_name_list[rss_keep_index]
-    gene_id_list <- gene_id_list[rss_keep_index]
-    motif_list <- motif_list[rss_keep_index]
-    
-  }
+  ##adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = i)
+  ## remove regulons adjust pval >= 0.05
+  ## disabled
+  ##rss_keep_index <- which(adj_pval < 0.05)
+  ##if (length(rss_keep_index) > 100000000) {
+  ##  ras <- ras[rss_keep_index,]
+  ##  originak_ras <- originak_ras[rss_keep_index,]
+  ##  gene_name_list <- gene_name_list[rss_keep_index]
+  ##  gene_id_list <- gene_id_list[rss_keep_index]
+  ##  motif_list <- motif_list[rss_keep_index]
+  ##}
   rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = i)
   rss_list <- as.list(rss_list)
   # calculate to be removed regulons index, if no auc score or less than 0.05
