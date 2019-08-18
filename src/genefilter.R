@@ -227,14 +227,19 @@ filter_cell_func <- function(this){
 }
 
 my.object<-CreateSeuratObject(expFile)
+
+if (upload_type == "TenX.folder" | upload_type == "TenX.h5"){
+  my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
+  my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
+}
+
 ## get raw data################################  
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 sce<-SingleCellExperiment(list(counts=my.count.data))
+
 ## if all values are integers, perform normalization, otherwise skip to imputation
 if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
-  
 ## normalization##############################
-
   sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
   sce<-scater::normalize(sce,return_log=F)
   my.normalized.data <- normcounts(sce)
