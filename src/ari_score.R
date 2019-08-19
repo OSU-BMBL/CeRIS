@@ -59,7 +59,7 @@ user_cellname_index <- 1
 user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,user_label_index],stringsAsFactors = F)
 
 #test
-user_label_name <- user_label[,2]
+user_label_name <- user_label[order(user_label[,2]),2]
 user_label[,2] <- factor(user_label[,2])
 label_order <- unique(user_label[,2])
 levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
