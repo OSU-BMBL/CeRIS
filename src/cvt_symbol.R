@@ -44,7 +44,7 @@ getwd()
 # expName <- "20190408222612_filtered_expression.txt"
 # promoter_len <- '1000'
 srcFile <- list.files(srcDir,pattern = "*_bic.txt")
-expFile <- read.table(expName,sep="\t",header = T)
+expFile <- read.table(expName,sep="\t",header = T,row.names = 1,check.names = F)
 promoter_len <- as.numeric(promoter_len)
 
 get_row_num <- function (this){

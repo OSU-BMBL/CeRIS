@@ -37,7 +37,7 @@ close(conds_file_handle)
 
 gene_file <- read.delim(paste(jobid,"_blocks.gene.txt",sep = ""),sep=" ",header = F)[,-1]
 cell_label <- read.table(label_file,sep="\t",header = T)
-gene_expression <- read.table(expFile,sep="\t",header = T)
+gene_expression <- read.table(expFile,sep="\t",header = T,row.names = 1,check.names = F)
 gene_name <- rownames(gene_expression)
 write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names = F,col.names = F,quote = F)
 

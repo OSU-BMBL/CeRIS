@@ -31,14 +31,14 @@ sort_dir <- function(dir) {
 all_regulon <- sort_dir(list.files(path = workdir,pattern = "._bic.regulon_gene_symbol.txt$"))
 all_label <- sort_dir(list.files(path = workdir,pattern = ".+cell_label.txt$")[1])
 label_file <- read.table(all_label,header = T)
-exp_file <- read.table(paste(jobid,"_raw_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F)
+exp_file <- read.table(paste(jobid,"_filtered_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F,row.names = 1)
 #exp_file<- read.delim(paste(jobid,"_raw_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 
 short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
 short_dir <- sort_dir(short_dir)
 module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 
-exp_file <- log1p(exp_file)
+#exp_file <- log1p(exp_file)
 exp_file <- exp_file - rowMeans(exp_file)
 user_label_name <- read.table(paste(jobid,"_user_label_name.txt",sep = ""),stringsAsFactors = F,header = F,check.names = F)
 i=j=k=1

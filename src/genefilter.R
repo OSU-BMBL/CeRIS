@@ -303,7 +303,9 @@ write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(jo
 write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write.table(as.data.frame(expFile),paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
+#write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,col.names = c(colnames(exp_data)),sep="\t",quote=FALSE)
+write.table(data.frame("Gene"=rownames(exp_data),exp_data,check.names = F),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,sep="\t",quote=FALSE)
+
 
 rm(my.imputated.data)
 rm(my.normalized.data)
