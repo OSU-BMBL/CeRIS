@@ -13,10 +13,10 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
- wd <- "D:/Users/flyku/Documents/IRIS3-data/2019081740810"
- jobid <-20190816205310 
- expFile <- "20190816205310_filtered_expression.txt"
- labelFile <- "20190816205310_cell_label.txt"
+# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818190915"
+# jobid <-20190818190915 
+# expFile <- "20190818190915_filtered_expression.txt"
+# labelFile <- "20190818190915_cell_label.txt"
 # wd <- getwd()
 setwd(wd)
 
@@ -219,14 +219,16 @@ for (i in 1:length(alldir)) {
   motif_list <- motif_list[rss_keep_index]
   ras <- ras[rss_keep_index,]
   originak_ras <- originak_ras[rss_keep_index,]
-  
+
   rss_rank <- order(unlist(rss_list),decreasing = T)
   # x <- gene_name_list[[1]]
   gene_name_list <- gene_name_list[rss_rank]
   gene_id_list <- gene_id_list[rss_rank]
   motif_list <- motif_list[rss_rank]
   ras <- ras[rss_rank,]
+  originak_ras <- originak_ras[rss_rank,]
   rss_list <- rss_list[rss_rank]
+  
   
   marker<-lapply(gene_name_list, function(x){
     x[which(x%in%marker_data[,i])]
@@ -234,25 +236,27 @@ for (i in 1:length(alldir)) {
   
   if(sum(sapply(marker, length))>0){
     rss_rank<-order(sapply(marker,length),decreasing=T)
+    marker <- marker[rss_rank]
+    rss_list <- rss_list[rss_rank]
+    gene_name_list <- gene_name_list[rss_rank]
+    gene_id_list <- gene_id_list[rss_rank]
+    # put marker genes on top
+    gene_id_list <- mapply(function(X,Y,Z){
+      id <- which(Y %in% X)
+      return(unique(append(Z[id],Z)))
+    },X=marker,Y=gene_name_list,Z=gene_id_list)
+    
+    gene_name_list <- mapply(function(X,Y){
+      return(unique(append(X,Y)))
+    },X=marker,Y=gene_name_list)
+    
+    motif_list <- motif_list[rss_rank]
+    ras <- ras[rss_rank,]
+    originak_ras <- originak_ras[rss_rank,]
   }
-  marker <- marker[rss_rank]
-  rss_list <- rss_list[rss_rank]
-  gene_name_list <- gene_name_list[rss_rank]
-  gene_id_list <- gene_id_list[rss_rank]
+
   
-  # put marker genes on top
-  gene_id_list <- mapply(function(X,Y,Z){
-    id <- which(Y %in% X)
-    return(unique(append(Z[id],Z)))
-  },X=marker,Y=gene_name_list,Z=gene_id_list)
-  
-  gene_name_list <- mapply(function(X,Y){
-    return(unique(append(X,Y)))
-  },X=marker,Y=gene_name_list)
-  
-  motif_list <- motif_list[rss_rank]
-  ras <- ras[rss_rank,]
-  originak_ras <- originak_ras[rss_rank,]
+ 
   colnames(ras) <- label_data[,1]
   colnames(originak_ras) <- label_data[,1]
   
