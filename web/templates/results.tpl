@@ -1,12 +1,7 @@
 {{extends file="base.tpl"}} {{block name="extra_js"}} {{/block}} {{block name="extra_style"}} {{/block}} {{block name="main"}}
 
-<!-- Latest compiled and minified plotly.js JavaScript -->
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<!-- OR use a specific plotly.js release (e.g. version 1.5.0)
-<script src="https://cdn.plot.ly/plotly-1.5.0.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script> -->
 
-<script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script><script>
 var flag = [];
 $(document).ready(function() {
 	
@@ -53,6 +48,7 @@ $(document).ready(function() {
 
 });
 	function show_peak_table(item){
+		window.location = "#"+$(item).attr("id")
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(8)
 		table_id = "table-"+regulon_id
@@ -116,6 +112,7 @@ $(document).ready(function() {
 	
 	
 	function show_tad_table(item){
+		window.location = "#"+$(item).attr("id")
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(7)
 		table_id = "tad-table-"+regulon_id
@@ -168,6 +165,7 @@ $(document).ready(function() {
 		document.getElementById(table_id).innerHTML=""
 	}
 	function show_similar_table(item) {
+	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
 	table_id = "similar-table-" + regulon_id
@@ -205,6 +203,7 @@ $(document).ready(function() {
 	}
 	
 	function show_regulon_table(item) {
+	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
 	ct_id= regulon_id.substring(
@@ -232,6 +231,7 @@ $(document).ready(function() {
 	}
 	
 	function show_trajectory_table(item) {
+	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(14)
 	ct_id= regulon_id.substring(
@@ -258,6 +258,7 @@ $(document).ready(function() {
 	document.getElementById(table_id).innerHTML = ""
 	}
 	function show_gene_tsne(item) {
+	window.location = "#"+$(item).attr("id")
 	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
 	ct_id= regulon_id.substring(
     regulon_id.lastIndexOf("CT") + 2, 
@@ -347,19 +348,19 @@ $(document).ready(function() {
   document.body.removeChild(form)
 }
 function copyToClipboard(text){
-    const ele = document.createElement('textarea'); 
+    const ele = document.createElement('textarea')
     ele.value = text; 
     ele.setAttribute('readonly', true)
   // Following styling is to avoid flashing textarea on screen 
-    ele.style.position = 'absolute';
-    ele.style.padding = 0;
-    ele.style.background = 'transparent';
-    ele.style.outline = 'none'; 
-    ele.style.left = '-100%';
-  document.body.appendChild(ele); 
+    ele.style.position = 'absolute'
+    ele.style.padding = 0
+    ele.style.background = 'transparent'
+    ele.style.outline = 'none';
+    ele.style.left = '-100%'
+  document.body.appendChild(ele)
   ele.select(); 
-    document.execCommand('copy');
-    document.body.removeChild(ele); 
+    document.execCommand('copy')
+    document.body.removeChild(ele);
   }
  
 function copy_list(item){
@@ -386,11 +387,11 @@ if($(item).attr("id").includes("CT")) {
 	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_ct[0] + match_type
 }
 
-var xmlhttp = new XMLHttpRequest();
- xmlhttp.open("GET", file_path, false);
+var xmlhttp = new XMLHttpRequest()
+ xmlhttp.open("GET", file_path, false)
  xmlhttp.send();
   if (xmlhttp.status==200) {
-	txt = xmlhttp.responseText;
+	txt = xmlhttp.responseText
 	var lines = txt.split("\n")
 	gene_idx = match_ct[1] - 1
 	lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
@@ -1345,25 +1346,28 @@ var trace{{$silh_trace[clust]}} = {
 {{/section}}
 
 
-var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}];
+var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}]
 
-		var score_layout = {
-		title: "",
-		autosize:true,
-		barmode: 'group',
-			width:window.innerHeight-10,
-            font: {
-                size: 12
-            },
+var score_layout = {
+	title: "",
+	autosize:true,
+	barmode: 'group',
+		width:window.innerHeight-10,
+		font: {
+			size: 12
+		},
 	"titlefont": {
     "size": 16
 	},
+	width: 500,
+	height: 500,
 	"xaxis": {
 	visible:false,
 	tickangle: -45,
 	},
-        }
-		var score_config = {
+ }
+ 
+var score_config = {
   toImageButtonOptions: {
 	title: 'Download plot as a svg',
     format: 'svg', // one of png, svg, jpeg, webp
@@ -1376,7 +1380,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
   displayModeBar: true,
   modeBarButtonsToRemove:['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d','hoverClosestCartesian', 'hoverCompareCartesian','hoverClosest3d','toggleHover','hoverClosestGl2d','hoverClosestPie','toggleSpikelines']
 };
-		Plotly.react('score_div', score_data, score_layout, score_config);
+	Plotly.react('score_div', score_data, score_layout, score_config);
 
     </script>
 	
@@ -1407,7 +1411,8 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		title: "",
 		autosize:true,
 		responsive: true,
-		width:window.innerHeight-10,
+		width: 500,
+		height: 500,
             font: {
                 size: 12
             },
@@ -1418,6 +1423,5 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
         Plotly.react('sankey_div', sankey_data, sankey_layout,score_config)
 		 </script>
 		{{/if}}
-<div class="push"></div>
-</main>
+<div class="push"></div></main>
 {{/block}}
