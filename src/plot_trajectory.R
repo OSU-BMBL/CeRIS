@@ -15,6 +15,37 @@ srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
 
+reset_par <- function(){
+  op <- structure(list(xlog = FALSE, ylog = FALSE, adj = 0.5, ann = TRUE,
+                       ask = FALSE, bg = "transparent", bty = "o", cex = 1, cex.axis = 1,
+                       cex.lab = 1, cex.main = 1.2, cex.sub = 1, col = "black",
+                       col.axis = "black", col.lab = "black", col.main = "black",
+                       col.sub = "black", crt = 0, err = 0L, family = "", fg = "black",
+                       fig = c(0, 1, 0, 1), fin = c(6.99999895833333, 6.99999895833333
+                       ), font = 1L, font.axis = 1L, font.lab = 1L, font.main = 2L,
+                       font.sub = 1L, lab = c(5L, 5L, 7L), las = 0L, lend = "round",
+                       lheight = 1, ljoin = "round", lmitre = 10, lty = "solid",
+                       lwd = 1, mai = c(1.02, 0.82, 0.82, 0.42), mar = c(5.1, 4.1,
+                                                                         4.1, 2.1), mex = 1, mfcol = c(1L, 1L), mfg = c(1L, 1L, 1L,
+                                                                                                                        1L), mfrow = c(1L, 1L), mgp = c(3, 1, 0), mkh = 0.001, new = FALSE,
+                       oma = c(0, 0, 0, 0), omd = c(0, 1, 0, 1), omi = c(0, 0, 0,
+                                                                         0), pch = 1L, pin = c(5.75999895833333, 5.15999895833333),
+                       plt = c(0.117142874574832, 0.939999991071427, 0.145714307397962,
+                               0.882857125425167), ps = 12L, pty = "m", smo = 1, srt = 0,
+                       tck = NA_real_, tcl = -0.5, usr = c(0.568, 1.432, 0.568,
+                                                           1.432), xaxp = c(0.6, 1.4, 4), xaxs = "r", xaxt = "s", xpd = FALSE,
+                       yaxp = c(0.6, 1.4, 4), yaxs = "r", yaxt = "s", ylbias = 0.2), .Names = c("xlog",
+                                                                                                "ylog", "adj", "ann", "ask", "bg", "bty", "cex", "cex.axis",
+                                                                                                "cex.lab", "cex.main", "cex.sub", "col", "col.axis", "col.lab",
+                                                                                                "col.main", "col.sub", "crt", "err", "family", "fg", "fig", "fin",
+                                                                                                "font", "font.axis", "font.lab", "font.main", "font.sub", "lab",
+                                                                                                "las", "lend", "lheight", "ljoin", "lmitre", "lty", "lwd", "mai",
+                                                                                                "mar", "mex", "mfcol", "mfg", "mfrow", "mgp", "mkh", "new", "oma",
+                                                                                                "omd", "omi", "pch", "pin", "plt", "ps", "pty", "smo", "srt",
+                                                                                                "tck", "tcl", "usr", "xaxp", "xaxs", "xaxt", "xpd", "yaxp", "yaxs",
+                                                                                                "yaxt", "ylbias"))
+  par(op)
+}
 
 Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
   #labeling cell
@@ -34,10 +65,11 @@ Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NUL
   return(my.trajectory)
 }
 
+
 Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   my.classification.color<-as.character(palette36.colors(36))[-2]
-  par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+  par(mar=c(3.1, 3.1, 2.1, 5.1), xpd=TRUE)
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
        col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
        pch=20,frame.plot = FALSE,
@@ -48,37 +80,37 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
   tmp.color.cat<-tmp.color.cat[order(as.numeric(tmp.color.cat$CellName)),]
   # add legend
-  if (length(tmp.color.cat$CellName) > 10) {
+  if(length(tmp.color.cat$CellName)>10){
     legend("topright",legend = tmp.color.cat$CellName,
-           inset=c(-0.2,0), ncol=2,
+           inset=c(0.1,0), ncol=2,
            col = tmp.color.cat$Color,pch = 20,
            cex=0.8,title="cluster",bty='n')
-  } else {
-    legend("topright",legend = tmp.color.cat$CellName,
-           inset=c(-0.2,0), ncol=1,
-           col = tmp.color.cat$Color,pch = 20,
-           cex=0.8,title="cluster",bty='n')
-  }
+  } else {legend("topright",legend = tmp.color.cat$CellName,
+                 inset=c(0.1,0), ncol=1,
+                 col = tmp.color.cat$Color,pch = 20,
+                 cex=0.8,title="cluster",bty='n')}
+  
   
   if(add.line==T){
     lines(SlingshotDataSet(tmp.trajectory.cluster), 
           lwd=1,pch=3, col=alpha('black',0.7),
           type="l",show.constraints=show.constraints)
   }
+  reset_par()
 }
 
 
 Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
-  tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
+  tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon,customized = customized)
   tmp.cell.name<-colnames(tmp.trajectory.cluster)
   tmp.cell.name.index<-match(tmp.cell.name,rownames(tmp.regulon.score))
   tmp.regulon.score<-tmp.regulon.score[tmp.cell.name.index,]
   val<-tmp.regulon.score$regulon.score
   #
-  plot.new()
-  layout(matrix(1:2,nrow=1),widths=c(0.8,0.2))
-  grPal <- colorRampPalette(c("grey","red"))
+  
+  layout(matrix(1:2,nrow=1),widths=c(0.7,0.3))
+  grPal <- colorRampPalette(c("blue","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
   
   par(mar=c(5.1,2.1,1.1,2.1))
@@ -93,7 +125,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   xr <- 1.5
   yt <- 2
   
-  par(mar=c(5.1,1.1,1.1,4.1))
+  par(mar=c(20.1,1.1,1.1,10.1))
   plot(NA,type="n",ann=F,xlim=c(1,2),ylim=c(1,2),xaxt="n",yaxt="n",bty="n")
   rect(
     xl,
@@ -111,8 +143,10 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   mtext(c(tmp.min,tmp.Nmean,0,tmp.Pmean,tmp.max),
         at=c(tmp.cor[5],tmp.cor[15],tmp.cor[25],tmp.cor[35],tmp.cor[45]),
         side=2,las=1,cex=0.7)
+  reset_par()
   
 }
+
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
   tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
@@ -201,8 +235,8 @@ if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
     my.trajectory <- readRDS("trajectory_obj.rds")
     my.object <- readRDS("seurat_obj.rds")
   }
-  
-  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = NULL,end.cluster = NULL)
+  reset_par()
+  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = NULL,end.cluster = NULL,customized = T)
 }
 quiet(dev.off())
 
