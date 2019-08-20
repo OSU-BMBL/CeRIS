@@ -1,15 +1,18 @@
 {{extends file="base.tpl"}} {{block name="extra_js"}} {{/block}} {{block name="extra_style"}} {{/block}} {{block name="main"}}
 
-<!-- Latest compiled and minified plotly.js JavaScript -->
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<!-- OR use a specific plotly.js release (e.g. version 1.5.0)
-<script src="https://cdn.plot.ly/plotly-1.5.0.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script> -->
-
-<script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script><script>
 var flag = [];
-$(document).ready(function() {
+window.addEventListener('scroll', function(e) {
+if(document.getElementById("myTab").getBoundingClientRect().y == 10){
+	document.getElementById("myTab").setAttribute("style","background-color:#fff;border: 5px solid #2775b6;border-radius: 5px")
 	
+}	else {
+	document.getElementById("myTab").setAttribute("style","background-color:transparent;")
+}
+});
+
+$(document).ready(function() {
+
 	$('#tablePreview').DataTable({
         "searching": false,
         "paging": false,
@@ -30,6 +33,7 @@ $(document).ready(function() {
     }
 
     $('a[tabtype="main"]').on('shown.bs.tab', function(e) {
+		window.location = "#"+$(e.target).attr("id")
         var json_file = $(e.target).attr("json")
         var root_id = $(e.target).attr("root")
         if (!arrayContains(root_id, flag)) {
@@ -53,6 +57,7 @@ $(document).ready(function() {
 
 });
 	function show_peak_table(item){
+		window.location = "#"+$(item).attr("id")
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(8)
 		table_id = "table-"+regulon_id
@@ -116,6 +121,7 @@ $(document).ready(function() {
 	
 	
 	function show_tad_table(item){
+		window.location = "#"+$(item).attr("id")
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(7)
 		table_id = "tad-table-"+regulon_id
@@ -168,6 +174,7 @@ $(document).ready(function() {
 		document.getElementById(table_id).innerHTML=""
 	}
 	function show_similar_table(item) {
+	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
 	table_id = "similar-table-" + regulon_id
@@ -205,6 +212,7 @@ $(document).ready(function() {
 	}
 	
 	function show_regulon_table(item) {
+	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
 	ct_id= regulon_id.substring(
@@ -225,13 +233,14 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>CT'+ct_id+' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>'+ regulon_id +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>t-SNE Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>t-SNE Plot Colored by ' + regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
 	}
 	
 	function show_trajectory_table(item) {
+	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(14)
 	ct_id= regulon_id.substring(
@@ -252,12 +261,13 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>Trajectory plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p> '+ regulon_id +' trajectory plot</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>Trajectory Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p>Trajectory Plot Colored by ' + regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
 	}
 	function show_gene_tsne(item) {
+	window.location = "#"+$(item).attr("id")
 	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
 	ct_id= regulon_id.substring(
     regulon_id.lastIndexOf("CT") + 2, 
@@ -280,7 +290,7 @@ $(document).ready(function() {
 		document.getElementById(table_content_id).innerHTML = ''
 		let tmp = document.getElementById(table_id).innerHTML
 		console.log(tmp)
-		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p> '+ gene_symbol +' t-SNE plot</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
+		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>t-SNE Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>t-SNE Plot Colored by Normalized'+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
 		console.log(document.getElementById(table_id).innerHTML)
 		},
 	})
@@ -347,19 +357,19 @@ $(document).ready(function() {
   document.body.removeChild(form)
 }
 function copyToClipboard(text){
-    const ele = document.createElement('textarea'); 
+    const ele = document.createElement('textarea')
     ele.value = text; 
     ele.setAttribute('readonly', true)
   // Following styling is to avoid flashing textarea on screen 
-    ele.style.position = 'absolute';
-    ele.style.padding = 0;
-    ele.style.background = 'transparent';
-    ele.style.outline = 'none'; 
-    ele.style.left = '-100%';
-  document.body.appendChild(ele); 
+    ele.style.position = 'absolute'
+    ele.style.padding = 0
+    ele.style.background = 'transparent'
+    ele.style.outline = 'none';
+    ele.style.left = '-100%'
+  document.body.appendChild(ele)
   ele.select(); 
-    document.execCommand('copy');
-    document.body.removeChild(ele); 
+    document.execCommand('copy')
+    document.body.removeChild(ele);
   }
  
 function copy_list(item){
@@ -386,11 +396,11 @@ if($(item).attr("id").includes("CT")) {
 	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_ct[0] + match_type
 }
 
-var xmlhttp = new XMLHttpRequest();
- xmlhttp.open("GET", file_path, false);
+var xmlhttp = new XMLHttpRequest()
+ xmlhttp.open("GET", file_path, false)
  xmlhttp.send();
   if (xmlhttp.status==200) {
-	txt = xmlhttp.responseText;
+	txt = xmlhttp.responseText
 	var lines = txt.split("\n")
 	gene_idx = match_ct[1] - 1
 	lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
@@ -539,10 +549,10 @@ var xmlhttp = new XMLHttpRequest();
                                              <table id="tablePreview" class="table">
                                                 <thead>
                                                     <tr>
-                                                        <th>ARI</th>
-                                                        <th>RI</th>
-                                                        <th>JI</th>
-                                                        <th>FMI</th>
+                                                        <th>Adjusted Rand Index (ARI)</th>
+                                                        <th>Rand Index (RI)</th>
+                                                        <th>Jaccard Index (JI)</th>
+                                                        <th>Fowlkes and Mallows's index (FMI)</th>
                                                         <!--<th>Purity</th>
                                                         <th>Entropy</th><th>Accuracy</th> <td>{{$purity}}</td>
                                                         <td>{{$entropy}}</td><td>{{$Accuracy}}</td> -->
@@ -597,13 +607,23 @@ var xmlhttp = new XMLHttpRequest();
 												</div>
 											</div>
 											-->
+											<div class="CT-result-img">
+                                                <div class="col-sm-6">
+												<h4 style="text-align:center;margin-top:50px"> t-SNE Plot Colored by Cell Types</h4>
+                                                   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.png"></img>
+												</div>
+												<div class="col-sm-6">
+												<h4 style="text-align:center;margin-top:50px"> Trajectory Plot Colored by Cell Types</h4>
+                                                   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
+												</div>
+											</div>
                                             <div class="CT-result-img">
-                                                <div class="col-sm-12">
+                                                <div class="col-sm-6">
 												<hr>
 												<h4 style="text-align:center;margin-top:50px"> Silhouette score</h4>
                                                     <div id="score_div"></div>
 												</div>{{if ($sankey_src|@count >0)}}
-                                                <div class="col-sm-12">
+                                                <div class="col-sm-6">
 												<hr>
 												<h4 style="text-align:center;margin-top:50px"> Sankey plot</h4>
 													<div id="sankey_div"></div>
@@ -654,7 +674,8 @@ var xmlhttp = new XMLHttpRequest();
                         <div class="panel-body">
                             <div class="row" style="">
                                 <div class="form-group col-md-12 col-sm-12" style="height:100%">
-									     <ul class="nav nav-tabs" id="myTab" role="tablist">
+								
+									     <ul class="nav nav-tabs nav-sticky" id="myTab" role="tablist">
 														   <!--
 															<li class="nav-item">
                                                                 <a class="nav-link" id="profile-tab" data-toggle="tab" tabtype="main" href="#main_CT2" json="data/{{$jobid}}/ct2.json" root="#container-id-12" role="tab" aria-controls="profile" aria-selected="false">Cell Type2</a>
@@ -1345,25 +1366,28 @@ var trace{{$silh_trace[clust]}} = {
 {{/section}}
 
 
-var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}];
+var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clust]}},  {{/section}}]
 
-		var score_layout = {
-		title: "",
-		autosize:true,
-		barmode: 'group',
-			width:window.innerHeight-10,
-            font: {
-                size: 12
-            },
+var score_layout = {
+	title: "",
+	autosize:true,
+	barmode: 'group',
+		width:window.innerHeight-10,
+		font: {
+			size: 12
+		},
 	"titlefont": {
     "size": 16
 	},
+	width: 500,
+	height: 500,
 	"xaxis": {
 	visible:false,
 	tickangle: -45,
 	},
-        }
-		var score_config = {
+ }
+ 
+var score_config = {
   toImageButtonOptions: {
 	title: 'Download plot as a svg',
     format: 'svg', // one of png, svg, jpeg, webp
@@ -1376,7 +1400,7 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
   displayModeBar: true,
   modeBarButtonsToRemove:['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d','hoverClosestCartesian', 'hoverCompareCartesian','hoverClosest3d','toggleHover','hoverClosestGl2d','hoverClosestPie','toggleSpikelines']
 };
-		Plotly.react('score_div', score_data, score_layout, score_config);
+	Plotly.react('score_div', score_data, score_layout, score_config);
 
     </script>
 	
@@ -1407,7 +1431,8 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		title: "",
 		autosize:true,
 		responsive: true,
-		width:window.innerHeight-10,
+		width: 500,
+		height: 500,
             font: {
                 size: 12
             },
@@ -1416,8 +1441,8 @@ var score_data = [{{section name=clust loop=$silh_trace}}trace{{$silh_trace[clus
 		},
         }
         Plotly.react('sankey_div', sankey_data, sankey_layout,score_config)
+
 		 </script>
 		{{/if}}
-<div class="push"></div>
-</main>
+<div class="push"></div></main>
 {{/block}}
