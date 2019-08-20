@@ -22,6 +22,10 @@ suppressPackageStartupMessages(library(scran))
 suppressPackageStartupMessages(library(slingshot))
 suppressPackageStartupMessages(library(destiny))
 suppressPackageStartupMessages(library(gam))
+suppressPackageStartupMessages(library(RColorBrewer))
+suppressPackageStartupMessages(library(Polychrome))
+suppressPackageStartupMessages(library(ggplot2))
+
 
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
@@ -61,7 +65,7 @@ load_test_data <- function(){
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'iris3_example_expression_matrix.csv'
+  label_file<-'iris3_example_expression_label.csv'
   delimiter <- ','
   param_k<-0
   label_use_sc3 <- 2
@@ -505,10 +509,128 @@ saveRDS(my.object,file="seurat_obj.rds")
 my.trajectory<-SingleCellExperiment(assays=List(counts=GetAssayData(object = my.object[['RNA']],slot="counts")))
 SummarizedExperiment::assays(my.trajectory)$norm<-exp_data
 
-pca <- prcomp(t(SummarizedExperiment::assays(my.trajectory)$norm), scale. = FALSE)
-rd1 <- pca$x[,1:2]
 dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
 rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
-reducedDims(my.trajectory) <- SimpleList(PCA = rd1, DiffMap = rd2)
+reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
 saveRDS(my.trajectory,file="trajectory_obj.rds")
 
+
+Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
+  # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
+  # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
+  # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
+  if(!customized){
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+                                         Cell_type=my.object$seurat_clusters)
+  }else{
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+                                         Cell_type=as.factor(my.object$Customized.idents))
+  }
+  p.cluster <- ggplot(my.plot.all.source,
+                      aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
+  p.cluster <- p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+  #p.cluster<-theme_linedraw()
+  p.cluster <- p.cluster + labs(col="cell type")
+  p.cluster <- p.cluster + theme_classic()+scale_fill_continuous(name="cell type")
+  p.cluster <- p.cluster + coord_fixed(ratio=1)
+  p.cluster
+}
+
+reset_par <- function(){
+  op <- structure(list(xlog = FALSE, ylog = FALSE, adj = 0.5, ann = TRUE,
+                       ask = FALSE, bg = "transparent", bty = "o", cex = 1, cex.axis = 1,
+                       cex.lab = 1, cex.main = 1.2, cex.sub = 1, col = "black",
+                       col.axis = "black", col.lab = "black", col.main = "black",
+                       col.sub = "black", crt = 0, err = 0L, family = "", fg = "black",
+                       fig = c(0, 1, 0, 1), fin = c(6.99999895833333, 6.99999895833333
+                       ), font = 1L, font.axis = 1L, font.lab = 1L, font.main = 2L,
+                       font.sub = 1L, lab = c(5L, 5L, 7L), las = 0L, lend = "round",
+                       lheight = 1, ljoin = "round", lmitre = 10, lty = "solid",
+                       lwd = 1, mai = c(1.02, 0.82, 0.82, 0.42), mar = c(5.1, 4.1,
+                                                                         4.1, 2.1), mex = 1, mfcol = c(1L, 1L), mfg = c(1L, 1L, 1L,
+                                                                                                                        1L), mfrow = c(1L, 1L), mgp = c(3, 1, 0), mkh = 0.001, new = FALSE,
+                       oma = c(0, 0, 0, 0), omd = c(0, 1, 0, 1), omi = c(0, 0, 0,
+                                                                         0), pch = 1L, pin = c(5.75999895833333, 5.15999895833333),
+                       plt = c(0.117142874574832, 0.939999991071427, 0.145714307397962,
+                               0.882857125425167), ps = 12L, pty = "m", smo = 1, srt = 0,
+                       tck = NA_real_, tcl = -0.5, usr = c(0.568, 1.432, 0.568,
+                                                           1.432), xaxp = c(0.6, 1.4, 4), xaxs = "r", xaxt = "s", xpd = FALSE,
+                       yaxp = c(0.6, 1.4, 4), yaxs = "r", yaxt = "s", ylbias = 0.2), .Names = c("xlog",
+                                                                                                "ylog", "adj", "ann", "ask", "bg", "bty", "cex", "cex.axis",
+                                                                                                "cex.lab", "cex.main", "cex.sub", "col", "col.axis", "col.lab",
+                                                                                                "col.main", "col.sub", "crt", "err", "family", "fg", "fig", "fin",
+                                                                                                "font", "font.axis", "font.lab", "font.main", "font.sub", "lab",
+                                                                                                "las", "lend", "lheight", "ljoin", "lmitre", "lty", "lwd", "mai",
+                                                                                                "mar", "mex", "mfcol", "mfg", "mfrow", "mgp", "mkh", "new", "oma",
+                                                                                                "omd", "omi", "pch", "pin", "plt", "ps", "pty", "smo", "srt",
+                                                                                                "tck", "tcl", "usr", "xaxp", "xaxs", "xaxt", "xpd", "yaxp", "yaxs",
+                                                                                                "yaxt", "ylbias"))
+  par(op)
+}
+
+Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
+  #labeling cell
+  if(customized==TRUE){
+    tmp.cell.type<-my.object$Customized.idents
+  }
+  if(customized==FALSE){
+    tmp.cell.type<-as.character(my.object$seurat_clusters)
+  }
+  tmp.cell.name.index<-match(colnames(my.trajectory),colnames(my.object))
+  tmp.cell.type<-tmp.cell.type[tmp.cell.name.index]
+  colData(my.trajectory)$cell.label<-tmp.cell.type
+  # run trajectory, first run the lineage inference
+  my.trajectory <- slingshot(my.trajectory, clusterLabels = 'cell.label', reducedDim = 'DiffMap',
+                             start.clus=start.cluster,end.clus=end.cluster)
+  #summary(my.trajectory$slingPseudotime_1)
+  return(my.trajectory)
+}
+
+
+Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
+  tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
+  my.classification.color<-as.character(palette36.colors(36))[-2]
+  par(mar=c(3.1, 3.1, 2.1, 5.1), xpd=TRUE)
+  plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
+       col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
+       pch=20,frame.plot = FALSE,
+       asp=1)
+  #grid()
+  tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
+                                  Color=my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)])
+  tmp.color.cat<-tmp.color.cat[!duplicated(tmp.color.cat$CellName),]
+  tmp.color.cat<-tmp.color.cat[order(as.numeric(tmp.color.cat$CellName)),]
+  # add legend
+  if(length(tmp.color.cat$CellName)>10){
+    legend("topright",legend = tmp.color.cat$CellName,
+           inset=c(0.1,0), ncol=2,
+           col = tmp.color.cat$Color,pch = 20,
+           cex=0.8,title="cluster",bty='n')
+  } else {legend("topright",legend = tmp.color.cat$CellName,
+                 inset=c(0.1,0), ncol=1,
+                 col = tmp.color.cat$Color,pch = 20,
+                 cex=0.8,title="cluster",bty='n')}
+  
+  
+  if(add.line==T){
+    lines(SlingshotDataSet(tmp.trajectory.cluster), 
+          lwd=1,pch=3, col=alpha('black',0.7),
+          type="l",show.constraints=show.constraints)
+  }
+  reset_par()
+}
+
+quiet <- function(x) {
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+} 
+
+
+png(paste("regulon_id/overview_ct.png",sep = ""),width=1600, height=1200,res = 300)
+Plot.cluster2D(reduction.method = "tsne",customized = T)
+quiet(dev.off())
+
+png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=1600, height=1200,res = 300)
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+quiet(dev.off())
