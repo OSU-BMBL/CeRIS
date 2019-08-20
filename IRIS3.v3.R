@@ -259,7 +259,7 @@ my.object<-FindClusters(my.object,resolution = 0.5)
 # M3  G5  G6.....#
 #----------------#
 ## test data, input data path
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
+# setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/2019062485208/")
 # get cell and regulon information
 Get.CellType<-function(cell.type=1,...){
   if(!is.null(cell.type)){
@@ -415,13 +415,14 @@ Dim.Calculate<-function(Matrix.type="GEM",...){
   }
   return(a)
 }
-Dim.Calculate(Matrix.type="RSM")
+# Dim.Calculate(Matrix.type="GEM")
 # two mode GEM RSM
-reducedDims(my.trajectory)<-Dim.Calculate(Matrix.type="RSM")
-Plot.Cluster.Trajectory(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F)
-Plot.Regulon.Trajectory(customized=T,cell.type=4,regulon=1,start.cluster=NULL,end.cluster=NULL)
+reducedDims(my.trajectory)<-Dim.Calculate(Matrix.type="GEM")
+######## test ######################################
+# Plot.Cluster.Trajectory(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F)
+# Plot.Regulon.Trajectory(customized=T,cell.type=4,regulon=1,start.cluster=NULL,end.cluster=NULL)
 
-Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){W
+Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
   #labeling cell
   if(customized==TRUE){
     tmp.cell.type<-my.object$Customized.idents
@@ -485,7 +486,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   #
   
   layout(matrix(1:2,nrow=1),widths=c(0.7,0.3))
-  grPal <- colorRampPalette(c("grey","red"))
+  grPal <- colorRampPalette(c("blue","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
   
   par(mar=c(5.1,2.1,1.1,2.1))
