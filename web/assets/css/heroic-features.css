@@ -833,6 +833,17 @@ font-size:16px;
 	
 	
 }
+.nav-sticky{
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 10px;
+  z-index:999;
+}
+
+.nav-tabs>li.nav-item{
+	margin-bottom:0;
+}
+
 @media (max-width:1367px){
 	#tomtom_table {
 	  font-size:12px;
