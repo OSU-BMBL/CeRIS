@@ -5,7 +5,6 @@ var flag = [];
 window.addEventListener('scroll', function(e) {
 if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 	document.getElementById("myTab").setAttribute("style","background-color:#fff;border: 5px solid #2775b6;border-radius: 5px")
-	
 }	else {
 	document.getElementById("myTab").setAttribute("style","background-color:transparent;")
 }
@@ -21,7 +20,7 @@ $(document).ready(function() {
 	$('.regulon_table').DataTable({
 	"aaSorting": []
 	})
-    document.getElementsByClassName("tomtom_pvalue").innerHTML = "test";
+
     $("#to_enrichr").click(function() {
         get_gene_list(1, 2);
     });
@@ -35,6 +34,8 @@ $(document).ready(function() {
     $('a[tabtype="main"]').on('shown.bs.tab', function(e) {
 		window.location = "#"+$(e.target).attr("id")
         var json_file = $(e.target).attr("json")
+		$('.nav-tabs>li>a').removeClass('hover')
+		$(e.target).addClass('hover')
         var root_id = $(e.target).attr("root")
         if (!arrayContains(root_id, flag)) {
             make_clust_main(json_file, root_id)
@@ -686,13 +687,13 @@ var xmlhttp = new XMLHttpRequest()
 															-->
 															{{section name=ct_idx start=0 loop=$count_ct}}
                                                             <li class="nav-item {{if {{$count_ct[ct_idx]}} eq '1'}}active{{/if}}">
-                                                                <a class="nav-link fade in {{if {{$count_ct[ct_idx]}} eq '0'}}active{{/if}}" id="home-tab" data-toggle="tab" tabtype="main" href="#main_CT{{$count_ct[ct_idx]}}" json="data/{{$jobid}}/json/CT{{$count_ct[ct_idx]}}.json" root="#container-id-{{$count_ct[ct_idx]}}" role="tab" aria-controls="home" aria-selected="true">CT{{$count_ct[ct_idx]}}</a>
+                                                                <a class="nav-link fade in {{if {{$count_ct[ct_idx]}} eq '0'}}active{{/if}}" id="nav-{{$count_ct[ct_idx]}}" data-toggle="tab" tabtype="main" href="#main_CT{{$count_ct[ct_idx]}}" json="data/{{$jobid}}/json/CT{{$count_ct[ct_idx]}}.json" root="#container-id-{{$count_ct[ct_idx]}}" role="tab" aria-controls="home" aria-selected="true">CT{{$count_ct[ct_idx]}}</a>
                                                             </li>
 															{{/section}}
 															{{if $count_module > 0}}
 															{{section name=ct_idx start=0 loop=$count_module}}
                                                             <li class="nav-item">
-                                                                <a class="nav-link fade in " id="home-tab" data-toggle="tab" tabtype="main" href="#main_module{{$count_module[ct_idx]}}" json="data/{{$jobid}}/json/module{{$count_module[ct_idx]}}.json" root="#container-id-module-{{$count_module[ct_idx]}}" role="tab" aria-controls="home" aria-selected="true">module{{$count_module[ct_idx]}}</a>
+                                                                <a class="nav-link fade in " id="nav{{$count_module[ct_idx]}}" data-toggle="tab" tabtype="main" href="#main_module{{$count_module[ct_idx]}}" json="data/{{$jobid}}/json/module{{$count_module[ct_idx]}}.json" root="#container-id-module-{{$count_module[ct_idx]}}" role="tab" aria-controls="home" aria-selected="true">module{{$count_module[ct_idx]}}</a>
                                                             </li>
 															{{/section}}
 															{{/if}}
