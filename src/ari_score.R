@@ -44,6 +44,7 @@ library(data.table)
 
 
 sc3_cluster <- read.table(paste(jobid,"_sc3_label.txt",sep=""),header=T,sep='\t',check.names = FALSE)
+# srcFile <- 'iris3_example_expression_label.csv'
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
@@ -60,11 +61,15 @@ user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,
 
 #test
 user_label_name <- user_label[order(user_label[,2]),2]
+sc3_cluster <- sc3_cluster[order(user_label[,2]),]
+user_label <- user_label[order(user_label[,2]),]
 user_label[,2] <- factor(user_label[,2])
 label_order <- unique(user_label[,2])
 levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
 colnames(sc3_cluster) <- c("cell_name","cluster")
 colnames(user_label) <- c("cell_name","label")
+
+write.table(sc3_cluster, paste(jobid,"_sc3_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 
 if (label_use_sc3 == 2) {
   is_evaluation <- 'yes'
