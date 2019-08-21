@@ -25,7 +25,7 @@ while read -r species; do
 		else
 			cp $file $ct_dir"/bic"$meme_index.txt.fa
 			meme_index=$((meme_index+1))
-			/var/www/html/iris3/program/dminda/src/BoBro/BoBro -i $file -l $min_length -F -o 10 -Z /var/www/html/iris3/program/bg_data/$species.bg.fa &
+			/var/www/html/iris3/program/dminda/src/BoBro/BoBro -i $file -l $min_length -F -o 3 -Z /var/www/html/iris3/program/bg_data/$species.bg.fa &
 		fi
 		#perl /var/www/html/iris3/program/dminda/BBR1.pl 1 $file -L $min_length -U $max_length -R 2 -F -n 10 0.4
 	done
