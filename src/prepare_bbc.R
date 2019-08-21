@@ -6,7 +6,7 @@ library(tidyverse)
 args <- commandArgs(TRUE)
 #setwd("d:/Users/flyku/Documents/IRIS3-data/test_dzscore")
 #srcDir <- getwd()
-#jobid <-2019062485208 
+#jobid <-2019082195321 
 #motif_len <- 12
 srcDir <- args[1]
 motif_len <- args[2]
@@ -65,13 +65,15 @@ convert_motif <- function(filepath){
     df <- line[substr(line,0,1) == ">"]
     df <- read.table(text=df,sep = "\t")
     colnames(df) <- c("MotifNum","Seq","start","end","Motif","Score","Info")
+  } else {
+    return (0)
   }
   close(motif_file)
   return(df)
 }
 
-#i=1
-#j=1
+#i=3
+#j=31
 #info = "bic1.txt.fa.closures-1"  
 module_type <- sub(paste(".*_ *(.*?) *_.*",sep=""), "\\1", alldir)
 #module_type <- rep("CT",6)
@@ -91,40 +93,44 @@ for (i in 1:length(alldir)) {
       bic_idx <- as.numeric(unlist(matches))
       #test
       #motif_seq <- convert_motif(paste(all_closure[j],".test",sep = ""))[,c(1,5,7)]
-      motif_seq <- convert_motif(all_closure[j])[,c(1,5,7)]
-      motif_pos <- convert_motif(all_closure[j])[,c(1,2,3,4,7)]
-      gene_pos <- merge(motif_pos,gene_info,by.x = "Info",by.y = 'V2')
-      gene_pos <-transform(gene_pos, min = pmin(start, end), max=pmax(start,end))
-      gene_pos[,4] <-  gene_pos[,7] + gene_pos[,8]
-      gene_pos[,5] <-  gene_pos[,7] + gene_pos[,9]
-      gene_pos[,10] <- module_type[i]
-      gene_pos[,11] <- paste(i,bic_idx,sub(">Motif-","",gene_pos[,2]),sep = ",")
-      if(module_type[i] == "module"){
-        regulon_idx_module <- regulon_idx_module + 1
-        gene_pos[,11] <- paste(regulon_idx_module,bic_idx,sub(">Motif-","",gene_pos[,2]),sep = ",")
-      }
-      #write.table(gene_pos[,c(6,4,5,1)],paste(alldir[i],"/bic",j,".bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
-      result_gene_pos <- rbind(result_gene_pos,gene_pos[,c(6,4,5,1,10,11)])
-      motif_seq[,1] <- gsub(">Motif","",motif_seq[,1])
-      motif_seq[,4] <- as.factor(paste(short_all_closure[j],motif_seq[,1],sep=""))
-      seq_file <- motif_seq[,c(4,3)]
-      motif_seq <- motif_seq[,c(4,2)]
-      colnames(motif_seq) <- c("info","seq")
-      colnames(seq_file) <- c("info","genes")
-      combined_seq <- rbind(combined_seq,motif_seq)
-      combined_gene <- rbind(combined_gene,seq_file)
-      res <- paste(alldir[i],".bbc.txt",sep="")
-      #res <- file("filename", "w")
-      cat("", file=res)
-      for (info in levels(combined_seq[,1])) {
-        cat(paste(">",as.character(info),sep=""), file=res,sep="\n",append = T)
-        if (length(as.character(combined_seq[which(combined_seq[,1]== info),2])) >= 100) {
-          sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])[1:99]
-        } else {
-          sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])
+      convert_result <- convert_motif(all_closure[j])
+      if (convert_result != 0) {
+        motif_seq <- convert_result[,c(1,5,7)]
+        motif_pos <- convert_result[,c(1,2,3,4,7)]
+        gene_pos <- merge(motif_pos,gene_info,by.x = "Info",by.y = 'V2')
+        gene_pos <-transform(gene_pos, min = pmin(start, end), max=pmax(start,end))
+        gene_pos[,4] <-  gene_pos[,7] + gene_pos[,8]
+        gene_pos[,5] <-  gene_pos[,7] + gene_pos[,9]
+        gene_pos[,10] <- module_type[i]
+        gene_pos[,11] <- paste(i,bic_idx,sub(">Motif-","",gene_pos[,2]),sep = ",")
+        if(module_type[i] == "module"){
+          regulon_idx_module <- regulon_idx_module + 1
+          gene_pos[,11] <- paste(regulon_idx_module,bic_idx,sub(">Motif-","",gene_pos[,2]),sep = ",")
         }
-        cat(sequence, file=res,sep="\n",append = T)
+        #write.table(gene_pos[,c(6,4,5,1)],paste(alldir[i],"/bic",j,".bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+        result_gene_pos <- rbind(result_gene_pos,gene_pos[,c(6,4,5,1,10,11)])
+        motif_seq[,1] <- gsub(">Motif","",motif_seq[,1])
+        motif_seq[,4] <- as.factor(paste(short_all_closure[j],motif_seq[,1],sep=""))
+        seq_file <- motif_seq[,c(4,3)]
+        motif_seq <- motif_seq[,c(4,2)]
+        colnames(motif_seq) <- c("info","seq")
+        colnames(seq_file) <- c("info","genes")
+        combined_seq <- rbind(combined_seq,motif_seq)
+        combined_gene <- rbind(combined_gene,seq_file)
+        res <- paste(alldir[i],".bbc.txt",sep="")
+        #res <- file("filename", "w")
+        cat("", file=res)
+        for (info in levels(combined_seq[,1])) {
+          cat(paste(">",as.character(info),sep=""), file=res,sep="\n",append = T)
+          if (length(as.character(combined_seq[which(combined_seq[,1]== info),2])) >= 100) {
+            sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])[1:99]
+          } else {
+            sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])
+          }
+          cat(sequence, file=res,sep="\n",append = T)
+        }
       }
+      
     }
   } else {
     cat("", file= paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
