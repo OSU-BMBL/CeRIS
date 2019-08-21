@@ -283,7 +283,7 @@ dim(expFile)
 my.object<-0
 my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
-cell_names <- colnames(my.normalized.data)
+cell_names <- colnames(my.object)
 
 
 ## calculate filtering rate
