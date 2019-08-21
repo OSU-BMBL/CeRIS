@@ -149,8 +149,30 @@ $(document).ready(function() {
 				"searching": false,
 				"bInfo" : false,
 				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
-			"iDisplayLength": 5,
-		})
+				"iDisplayLength": 5,
+				columnDefs: [/*{
+                "targets": [2],
+                render: function (data, type, row, meta){	
+						return data.length
+					}
+				},*/{
+                "targets": [2],
+                render: function (data, type, row, meta){	
+						var dat=new Array
+						if (type === 'display')
+						{
+							
+							res=data.split(" ")
+							console.log(res)
+							for(i=0;i < res.length;i++) {
+								dat[i] = '<a  href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+							}
+						}
+						return dat
+					}
+				}
+				],
+			})
 			} else if (match_species == 'Mouse'){
 			$(table_jquery_id).DataTable( {
 				dom: 'lBfrtip',

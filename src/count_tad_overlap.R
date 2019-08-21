@@ -7,6 +7,7 @@ args <- commandArgs(TRUE)
 # tad_dir <- 'D:/Users/flyku/Documents/IRIS3-data/tad/mm10'
 # regulon <- 'CT1S-R2'
 # jobid <- '20190404232115'
+# species <- 'Human'
 srcDir <- args[1] # /var/www/html/iris3/data/20190404232115
 regulon <- args[2] # CT3S-R5
 species <- args[3] #Human, Mouse
@@ -31,7 +32,7 @@ regulon_id <- gsub( ".*R", "", regulon)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 tad_files <- list.files(tad_dir,pattern = "*.bed.txt$",full.names = T)
 motif_position <- read.delim("motif_position.bed",sep = '\t',header = F)
-regulon_filename <- paste(jobid,"_",regulon_type,"_",regulon_type_id,"_bic.regulon.txt",sep="")
+regulon_filename <- paste(jobid,"_",regulon_type,"_",regulon_type_id,"_bic.regulon_gene_id.txt",sep="")
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""),header = T)
 regulon_file_connection <- file(regulon_filename)
 regulon_file <- strsplit(readLines(regulon_file_connection), "\t")
@@ -89,17 +90,17 @@ invisible(capture.output(lapply(result_gene_list, write,paste("tad/",regulon,".t
 #j=1932
 #
 #tad_files <- list.files( "D:/Users/flyku/Documents/IRIS3-data/tad/hg38",pattern = "*.bed$",full.names = T)
-for (i in 1:length(tad_files)) {
-  test_tad <- read.table(tad_files[i],header = F)
-  tad_gene_list <- list()
-  for (j in 1:max(test_tad[,4])) {
-    this_tad_gene_list <- as.character(test_tad[which(test_tad[,4] == j),8])
-    #this_tad_gene_list <- this_tad_gene_list[!duplicated(this_tad_gene_list)]
-    tad_gene_list[[j]] <- this_tad_gene_list
-  }
-  #lapply(tad_gene_list, function(x) write.table( data.frame(x), paste(tad_files[i],".txt",sep = "")  , append= T, sep='\t' ))
-  file.create(paste(tad_files[i],".txt",sep = ""))
-  lapply(tad_gene_list, write,paste(tad_files[i],".txt",sep = ""), append=TRUE, ncolumns=1000)
-}
+#for (i in 1:length(tad_files)) {
+#  test_tad <- read.table(tad_files[i],header = F)
+#  tad_gene_list <- list()
+#  for (j in 1:max(test_tad[,4])) {
+#    this_tad_gene_list <- as.character(test_tad[which(test_tad[,4] == j),8])
+#    #this_tad_gene_list <- this_tad_gene_list[!duplicated(this_tad_gene_list)]
+#    tad_gene_list[[j]] <- this_tad_gene_list
+#  }
+#  #lapply(tad_gene_list, function(x) write.table( data.frame(x), paste(tad_files[i],".txt",sep = "")  , append= T, sep='\t' ))
+#  file.create(paste(tad_files[i],".txt",sep = ""))
+#  lapply(tad_gene_list, write,paste(tad_files[i],".txt",sep = ""), append=TRUE, ncolumns=1000)
+#}
 
 
