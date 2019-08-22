@@ -14,9 +14,9 @@ jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
 # wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818190915"
-# jobid <-20190818190915 
-# expFile <- "20190818190915_filtered_expression.txt"
-# labelFile <- "20190818190915_cell_label.txt"
+# jobid <-2019082172234 
+# expFile <- "2019082172234_filtered_expression.txt"
+# labelFile <- "2019082172234_cell_label.txt"
 # wd <- getwd()
 setwd(wd)
 
@@ -164,7 +164,12 @@ for (i in 1:length(alldir)) {
   total_gene_list <- append(total_gene_list,regulon_gene_name)
 }
 total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
-total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
+if (ncol(exp_data) > 5000) {
+  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "aucell")
+} else {
+  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
+  
+}
 
 #i=1
 # genes=x= gene_name_list[[1]]
