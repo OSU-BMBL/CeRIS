@@ -2,12 +2,14 @@
 ########## Test DMINDA and MEME overlap ##################
 # used files:
 # regulon_motif
+library(tidyverse)
 
 library(dabestr)
 ###test
-wd <- "d:/Users/flyku/Documents/IRIS3-data/20190816170235"
-jobid <-20190816170235 
-# wd <- getwd()
+#wd <- "d:/Users/flyku/Documents/IRIS3-data/20190816170235"
+setwd("C:/Users/wan268/Documents/iris3_data/20190822164428")
+jobid <-20190822164428 
+ wd <- getwd()
 setwd(wd)
 
 quiet <- function(x) { 
@@ -30,9 +32,10 @@ alldir <- list.dirs(path = wd)
 alldir <- grep("*_bic$",alldir,value=T)
 alldir <- sort_dir(alldir)
 
-#i=1
+#i=10
 total_motif_list <- list()
 total_rank_list <- list()
+total_gene_module <- tibble()
 for (i in 1:length(alldir)) {
   regulon_motif_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""),"r")
   regulon_motif <- readLines(regulon_motif_handle)
@@ -42,6 +45,11 @@ for (i in 1:length(alldir)) {
   regulon_rank_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),"r")
   regulon_rank <- readLines(regulon_rank_handle)
   close(regulon_rank_handle)
+  
+  gene_module <- read_delim(paste(jobid,"_CT_",i,"_bic.txt",sep = ""),delim="\t")
+  colnames(gene_module) <- paste("ct",i,colnames(gene_module),sep = "")
+  total_gene_module <- append(gene_module,total_gene_module)
+
   rank_list <- lapply(strsplit(regulon_rank,"\\t"), function(x){x})
   total_motif_list <- append(total_motif_list,motif_list)
   total_rank_list <- append(total_rank_list,rank_list)
@@ -55,7 +63,6 @@ multiple_motif <- unlist(lapply(total_motif_list, function(x){
 total_regulon <- length(total_motif_list)
 total_multiple_regulon <- length(which(multiple_motif == T))
 multiple_motif <- total_motif_list[which(multiple_motif == T)]
-total_motif_list[multiple_motif]
 length(multiple_motif)
 
 
@@ -151,3 +158,69 @@ unpaired_mean_diff <- dabest(df,group, value,
 plot(unpaired_mean_diff)
 total_regulon
 total_multiple_regulon
+
+
+
+
+
+
+
+############test marker gene in gene module
+
+total_gene_module <- lapply(total_gene_module, na.omit)
+gene1 <- which(unlist(lapply(total_gene_module, function(x){
+  return("CD99" %in% x)
+}))==T)
+
+gene1 <- which(unlist(lapply(total_gene_module, function(x){
+  return("CAV1" %in% x)
+}))==T)
+
+gene1 <- which(unlist(lapply(total_gene_module, function(x){
+  return("FOLR1" %in% x)
+}))==T)
+
+exp_data<- read_delim(paste(jobid,"_filtered_expression.txt",sep = ""),delim = "\t")
+barplot(as.numeric(exp_data[which(exp_data[,1]=="CD99"),]))
+
+mean(as.matrix(exp_data[,-1]))
+
+
+############parse MEME xml output
+require(XML)
+xdata <- "tomtom/ct3bic7m1/JASPAR/tomtom.xml"
+xml_data <- xmlToList(fm)
+
+Fun2 <-function(xdata){
+  dumFun <- function(x){
+    xname <- xmlName(x)
+    xattrs <- xmlAttrs(x)
+    c(sapply(xmlChildren(x), xmlValue), name = xname, xattrs)
+  }
+  dum <- xmlParse(xdata)
+  as.data.frame(t(xpathSApply(dum, "//*/POR", dumFun)), stringsAsFactors = FALSE)
+}
+
+a <- Fun2(fn)
+a
+doc <- xmlTreeParse(xdata)
+xpathApply(doc,"//param[@id=*]",xmlValue)
+
+xmlinfile <- paste(readLines(xdata), collapse="\n")
+
+xpathApply(xmlParse(xmlinfile), "/params/param[@id='3']", xmlValue)  
+
+rootNode <- xmlRoot(xdata)
+for (i in 1:xmlSize(rootNode)) {                
+  
+  id = xmlGetAttr(node = rootNode[[i]],    
+                  name = "id")                 
+  
+  sapply(X = rootNode[[i]]["prix"],          
+         fun = addAttributes,                   
+         id = id)                                
+}
+
+nm <- xmlRoot(doc)
+xmlGetAttr(nm, "targets")
+xmlName(xmlRoot(doc)[[2]])
