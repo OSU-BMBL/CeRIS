@@ -533,7 +533,8 @@ Plot.GeneTSNE<-function(gene.name=NULL){
   tmp.dim<-as.data.frame(my.object@reductions$tsne@cell.embeddings)
   tmp.MatchIndex<- match(colnames(tmp.gene.expression),rownames(tmp.dim))
   tmp.dim<-tmp.dim[tmp.MatchIndex,]
-  tmp.gene.name<-paste0("^",gene.name,"$")
+  tmp.gene.name<-paste0
+  ("^",gene.name,"$")
   tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
