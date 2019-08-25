@@ -226,7 +226,7 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   par(mar=c(3.1, 3.1, 2.1, 5.1), xpd=TRUE)
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
        col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
-       pch=20,frame.plot = FALSE,
+       pch=20,frame.plot = FALSE,cex=(1/log(ncol(tmp.trajectory.cluster))),
        asp=1)
   #grid()
   tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
@@ -237,11 +237,11 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   if(length(tmp.color.cat$CellName)>10){
     legend("topright",legend = tmp.color.cat$CellName,
            inset=c(0.1,0), ncol=2,
-           col = tmp.color.cat$Color,pch = 20,
+           col = as.character(tmp.color.cat$Color),pch = 20,
            cex=0.8,title="cluster",bty='n')
   } else {legend("topright",legend = tmp.color.cat$CellName,
                  inset=c(0.1,0), ncol=1,
-                 col = tmp.color.cat$Color,pch = 20,
+                 col = as.character(tmp.color.cat$Color),pch = 20,
                  cex=0.8,title="cluster",bty='n')}
   
   
@@ -267,7 +267,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   
   par(mar=c(5.1,2.1,1.1,2.1))
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
-       col=alpha(tmp.color,0.7),
+       col=alpha(tmp.color,0.7),cex=(1/log(nrow(tmp.regulon.score))),
        pch=20,frame.plot = FALSE,
        asp=1)
   lines(SlingshotDataSet(tmp.trajectory.cluster))
@@ -277,7 +277,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   xr <- 1.5
   yt <- 2
   
-  par(mar=c(20.1,1.1,1.1,3.1))
+  par(mar=c(20.1,1.1,1.1,5.1))
   plot(NA,type="n",ann=F,xlim=c(1,2),ylim=c(1,2),xaxt="n",yaxt="n",bty="n")
   rect(
     xl,
