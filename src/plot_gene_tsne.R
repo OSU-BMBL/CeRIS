@@ -107,7 +107,7 @@ quiet <- function(x) {
 
 setwd(srcDir)
 
-png(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""),width=1600, height=1200,res = 300)
+png(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""),width=2000, height=1500,res = 300)
 if (!file.exists(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
@@ -118,7 +118,7 @@ if (!file.exists(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""))){
 quiet(dev.off())
 
 
-png(paste("regulon_id/overview_ct.png",sep = ""),width=1600, height=1200,res = 300)
+png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)

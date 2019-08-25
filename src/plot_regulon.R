@@ -127,7 +127,7 @@ regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 
-png(paste("regulon_id/overview_ct.png",sep = ""),width=1600, height=1200,res = 300)
+png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
@@ -141,7 +141,7 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
   #quiet(dev.off())
 }
 quiet(dev.off())
-png(paste("regulon_id/",id,".png",sep = ""),width=1600, height=1200,res = 300)
+png(paste("regulon_id/",id,".png",sep = ""),width=2000, height=1500,res = 300)
 if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
