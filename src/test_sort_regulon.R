@@ -8,16 +8,18 @@
 library(scales)
 library(sgof)
 library(ggplot2)
-
-args <- commandArgs(TRUE)
-wd <- args[1] # filtered expression file name
-jobid <- args[2] # user job id
+library(dabestr)
+#args <- commandArgs(TRUE)
+#wd <- args[1] # filtered expression file name
+#jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
-wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818190915"
-jobid <-20190818190915 
-expFile <- "20190818190915_filtered_expression.txt"
-labelFile <- "20190818190915_cell_label.txt"
+jobid <-2019081835505 
+total_ct_number <- 3
+wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
+
+expFile <- paste(jobid,"_filtered_expression.txt",sep="")
+labelFile <- paste(jobid,"_cell_label.txt",sep = "")
 # wd <- getwd()
 setwd(wd)
 
@@ -63,7 +65,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   else if (method=="gsva"){
     require("GSVA")
     require("snow")
-    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T,parallel.sz=8)
+    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T)
   } 
   return(score_vec)
 }
@@ -117,7 +119,7 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #  }
   #}
 }
-score_vec<-ras
+
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
 
@@ -152,92 +154,109 @@ sort_dir <- function(dir) {
   
 }
 
-alldir <- list.dirs(path = wd)
-alldir <- grep("*_bic$",alldir,value=T)
-alldir <- sort_dir(alldir)
+#alldir <- list.dirs(path = wd)
+#alldir <- grep("*_bic$",alldir,value=T)
+#alldir <- sort_dir(alldir)
+#
+#exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
+#exp_data <- as.matrix(exp_data)
 
-exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
-exp_data <- as.matrix(exp_data)
-
-label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
-marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
+#label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+#marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
 total_gene_list <- vector()
+total_rank <- vector()
 total_gene_index <- 1
 #i=1
 ## to speed up gsva process, read all genes  to one list
-length(alldir)
-for (i in 1:1) {
+
+for (i in 1:total_ct_number) {
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
   close(regulon_gene_name_handle)
+  
+  regulon_rank_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),"r")
+  regulon_rank <- readLines(regulon_rank_handle)
+  close(regulon_rank_handle)
+  
   total_gene_list <- append(total_gene_list,regulon_gene_name)
+  total_rank <- append(total_rank,regulon_rank)
 }
+
 total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
-total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
-library(dabestr)
-reg=1
-ct=1
-activity_score <- read.table(paste(jobid,"_CT_",ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-barplot(as.matrix(activity_score[1,]))
+total_rank<- lapply(strsplit(total_rank,"\\t"), function(x){x[-1]})
 
-barplot(originak_ras[1,])
-barplot(as.matrix(ras[1,]))
-barplot(as.matrix(ras[1,]))
+regulon_with_marker_index <- lapply(total_rank, function(x){
+  if(length(x) > 4){
+    return(T)
+  }else{
+    return(F)
+  }
+})
 
+  total_rss <- lapply(total_rank, function(x){
+    return(x[4])
+  })
+
+  #total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
+
+  #activity_score <- read.table(paste(jobid,"_CT_",ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 
   label_data <- label_data[order(label_data[,2]),]
-  ct_vec <- ifelse(label_data[,2] %in% ct, "this_cell_type", "others")
-  total_ras <- normalize_ras(total_ras)
-  ras <- total_ras[1,]
-  ras <- normalize_ras(ras)
+  marker_vec <- ifelse(regulon_with_marker_index == T, "have_marker", "otherwise")
+  #total_ras <- normalize_ras(total_ras)
+  #ras <- total_ras
+  #ras <- normalize_ras(ras)
+  
   #rss <- calc_rss(label_data=label_data,score_vec = ras,num_ct = ct)
-  df <- as.data.frame(cbind(as.numeric(ras),ct_vec))
-  df[,1] <- as.numeric(df[,1])
+  df <- as.data.frame(cbind(as.numeric(total_rss),marker_vec))
+  df[,1] <- as.numeric(as.vector(df[,1]))
   colnames(df) <- c("value","group")
   unpaired_mean_diff <- dabest(df,group, value,
-                               idx =  c("this_cell_type","others"),
+                               idx =  c("have_marker","otherwise"),
                                paired = F,ci=95)
   
   plot(unpaired_mean_diff)
   
-  # get cell type vector, add 1 if in this cell type
-  ct_vec_rss <- ifelse(label_data[,2] %in% ct, 0, 1)
-  
-  # also normalize ct_vec to sum=1
-  sum_ct_vec <- sum(ct_vec_rss)
-  ct_vec_rss <- ct_vec_rss/sum_ct_vec
-  jsd_result <- apply(as.data.frame(ras), 1, function(x){
-    return (calc_jsd(x,ct_vec_rss))
-  })
-  #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
-  rss <- 1- sqrt(jsd_result)
-
-
-  ggplot_ras <- data.frame('score'=t(ras))
-  ggplot_ras[,2] <- label_data[,1]
-  ggplot_ras[,3] <- ifelse(label_data[,2] %in% ct, "this_cell_type", "others")
-  ggplot_ras[,4] <- ct_vec_rss
-  ggplot(ggplot_ras, aes(y=X1, x=V2, fill=ct_vec)) + 
-    geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
-    labs(y="Regulon activity score",x="") +
-    theme(legend.title=element_blank())+
-    theme(plot.margin = unit(c(1,1,1,2), "cm"))
-  
-  ggplot(ggplot_ras, aes(y=V4, x=V2, fill=ct_vec)) + 
-    geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
-    labs(y="Cell type",x="") +
-    theme(legend.title=element_blank())+
-    theme(plot.margin = unit(c(1,1,1,2), "cm"))
-  
-
-  
-  ## check rss distribution
-  ras <- total_ras
-  ras <- normalize_ras(ras)
-  for (i in nrow(ras)) {
-    rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = 1)
-  }
   
   
-  
+##  # get cell type vector, add 1 if in this cell type
+##  ct_vec_rss <- ifelse(label_data[,2] %in% ct, 0, 1)
+##  
+##  # also normalize ct_vec to sum=1
+##  sum_ct_vec <- sum(ct_vec_rss)
+##  ct_vec_rss <- ct_vec_rss/sum_ct_vec
+##  jsd_result <- apply(as.data.frame(ras), 1, function(x){
+##    return (calc_jsd(x,ct_vec_rss))
+##  })
+##  #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
+##  rss <- 1- sqrt(jsd_result)
+##
+##
+##  ggplot_ras <- data.frame('score'=t(ras))
+##  ggplot_ras[,2] <- label_data[,1]
+##  ggplot_ras[,3] <- ifelse(label_data[,2] %in% ct, "this_cell_type", "others")
+##  ggplot_ras[,4] <- ct_vec_rss
+##  ggplot(ggplot_ras, aes(y=X1, x=V2, fill=ct_vec)) + 
+##    geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
+##    labs(y="Regulon activity score",x="") +
+##    theme(legend.title=element_blank())+
+##    theme(plot.margin = unit(c(1,1,1,2), "cm"))
+##  
+##  ggplot(ggplot_ras, aes(y=V4, x=V2, fill=ct_vec)) + 
+##    geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
+##    labs(y="Cell type",x="") +
+##    theme(legend.title=element_blank())+
+##    theme(plot.margin = unit(c(1,1,1,2), "cm"))
+##  
+##
+##  
+##  ## check rss distribution
+##  ras <- total_ras
+##  ras <- normalize_ras(ras)
+##  for (i in nrow(ras)) {
+##    rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = 1)
+##  }
+##  
+##  
+##  ##
