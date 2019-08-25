@@ -1,27 +1,53 @@
-#######  Plot regulon ##########
-#
-#library(Seurat)
-library(RColorBrewer)
-library(Polychrome)
-library(ggplot2)
+library(Seurat,lib.loc = "/users/PAS1475/cyz931123/R/Seurat/Seurat3.0/")
 
-args <- commandArgs(TRUE) 
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
-#setwd("/var/www/html/iris3/data/20190802103754")
-#srcDir <- getwd()
-#id <-"CT1S-R1" 
-#jobid <- "20190802103754"
-#########################################################################################
-# yuzhou test
-# setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/11.Klein/20190818121919/")
-#srcDir <- getwd()
-#id <-"CT1S-R1" 
-#jobid <- "20190818121919"
-##########################################################################################
-srcDir <- args[1]
-id <- args[2]
-jobid <- args[3]
+if(!require(hdf5r)) {
+  install.packages("hdf5r")
+} 
 
+if(!require(Matrix)) {
+  install.packages("Matrix")
+}
+if(!require(plotly)){
+  install.packages("plotly")
+}
+if (!require("RColorBrewer")) {
+  install.packages("RColorBrewer")
+}
+if (!require("Polychrome")) {
+  install.packages("Polychrome")
+  library(Polychrome)
+}
+
+if (!require("dplyr")) {
+  install.packages("dplyr")
+  library(dplyr)
+}
+
+if(!require("DrImpute")){
+  install.packages("DrImpute")
+  library("DrImpute")
+}
+
+if (!require("scran")) {
+  BiocManager::install("scran")
+  library(scran)
+}
+if (!require("slingshot")){
+  BiocManager::install("slingshot")
+  library(slingshot)
+}
+if (!require("destiny")){
+  BiocManager::install("destiny")
+}
+if(!require(gam)){
+  install.packages("gam")
+}
+if(!require(LTMGSCA)){
+  devtools::install_github("zy26/LTMGSCA")
+}
+#pre-optional
+options(stringsAsFactors = F)
+options(check.names = F)
 reset_par <- function(){
   op <- structure(list(xlog = FALSE, ylog = FALSE, adj = 0.5, ann = TRUE,
                        ask = FALSE, bg = "transparent", bty = "o", cex = 1, cex.axis = 1,
@@ -53,7 +79,130 @@ reset_par <- function(){
                                                                                                 "yaxt", "ylbias"))
   par(op)
 }
+read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
+  if(!is.null(x)){
+    if(!is.null(read.method)){
+      if(read.method !="TenX.h5"&&read.method!="CellGene"&&read.method!="TenX.folder"){
+        stop("wrong 'read.method' argument, please choose 'TenX.h5','TenX.folder', or 'CellGene'!")}
+      if(read.method == "TenX.h5"){
+        tmp_x<-Read10X_h5(x)
+        return(tmp_x)
+      }else if(read.method =="TenX.folder"){
+        tmp_x<-Read10X(x)
+        return(tmp_x)
+      } else if(read.method == "CellGene"){# read in cell * gene matrix, if there is error report, back to 18 line to run again.
+        tmp_x<-read.delim(x,header = T,row.names = 1,check.names = F,sep=sep,...)
+        tmp_x<-as.sparse(tmp_x)
+        return(tmp_x)
+      }
+    }
+  }else {stop("Missing 'x' argument, please input correct data")}
+}
+Data.Preprocessing<-function(TenX = FALSE) {
+  if(TenX== TRUE){
+    my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
+    my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
+  }
+  return(my.object)
+}
 
+Get.CellType<-function(cell.type=1,...){
+  if(!is.null(cell.type)){
+    my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_symbol.txt")
+    my.cell.regulon.indicator<-grep(paste0("_",as.character(cell.type),"_bic"),my.cell.regulon.filelist)
+    my.cts.regulon.raw<-readLines(my.cell.regulon.filelist[my.cell.regulon.indicator])
+    my.regulon.list<-strsplit(my.cts.regulon.raw,"\t")
+    return(my.regulon.list)
+  }else{stop("please input a cell type")}
+  
+}
+Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
+  x<-Get.CellType(cell.type = cell.type)
+  my.rowname<-rownames(my.object)
+  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),ignore.case = T,my.rowname))
+  # my.object@data stores normalized data
+  tmp.regulon<-my.object@assays$RNA@data[gene.index,]
+  return(tmp.regulon)
+}
+Get.RegulonScore<-function(cell.type=1,regulon=1,...){
+  # recognize the regulon file pattern.
+  tmp.FileList<-list.files(pattern = "regulon_activity_score")
+  cell.type.index<-grep(paste0("_CT_",cell.type,"_bic"),tmp.FileList)
+  tmp.RegulonScore<-read.delim(tmp.FileList[cell.type.index],sep = "\t",check.names = F)[regulon,]
+  tmp.NameIndex<-match(rownames(my.object@reductions$tsne@cell.embeddings),names(tmp.RegulonScore))
+  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
+  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
+  my.plot.regulon<-cbind.data.frame(my.object@reductions$tsne@cell.embeddings[,c(1,2)],regulon.score=tmp.RegulonScore.Numeric)
+  return(my.plot.regulon)
+}
+Plot.cluster2D<-function(customized=F,...){
+  if(!customized==TRUE){
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
+                                         Cell_type=my.object$seurat_clusters)
+  }else{
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
+                                         Cell_type=as.factor(my.object$Customized.idents))
+  }
+  p.cluster<-ggplot(my.plot.all.source,
+                    aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
+  p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+  #p.cluster<-theme_linedraw()
+  p.cluster<-p.cluster + labs(col="cell type")
+  p.cluster+theme_light()+scale_fill_continuous(name="cell type") + coord_fixed(1)
+  
+}
+
+Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=T,...){
+  message("plotting regulon ",regulon," of cell type ",cell.type,"...")
+  my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
+                                    cell.type = cell.type,
+                                    regulon = regulon,
+                                    customized = customized)
+  
+  p.regulon<-ggplot(my.plot.regulon,
+                    aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
+  p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
+  p.regulon<-p.regulon + labs(col="regulon score") + coord_fixed(1)
+  message("finish!")
+  p.regulon
+  
+  
+}
+Get.MarkerGene<-function(customized=T){
+  if(customized==T){
+    Idents(my.object)<-my.object$Customized.idents
+    my.marker<-FindAllMarkers(my.object,only.pos = T)
+  } else {
+    Idents(my.object)<-my.object$seurat_clusters
+    my.marker<-FindAllMarkers(my.object,only.pos = T)
+  }
+  my.cluster<-unique(as.character(Idents(my.object)))
+  my.top.20<-c()
+  for( i in 1:length(my.cluster)){
+    my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
+    my.top.20.tmp<-list(my.cluster.data.frame$gene[1:100])
+    my.top.20<-append(my.top.20,my.top.20.tmp)
+  }
+  names(my.top.20)<-paste0("CT",my.cluster)
+  my.top.20<-as.data.frame(my.top.20)
+  return(my.top.20)
+}
+Dim.Calculate<-function(Matrix.type="GEM",...){
+  if(Matrix.type == "GEM"){
+    dm<-DiffusionMap(t(as.matrix(GetAssayData(object = my.object,assay = "RNA",slot = "data"))))
+    rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
+    a <- SimpleList( DiffMap = rd2)
+    print("using GEM.")
+  } 
+  # second mode Regulon score
+  if(Matrix.type == "RSM") { 
+    dm<-DiffusionMap(t(as.matrix(my.regulon.cell.Matrix)))
+    rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
+    a<-SimpleList( DiffMap = rd2)
+    print("using Regulon score matrix") 
+  }
+  return(a)
+}
 Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NULL,...){
   #labeling cell
   if(customized==TRUE){
@@ -71,15 +220,13 @@ Get.cluster.Trajectory<-function(customized=T,start.cluster=NULL,end.cluster=NUL
   #summary(my.trajectory$slingPseudotime_1)
   return(my.trajectory)
 }
-
-
 Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,end.cluster=NULL,show.constraints=F,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   my.classification.color<-as.character(palette36.colors(36))[-2]
   par(mar=c(3.1, 3.1, 2.1, 5.1), xpd=TRUE)
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
        col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
-       pch=20,frame.plot = FALSE,cex=(1/log(ncol(tmp.trajectory.cluster))),
+       pch=20,frame.plot = FALSE,
        asp=1)
   #grid()
   tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
@@ -90,11 +237,11 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   if(length(tmp.color.cat$CellName)>10){
     legend("topright",legend = tmp.color.cat$CellName,
            inset=c(0.1,0), ncol=2,
-           col = as.character(tmp.color.cat$Color),pch = 20,
+           col = tmp.color.cat$Color,pch = 20,
            cex=0.8,title="cluster",bty='n')
   } else {legend("topright",legend = tmp.color.cat$CellName,
                  inset=c(0.1,0), ncol=1,
-                 col = as.character(tmp.color.cat$Color),pch = 20,
+                 col = tmp.color.cat$Color,pch = 20,
                  cex=0.8,title="cluster",bty='n')}
   
   
@@ -105,8 +252,6 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   }
   reset_par()
 }
-
-
 Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.cluster=NULL,end.cluster=NULL,...){
   tmp.trajectory.cluster<-Get.cluster.Trajectory(customized = customized,start.cluster=start.cluster,end.cluster=end.cluster)
   tmp.regulon.score<- Get.RegulonScore(cell.type = cell.type,regulon = regulon)
@@ -122,7 +267,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   
   par(mar=c(5.1,2.1,1.1,2.1))
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
-       col=alpha(tmp.color,0.7),cex=(1/log(nrow(tmp.regulon.score))),
+       col=alpha(tmp.color,0.7),
        pch=20,frame.plot = FALSE,
        asp=1)
   lines(SlingshotDataSet(tmp.trajectory.cluster))
@@ -132,7 +277,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   xr <- 1.5
   yt <- 2
   
-  par(mar=c(20.1,1.1,1.1,5.1))
+  par(mar=c(20.1,1.1,1.1,3.1))
   plot(NA,type="n",ann=F,xlim=c(1,2),ylim=c(1,2),xaxt="n",yaxt="n",bty="n")
   rect(
     xl,
@@ -153,82 +298,3 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   reset_par()
   
 }
-
-Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
-  x<-Get.CellType(cell.type = cell.type)
-  my.rowname<-rownames(my.object)
-  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),ignore.case = T,my.rowname))
-  # my.object@data stores normalized data
-  tmp.regulon<-my.object@assays$RNA@data[gene.index,]
-  return(tmp.regulon)
-}
-Get.CellType<-function(cell.type=NULL,...){
-  if(!is.null(cell.type)){
-    my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_symbol.txt")
-    my.cell.regulon.indicator<-grep(paste0("_",as.character(cell.type),"_bic"),my.cell.regulon.filelist)
-    my.cts.regulon.raw<-readLines(my.cell.regulon.filelist[my.cell.regulon.indicator])
-    my.regulon.list<-strsplit(my.cts.regulon.raw,"\t")
-    return(my.regulon.list)
-  }else{stop("please input a cell type")}
-  
-}
-
-
-
-Get.RegulonScore<-function(cell.type=1,regulon=1,...){
-  # recognize the regulon file pattern.
-  tmp.FileList<-list.files(pattern = "regulon_activity_score")
-  cell.type.index<-grep(paste0("_CT_",cell.type,"_bic"),tmp.FileList)
-  tmp.RegulonScore<-read.delim(tmp.FileList[cell.type.index],sep = "\t",check.names = F)[regulon,]
-  tmp.NameIndex<-match(rownames(my.object@reductions$tsne@cell.embeddings),names(tmp.RegulonScore))
-  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
-  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
-  my.plot.regulon<-cbind.data.frame(my.object@reductions$tsne@cell.embeddings[,c(1,2)],regulon.score=tmp.RegulonScore.Numeric)
-  return(my.plot.regulon)
-}
-quiet <- function(x) {
-  sink(tempfile()) 
-  on.exit(sink()) 
-  invisible(force(x)) 
-} 
-
-setwd(srcDir)
-
-regulon_ct <-gsub( "-.*$", "", id)
-regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
-regulon_id <- gsub( ".*R", "", id)
-regulon_id <- gsub("[[:alpha:]]","",regulon_id)
-
-activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=1600, height=1200,res = 300)
-if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
-  #Plot.cluster2D(reduction.method = "tsne",customized = T)
-  #Plot.TrajectoryByCellType(customized = T)
-  if(!exists("my.trajectory")){
-    library(slingshot)
-    library(Seurat)
-    library(SummarizedExperiment)
-    suppressPackageStartupMessages(library(destiny))
-    my.trajectory <- readRDS("trajectory_obj.rds")
-    my.object <- readRDS("seurat_obj.rds")
-  }
-  Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
-}
-quiet(dev.off())
-
-png(paste("regulon_id/",id,".trajectory.png",sep = ""),width=2000, height=1500,res = 300)
-if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
-  if(!exists("my.trajectory")){
-    library(slingshot)
-    library(Seurat)
-    library(SummarizedExperiment)
-    suppressPackageStartupMessages(library(destiny))
-    my.trajectory <- readRDS("trajectory_obj.rds")
-    my.object <- readRDS("seurat_obj.rds")
-  }
-  reset_par()
-  Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = NULL,end.cluster = NULL,customized = T)
-}
-quiet(dev.off())
-
-
