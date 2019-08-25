@@ -119,7 +119,7 @@ Get.CellType<-function(cell.type=1,...){
 Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   x<-Get.CellType(cell.type = cell.type)
   my.rowname<-rownames(my.object)
-  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
+  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),ignore.case = T,my.rowname))
   # my.object@data stores normalized data
   tmp.regulon<-my.object@assays$RNA@data[gene.index,]
   return(tmp.regulon)
@@ -295,6 +295,6 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   mtext(c(tmp.min,tmp.Nmean,0,tmp.Pmean,tmp.max),
         at=c(tmp.cor[5],tmp.cor[15],tmp.cor[25],tmp.cor[35],tmp.cor[45]),
         side=2,las=1,cex=0.7)
-  wreset_par()
+  reset_par()
   
 }
