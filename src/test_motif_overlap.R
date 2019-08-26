@@ -187,9 +187,13 @@ mean(as.matrix(exp_data[,-1]))
 
 
 ############parse MEME xml output
+# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818121919"
+# jobid <-20190818121919 
+setwd(wd)
+require(xml2)
 require(XML)
-xdata <- "tomtom/ct3bic7m1/JASPAR/tomtom.xml"
-xml_data <- xmlToList(fm)
+xdata <- "tomtom/ct1bic48m10/JASPAR/tomtom.xml"
+xml_data <- xmlToList(xdata)
 
 Fun2 <-function(xdata){
   dumFun <- function(x){
@@ -221,6 +225,43 @@ for (i in 1:xmlSize(rootNode)) {
          id = id)                                
 }
 
-nm <- xmlRoot(doc)
-xmlGetAttr(nm, "targets")
-xmlName(xmlRoot(doc)[[2]])
+
+xml_data <- read_xml(xdata)
+#nodes <- xml_find_all(xml_data, ".//motif")
+#nodes<-xml_attr(nodes, "id")[motif_index]
+motif_name <- xml_find_all(xml_data, ".//motif")
+motif_name <- xml_attr(motif_name, "alt")
+motif_index <- xml_find_all(xml_data, ".//matches")
+motif_index <- xml_find_all(xml_data, ".//query")
+motif_index <- xml_find_all(xml_data, ".//target")
+motif_index<-as.numeric(xml_attr(motif_index, "idx")[1]) + 2
+motif_name[motif_index]
+
+#xml_text(motif_name)
+#i=101
+allfiles <- list.files(path = "tomtom",pattern = "tomtom.xml",recursive = T,full.names = T)
+total_motif_name <- data.frame()
+for (i in 1:length(allfiles)) {
+  motif_id <- strsplit(allfiles[i],"/")[[1]][2]
+  if (strsplit(allfiles[i],"/")[[1]][3] == "JASPAR"){
+    xml_data <- read_xml(allfiles[i])
+    motif_name <- xml_find_all(xml_data, ".//motif")
+    motif_name <- xml_attr(motif_name, "alt")
+    motif_index <- xml_find_all(xml_data, ".//matches")
+    motif_index <- xml_find_all(xml_data, ".//query")
+    motif_index <- xml_find_all(xml_data, ".//target")
+    motif_index<-as.numeric(xml_attr(motif_index, "idx")[1]) + 2
+    total_motif_name <- rbind(total_motif_name,data.frame(motif_id,motif_name[motif_index]))
+  }
+}
+colnames(total_motif_name) <- c("motif_id","TF_name")
+tst <- total_motif_name
+
+total_regulon_list <- list()
+for (i in 1:length(unique(total_motif_name[,2]))) {
+  this_tf_index <- total_motif_name[,2] %in% unique(total_motif_name[,2])[i]
+  tmp_list <- c(as.character(unique(total_motif_name[,2])[i]),as.character(total_motif_name[this_tf_index,1]))
+  total_regulon_list <- append(list(tmp_list),total_regulon_list)
+}
+
+
