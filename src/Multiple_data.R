@@ -53,7 +53,7 @@ read.multipledata<-function(Path=getwd()){
 ##########################################
 # integrate:
 my.anchor<-FindIntegrationAnchors(object.list = my.data.list, dims = 1:30)
-pancreas.integrated <- IntegrateData(anchorset = my.anchor, dims = 1:30)
+my.integrated <- IntegrateData(anchorset = my.anchor, dims = 1:30)
 
 
 
