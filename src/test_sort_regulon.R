@@ -4,7 +4,7 @@
 # filtered exp matrix
 # cell label
 # regulon_gene_symbol, regulon_gene_id, regulon_motif, motif_ranks (from merge_bbc.R)
-
+library("ggpubr")
 library(scales)
 library(sgof)
 library(ggplot2)
@@ -14,10 +14,10 @@ library(dabestr)
 #jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
-jobid <-2019081835505 
-total_ct_number <- 3
-wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
-
+jobid <-20190822164428 
+total_ct_number <- 18
+#wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
+wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 labelFile <- paste(jobid,"_cell_label.txt",sep = "")
 # wd <- getwd()
@@ -212,11 +212,58 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   df <- as.data.frame(cbind(as.numeric(total_rss),marker_vec))
   df[,1] <- as.numeric(as.vector(df[,1]))
   colnames(df) <- c("value","group")
-  unpaired_mean_diff <- dabest(df,group, value,
-                               idx =  c("have_marker","otherwise"),
-                               paired = F,ci=95)
   
-  plot(unpaired_mean_diff)
+  ##plot markers - non markers
+  ##unpaired_mean_diff <- dabest(df,group, value,
+  ##                             idx =  c("have_marker","otherwise"),
+  ##                             paired = F,ci=95)
+  ##
+  ##plot(unpaired_mean_diff)
+  
+  total_regulon_marker_length <- lapply(total_rank, function(x){
+    return(length(x)-4)
+  })
+  total_regulon_pvalue <- lapply(total_rank, function(x){
+    return(x[2])
+  })
+  total_regulon_zscore <- lapply(total_rank, function(x){
+    if(x[2] != x[3]) {
+      return(x[3])
+    } else {
+      return(0)
+    }
+  })
+  ##plot correlation number of markers
+  df_marker_length <- data.frame(rss=as.numeric(unlist(total_rss)),length=as.numeric(unlist(total_regulon_marker_length)))
+  df_marker_length <- df_marker_length[df_marker_length$length>0,]
+
+  #cor.test(df_marker_length[,1],df_marker_length[,2])
+  #ggscatter(df_marker_length, x = "length", y = "rss", 
+  #          add = "reg.line", conf.int = TRUE, 
+  #          cor.coef = TRUE, cor.method = "pearson",
+  #          xlab = "Number of markers", ylab = "RSS value")
+  
+  
+
+  ##plot correlation pvalue-rss
+  
+  #df_pval_rss <- data.frame(rss=as.numeric(unlist(total_rss)),pval=as.numeric(unlist(total_regulon_pvalue)))
+  #df_pval_rss <- df_pval_rss[df_pval_rss$pval>100,]
+  #ggscatter(df_pval_rss, x = "pval", y = "rss", 
+  #          add = "reg.line", conf.int = TRUE, 
+  #          cor.coef = TRUE, cor.method = "pearson",
+  #          xlab = "P-value", ylab = "RSS value")
+  #
+  
+  ##plot correlation z-score-rss
+  
+  df_zscore_rss <- data.frame(rss=as.numeric(unlist(total_rss)),zscore=as.numeric(unlist(total_regulon_zscore)))
+  df_zscore_rss <- df_zscore_rss[df_zscore_rss$zscore>2,]
+  df_zscore_rss <- df_zscore_rss[df_zscore_rss$zscore<100,]
+  ggscatter(df_zscore_rss, x = "zscore", y = "rss", 
+            add = "reg.line", conf.int = TRUE, 
+            cor.coef = TRUE, cor.method = "pearson",
+            xlab = "Zscore", ylab = "RSS value")
   
   
   
