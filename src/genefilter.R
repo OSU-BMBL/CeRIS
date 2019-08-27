@@ -422,7 +422,8 @@ plot(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "
 
 my.object<-FindNeighbors(my.object,dims = 1:30)
 my.object<-FindClusters(my.object)
-cell_info <-  my.object$seurat_clusters
+cell_info <- my.object$seurat_clusters
+cell_info <- as.factor(as.numeric(cell_info))
 cell_label <- cbind(cell_names,cell_info)
 colnames(cell_label) <- c("cell_name","label")
 write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
@@ -468,16 +469,16 @@ Get.MarkerGene<-function(my.object, customized=T){
     Idents(my.object)<-my.object$seurat_clusters
     my.marker<-FindAllMarkers(my.object,only.pos = T)
   }
-  my.cluster<-unique(as.character(as.numeric(Idents(my.object))))
-  my.top.20<-c()
+  my.cluster<-as.character(sort(unique(as.numeric(Idents(my.object)))))
+  my.top<-c()
   for( i in 1:length(my.cluster)){
-    my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
-    my.top.20.tmp<-list(my.cluster.data.frame$gene[1:100])
-    my.top.20<-append(my.top.20,my.top.20.tmp)
+    my.cluster.data.frame<-my.marker[my.marker$cluster==my.cluster[i],]
+    my.top.tmp<-list(my.cluster.data.frame$gene[1:100])
+    my.top<-append(my.top,my.top.tmp)
   }
-  names(my.top.20)<-paste0("CT",my.cluster)
-  my.top.20<-as.data.frame(my.top.20)
-  return(my.top.20)
+  names(my.top)<-paste0("CT",my.cluster)
+  my.top<-as.data.frame(my.top)
+  return(my.top)
 }
 
 my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = T)

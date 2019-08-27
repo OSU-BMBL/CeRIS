@@ -312,7 +312,7 @@ Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customize
 Plot.regulon2D(cell.type=3,regulon=5,customized = T)
 Plot.cluster2D(customized = F)
 
-Get.MarkerGene<-function(customized=T){
+Get.MarkerGene<-function(my.object, customized=T){
   if(customized){
     Idents(my.object)<-my.object$Customized.idents
     my.marker<-FindAllMarkers(my.object,only.pos = T)
@@ -320,16 +320,16 @@ Get.MarkerGene<-function(customized=T){
     Idents(my.object)<-my.object$seurat_clusters
     my.marker<-FindAllMarkers(my.object,only.pos = T)
   }
-  my.cluster<-unique(as.character(Idents(my.object)))
-  my.top.20<-c()
+  my.cluster<-as.character(sort(unique(as.numeric(Idents(my.object)))))
+  my.top<-c()
   for( i in 1:length(my.cluster)){
-    my.cluster.data.frame<-filter(my.marker,cluster==my.cluster[i])
-    my.top.20.tmp<-list(my.cluster.data.frame$gene[1:100])
-    my.top.20<-append(my.top.20,my.top.20.tmp)
+    my.cluster.data.frame<-my.marker[my.marker$cluster==my.cluster[i],]
+    my.top.tmp<-list(my.cluster.data.frame$gene[1:100])
+    my.top<-append(my.top,my.top.tmp)
   }
-  names(my.top.20)<-paste0("CT",my.cluster)
-  my.top.20<-as.data.frame(my.top.20)
-  return(my.top.20)
+  names(my.top)<-paste0("CT",my.cluster)
+  my.top<-as.data.frame(my.top)
+  return(my.top)
 }
 my.cluster.uniq.marker<-Get.MarkerGene(customized = T)
 write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
