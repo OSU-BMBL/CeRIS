@@ -416,9 +416,9 @@ if(ncol(my.object) < 50) {
 }
 head(Embeddings(my.object, reduction = "pca")[, 1:5])
 
-num_pca <- which(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))) > 0.8)[1]
+#num_pca <- which(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))) > 0.8)[1]
 
-plot(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))),type='o')
+#plot(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))),type='o')
 
 my.object<-FindNeighbors(my.object,dims = 1:30)
 my.object<-FindClusters(my.object)
