@@ -165,7 +165,7 @@ for (i in 1:length(alldir)) {
 }
 total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
 if (ncol(exp_data) > 5000) {
-  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "aucell")
+  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "plage")
 } else {
   total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
   
