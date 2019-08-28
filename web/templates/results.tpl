@@ -250,13 +250,13 @@ $(document).ready(function() {
 		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading t-SNE plot...</h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading UMAP plot...</h3></div>'
 		},
 		data: {'id': regulon_id},
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>t-SNE Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>t-SNE Plot Colored by ' + regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -305,7 +305,7 @@ $(document).ready(function() {
 		url: "prepare_gene_tsne.php?jobid=" + jobid + "&id=" + gene_symbol,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading gene t-SNE plot...</h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading gene UMAP plot...</h3></div>'
 		},
 		data: {'id': gene_symbol},
 		dataType: 'json',
@@ -313,7 +313,7 @@ $(document).ready(function() {
 		document.getElementById(table_content_id).innerHTML = ''
 		let tmp = document.getElementById(table_id).innerHTML
 		console.log(tmp)
-		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>t-SNE Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>t-SNE Plot Colored by Normalized'+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.tsne.png" /></div>'
+		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
 		console.log(document.getElementById(table_id).innerHTML)
 		},
 	})
@@ -632,7 +632,7 @@ var xmlhttp = new XMLHttpRequest()
 											-->
 											<div class="CT-result-img">
                                                 <div class="col-sm-6">
-												<h4 style="text-align:center;margin-top:50px"> t-SNE Plot Colored by Cell Types</h4>
+												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Cell Types</h4>
                                                    <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.png"></img>
 												</div>
 												<div class="col-sm-6">
@@ -770,7 +770,7 @@ var xmlhttp = new XMLHttpRequest()
                                                                         <tr><td class="gene-table">
                                                                             <div style="width:100%; font-size:14px;">
 																				<table class="table table-hover table-sm" ><tbody>
-	                                <tr><td>Marker gene</td><td>Gene Symbol  <button class="btn btn-default" id="symbol-{{$regulon_result[$sec0][sec1][0]}}" onclick="copy_list(this)">Copy</button></td><td>Enesmbl ID  <button class="btn btn-default" id="id-{{$regulon_result[$sec0][sec1][0]}}"onclick="copy_list(this)">Copy</button></td><td>Gene t-SNE plot</td>
+	                                <tr><td>Marker gene</td><td>Gene Symbol  <button class="btn btn-default" id="symbol-{{$regulon_result[$sec0][sec1][0]}}" onclick="copy_list(this)">Copy</button></td><td>Enesmbl ID  <button class="btn btn-default" id="id-{{$regulon_result[$sec0][sec1][0]}}"onclick="copy_list(this)">Copy</button></td><td>Gene UMAP plot</td>
 									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
 										  <tr><td>
@@ -810,9 +810,9 @@ var xmlhttp = new XMLHttpRequest()
                                                         </button>
                                                         <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
                                                         </button>-->
-														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">t-SNE plot
+														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">UMAP plot
                                                         </button>
-                                                        <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon t-SNE
+                                                        <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon UMAP
                                                         </button>
 														<button type="button" id="trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_trajectory_table(this);$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Trajectory plot
                                                         </button>

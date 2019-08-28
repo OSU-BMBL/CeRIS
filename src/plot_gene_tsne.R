@@ -29,8 +29,21 @@ Plot.GeneTSNE<-function(gene.name=NULL){
   g
 }
 
+Plot.GeneUMAP<-function(gene.name=NULL){
+  tmp.gene.expression<- my.object@assays$RNA@data
+  tmp.dim<-as.data.frame(my.object@reductions$umap@cell.embeddings)
+  tmp.MatchIndex<- match(colnames(tmp.gene.expression),rownames(tmp.dim))
+  tmp.dim<-tmp.dim[tmp.MatchIndex,]
+  tmp.gene.name<-paste0("^",gene.name,"$")
+  tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
+  tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
+  g<-ggplot(tmp.dim.df,aes(x=UMAP_1,y=UMAP_2,color=Gene))
+  g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
+  g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
+  g
+}
 
-Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
@@ -107,13 +120,13 @@ quiet <- function(x) {
 
 setwd(srcDir)
 
-png(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""),width=2000, height=1500,res = 300)
-if (!file.exists(paste("regulon_id/",gene_symbol,".tsne.png",sep = ""))){
+png(paste("regulon_id/",gene_symbol,".umap.png",sep = ""),width=2000, height=1500,res = 300)
+if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.GeneTSNE(gene_symbol)
+  Plot.GeneUMAP(gene_symbol)
 }
 quiet(dev.off())
 
@@ -124,6 +137,6 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.cluster2D(reduction.method = "tsne",customized = T)
+  Plot.cluster2D(reduction.method = "umap",customized = T)
 }
 quiet(dev.off())

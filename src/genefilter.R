@@ -56,12 +56,12 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("C:/Users/wan268/Documents/iris3_data/MM")
-  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
+  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
+  # setwd("C:/Users/wan268/Documents/iris3_data/20190821202541")
   #srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "iris3_example_expression_matrix.csv"
-  jobid <- "20190802103754"
+  jobid <- "20190821202541"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
@@ -426,6 +426,7 @@ cell_info <- my.object$seurat_clusters
 cell_info <- as.factor(as.numeric(cell_info))
 cell_label <- cbind(cell_names,cell_info)
 colnames(cell_label) <- c("cell_name","label")
+cell_label <- cell_label[order(cell_label[,2]),]
 write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 #write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 
@@ -450,9 +451,9 @@ Idents(my.object)<-as.factor(my.object$Customized.idents)
 ###########################################
 # CORE part: Run TSNE and UMAP######################
 ###########################################
-my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
+#my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
 # run umap to get high dimension scatter plot at 2 dimensional coordinate system.
-##my.object<-RunUMAP(object = my.object,dims = 1:30)
+my.object<-RunUMAP(object = my.object,dims = 1:30,umap.method="uwot")
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
@@ -508,7 +509,7 @@ saveRDS(my.object,file="seurat_obj.rds")
 
 
 my.trajectory<-SingleCellExperiment(assays=List(counts=GetAssayData(object = my.object[['RNA']],slot="counts")))
-SummarizedExperiment::assays(my.trajectory)$norm<-exp_data
+SummarizedExperiment::assays(my.trajectory)$norm<-GetAssayData(object = my.object,slot = "data")
 
 dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
 rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
@@ -516,7 +517,7 @@ reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
 saveRDS(my.trajectory,file="trajectory_obj.rds")
 
 
-Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,...){
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
@@ -627,11 +628,11 @@ quiet <- function(x) {
   invisible(force(x)) 
 } 
 
-
-png(paste("regulon_id/overview_ct.png",sep = ""),width=1600, height=1200,res = 300)
-Plot.cluster2D(reduction.method = "tsne",customized = T)
+dir.create("regulon_id")
+png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
+Plot.cluster2D(reduction.method = "umap",customized = T)
 quiet(dev.off())
 
-png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=1600, height=1200,res = 300)
+png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())

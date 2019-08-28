@@ -212,7 +212,7 @@ if (!file.exists(paste("regulon_id/overview_ct.trajectory.png",sep = ""))){
     my.trajectory <- readRDS("trajectory_obj.rds")
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = F,end.cluster=NULL,show.constraints=T)
+  Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 }
 quiet(dev.off())
 

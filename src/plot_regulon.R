@@ -9,7 +9,7 @@ args <- commandArgs(TRUE)
 #setwd("C:/Users/wan268/Documents/iris3_data/0624")
 #wd <- "D:/Users/flyku/Documents/IRIS3-data/20190802103754"
 #srcDir <- getwd()
-#id <-"CT4S-R7" 
+#id <-"CT1S-R1" 
 #jobid <- "20190802103754"
 srcDir <- args[1]
 id <- args[2]
@@ -134,8 +134,8 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
     my.object <- readRDS("seurat_obj.rds")
   }
   
-  Plot.cluster2D(reduction.method = "tsne",customized = T)
-  
+  Plot.cluster2D(reduction.method = "umap",customized = T)
+  #Plot.cluster2D(reduction.method = "umap",customized = T)
   #pdf(paste("regulon_id/overview_ct.pdf",sep = ""))
   #Plot.cluster2D(reduction.method = "tsne",customized = T)
   #quiet(dev.off())
@@ -148,7 +148,7 @@ if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
     my.object <- readRDS("seurat_obj.rds")
   }
   
-  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T)
+  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap")
   
   #pdf(paste("regulon_id/",id,".pdf",sep = ""))
   #Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T)
