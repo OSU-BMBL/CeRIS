@@ -8,12 +8,11 @@ library(singscore)
 library(ggplot2)
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 rankData <- rankGenes(exp_data, tiesMethod = "max" )
-
+plot(density(as.matrix(exp_data)))
 colnames(tgfb_expr_10_se)
 head(rankData[,2,drop = FALSE])
 cells_rankings <- AUCell_buildRankings(as.matrix(exp_data),plotStats = F) 
 
-barplot(rankData[,1])
 barplot(cells_rankings@assays@.xData$`.->data`$ranking[,1])
 genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
 aucRanks <- cells_rankings[which(rownames(cells_rankings) %in% genes),,drop=FALSE]
@@ -100,7 +99,7 @@ method="gsva"
 .gsva <- function(expr, gset.idx.list,
                   method=c("gsva", "ssgsea", "zscore", "plage"),
                   kcdf=c("Gaussian", "Poisson", "none"),
-                  rnaseq=FALSE,
+                  rnaseq=T,
                   abs.ranking=FALSE,
                   parallel.sz=0, 
                   parallel.type="SOCK",

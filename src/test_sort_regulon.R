@@ -14,8 +14,8 @@ library(dabestr)
 #jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
-jobid <-20190822164428 
-total_ct_number <- 18
+jobid <-20190821202541 
+total_ct_number <- 14
 #wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
 wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
@@ -243,8 +243,12 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   #          cor.coef = TRUE, cor.method = "pearson",
   #          xlab = "Number of markers", ylab = "RSS value")
   
-  
-
+  total_regulon_length <- lapply(total_gene_list, function(x){
+    return(length(x))
+  })
+    
+    
+  hist(unlist(total_regulon_length),breaks = 50)
   ##plot correlation pvalue-rss
   
   #df_pval_rss <- data.frame(rss=as.numeric(unlist(total_rss)),pval=as.numeric(unlist(total_regulon_pvalue)))
