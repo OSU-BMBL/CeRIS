@@ -11,14 +11,15 @@ library(sgof)
 args <- commandArgs(TRUE)
 wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
-#wd<-getwd()
+# wd<-getwd()
 ####test
-# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818190915"
-# jobid <-2019082172234 
-# expFile <- "2019082172234_filtered_expression.txt"
-# labelFile <- "2019082172234_cell_label.txt"
+# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190823145911"
+# setwd("C:/Users/wan268/Documents/iris3_data/20190818190915")
+# jobid <-20190818190915 
+# expFile <- "20190818190915_filtered_expression.txt"
+# labelFile <- "20190818190915_cell_label.txt"
 # wd <- getwd()
-setwd(wd)
+#setwd(wd)
 
 quiet <- function(x) { 
   sink(tempfile()) 
@@ -40,15 +41,17 @@ calc_jsd <- function(v1,v2) {
 #num_ct <- 1
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
 #calculate regulon activity score (RAS) 
-#expr <- as.matrix(exp_data)
-# genes <- gene_name_list
-calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea")) {
+#expr <- exp_data
+# genes <- total_gene_list
+calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea","custom_auc")) {
   if (method=="aucell"){ #use top 10% cutoff
     require(AUCell)
     names(genes) <- 1:length(genes)
-    cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
+    cells_rankings <- AUCell_buildRankings(expr,plotStats = F) 
     cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.1)
-    score_vec <- cells_AUC@assays@data@listData[['AUC']]
+    #score_vec <- cells_AUC@assays@data@listData[['AUC']]
+    score_vec <- cells_AUC@assays@.xData$data$AUC
+
   } else if (method=="zscore"){
     require("GSVA")
     score_vec <- gsva(expr,gset=genes,method="zscore")
@@ -58,12 +61,57 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   } else if (method=="ssgsea"){
     require("GSVA")
     score_vec <- gsva(expr,gset=genes,method="ssgsea")
-  } 
-  else if (method=="gsva"){
+  } else if (method=="gsva"){
     require("GSVA")
     require("snow")
     score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T,parallel.sz=8)
-  } 
+  } else if (method=="rank_u_test"){
+    require(AUCell)
+    require(BioQC)
+    if(!data.table::is.data.table(expr))
+    expr <- data.table::data.table(expr, keep.rownames=TRUE)
+    data.table::setkey(expr, "rn") # (reorders rows)
+    colsNam <- colnames(expr)[-1] # 1=row names
+    names(genes) <- 1:length(genes)
+    dim(exp_data)
+    rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frank, ties.method="random", na.last="keep"),
+                         .SDcols=colsNam]
+    rn <- rankings$rn
+    rankings <- as.matrix(rankings[,-1])
+    rownames(rankings) <- rn
+    indx <- seq_len(nrow(label_data))
+    #geneset=genes[[1]]
+    #genes <- genes[1:20]
+    score_vec <- sapply(genes,function(geneset){
+      #geneset <- unique(geneset)
+      #geneset <- geneset[which(geneset %in% rownames(rankings))]
+      #'%notin%' <- Negate('%in%')
+      #gSetRanks <- rankings[which(rownames(rankings) %in% geneset),,drop=FALSE]
+      #other_ranking <- rankings[which(rownames(rankings) %notin% geneset),,drop=FALSE]
+      #wilcox.test(gSetRanks[,1], other_ranking[,1])$p.value
+      #pval <- sapply(indx, function(i) wilcox.test(gSetRanks@assays@.xData$data$ranking[,i], other_ranking@assays@.xData$data$ranking[,i])$p.value)
+      set_in_list <- rownames(rankings) %in% geneset
+      #pval <- sapply(indx, function(i) wmwTest(rankings[,i], set_in_list, valType="p.two.sided"))
+      pval <- wmwTest(rankings, set_in_list, valType="p.two.sided", simplify = T)
+      pval_correction <- sgof::BH(pval)
+      adj_pval <-pval_correction$Adjusted.pvalues[order(match(pval_correction$data,pval))]
+      print(Sys.time())
+      return(-1*log10(adj_pval))
+    })
+    score_vec <- t(score_vec)
+    colnames(score_vec) <- label_data[,1]
+    
+    ##### test two u-test function speed
+    #library(microbenchmark)
+    #microbenchmark(
+    #  sapply(indx, function(i) wmwTest(rankings[,i], set_in_list, valType="p.two.sided")),times = 10
+    #)
+    #microbenchmark(
+    #  sapply(indx, function(i) wilcox.test(gSetRanks[,i], other_ranking[,i])$p.value),times = 10
+    #)
+    
+    #
+  }
   return(score_vec)
 }
 
@@ -116,7 +164,7 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #  }
   #}
 }
-
+#score_vec=ras
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   
@@ -162,13 +210,14 @@ for (i in 1:length(alldir)) {
   regulon_gene_name <- readLines(regulon_gene_name_handle)
   close(regulon_gene_name_handle)
   total_gene_list <- append(total_gene_list,regulon_gene_name)
-}
-total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
+} 
+print(Sys.time())
+total_gene_list <- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
+#total_gene_list <- total_gene_list[1:10]
 if (ncol(exp_data) > 5000) {
-  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "plage")
+  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "rank_u_test")
 } else {
-  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
-  
+  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "rank_u_test")
 }
 
 #i=1
@@ -310,34 +359,124 @@ tmp_list <- strsplit(total_motif_list,",")
 tmp_list <- lapply(tmp_list, function(x){
   paste("ct",x[1],"bic",x[2],"m",x[3],sep = "")
 })
+
 write.table(unlist(tmp_list),"total_motif_list.txt",quote = F,row.names = F,col.names = F)
-#.AUC.geneSet_norm <- function(geneSet=genes, rankings=cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05, gSetName="")
-#{
-#  geneSet <- unique(geneSet)
-#  nGenes <- length(geneSet)
-#  geneSet <- geneSet[which(geneSet %in% rownames(rankings))]
-#  missing <- nGenes-length(geneSet)
-#  
-#  gSetRanks <- rankings[which(rownames(rankings) %in% geneSet),,drop=FALSE]
-#  rm(rankings)
-#  
-#  aucThreshold <- round(aucMaxRank)
-#  ########### NEW version:  #######################
-#  x_th <- 1:nrow(gSetRanks)
-#  x_th <- sort(x_th[x_th<aucThreshold])
-#  y_th <- seq_along(x_th)
-#  maxAUC <- sum(diff(c(x_th, aucThreshold)) * y_th) 
-#  ############################################
-#  
-#  # Apply by columns (i.e. to each ranking)
-#  auc <- apply(gSetRanks@assays@.xData$data$ranking, 2, .auc, aucThreshold, maxAUC)
-#  
-#  return(c(auc, missing=missing, nGenes=nGenes))
-#}
-#
-#.auc <- function(oneRanking=gSetRanks@assays@.xData$data$ranking[,90], aucThreshold, maxAUC)
-#{
-#  x <- unlist(oneRanking)[1]
-#  y <- seq_along(x)
-#  sum(diff(c(x, aucThreshold)) * y)/maxAUC
-#}
+
+##.AUC.geneSet_norm <- function(geneSet=genes, rankings=cells_rankings, aucMaxRank=nrow(cells_rankings)*0.05, gSetName="")
+##{
+##  geneSet <- unique(geneSet)
+##  nGenes <- length(geneSet)
+##  geneSet <- geneSet[which(geneSet %in% rownames(rankings))]
+##  missing <- nGenes-length(geneSet)
+##  '%notin%' <- Negate('%in%')
+##  gSetRanks <- rankings[which(rownames(rankings) %in% geneSet),,drop=FALSE]
+##  other_ranking <- rankings[which(rownames(rankings) %notin% geneSet),,drop=FALSE]
+##  
+##  rm(rankings)
+##  
+##  aucThreshold <- round(aucMaxRank)
+##  ########### NEW version:  #######################
+##  x_th <- 1:nrow(gSetRanks)
+##  x_th <- sort(x_th[x_th<aucThreshold])
+##  y_th <- seq_along(x_th)
+##  maxAUC <- sum(diff(c(x_th, aucThreshold)) * y_th) 
+##  ############################################
+##  
+##  # Apply by columns (i.e. to each ranking)
+##  auc <- apply(gSetRanks@assays@.xData$data$ranking, 2, .auc2, aucThreshold, maxAUC)
+##  pval_correction <- sgof::BH(auc)
+##  adj_pval <-pval_correction$Adjusted.pvalues[order(match(pval_correction$data,auc))]
+##  names(adj_pval) <- names(auc)
+##  return(c(auc, missing=missing, nGenes=nGenes))
+##}
+##
+##.auc <- function(oneRanking=gSetRanks@assays@.xData$data$ranking[,90], aucThreshold, maxAUC)
+##{
+##  x <- unlist(oneRanking)[1]
+##  y <- seq_along(x)
+##  sum(diff(c(x, aucThreshold)) * y)/maxAUC
+##}
+##
+##
+##barplot(-1*log10(auc))
+##barplot(-1*log10(adj_pval))
+##calc_rss(label_data,adj_pval,1)
+##
+##exp_data[which(rownames(exp_data) == "ANAPC11"),1]
+##
+##
+##
+##.AUCell_buildRankings <- function(exprMat=exp_data, plotStats=TRUE, nCores=8, keepZeroesAsNA=FALSE, verbose=TRUE)
+##{
+##  #### Optional. TODO: test thoroughly!
+##  if(keepZeroesAsNA){
+##    exprMat[which(exprMat==0, arr.ind=TRUE)] <- NA 
+##  }
+##  #### 
+##  
+##  if(!data.table::is.data.table(exprMat))
+##    exprMat <- data.table::data.table(exprMat, keep.rownames=TRUE)
+##  # TO DO: Replace by sparse matrix??? (e.g. dgTMatrix)
+##  data.table::setkey(exprMat, "rn") # (reorders rows)
+##  
+##  nGenesDetected <- numeric(0)
+##  msg <- tryCatch(plotGeneCount(exprMat[,-"rn", with=FALSE], plotStats=plotStats, verbose=verbose),
+##                  error = function(e) {
+##                    return(e)
+##                  })
+##  if("error" %in% class(msg)) {
+##    warning("There has been an error in plotGeneCount() [Message: ",
+##            msg$message, "]. Proceeding to calculate the rankings...", sep="")
+##  }else{
+##    if(is.numeric(nGenesDetected))
+##      nGenesDetected <- msg
+##  }
+##  
+##  colsNam <- colnames(exprMat)[-1] # 1=row names
+##  if(nCores==1)
+##  {
+##    # The rankings are saved in exprMat (i.e. By reference)
+##    exprMat[, (colsNam):=lapply(-.SD, data.table::frank, ties.method="random", na.last="keep"),
+##            .SDcols=colsNam]
+##    
+##  }else
+##  {
+##    # doRNG::registerDoRNG(nCores)
+##    doParallel::registerDoParallel()
+##    options(cores=nCores)
+##    
+##    if(verbose)
+##      message("Using ", foreach::getDoParWorkers(), " cores.")
+##    
+##    # Expected warning: Not multiple
+##    suppressWarnings(colsNamsGroups <- split(colsNam,
+##                                             (seq_along(colsNam)) %% nCores))
+##    rowNams <- exprMat$rn
+##    
+##    colsGr <- NULL
+##    "%dopar%"<- foreach::"%dopar%"
+##    suppressPackageStartupMessages(exprMat <-
+##                                     doRNG::"%dorng%"(foreach::foreach(colsGr=colsNamsGroups,
+##                                                                       .combine=cbind),
+##                                                      {
+##                                                        # Edits by reference: how to make it work in paralell...?
+##                                                        subMat <- exprMat[,colsGr, with=FALSE]
+##                                                        subMat[, (colsGr):=lapply(-.SD, data.table::frank, ties.method="random", na.last="keep"),
+##                                                               .SDcols=colsGr]
+##                                                      }))
+##    # Keep initial order & recover rownames
+##    exprMat <- data.table::data.table(rn=rowNams, exprMat[,colsNam, with=FALSE])
+##    data.table::setkey(exprMat, "rn")
+##  }
+##  
+##  rn <- exprMat$rn
+##  exprMat <- as.matrix(exprMat[,-1])
+##  rownames(exprMat) <- rn
+##  
+##  # return(matrixWrapper(matrix=exprMat, rowType="gene", colType="cell",
+##  #                      matrixType="Ranking", nGenesDetected=nGenesDetected))
+##  names(dimnames(exprMat)) <- c("genes", "cells")
+##  new("aucellResults",
+##      SummarizedExperiment::SummarizedExperiment(assays=list(ranking=exprMat)),
+##      nGenesDetected=nGenesDetected)
+##}
