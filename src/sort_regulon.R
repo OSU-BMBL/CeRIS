@@ -13,13 +13,11 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 # wd<-getwd()
 ####test
-# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190823145911"
-# setwd("C:/Users/wan268/Documents/iris3_data/20190818190915")
-# jobid <-20190818190915 
-# expFile <- "20190818190915_filtered_expression.txt"
-# labelFile <- "20190818190915_cell_label.txt"
+# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818122320"
+# setwd("C:/Users/wan268/Documents/iris3_data/2019083104715")
+# jobid <-20190818122320 
 # wd <- getwd()
-#setwd(wd)
+# setwd(wd)
 
 quiet <- function(x) { 
   sink(tempfile()) 
@@ -41,16 +39,19 @@ calc_jsd <- function(v1,v2) {
 #num_ct <- 1
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
 #calculate regulon activity score (RAS) 
-#expr <- exp_data
-# genes <- total_gene_list
+# expr <- exp_data
+# genes <- total_gene_list[227:342]
 calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea","custom_auc")) {
   if (method=="aucell"){ #use top 10% cutoff
     require(AUCell)
+    expr <- as.matrix(expr)
     names(genes) <- 1:length(genes)
     cells_rankings <- AUCell_buildRankings(expr,plotStats = F) 
     cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.1)
     #score_vec <- cells_AUC@assays@data@listData[['AUC']]
-    score_vec <- cells_AUC@assays@.xData$data$AUC
+    #score_vec <- cells_AUC@assays@.xData$data$AUC
+    ## AUCell modified object structure
+    tryCatch(score_vec <- cells_AUC@assays@data@listData[['AUC']],error = function(e) score_vec <- cells_AUC@assays@.xData$data$AUC)
 
   } else if (method=="zscore"){
     require("GSVA")
@@ -65,42 +66,32 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     require("GSVA")
     require("snow")
     score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T,parallel.sz=8)
-  } else if (method=="rank_u_test"){
-    require(AUCell)
+  } else if (method=="wmw_test"){
     require(BioQC)
+    require(data.table)
     if(!data.table::is.data.table(expr))
     expr <- data.table::data.table(expr, keep.rownames=TRUE)
     data.table::setkey(expr, "rn") # (reorders rows)
     colsNam <- colnames(expr)[-1] # 1=row names
-    names(genes) <- 1:length(genes)
-    dim(exp_data)
-    rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frank, ties.method="random", na.last="keep"),
+    #names(genes) <- 1:length(genes)
+    rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="random", na.last="keep"),
                          .SDcols=colsNam]
     rn <- rankings$rn
     rankings <- as.matrix(rankings[,-1])
     rownames(rankings) <- rn
-    indx <- seq_len(nrow(label_data))
-    #geneset=genes[[1]]
-    #genes <- genes[1:20]
-    score_vec <- sapply(genes,function(geneset){
-      #geneset <- unique(geneset)
-      #geneset <- geneset[which(geneset %in% rownames(rankings))]
-      #'%notin%' <- Negate('%in%')
-      #gSetRanks <- rankings[which(rownames(rankings) %in% geneset),,drop=FALSE]
-      #other_ranking <- rankings[which(rownames(rankings) %notin% geneset),,drop=FALSE]
-      #wilcox.test(gSetRanks[,1], other_ranking[,1])$p.value
-      #pval <- sapply(indx, function(i) wilcox.test(gSetRanks@assays@.xData$data$ranking[,i], other_ranking@assays@.xData$data$ranking[,i])$p.value)
-      set_in_list <- rownames(rankings) %in% geneset
-      #pval <- sapply(indx, function(i) wmwTest(rankings[,i], set_in_list, valType="p.two.sided"))
-      pval <- wmwTest(rankings, set_in_list, valType="p.two.sided", simplify = T)
-      pval_correction <- sgof::BH(pval)
-      adj_pval <-pval_correction$Adjusted.pvalues[order(match(pval_correction$data,pval))]
-      print(Sys.time())
-      return(-1*log10(adj_pval))
-    })
-    score_vec <- t(score_vec)
-    colnames(score_vec) <- label_data[,1]
-    
+
+    time_idx <- 1
+    geneset <- as.data.frame(lapply(genes, function(x){
+      return(rownames(rankings) %in% x)
+    }))
+    names(geneset) <- 1:ncol(geneset)
+    dim(geneset)
+    print(Sys.time())
+    score_vec <- wmwTest(rankings, geneset, valType="abs.log10p.greater", simplify = T)
+    print(Sys.time())
+    score_vec[score_vec < 0.1] <- 0
+    #barplot(-1*log10(score_vec[1,]))
+
     ##### test two u-test function speed
     #library(microbenchmark)
     #microbenchmark(
@@ -109,7 +100,6 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     #microbenchmark(
     #  sapply(indx, function(i) wilcox.test(gSetRanks[,i], other_ranking[,i])$p.value),times = 10
     #)
-    
     #
   }
   return(score_vec)
@@ -126,8 +116,7 @@ normalize_ras <- function(score_vec){
   return(score_vec)
 }
 
-# test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
-#score_vec <- ras
+# [Deprecated].test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
 calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
@@ -164,7 +153,8 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #  }
   #}
 }
-#score_vec=ras
+
+
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   
@@ -182,18 +172,7 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   return(rss)
 }
 
-
-sort_dir <- function(dir) {
-  tmp <- sort(dir)
-  split <- strsplit(tmp, "_CT_") 
-  split <- as.numeric(sapply(split, function(x) x <- sub("_bic.*", "", x[2])))
-  return(tmp[order(split)])
-  
-}
-
-alldir <- list.dirs(path = wd)
-alldir <- grep("*_bic$",alldir,value=T)
-alldir <- sort_dir(alldir)
+total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
 
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
@@ -203,9 +182,9 @@ marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
 total_gene_list <- vector()
 total_gene_index <- 1
-#i=1
+#i=2
 ## to speed up gsva process, read all genes  to one list
-for (i in 1:length(alldir)) {
+for (i in 1:total_ct) {
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
   close(regulon_gene_name_handle)
@@ -214,15 +193,12 @@ for (i in 1:length(alldir)) {
 print(Sys.time())
 total_gene_list <- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
 #total_gene_list <- total_gene_list[1:10]
-if (ncol(exp_data) > 5000) {
-  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "rank_u_test")
-} else {
-  total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "rank_u_test")
-}
+#total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test")
+total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test")
 
 #i=1
 # genes=x= gene_name_list[[1]]
-for (i in 1:length(alldir)) {
+for (i in 1:total_ct) {
   
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
@@ -282,8 +258,7 @@ for (i in 1:length(alldir)) {
   ras <- ras[rss_rank,]
   originak_ras <- originak_ras[rss_rank,]
   rss_list <- rss_list[rss_rank]
-  
-  
+
   marker<-lapply(gene_name_list, function(x){
     x[which(x%in%marker_data[,i])]
   })
@@ -309,8 +284,6 @@ for (i in 1:length(alldir)) {
     originak_ras <- originak_ras[rss_rank,]
   }
 
-  
- 
   colnames(ras) <- label_data[,1]
   colnames(originak_ras) <- label_data[,1]
   
