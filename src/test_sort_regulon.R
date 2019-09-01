@@ -14,14 +14,15 @@ library(dabestr)
 #jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
-jobid <-20190821202541 
-total_ct_number <- 14
-#wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
-wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
+jobid <-20190818122320 
+
+wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
+#wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 labelFile <- paste(jobid,"_cell_label.txt",sep = "")
 # wd <- getwd()
 setwd(wd)
+total_ct_number <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
 
 quiet <- function(x) { 
   sink(tempfile()) 
@@ -182,8 +183,41 @@ for (i in 1:total_ct_number) {
   total_gene_list <- append(total_gene_list,regulon_gene_name)
   total_rank <- append(total_rank,regulon_rank)
 }
-
+t1 <- "CT4S-R122"
+length(grep("CT3.*?",t1))
+length(grep("CT4.*?",t1))
 total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
+
+##########Scatter plot of rss##############
+#total_rss_ct <- strsplit(total_rank,"\\t")
+#total_rss_ct <- sapply(total_rss_ct, function(x){
+#  if (length(grep("CT4.*?",x[1])) > 0){
+#    return(c(x[1],as.numeric(x[5])))
+#  }
+#})
+#df1 <- t(data.frame(score=total_rss_ct[228:352]))
+#rownames(df1) <- as.character(df1[,1])
+#colnames(df1) <- c("regulon","rss")
+#
+#
+#df1 <- as.data.frame(df1)
+#df1[,2] <- as.numeric(df1[,2])
+#df1[,1]  <- factor(df1[,1] , levels = df1[,1][order(df1[,2],decreasing = T)])
+#df2 <- df1[order(df1[,2],decreasing = T),]
+#df2[,1]  <- as.character(df1[,1])
+#df2[,1]  <- factor(df2[,1] , levels = df2[,1][order(df2[,2],decreasing = T)])
+#rownames(df2) <- as.character(df1[,1])
+#p1 <- ggplot(df2, aes(x=regulon, y=rss))+ 
+#  geom_point( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=6,color="#666666"),axis.title.y = element_text(size=12,color="#666666"),strip.text.x = element_text(size=14)) +
+#  labs(y="Regulon specificity score",x="Regulon") +
+#  theme(legend.title=element_blank())+
+#  theme(plot.margin = unit(c(1,1,1,2), "cm")) + scale_y_continuous(breaks=c(0, 0.2, 0.4, 0.6, 0.8,1.0))
+#png(paste("scatter.png",sep = ""),width=4000, height=1500,res = 300)
+#p1
+#quiet(dev.off())
+#
+########################
+
 total_rank<- lapply(strsplit(total_rank,"\\t"), function(x){x[-1]})
 
 regulon_with_marker_index <- lapply(total_rank, function(x){
@@ -197,7 +231,7 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   total_rss <- lapply(total_rank, function(x){
     return(x[4])
   })
-
+  
   #total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
 
   #activity_score <- read.table(paste(jobid,"_CT_",ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
@@ -213,12 +247,12 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   df[,1] <- as.numeric(as.vector(df[,1]))
   colnames(df) <- c("value","group")
   
-  ##plot markers - non markers
-  ##unpaired_mean_diff <- dabest(df,group, value,
-  ##                             idx =  c("have_marker","otherwise"),
-  ##                             paired = F,ci=95)
-  ##
-  ##plot(unpaired_mean_diff)
+  ###plot markers - non markers
+  unpaired_mean_diff <- dabest(df,group, value,
+                              idx =  c("have_marker","otherwise"),
+                              paired = F,ci=95)
+  
+  plot(unpaired_mean_diff)
   
   total_regulon_marker_length <- lapply(total_rank, function(x){
     return(length(x)-4)
@@ -237,18 +271,17 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   df_marker_length <- data.frame(rss=as.numeric(unlist(total_rss)),length=as.numeric(unlist(total_regulon_marker_length)))
   df_marker_length <- df_marker_length[df_marker_length$length>0,]
 
-  #cor.test(df_marker_length[,1],df_marker_length[,2])
   #ggscatter(df_marker_length, x = "length", y = "rss", 
-  #          add = "reg.line", conf.int = TRUE, 
-  #          cor.coef = TRUE, cor.method = "pearson",
-  #          xlab = "Number of markers", ylab = "RSS value")
+  #         add = "reg.line", conf.int = TRUE, 
+  #         cor.coef = TRUE, cor.method = "pearson",
+  #         xlab = "Number of markers", ylab = "RSS value")
   
   total_regulon_length <- lapply(total_gene_list, function(x){
     return(length(x))
   })
     
     
-  hist(unlist(total_regulon_length),breaks = 50)
+  #hist(unlist(total_regulon_length),breaks = 50)
   ##plot correlation pvalue-rss
   
   #df_pval_rss <- data.frame(rss=as.numeric(unlist(total_rss)),pval=as.numeric(unlist(total_regulon_pvalue)))
@@ -261,13 +294,13 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   
   ##plot correlation z-score-rss
   
-  df_zscore_rss <- data.frame(rss=as.numeric(unlist(total_rss)),zscore=as.numeric(unlist(total_regulon_zscore)))
-  df_zscore_rss <- df_zscore_rss[df_zscore_rss$zscore>2,]
-  df_zscore_rss <- df_zscore_rss[df_zscore_rss$zscore<100,]
-  ggscatter(df_zscore_rss, x = "zscore", y = "rss", 
-            add = "reg.line", conf.int = TRUE, 
-            cor.coef = TRUE, cor.method = "pearson",
-            xlab = "Zscore", ylab = "RSS value")
+  #df_zscore_rss <- data.frame(rss=as.numeric(unlist(total_rss)),zscore=as.numeric(unlist(total_regulon_zscore)))
+  #df_zscore_rss <- df_zscore_rss[df_zscore_rss$zscore>2,]
+  #df_zscore_rss <- df_zscore_rss[df_zscore_rss$zscore<100,]
+  #ggscatter(df_zscore_rss, x = "zscore", y = "rss", 
+  #          add = "reg.line", conf.int = TRUE, 
+  #          cor.coef = TRUE, cor.method = "pearson",
+  #          xlab = "Zscore", ylab = "RSS value")
   
   
   
@@ -311,3 +344,5 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
 ##  
 ##  
 ##  ##
+  
+  
