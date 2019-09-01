@@ -281,6 +281,7 @@ Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   tmp.regulon<-my.object@assays$RNA@data[gene.index,]
   return(tmp.regulon)
 }
+
 Generate.Regulon(cell.type = 1)
 
 #######################################################

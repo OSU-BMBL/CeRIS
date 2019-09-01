@@ -1,5 +1,4 @@
 #######  Plot regulon ##########
-
 library(RColorBrewer)
 library(Polychrome)
 library(ggplot2)
@@ -10,31 +9,38 @@ args <- commandArgs(TRUE)
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #wd <- "D:/Users/flyku/Documents/IRIS3-data/20190802103754"
 #srcDir <- getwd()
-#id <-"CT4S-R1" 
+#id <-"CT3S-R1" 
 #jobid <- "20190830171050"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
 
 
-Plot.cluster2D<-function(reduction.method="tsne",module=1,customized=F,pt_size=1,...){
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  if(!customized){
+  
+  if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=as.factor(my.object$Customized.idents))
   }
+  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
   p.cluster <- ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) + scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+  p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
+  # + scale_color_manual(values  = as.character(palette36.colors(36))[-2])
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
   #p.cluster<-theme_linedraw()
-  p.cluster <- p.cluster + labs(col="cell type")
-  p.cluster <- p.cluster + theme_classic()+scale_fill_continuous(name="cell type")
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell Type",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                               breaks=tmp.celltype,
+                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  
+  # + labs(col="cell type")           
+  p.cluster <- p.cluster + theme_classic() 
   p.cluster <- p.cluster + coord_fixed(ratio=1)
   p.cluster
 }
@@ -61,11 +67,18 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #scale_colour_gradientn(colors=jet.colors(10))
   #p.cluster<-theme_linedraw()
-  p.regulon <- p.regulon + theme_classic() + labs(col="regulon score") 
+  p.regulon <- p.regulon + theme_classic()
+ 
   #message("finish!")
   
   p.regulon <- p.regulon + coord_fixed(ratio=1)
   p.regulon
+}
+
+Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
+  x<-Get.CellType(cell.type = cell.type)
+  tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
+  return(tmp.regulon)
 }
 
 Get.CellType<-function(cell.type=NULL,...){
@@ -79,20 +92,9 @@ Get.CellType<-function(cell.type=NULL,...){
   
 }
 
-Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
-  x<-Get.CellType(cell.type = cell.type)
-  my.rowname<-rownames(my.object)
-  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
-  # my.object@data stores normalized data
-  tmp.regulon<-my.object@assays$RNA@data[gene.index,]
-  return(tmp.regulon)
-}
 
 
-
-
-
-Get.RegulonScore<-function(reduction.method="umap",cell.type=1,regulon=1,customized=T,...){
+Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
   my.regulon.number<-length(Get.CellType(cell.type = cell.type))
   if (regulon > my.regulon.number){
     stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
@@ -139,9 +141,8 @@ activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activit
 #activity_score_min <- min(activity_score)
 #activity_score <- activity_score - activity_score_min + 1
 num_cells <- ncol(activity_score)
-# pt-size =1 few cell
-# pt-size =0.2 large cell
-pt_size <- 1 
+
+pt_size <- (5.001*10^(-1)) - 3.002*10^(-5) * num_cells
 Cairo(width=2000, height=1500,dpi = 300, file=paste("regulon_id/overview_ct.png",sep = ""), type="png", bg="white")
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
   if(!exists("my.object")){

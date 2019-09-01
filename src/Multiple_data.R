@@ -9,9 +9,7 @@ rundata<-function(){
 
 read.multipledata<-function(Path=getwd()){
   # mode2 input individual files.
-  current.path<-getwd()
-  tmp.path<-Path
-  setwd(tmp.path)
+  setwd(Path)
   my.file<- list.files(pattern = ".h5")
   my.data.list<-list()
   for(i in 1:length(my.file)){
@@ -21,18 +19,9 @@ read.multipledata<-function(Path=getwd()){
     tmp.object <- (subset(tmp.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
     my.count.data<-GetAssayData(object = tmp.object[['RNA']],slot="counts")
     sce<-SingleCellExperiment(list(counts=my.count.data))
-   
-    if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
-      ## normalization##############################
       sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
       sce<-scater::normalize(sce,return_log=F)
       my.normalized.data <- normcounts(sce)
-    } else {
-      my.normalized.data <- my.count.data
-    }
-    
-    sce<-computeSumFactors(sce,positive=T)
-    sce<-scater::normalize(sce,return_log=F)
     my.normalized.data <-sce@assays@.xData$data@listData$normcounts
     my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
     colnames(my.imputated.data)<-colnames(my.count.data)
@@ -43,7 +32,6 @@ read.multipledata<-function(Path=getwd()){
     my.data.list<-append(my.data.list,tmp.object)
   }
   names(my.data.list)<-my.file
-  setwd(current.path)
 }
 ##########################################
 # integrate:
