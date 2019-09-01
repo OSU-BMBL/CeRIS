@@ -7,11 +7,11 @@ library(Cairo)
 
 args <- commandArgs(TRUE) 
 #setwd("D:/Users/flyku/Documents/IRIS3-data/20190802103754")
-#setwd("C:/Users/wan268/Documents/iris3_data/0624")
+#setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #wd <- "D:/Users/flyku/Documents/IRIS3-data/20190802103754"
 #srcDir <- getwd()
-#id <-"CT1S-R1" 
-#jobid <- "20190822164428"
+#id <-"CT4S-R1" 
+#jobid <- "20190830171050"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -68,12 +68,6 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   p.regulon
 }
 
-Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
-  x<-Get.CellType(cell.type = cell.type)
-  tmp.regulon<-subset(my.object,cells = colnames(my.object),features = x[[regulon]][-1])
-  return(tmp.regulon)
-}
-
 Get.CellType<-function(cell.type=NULL,...){
   if(!is.null(cell.type)){
     my.cell.regulon.filelist<-list.files(pattern = "bic.regulon_gene_symbol.txt")
@@ -85,9 +79,20 @@ Get.CellType<-function(cell.type=NULL,...){
   
 }
 
+Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
+  x<-Get.CellType(cell.type = cell.type)
+  my.rowname<-rownames(my.object)
+  gene.index<-sapply(x[[regulon]][-1],function(x) grep(paste0("^",x,"$"),my.rowname))
+  # my.object@data stores normalized data
+  tmp.regulon<-my.object@assays$RNA@data[gene.index,]
+  return(tmp.regulon)
+}
 
 
-Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
+
+
+
+Get.RegulonScore<-function(reduction.method="umap",cell.type=1,regulon=1,customized=T,...){
   my.regulon.number<-length(Get.CellType(cell.type = cell.type))
   if (regulon > my.regulon.number){
     stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
@@ -134,7 +139,9 @@ activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activit
 #activity_score_min <- min(activity_score)
 #activity_score <- activity_score - activity_score_min + 1
 num_cells <- ncol(activity_score)
-pt_size <- 1
+# pt-size =1 few cell
+# pt-size =0.2 large cell
+pt_size <- 1 
 Cairo(width=2000, height=1500,dpi = 300, file=paste("regulon_id/overview_ct.png",sep = ""), type="png", bg="white")
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
   if(!exists("my.object")){

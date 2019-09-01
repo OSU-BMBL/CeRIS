@@ -1,11 +1,5 @@
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/Seurat_multiple_data/immuno_cell/")
-
-pancreas.data <- readRDS(file = "pancreas_expression_matrix.rds")
-metadata <- readRDS(file = "pancreas_metadata.rds")
-# mode1 input before merge, user need upload meta file.
-pancreas <- CreateSeuratObject(pancreas.data, meta.data = metadata)
-pancreas.list <- SplitObject(pancreas, split.by = "tech")
-
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/Seurat_multiple_data/")
+library(Seurat,lib.loc = "/users/PAS1475/cyz931123/R/Seurat/Seurat3.0/")
 rundata<-function(){
   tmp.object<-FindVariableFeatures(tmp.object,selection.method = "vst",nfeatures = 2000)
   all.gene<-tmp.object@assays$RNA@var.features
@@ -25,8 +19,9 @@ read.multipledata<-function(Path=getwd()){
     tmp.object<-CreateSeuratObject(tmp.raw.data)
     tmp.object[["percent.mt"]] <- PercentageFeatureSet(tmp.object, pattern = "^MT-")
     tmp.object <- (subset(tmp.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
-    sce<-SingleCellExperiment(list(counts=my.count.data))
     my.count.data<-GetAssayData(object = tmp.object[['RNA']],slot="counts")
+    sce<-SingleCellExperiment(list(counts=my.count.data))
+   
     if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
       ## normalization##############################
       sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
@@ -52,8 +47,8 @@ read.multipledata<-function(Path=getwd()){
 }
 ##########################################
 # integrate:
-my.anchor<-FindIntegrationAnchors(object.list = my.data.list, dims = 1:30)
-my.integrated <- IntegrateData(anchorset = my.anchor, dims = 1:30)
+my.anchor <-FindIntegrationAnchors(object.list = my.data.list, dims = 1:30)
+my.object <- IntegrateData(anchorset = my.anchor, dims = 1:30)
 
 
 
