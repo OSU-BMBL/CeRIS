@@ -124,50 +124,77 @@ Generate.Regulon<-function(cell.type=NULL,regulon=1,...){
   tmp.regulon<-my.object@assays$RNA@data[gene.index,]
   return(tmp.regulon)
 }
-Get.RegulonScore<-function(cell.type=1,regulon=1,...){
-  # recognize the regulon file pattern.
-  tmp.FileList<-list.files(pattern = "regulon_activity_score")
-  cell.type.index<-grep(paste0("_CT_",cell.type,"_bic"),tmp.FileList)
-  tmp.RegulonScore<-read.delim(tmp.FileList[cell.type.index],sep = "\t",check.names = F)[regulon,]
-  tmp.NameIndex<-match(rownames(my.object@reductions$tsne@cell.embeddings),names(tmp.RegulonScore))
-  tmp.RegulonScore<-tmp.RegulonScore[tmp.NameIndex]
-  tmp.RegulonScore.Numeric<- as.numeric(tmp.RegulonScore)
-  my.plot.regulon<-cbind.data.frame(my.object@reductions$tsne@cell.embeddings[,c(1,2)],regulon.score=tmp.RegulonScore.Numeric)
-  return(my.plot.regulon)
-}
-Plot.cluster2D<-function(customized=F,...){
-  if(!customized==TRUE){
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
-                                         Cell_type=my.object$seurat_clusters)
-  }else{
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
-                                         Cell_type=as.factor(my.object$Customized.idents))
+Get.RegulonScore<-function(reduction.method="tsne",cell.type=1,regulon=1,customized=F,...){
+  my.regulon.number<-length(Get.CellType(cell.type = cell.type))
+  if (regulon > my.regulon.number){
+    stop(paste0("Regulon number exceeds the boundary. Under this cell type, there are total ", my.regulon.number," regulons"))
+  } else {
+    my.cts.regulon.S4<-Generate.Regulon(cell.type = cell.type,regulon=regulon)
+    if(customized){
+      my.cell.type<-my.cts.regulon.S4$Customized.idents
+      message(c("using customized cell label: ","|", paste0(unique(as.character(my.cts.regulon.S4$Customized.idents)),"|")))
+    }else{
+      my.cell.type<-as.numeric(my.cts.regulon.S4$seurat_clusters) 
+      message(c("using default cell label(seurat prediction): ","|", paste0(unique(as.character(my.cts.regulon.S4$seurat_clusters)),"|")))
+    } 
+    tmp_data<-as.data.frame(my.cts.regulon.S4@assays$RNA@data)
+    geneSets<-list(GeneSet1=rownames(tmp_data))
+    #cells_AUC<-AUCell_calcAUC(geneSets,cells_rankings,aucMaxRank = nrow(cells_rankings)*0.1)
+    #cells_assignment<-AUCell_exploreThresholds(cells_AUC,plotHist = F,nCores = 1,assign = T)
+    #my.auc.data<-as.data.frame(cells_AUC@assays@.xData$data$AUC)
+    #my.auc.data<-t(my.auc.data[,colnames(tmp_data)])
+    #regulon.score<-colMeans(tmp_data)/apply(tmp_data,2,sd)
+    regulon.score<-t(as.matrix(activity_score[regulon,]))
+    tmp.embedding<-Embeddings(my.object,reduction = reduction.method)[colnames(my.cts.regulon.S4),][,c(1,2)]
+    my.choose.regulon<-cbind.data.frame(tmp.embedding,Cell_type=my.cell.type)
+    my.choose.regulon <- cbind(my.choose.regulon, regulon.score=regulon.score[match(rownames(my.choose.regulon), rownames(regulon.score))])
+    
+    return(my.choose.regulon)
   }
-  p.cluster<-ggplot(my.plot.all.source,
-                    aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
-  #p.cluster<-theme_linedraw()
-  p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_light()+scale_fill_continuous(name="cell type") + coord_fixed(1)
-  
 }
-
-Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=T,...){
-  message("plotting regulon ",regulon," of cell type ",cell.type,"...")
+Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customized=T,pt_size=1,...){
+  #message("plotting regulon ",regulon," of cell type ",cell.type,"...")
   my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
                                     cell.type = cell.type,
                                     regulon = regulon,
                                     customized = customized)
+  # if(!customized){
+  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+  #                                        Cell_type=my.object$seurat_clusters)
+  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
+  # }else{
+  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+  #                                        Cell_type=as.factor(my.object$Customized.idents))
+  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
+  # }
+  # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
+  # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
+  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
+  #scale_colour_gradientn(colors=jet.colors(10))
+  #p.cluster<-theme_linedraw()
+  p.regulon <- p.regulon + theme_classic()+labs(col="Regulon Score")
   
-  p.regulon<-ggplot(my.plot.regulon,
-                    aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
-  p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-  p.regulon<-p.regulon + labs(col="regulon score") + coord_fixed(1)
-  message("finish!")
+  #message("finish!")
+  
+  p.regulon <- p.regulon + coord_fixed(ratio=1)
   p.regulon
-  
-  
 }
+
+Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customized=T,pt_size=1,...){
+  #message("plotting regulon ",regulon," of cell type ",cell.type,"...")
+  my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
+                                    cell.type = cell.type,
+                                    regulon = regulon,
+                                    customized = customized)
+  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
+
+  p.regulon <- p.regulon + theme_classic()
+  p.regulon <- p.regulon + coord_fixed(ratio=1)
+  p.regulon
+}
+
 Get.MarkerGene<-function(customized=T){
   if(customized==T){
     Idents(my.object)<-my.object$Customized.idents

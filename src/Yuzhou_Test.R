@@ -1,16 +1,27 @@
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/11.Klein/20190818121919/")
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050//")
 my.object<-readRDS("seurat_obj.rds")
+my.ltmg<-read.delim("20190830171050_filtered_expression.txt.em.chars",header = T)
+my.ltmg.pure<-my.ltmg[-which(duplicated(my.ltmg$o)==T),]
+
+rownames(my.ltmg.pure)<-my.ltmg.pure$o
+my.ltmg.pure<-my.ltmg.pure[,-1]
+
+
+my.object@assays$RNA@data<-as.sparse(my.ltmg.pure)
+
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 2000)
 all.gene<-my.object@assays$RNA@var.features
 my.object<-ScaleData(my.object,features = all.gene)
 my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
-ElbowPlot(object = my.object)
+# ElbowPlot(object = my.object)
 my.object<-RunTSNE(my.object,dims = 1:10,perplexity=10,dim.embed = 3)
-my.object<-FindNeighbors(my.object,k.param = 20,dims = 1:30)
-my.object<-FindClusters(my.object,resolution = 0.5)
+my.object<-RunUMAP(my.object,dims=1:10)
+# my.object<-FindNeighbors(my.object,k.param = 20,dims = 1:30)
+# my.object<-FindClusters(my.object,resolution = 0.5)
 # plot
-Plot.cluster2D(customized = T)
-Plot.regulon2D(reduction.method = "tsne",regulon = 1,customized = T,cell.type=3)
+activity_score <- read.table(paste(jobid,"_CT_",4,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
+Plot.cluster2D(customized = T,pt_size = pt_size)
+Plot.regulon2D(reduction.method = "umap",regulon = 1,customized = T,cell.type=4,pt_size = pt_size)
 #####
 my.RAS.filelist<-list.files(pattern = "_activity_score.txt")
 my.order<- sapply(strsplit(my.RAS.filelist,"_"),"[",3)

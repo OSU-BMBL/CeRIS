@@ -305,21 +305,25 @@ Get.RegulonScore()
 
 ##############################
 
-Plot.cluster2D<-function(customized=F,...){
-  if(!customized==TRUE){
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1,...){
+  if(customized==F){
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=my.object$seurat_clusters)
   }else{
-    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = "tsne"),
+    my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=as.factor(my.object$Customized.idents))
   }
-  p.cluster<-ggplot(my.plot.all.source,
-                    aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
-  #p.cluster<-theme_linedraw()
-  p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_light()+scale_fill_continuous(name="cell type") + coord_fixed(1)
-  
+  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
+  p.cluster <- ggplot(my.plot.all.source,
+                      aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
+  p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
+  p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell Type",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                               breaks=tmp.celltype,
+                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  p.cluster <- p.cluster + theme_classic() 
+  p.cluster <- p.cluster + coord_fixed(ratio=1)
+  p.cluster
 }
 
 # test plot cluster function. 
@@ -329,22 +333,19 @@ Plot.cluster2D(customized = T)
 # test Get.RegulonScore, output is matrix
 
 
-Plot.regulon2D<-function(reduction.method="tsne",regulon=1,cell.type=1,customized=T,...){
-  message("plotting regulon ",regulon," of cell type ",cell.type,"...")
+Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customized=T,pt_size=1,...){
   my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
                                     cell.type = cell.type,
                                     regulon = regulon,
                                     customized = customized)
-  
-  p.regulon<-ggplot(my.plot.regulon,
-                    aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
-  p.regulon<-p.regulon+geom_point(aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-  p.regulon<-p.regulon + labs(col="regulon score") + coord_fixed(1)
-  message("finish!")
+
+  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
+  p.regulon <- p.regulon + theme_classic()
+  p.regulon <- p.regulon + coord_fixed(ratio=1)
   p.regulon
-  
-  
 }
+
 Plot.regulon2D(cell.type=3,regulon=5,customized = T)
 Plot.cluster2D(customized = T)
 

@@ -9,7 +9,7 @@ args <- commandArgs(TRUE)
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #wd <- "D:/Users/flyku/Documents/IRIS3-data/20190802103754"
 #srcDir <- getwd()
-#id <-"CT3S-R1" 
+#id <-"CT1S-R1" 
 #jobid <- "20190830171050"
 srcDir <- args[1]
 id <- args[2]
@@ -67,7 +67,7 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
   #scale_colour_gradientn(colors=jet.colors(10))
   #p.cluster<-theme_linedraw()
-  p.regulon <- p.regulon + theme_classic()
+  p.regulon <- p.regulon + theme_classic()+labs(col="Regulon Score")
  
   #message("finish!")
   
