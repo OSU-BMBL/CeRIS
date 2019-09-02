@@ -65,15 +65,9 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
   p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-<<<<<<< HEAD
-  #scale_colour_gradientn(colors=jet.colors(10))
-  #p.cluster<-theme_linedraw()
-  p.regulon <- p.regulon + theme_classic()+labs(col="Regulon Score")
-=======
-
+  p.regulon <- p.regulon + theme_classic()+labs(col="Regulon\nscore")
   p.regulon <- p.regulon + theme_classic()
->>>>>>> 3e6c10e6bbff7239295eb7972a3bc590368f825f
- 
+
   #message("finish!")
   
   p.regulon <- p.regulon + coord_fixed(ratio=1)
