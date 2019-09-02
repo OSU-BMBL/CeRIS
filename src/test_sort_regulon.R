@@ -14,7 +14,7 @@ library(dabestr)
 #jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
-jobid <-20190818122320 
+jobid <-20190822164428 
 
 wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
 #wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
@@ -123,28 +123,21 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
 
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
-
+  
+  # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
+  
   # also normalize ct_vec to sum=1
   sum_ct_vec <- sum(ct_vec)
   ct_vec <- ct_vec/sum_ct_vec
-  #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
-  rss <- 1- sqrt(jsd_result)
-
-  ct_vec_repressed <- ifelse(label_data[,2] %in% num_ct, 0, 1)
-  sum_ct_vec_repressed <- sum(ct_vec_repressed)
-  ct_vec_repressed <- ct_vec_repressed/sum_ct_vec_repressed
-  jsd_result_repressed <- apply(as.data.frame(score_vec), 1, function(x){
-    return (calc_jsd(x,ct_vec_repressed))
-  })
-  #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
-  rss_repressed <- 1- sqrt(jsd_result_repressed)
   jsd_result <- apply(as.data.frame(score_vec), 1, function(x){
-    return (min(calc_jsd(x,ct_vec),calc_jsd(x,ct_vec_repressed)))
+    return (calc_jsd(x,ct_vec))
   })
+  #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
   rss <- 1- sqrt(jsd_result)
   return(rss)
 }
+
 
 
 sort_dir <- function(dir) {
@@ -303,46 +296,47 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
   #          xlab = "Zscore", ylab = "RSS value")
   
   
-  
-##  # get cell type vector, add 1 if in this cell type
-##  ct_vec_rss <- ifelse(label_data[,2] %in% ct, 0, 1)
-##  
-##  # also normalize ct_vec to sum=1
-##  sum_ct_vec <- sum(ct_vec_rss)
-##  ct_vec_rss <- ct_vec_rss/sum_ct_vec
-##  jsd_result <- apply(as.data.frame(ras), 1, function(x){
-##    return (calc_jsd(x,ct_vec_rss))
-##  })
-##  #calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
-##  rss <- 1- sqrt(jsd_result)
-##
-##
-##  ggplot_ras <- data.frame('score'=t(ras))
-##  ggplot_ras[,2] <- label_data[,1]
-##  ggplot_ras[,3] <- ifelse(label_data[,2] %in% ct, "this_cell_type", "others")
-##  ggplot_ras[,4] <- ct_vec_rss
-##  ggplot(ggplot_ras, aes(y=X1, x=V2, fill=ct_vec)) + 
-##    geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
-##    labs(y="Regulon activity score",x="") +
-##    theme(legend.title=element_blank())+
-##    theme(plot.margin = unit(c(1,1,1,2), "cm"))
-##  
-##  ggplot(ggplot_ras, aes(y=V4, x=V2, fill=ct_vec)) + 
-##    geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
-##    labs(y="Cell type",x="") +
-##    theme(legend.title=element_blank())+
-##    theme(plot.margin = unit(c(1,1,1,2), "cm"))
-##  
-##
-##  
-##  ## check rss distribution
-##  ras <- total_ras
-##  ras <- normalize_ras(ras)
-##  for (i in nrow(ras)) {
-##    rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = 1)
-##  }
-##  
-##  
-##  ##
+
+ # get cell type vector, add 1 if in this cell type
+ #ct=1
+ #ct_vec_rss <- ifelse(label_data[,2] %in% ct, 0, 1)
+ #
+ ## also normalize ct_vec to sum=1
+ #sum_ct_vec <- sum(ct_vec_rss)
+ #ct_vec_rss <- ct_vec_rss/sum_ct_vec
+ #jsd_result <- apply(as.data.frame(ras), 1, function(x){
+ #  return (calc_jsd(x,ct_vec_rss))
+ #})
+ ##calculate regulon specificity score (RSS); which defined by converting JSD to a similarity score
+ #rss <- 1- sqrt(jsd_result)
+#
+#
+ #ggplot_ras <- data.frame('score'=t(ras))
+ #ggplot_ras[,2] <- label_data[,1]
+ #ggplot_ras[,3] <- ifelse(label_data[,2] %in% ct, "this_cell_type", "others")
+ #ggplot_ras[,4] <- ct_vec_rss
+ #ggplot(ggplot_ras, aes(y=X1, x=V2, fill=ct_vec)) + 
+ #  geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
+ #  labs(y="Regulon activity score",x="") +
+ #  theme(legend.title=element_blank())+
+ #  theme(plot.margin = unit(c(1,1,1,2), "cm"))
+ #
+ #ggplot(ggplot_ras, aes(y=V4, x=V2, fill=ct_vec)) + 
+ #  geom_bar( stat="identity")+ theme(axis.text.x = element_text(angle = 45, hjust = 1, size=12,color="#666666"),axis.title.y = element_text(size=14,color="#666666"),strip.text.x = element_text(size=16)) +
+ #  labs(y="Cell type",x="") +
+ #  theme(legend.title=element_blank())+
+ #  theme(plot.margin = unit(c(1,1,1,2), "cm"))
+ 
+
+ #i=1
+ ### check rss distribution
+ #ras <- total_ras
+ #ras <- normalize_ras(ras)
+ #for (i in nrow(ras)) {
+ #  rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = 1)
+ #}
+ #
+ #barplot(as.matrix(ras[1,]))
+ ##
   
   
