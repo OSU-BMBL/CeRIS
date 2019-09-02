@@ -32,10 +32,10 @@ Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1
   p.cluster <- ggplot(my.plot.all.source,
                     aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
   p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
-  # + scale_color_manual(values  = as.character(palette36.colors(36))[-2])
+
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
-  #p.cluster<-theme_linedraw()
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell Type",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell Type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
                                                breaks=tmp.celltype,
                                                labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
   
@@ -65,8 +65,7 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
   p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
   p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-  #scale_colour_gradientn(colors=jet.colors(10))
-  #p.cluster<-theme_linedraw()
+
   p.regulon <- p.regulon + theme_classic()
  
   #message("finish!")
@@ -142,6 +141,7 @@ activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activit
 #activity_score <- activity_score - activity_score_min + 1
 num_cells <- ncol(activity_score)
 
+quiet(dir.create("regulon_id",showWarnings = F))
 pt_size <- (5.001*10^(-1)) - 3.002*10^(-5) * num_cells
 Cairo(width=2000, height=1500,dpi = 300, file=paste("regulon_id/overview_ct.png",sep = ""), type="png", bg="white")
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
