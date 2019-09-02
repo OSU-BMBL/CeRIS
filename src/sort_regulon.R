@@ -40,8 +40,9 @@ calc_jsd <- function(v1,v2) {
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
 #calculate regulon activity score (RAS) 
 # expr <- exp_data
-# genes <- total_gene_list[227:342]
+# genes <- total_gene_list
 calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea","custom_auc")) {
+  print(Sys.time())
   if (method=="aucell"){ #use top 10% cutoff
     require(AUCell)
     expr <- as.matrix(expr)
@@ -79,19 +80,26 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     rn <- rankings$rn
     rankings <- as.matrix(rankings[,-1])
     rownames(rankings) <- rn
-
-    time_idx <- 1
     geneset <- as.data.frame(lapply(genes, function(x){
       return(rownames(rankings) %in% x)
     }))
     names(geneset) <- 1:ncol(geneset)
     dim(geneset)
-    print(Sys.time())
+    
     score_vec <- wmwTest(rankings, geneset, valType="abs.log10p.greater", simplify = T)
-    print(Sys.time())
-    score_vec[score_vec < 0.1] <- 0
-    #barplot(-1*log10(score_vec[1,]))
-
+    #score_vec[score_vec < 1] <- 0
+    #for (i in 1:nrow(score_vec)) {
+    #  tmp <- as.numeric(quantile(score_vec[i,])[2])
+    #  #tmp2 <- mean(score_vec[i,])
+    #  #tmp3 <- median(score_vec[i,])
+    #  #snr1 <- mean(score_vec[i,])/sd(score_vec[i,])
+    #  score_vec[i,which(as.numeric(score_vec[i,]) < tmp)] <- 0
+    #  #c1 <- pass.filt(score_vec[i,], W=0.05, type="stop", method="ChebyshevI")
+    #  #barplot(score_vec[i,])
+    #  #barplot(c1)
+    #}
+    
+    #barplot(score_vec1[1,])
     ##### test two u-test function speed
     #library(microbenchmark)
     #microbenchmark(
@@ -102,6 +110,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     #)
     #
   }
+  print(Sys.time())
   return(score_vec)
 }
 
