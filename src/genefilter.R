@@ -25,7 +25,7 @@ suppressPackageStartupMessages(library(gam))
 suppressPackageStartupMessages(library(RColorBrewer))
 suppressPackageStartupMessages(library(Polychrome))
 suppressPackageStartupMessages(library(ggplot2))
-
+suppressPackageStartupMessages(library(cluster))
 
 args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
@@ -59,9 +59,10 @@ load_test_data <- function(){
   # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
   # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
   # setwd("C:/Users/wan268/Documents/iris3_data/20190821202541")
-  #srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
+  # setwd("C:/Users/wan268/Documents/iris3_data/20190818190915")
+  # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "iris3_example_expression_matrix.csv"
-  jobid <- "20190821202541"
+  jobid <- "20190802103754"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
@@ -280,7 +281,7 @@ dim(my.imputatedLog.data)
 dim(expFile)
 
 ## 
-my.object<-0
+
 my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
 cell_names <- colnames(my.object)
@@ -414,20 +415,25 @@ if(ncol(my.object) < 50) {
 } else {
   my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
 }
-head(Embeddings(my.object, reduction = "pca")[, 1:5])
-
-#num_pca <- which(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))) > 0.8)[1]
-
-#plot(cumsum(Stdev(my.object,reduction = "pca")/sum(Stdev(my.object,reduction = "pca"))),type='o')
 
 my.object<-FindNeighbors(my.object,dims = 1:30)
 my.object<-FindClusters(my.object)
+
+
+
 cell_info <- my.object$seurat_clusters
 cell_info <- as.factor(as.numeric(cell_info))
 cell_label <- cbind(cell_names,cell_info)
 colnames(cell_label) <- c("cell_name","label")
 cell_label <- cell_label[order(cell_label[,2]),]
 write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+
+dist.matrix <- dist(x = Embeddings(object = my.object[['pca']])[,1:30])
+sil <- silhouette(x = as.numeric(x = cell_info), dist = dist.matrix)
+silh_out <- cbind(cell_info,cell_names,sil[,3])
+silh_out <- silh_out[order(silh_out[,1]),]
+write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
+
 #write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 
 if (label_use_sc3 =='2'){
@@ -442,9 +448,7 @@ if (label_use_sc3 =='2'){
     cell_info <-  my.object$seurat_clusters
   }
 } 
-silh_out <- cbind(cell_info,cell_names,1)
-silh_out <- silh_out[order(silh_out[,1]),]
-write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
+
 my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
 Idents(my.object)<-as.factor(my.object$Customized.idents)
 
