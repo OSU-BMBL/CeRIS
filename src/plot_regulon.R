@@ -2,7 +2,7 @@
 library(RColorBrewer)
 library(Polychrome)
 library(ggplot2)
-library(Cairo) 
+#library(Cairo) 
 
 args <- commandArgs(TRUE) 
 #setwd("D:/Users/flyku/Documents/IRIS3-data/20190802103754")
@@ -35,7 +35,7 @@ Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1
 
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
 
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell Type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
                                                breaks=tmp.celltype,
                                                labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
   
@@ -143,7 +143,8 @@ num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
 pt_size <- (5.001*10^(-1)) - 3.002*10^(-5) * num_cells
-Cairo(width=2000, height=1500,dpi = 300, file=paste("regulon_id/overview_ct.png",sep = ""), type="png", bg="white")
+
+png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
@@ -153,7 +154,7 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
 }
 quiet(dev.off())
 
-Cairo(width=2000, height=1500,dpi = 300, file=paste("regulon_id/",id,".png",sep = ""), type="png", bg="white")
+png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))
 if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
@@ -162,6 +163,7 @@ if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
   Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size)
 }
 quiet(dev.off())
+
 
 #CairoPDF(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,
 #          pointsize = 12, bg = "white")
