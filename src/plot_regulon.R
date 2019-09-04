@@ -134,11 +134,9 @@ regulon_ct <-gsub( "-.*$", "", id)
 regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
-#plot(density(as.matrix(activity_score[1,])))
+
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
-#activity_score <- readr::read_delim(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),delim = "\t",col_names = T)
-#activity_score_min <- min(activity_score)
-#activity_score <- activity_score - activity_score_min + 1
+
 num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
