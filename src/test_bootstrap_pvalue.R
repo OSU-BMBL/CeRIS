@@ -1,4 +1,8 @@
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> parent of 818168f... test: rstudio server
 ########## Sort regulon by regulon specificity score ##################
 # used files:
 # filtered exp matrix
