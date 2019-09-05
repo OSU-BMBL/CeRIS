@@ -1,10 +1,10 @@
-   
+
 ########## Sort regulon by regulon specificity score ##################
 # used files:
 # filtered exp matrix
 # cell label
 # regulon_gene_symbol, regulon_gene_id, regulon_motif, motif_ranks (from merge_bbc.R)
-
+#library(microbenchmark)
 library(scales)
 library(sgof)
 require (reshape)
@@ -13,13 +13,14 @@ require (tidyverse)
 args <- commandArgs(TRUE)
 wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
-# wd<-getwd()
-####test
-# wd <- "D:/Users/flyku/Documents/IRIS3-data/2019083104715"
-# setwd("C:/Users/wan268/Documents/iris3_data/2019083104715")
-# jobid <-2019083104715 
-# wd <- getwd()
-# setwd(wd)
+
+load_test_data <- function(){
+  rm(list = ls(all = TRUE))
+  # setwd("/var/www/html/iris3/data/2019083104715")
+  wd <- "/var/www/html/iris3/data/2019083104715"
+  jobid <- "2019083104715"
+  setwd(wd)
+}
 
 quiet <- function(x) { 
   sink(tempfile()) 
@@ -121,10 +122,12 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   return(score_vec)
 }
 
-calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
-  random_genes <- as.data.frame(replicate(iteration, sample.int(nrow(rankings), regulon_size)))
-  boot_vec <- wmwTest(rankings, random_genes, valType="abs.log10p.greater", simplify = T)
-  return(boot_vec)
+
+
+calc_bootstrap_rss <- function(boot_ras,ct){
+  boot_ras <- normalize_ras(boot_ras)
+  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
+  return(this_rss)
 }
 
 #normalization
@@ -219,31 +222,47 @@ total_gene_list <- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
 rankings <- calc_ranking(exp_data)
 total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",rankings = rankings)
 
-regulon_size <- 72
+regulon_size <- 40
+iteration <- 10000
 
-iteration <- 100000
+library(foreach)
+library(doParallel)
+registerDoParallel(16)  # use multicore, set to the number of our cores
 
-calc_bootstrap_rss <- function(boot_ras,ct){
-  boot_ras <- normalize_ras(boot_ras)
-  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
-  return(this_rss)
-}
-ras <- calc_bootstrap_ras(rankings,iteration,regulon_size)
-rss <- sapply(seq(1:total_ct), function(x){
-  return(calc_bootstrap_rss(ras,x))
-})
-rss <- as_tibble(rss)
-colnames(rss) <- paste("CT",seq(1:total_ct),sep = "")
-rss <- gather(rss,CT,RSS,CT1:CT4)
-#plot(density(rss45),main = paste("regulon size:",regulon_size))
 #ggplot(rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
+calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
+  random_genes <- as.data.frame(replicate(iteration, sample.int(nrow(rankings), regulon_size)))
+  boot_vec <- wmwTest(rankings, random_genes, valType="abs.log10p.greater", simplify = T)
+  #random_genes <- replicate(iteration, list(rownames(rankings)[sample.int(nrow(rankings), regulon_size)]))
+  #boot_vec <- gsva(exp_data,gset=random_genes,method="zscore")
+  return(boot_vec)
+}
+
+ras <- calc_bootstrap_ras(rankings,iteration,regulon_size)
+
+##### Test performance enable parallel RSS
+#microbenchmark(
+#  rss<-foreach (i=1:total_ct) %dopar% {
+#    calc_bootstrap_rss(ras,i)
+#  },
+#  rss <- sapply(seq(1:total_ct), function(x){
+#    return(calc_bootstrap_rss(ras,x))
+#  }),
+#  times = 1
+#)
+rss<-foreach (i=1:total_ct) %dopar% {
+  calc_bootstrap_rss(ras,i)
+  } %>%
+  set_names(paste("CT",seq(1:total_ct),sep = "")) %>%
+  as.tibble() %>%
+  gather(CT,RSS)
 
 
-
-this_rss <- 0.80658853
+this_rss <- 0.40658853
 this_ct <- "CT4"
 
-res1 <- rss %>% 
+res1 <- rss %>%
+  as.tibble()%>%
   filter(CT==this_ct)%>%
   pull(RSS)
 #%>%filter(cume_dist(RSS) > this_rss)
@@ -256,8 +275,3 @@ if (this_rss < mean(res1)){
 }
 pvalue
 
-
-summary(rss_2)
-dim(ras)
-ras[1,]
-rss_2 <- calc_bootstrap_rss(ras,2)
