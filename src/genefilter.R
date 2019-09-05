@@ -56,18 +56,15 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("C:/Users/wan268/Documents/iris3_data/20190802103754")
-  # setwd("d:/Users/flyku/Documents/IRIS3-data/20190802103754")
-  # setwd("C:/Users/wan268/Documents/iris3_data/20190821202541")
-  # setwd("C:/Users/wan268/Documents/iris3_data/20190818190915")
+  # setwd("/var/www/html/iris3/data/2019083104715")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "iris3_example_expression_matrix.csv"
-  jobid <- "20190802103754"
-  delim <- ","
+  srcFile = "GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
+  jobid <- "2019083104715"
+  delim <- "\t"
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'iris3_example_expression_label.csv'
-  delimiter <- ','
+  label_file<-'label-GSE110499.txt'
+  delimiter <- '\t'
   param_k<-0
   label_use_sc3 <- 2
 }
@@ -255,37 +252,39 @@ if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
 ## imputation#################################
 
 my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
+rm(my.normalized.data)
 
 colnames(my.imputated.data)<-colnames(my.count.data)
 rownames(my.imputated.data)<-rownames(my.count.data)
-my.imputated.data<- as.sparse(my.imputated.data)
-my.imputatedLog.data<-log1p(my.imputated.data)
+rm(my.count.data)
 
-thres_genes <- nrow(my.imputatedLog.data) * 0.01
-thres_cells <- ncol(my.imputatedLog.data) * 0.05
+my.imputated.data<- as.sparse(my.imputated.data)
+my.imputated.data<-log1p(my.imputated.data)
+
+thres_genes <- nrow(my.imputated.data) * 0.01
+thres_cells <- ncol(my.imputated.data) * 0.05
 
 ## apply gene filtering
 if(is_gene_filter == "1"){
-  gene_index <- as.vector(apply(my.imputatedLog.data, 1, filter_gene_func))
-  my.imputatedLog.data <- my.imputatedLog.data[which(gene_index == 1),]
+  gene_index <- as.vector(apply(my.imputated.data, 1, filter_gene_func))
+  my.imputated.data <- my.imputated.data[which(gene_index == 1),]
   expFile <- expFile[which(gene_index == 1),]
 } 
 ## apply cell filtering
 if(is_cell_filter == "1"){
-  cell_index <- as.vector(apply(my.imputatedLog.data, 2, filter_cell_func))
-  my.imputatedLog.data <- my.imputatedLog.data[,which(cell_index == 1)]
-  expFile <- expFile[,colnames(my.imputatedLog.data)]
+  cell_index <- as.vector(apply(my.imputated.data, 2, filter_cell_func))
+  my.imputated.data <- my.imputated.data[,which(cell_index == 1)]
+  expFile <- expFile[,colnames(my.imputated.data)]
 } 
 
-dim(my.imputatedLog.data)
+dim(my.imputated.data)
 dim(expFile)
 
-## 
 
 my.object<-CreateSeuratObject(expFile)
-my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
+my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputated.data,assay="RNA")
 cell_names <- colnames(my.object)
-
+rm(my.imputated.data)
 
 ## calculate filtering rate
 #filter_gene_num <- nrow(expFile)-nrow(my.object)
@@ -312,11 +311,9 @@ write.table(as.data.frame(expFile),paste(jobid,"_raw_expression.txt",sep = ""), 
 write.table(data.frame("Gene"=rownames(exp_data),exp_data,check.names = F),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,sep="\t",quote=FALSE)
 
 
-rm(my.imputated.data)
-rm(my.normalized.data)
 rm(expFile)
-rm(my.imputatedLog.data)
-
+rm(sce)
+rm(db)
 
 if (label_file == 0 | label_file==1){
   cell_info <- colnames(exp_data)
