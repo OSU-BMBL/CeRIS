@@ -1,7 +1,9 @@
 setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050//")
 my.object<-readRDS("seurat_obj.rds")
 my.ltmg<-read.delim("20190830171050_filtered_expression.txt.em.chars",header = T)
-my.ltmg.pure<-my.ltmg[-which(duplicated(my.ltmg$o)==T),]
+my.ltmg2<-read.csv("LTMG.matrix.csv",header = T,sep = ",")
+my.ltmg.line<-readLines("20190830171050_filtered_expression.txt.em.chars")
+my.ltmg.pure<-my.ltmg[-which(duplicated(my.ltmg$o)==T),1:5]
 
 rownames(my.ltmg.pure)<-my.ltmg.pure$o
 my.ltmg.pure<-my.ltmg.pure[,-1]
