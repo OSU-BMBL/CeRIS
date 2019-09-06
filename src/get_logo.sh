@@ -32,7 +32,7 @@ do
     fi
     sleep 1
 	done
-	if grep -q $(basename "$file" .fsa) "total_motif_list.txt"; then
+	#if grep -q $(basename "$file" .fsa) "total_motif_list.txt"; then
 	perl /var/www/html/iris3/program/dminda/motif_tools/align2uniprobe.pl $file | perl /var/www/html/iris3/program/dminda/motif_tools/uniprobe2meme > $file.meme &
 	#mkdir tomtom/$(basename "$file" .fsa)
 	#mkdir tomtom/$(basename "$file" .fsa)/HOCOMOCO
@@ -43,7 +43,7 @@ do
 	#echo "/var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa)/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file.meme /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme "
 	tail -n +2 $file > $file.logo.fa &
 	perl /var/www/html/bobro2/program/script/weblogo/seqlogo -F PNG -a -n -Y -k 1 -c  -f $file.logo.fa > $file.png &
-	fi
+	#fi
 done
 wait
 
