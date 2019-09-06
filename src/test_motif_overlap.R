@@ -4,11 +4,11 @@
 # regulon_motif
 library(tidyverse)
 
-library(dabestr)
+#library(dabestr)
 ###test
 #wd <- "d:/Users/flyku/Documents/IRIS3-data/20190816170235"
-setwd("C:/Users/wan268/Documents/iris3_data/20190822164428")
-jobid <-20190822164428 
+setwd("/var/www/html/iris3/data/2019090635812")
+jobid <-2019090635812 
  wd <- getwd()
 setwd(wd)
 
@@ -192,7 +192,7 @@ mean(as.matrix(exp_data[,-1]))
 setwd(wd)
 require(xml2)
 require(XML)
-xdata <- "tomtom/ct1bic48m10/JASPAR/tomtom.xml"
+xdata <- "tomtom/ct4bic187m2/tomtom.xml"
 xml_data <- xmlToList(xdata)
 
 Fun2 <-function(xdata){

@@ -56,10 +56,10 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/2019083104715")
+  # setwd("/var/www/html/iris3/data/2019090635812")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
-  jobid <- "2019083104715"
+  jobid <- "2019090635812"
   delim <- "\t"
   is_gene_filter <- 1
   is_cell_filter <- 1
