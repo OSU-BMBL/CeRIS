@@ -19,19 +19,22 @@ read.multipledata<-function(Path=getwd()){
     tmp.object <- (subset(tmp.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
     my.count.data<-GetAssayData(object = tmp.object[['RNA']],slot="counts")
     sce<-SingleCellExperiment(list(counts=my.count.data))
-      sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
-      sce<-scater::normalize(sce,return_log=F)
-      my.normalized.data <- normcounts(sce)
-    my.normalized.data <-sce@assays@.xData$data@listData$normcounts
+    sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
+    sce<-scater::normalize(sce,return_log=F)
+    my.normalized.data <- normcounts(sce)
     my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
     colnames(my.imputated.data)<-colnames(my.count.data)
     rownames(my.imputated.data)<-rownames(my.count.data)
     my.imputated.data<- as.sparse(my.imputated.data)
     my.imputatedLog.data<-log1p(my.imputated.data)
     tmp.object<-SetAssayData(object = tmp.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
+    # tmp.object<-SetAssayData(object = tmp.object,slot = "data",new.data = my.normalized.data,assay="RNA")
     my.data.list<-append(my.data.list,tmp.object)
+    print(paste("finish",i))
   }
   names(my.data.list)<-my.file
+  print("named")
+  return(my.data.list)
 }
 ##########################################
 # integrate:

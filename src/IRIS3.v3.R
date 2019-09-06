@@ -31,7 +31,7 @@ reset_par <- function(){
   par(op)
 }
 # set working directory, you may change the directory first.
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/13. Chung/")
+# setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/13. Chung/")
 # loading required packege
 library(Seurat,lib.loc = "/users/PAS1475/cyz931123/R/Seurat/Seurat3.0/")
 
