@@ -481,7 +481,7 @@ else if (!file_exists($tempnam)) {
 	$status= "404";
 }else {
 	$status = "0";
-	header("Refresh: 15;url='results.php?jobid=$jobid'");
+	header("Refresh: 60;url='results.php?jobid=$jobid'");
 }
 
 $_SESSION[$jobid."ann"]=$annotation1;

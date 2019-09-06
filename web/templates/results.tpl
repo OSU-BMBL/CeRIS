@@ -1245,7 +1245,7 @@ var xmlhttp = new XMLHttpRequest()
 						<div class="panel-body">
 					<div style="text-align: left;">
                         <strong><h3>Sorry, there has been an error</h3></strong> <p style="color:red">Please check with your data format (input file should be txt, csv or tsv format): <br>1. Gene expression matrix: Gene expression matrix (GEMAT) file with genes as rows and cells as columns. <br>2. Cell label file (Optional): a two-column matrix with the first column as the cell names exactly matching the gene expression file, and the second column as ground-truth cell clusters. <br>3. Gene module file (Optional): Each column should reprensents a gene module.</p>
-						<br>For further question, please contact ma.1915@osu.edu<br>
+						<br>For further question, please contact qin.ma@osumc.edu<br>
 						<!---
 						
 						<p>Perhaps you are here because: </p>
@@ -1295,7 +1295,7 @@ var xmlhttp = new XMLHttpRequest()
                     {{else}} {{block name="meta"}}
 					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
                 <div class="panel-body">
-                    <META HTTP-EQUIV="REFRESH" CONTENT="15"> {{/block}}
+                    <META HTTP-EQUIV="REFRESH" CONTENT="60"> {{/block}}
 
                     <div style="text-align: left;">
                         <div class="flatPanel panel panel-default">
@@ -1304,7 +1304,7 @@ var xmlhttp = new XMLHttpRequest()
                             <img src="static/images/busy.gif" />
                             <br /> Your request is received now.
                             <br> You can remember your jobid <font color="red"> <strong>{{$jobid}}</strong> </font>
-                            <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>30</b> seconds.
+                            <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>60</b> seconds.
                             <br/> Link:&nbsp
                             <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">https://bmbl.bmi.osumc.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
 							
