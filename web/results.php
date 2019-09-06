@@ -1,8 +1,9 @@
 <?php
-set_time_limit(300);
+
 require_once("config/common.php");
 require_once("config/smarty.php");
 require_once("lib/spyc.php");
+//error_reporting(E_ERROR | E_PARSE);
 //require_once("lib/hmmer.php");
 $jobid=$_GET['jobid'];
 
@@ -327,7 +328,6 @@ if (file_exists("$DATAPATH/$jobid/$jobid"."_sankey.txt")){
 } 
 }
 
-
 foreach ($regulon_gene_symbol_file as $key=>$this_regulon_gene_symbol_file){
 	
 	$status = "1";
@@ -404,7 +404,7 @@ foreach ($tomtom_file as $key=>$this_tomtom_file){
 			#print_r($this_tomtom_file->getRealPath());
 			#getStringBetween($this_tomtom_file->getRealPath(),"tomtom","JASPER");
 			$motif_name = getStringBetween($this_tomtom_file->getRealPath(),"tomtom/","/tomtom.tsv");
-			$motif_name = str_replace("/","_",$motif_name);
+			#$motif_name = str_replace("/","_",$motif_name);
 			$tomtom_result[$motif_name][] = array_map('trim',$line);
 			#print_r($count);
 		}
@@ -418,7 +418,7 @@ foreach ($tomtom_file as $key=>$this_tomtom_file){
 	}
 	fclose($fp);
 	}
-	#print_r($tomtom_result['ct1bic1m1_JASPAR'][2]);
+	#print_r($tomtom_result['ct1bic1m1'][0]);
 if(sizeof($module_gene_name_file)){
 	foreach ($module_gene_name_file as $key=>$this_module_gene_name_file){
 	$fp = fopen("$this_module_gene_name_file", 'r');

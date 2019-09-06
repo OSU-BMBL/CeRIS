@@ -225,20 +225,23 @@ wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
 Rscript /var/www/html/iris3/program/prepare_bbc.R \$wd \$motif_min_length\n
-touch bg \n
-/var/www/html/iris3/program/get_bbc.sh \$wd\n
-Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
-Rscript /var/www/html/iris3/program/sort_regulon.R \$wd \$jobid\n
-cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
-Rscript /var/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
-mkdir json
-/var/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
+
 mkdir tomtom\n
 mkdir logo_tmp\n
 mkdir logo\n
 mkdir regulon_id\n
 /var/www/html/iris3/program/get_logo.sh \$wd
 /var/www/html/iris3/program/get_tomtom.sh \$wd
+#touch bg \n
+#/var/www/html/iris3/program/get_bbc.sh \$wd\n
+#Rscript /var/www/html/iris3/program/merge_bbc.R \$wd \$jobid \$motif_min_length\n
+Rscript /var/www/html/iris3/program/merge_tomtom.R \$wd \$jobid \$motif_min_length\n
+Rscript /var/www/html/iris3/program/sort_regulon.R \$wd \$jobid\n
+#cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
+Rscript /var/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
+mkdir json
+/var/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
+
 /var/www/html/iris3/program/get_atac_overlap.sh \$wd
 zip -R \$wd\$jobid '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' \n
 perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
