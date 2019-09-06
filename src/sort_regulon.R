@@ -172,13 +172,10 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #}
 }
 
-calc_rss_pvalue <- function(this_rss,this_bootstrap_rss,ct){
-  ef <- ecdf(this_bootstrap_rss)
-  if (this_rss < mean(this_bootstrap_rss)){
-    pvalue <- ef(this_rss)
-  } else {
-    pvalue <- 1 - ef(this_rss)
-  }
+calc_rss_pvalue <- function(this_rss=0.66,this_bootstrap_rss,ct=1){
+  #ef <- ecdf(this_bootstrap_rss)
+  #pvalue <- 1 - ef(this_rss)
+  pvalue <- length(which(this_rss < this_bootstrap_rss))/length(this_bootstrap_rss)
   return(pvalue)
 }
 
