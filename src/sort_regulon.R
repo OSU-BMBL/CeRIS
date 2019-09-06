@@ -7,16 +7,18 @@
 
 library(scales)
 library(sgof)
+library(foreach)
+library(tidyverse)
+library(doParallel)
+registerDoParallel(8)  # use multicore, set to the number of our cores
 
 args <- commandArgs(TRUE)
 wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 # wd<-getwd()
 ####test
-# wd <- "D:/Users/flyku/Documents/IRIS3-data/20190818122320"
-# setwd("C:/Users/wan268/Documents/iris3_data/2019083104715")
-# jobid <-20190818122320 
-# wd <- getwd()
+# wd <- "/var/www/html/iris3/data/2019090643259"
+# jobid <-2019090643259 
 # setwd(wd)
 
 quiet <- function(x) { 
@@ -36,12 +38,28 @@ calc_jsd <- function(v1,v2) {
 }
 
 
+calc_ranking <- function(expr){
+  require(data.table)
+  if(!data.table::is.data.table(expr))
+    expr <- data.table::data.table(expr, keep.rownames=TRUE)
+  data.table::setkey(expr, "rn") # (reorders rows)
+  colsNam <- colnames(expr)[-1] # 1=row names
+  #names(genes) <- 1:length(genes)
+  rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="random", na.last="keep"),
+                   .SDcols=colsNam]
+  rn <- rankings$rn
+  rankings <- as.matrix(rankings[,-1])
+  rownames(rankings) <- rn
+  return(rankings)
+}
+
+
 #num_ct <- 1
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
 #calculate regulon activity score (RAS) 
 # expr <- exp_data
 # genes <- total_gene_list
-calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea","custom_auc")) {
+calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea","custom_auc"), rankings) {
   print(Sys.time())
   if (method=="aucell"){ #use top 10% cutoff
     require(AUCell)
@@ -53,7 +71,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
     #score_vec <- cells_AUC@assays@.xData$data$AUC
     ## AUCell modified object structure
     tryCatch(score_vec <- cells_AUC@assays@data@listData[['AUC']],error = function(e) score_vec <- cells_AUC@assays@.xData$data$AUC)
-
+    
   } else if (method=="zscore"){
     require("GSVA")
     score_vec <- gsva(expr,gset=genes,method="zscore")
@@ -70,23 +88,13 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   } else if (method=="wmw_test"){
     require(BioQC)
     require(data.table)
-    if(!data.table::is.data.table(expr))
-    expr <- data.table::data.table(expr, keep.rownames=TRUE)
-    data.table::setkey(expr, "rn") # (reorders rows)
-    colsNam <- colnames(expr)[-1] # 1=row names
-    #names(genes) <- 1:length(genes)
-    rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="random", na.last="keep"),
-                         .SDcols=colsNam]
-    rn <- rankings$rn
-    rankings <- as.matrix(rankings[,-1])
-    rownames(rankings) <- rn
     geneset <- as.data.frame(lapply(genes, function(x){
       return(rownames(rankings) %in% x)
     }))
     names(geneset) <- 1:ncol(geneset)
     dim(geneset)
-    
     score_vec <- wmwTest(rankings, geneset, valType="abs.log10p.greater", simplify = T)
+    
     #score_vec[score_vec < 1] <- 0
     #for (i in 1:nrow(score_vec)) {
     #  tmp <- as.numeric(quantile(score_vec[i,])[2])
@@ -113,6 +121,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   print(Sys.time())
   return(score_vec)
 }
+
 
 #normalization
 normalize_ras <- function(score_vec){
@@ -163,6 +172,15 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #}
 }
 
+calc_rss_pvalue <- function(this_rss,this_bootstrap_rss,ct){
+  ef <- ecdf(this_bootstrap_rss)
+  if (this_rss < mean(this_bootstrap_rss)){
+    pvalue <- ef(this_rss)
+  } else {
+    pvalue <- 1 - ef(this_rss)
+  }
+  return(pvalue)
+}
 
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
@@ -181,6 +199,21 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   return(rss)
 }
 
+calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
+  random_genes <- as.data.frame(replicate(iteration, sample.int(nrow(rankings), regulon_size)))
+  boot_vec <- wmwTest(rankings, random_genes, valType="abs.log10p.greater", simplify = T)
+  #random_genes <- replicate(iteration, list(rownames(rankings)[sample.int(nrow(rankings), regulon_size)]))
+  #boot_vec <- gsva(exp_data,gset=random_genes,method="zscore")
+  return(boot_vec)
+}
+
+
+calc_bootstrap_rss <- function(boot_ras,ct){
+  boot_ras <- normalize_ras(boot_ras)
+  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
+  return(this_rss)
+}
+
 total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
 
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
@@ -192,7 +225,7 @@ total_motif_list <- vector()
 total_gene_list <- vector()
 total_gene_index <- 1
 #i=2
-## to speed up gsva process, read all genes  to one list
+## to speed up gsva process, read all genes  to one lists
 for (i in 1:total_ct) {
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
@@ -201,9 +234,19 @@ for (i in 1:total_ct) {
 } 
 print(Sys.time())
 total_gene_list <- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
-#total_gene_list <- total_gene_list[1:10]
+rankings <- calc_ranking(exp_data)
+
 #total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test")
-total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test")
+total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",rankings = rankings)
+
+#### bootstrap resampling to calculate p-value
+bootstrap_ras <- calc_bootstrap_ras(rankings=rankings,iteration=10000,regulon_size=40)
+bootstrap_rss <- foreach (i=1:total_ct) %dopar% {
+  calc_bootstrap_rss(bootstrap_ras,i)
+} %>%
+  set_names(seq(1:total_ct)) %>%
+  as.tibble() %>%
+  gather(CT,RSS)
 
 #i=1
 # genes=x= gene_name_list[[1]]
@@ -243,6 +286,11 @@ for (i in 1:total_ct) {
   ##  gene_id_list <- gene_id_list[rss_keep_index]
   ##  motif_list <- motif_list[rss_keep_index]
   ##}
+  this_bootstrap_rss <- bootstrap_rss %>%
+    as.tibble()%>%
+    dplyr::filter(CT==i)%>%
+    pull(RSS)
+  
   rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = i)
   rss_list <- as.list(rss_list)
   # calculate to be removed regulons index, if no auc score or less than 0.05
@@ -268,7 +316,7 @@ for (i in 1:total_ct) {
   originak_ras <- originak_ras[rss_rank,]
   rss_list <- rss_list[rss_rank]
 
-  marker<-lapply(gene_name_list, function(x){
+  marker <- lapply(gene_name_list, function(x){
     x[which(x%in%marker_data[,i])]
   })
   
@@ -299,6 +347,8 @@ for (i in 1:total_ct) {
   write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.regulon_activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
   total_motif_list <- append(total_motif_list,unlist(motif_list))
   #j=1
+  rss_pvalue_list <- lapply(rss_list, calc_rss_pvalue,this_bootstrap_rss,i)
+  
   for (j in 1:length(gene_name_list)) {
     regulon_tag <- paste("CT",i,"S-R",j,sep = "")
     gene_name_list[[j]] <- append(regulon_tag,gene_name_list[[j]])
@@ -315,6 +365,8 @@ for (i in 1:total_ct) {
     this_motif_value <- cbind(regulon_tag,this_motif_value)
     regulon_rank_result <- rbind(regulon_rank_result,this_motif_value)
   }
+  
+  ## calculate rss p-value
 
   #write.table(regulon_rank_result,paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""))
@@ -333,7 +385,11 @@ for (i in 1:total_ct) {
     
     cat(as.character(regulon_rank_result[j,]),file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T,sep = "\t")
     cat("\t",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
+    cat(rss_pvalue_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T,sep = "\t")
+    
+    cat("\t",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
     cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T,sep = "\t")
+
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
   }
 }
