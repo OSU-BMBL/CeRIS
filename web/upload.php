@@ -37,6 +37,9 @@ if (!empty($_FILES)) {
 	switch($mime_type) {
 	case "application/x-gzip":
 		$new_array['type'][] = 'gzip';
+		$fp = fopen("$workdir/upload_type.txt", 'w');
+		fwrite($fp,"TenX.folder\n");
+		fclose($fp);
 		break;
 	case "text/plain":
 		#$new_array = array();
