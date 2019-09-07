@@ -56,15 +56,15 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/2019090635812")
+  # setwd("/var/www/html/iris3/data/20190906113325")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
-  jobid <- "2019090635812"
-  delim <- "\t"
+  srcFile = "Zeisel_expression.csv"
+  jobid <- "20190906113325"
+  delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'label-GSE110499.txt'
-  delimiter <- '\t'
+  label_file<-'Zeisel_cell_label.csv'
+  delimiter <- ','
   param_k<-0
   label_use_sc3 <- 2
 }
