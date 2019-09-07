@@ -56,17 +56,17 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/20190906113325")
+  # setwd("/var/www/html/iris3/data/20190906120624/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "Zeisel_expression.csv"
-  jobid <- "20190906113325"
+  jobid <- "20190906120624"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
   label_file<-'Zeisel_cell_label.csv'
   delimiter <- ','
   param_k<-0
-  label_use_sc3 <- 2
+  label_use_sc3 <- 0
 }
 
 ##############################
@@ -80,6 +80,19 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
         tmp_x<-Read10X_h5(x)
         return(tmp_x)
       }else if(read.method =="TenX.folder"){
+        all_files <- list.files(getwd())
+        barcode_file <- grep("barcode",all_files)
+        matrix_file <- grep("matrix",all_files)
+        gene_file <- grep("gene",all_files)
+       
+        file.rename(all_files[barcode_file],paste("barcode",gsub(".*barcode","",all_files[barcode_file]),sep = ""))
+        file.rename(all_files[matrix_file],paste("matrix",gsub(".*matrix","",all_files[matrix_file]),sep = ""))
+        file.rename(all_files[gene_file],paste("gene",gsub(".*gene","",all_files[gene_file]),sep = ""))
+        
+        system(paste("gunzip",(all_files[barcode_file])))
+        system(paste("gunzip",(all_files[matrix_file])))
+        system(paste("gunzip",(all_files[gene_file])))
+        
         tmp_x<-Read10X(getwd())
         return(tmp_x)
       } else if(read.method == "CellGene"){# read in cell * gene matrix, if there is error report, back to 18 line to run again.
@@ -263,7 +276,7 @@ my.imputated.data<-log1p(my.imputated.data)
 
 thres_genes <- nrow(my.imputated.data) * 0.01
 thres_cells <- ncol(my.imputated.data) * 0.05
-
+dim(my.imputated.data)
 ## apply gene filtering
 if(is_gene_filter == "1"){
   gene_index <- as.vector(apply(my.imputated.data, 1, filter_gene_func))
@@ -518,26 +531,35 @@ reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
 saveRDS(my.trajectory,file="trajectory_obj.rds")
 
 
-Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,...){
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  if(!customized){
+  
+  if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=as.factor(my.object$Customized.idents))
   }
+  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
   p.cluster <- ggplot(my.plot.all.source,
                       aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster <- p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
-  #p.cluster<-theme_linedraw()
-  p.cluster <- p.cluster + labs(col="cell type")
-  p.cluster <- p.cluster + theme_classic()+scale_fill_continuous(name="cell type")
+  p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
+  
+  p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
+  
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                               breaks=tmp.celltype,
+                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  
+  # + labs(col="cell type")           
+  p.cluster <- p.cluster + theme_classic() 
   p.cluster <- p.cluster + coord_fixed(ratio=1)
   p.cluster
 }
+
 
 reset_par <- function(){
   op <- structure(list(xlog = FALSE, ylog = FALSE, adj = 0.5, ann = TRUE,
@@ -629,9 +651,11 @@ quiet <- function(x) {
   invisible(force(x)) 
 } 
 
+pt_size <- (5.001*10^(-1)) - 3.002*10^(-5) * ncol(my.object)
 dir.create("regulon_id")
 png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
-Plot.cluster2D(reduction.method = "umap",customized = T)
+Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
+#Plot.cluster2D(reduction.method = "tsne",customized = T,pt_size = pt_size)
 quiet(dev.off())
 
 png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
