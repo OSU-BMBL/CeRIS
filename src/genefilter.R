@@ -80,18 +80,24 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
         tmp_x<-Read10X_h5(x)
         return(tmp_x)
       }else if(read.method =="TenX.folder"){
+        #improve later
         all_files <- list.files(getwd())
-        barcode_file <- grep("barcode",all_files)
+        barcode_file <- grep("barcodes",all_files)
         matrix_file <- grep("matrix",all_files)
-        gene_file <- grep("gene",all_files)
-       
-        file.rename(all_files[barcode_file],paste("barcode",gsub(".*barcode","",all_files[barcode_file]),sep = ""))
-        file.rename(all_files[matrix_file],paste("matrix",gsub(".*matrix","",all_files[matrix_file]),sep = ""))
-        file.rename(all_files[gene_file],paste("gene",gsub(".*gene","",all_files[gene_file]),sep = ""))
+        gene_file <- grep("genes",all_files)
         
-        system(paste("gunzip",(all_files[barcode_file])))
-        system(paste("gunzip",(all_files[matrix_file])))
-        system(paste("gunzip",(all_files[gene_file])))
+        try(system(paste("gunzip",(all_files[barcode_file]))),silent = T)
+        try(system(paste("gunzip",(all_files[matrix_file]))),silent = T)
+        try(system(paste("gunzip",(all_files[gene_file]))),silent = T)
+        
+        all_files <- list.files(getwd())
+        barcode_file <- grep("barcodes",all_files)
+        matrix_file <- grep("matrix",all_files)
+        gene_file <- grep("genes",all_files)
+        
+        tryCatch(file.rename(all_files[barcode_file],paste("barcodes",gsub(".*barcodes","",all_files[barcode_file]),sep = "")),error = function(e) 0)
+        tryCatch(file.rename(all_files[matrix_file],paste("matrix",gsub(".*matrix","",all_files[matrix_file]),sep = "")),error = function(e) 0)
+        tryCatch(file.rename(all_files[gene_file],paste("genes",gsub(".*genes","",all_files[gene_file]),sep = "")),error = function(e) 0)
         
         tmp_x<-Read10X(getwd())
         return(tmp_x)
@@ -254,7 +260,7 @@ sce<-SingleCellExperiment(list(counts=my.count.data))
 
 ## if all values are integers, perform normalization, otherwise skip to imputation
 if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
-## normalization##############################
+  ## normalization##############################
   sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
   sce<-scater::normalize(sce,return_log=F)
   my.normalized.data <- normcounts(sce)
@@ -438,7 +444,23 @@ colnames(cell_label) <- c("cell_name","label")
 cell_label <- cell_label[order(cell_label[,2]),]
 write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 
-dist.matrix <- dist(x = Embeddings(object = my.object[['pca']])[,1:30])
+
+###########################################
+#  Run TSNE and UMAP ######################
+###########################################
+#my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
+# run umap to get high dimension scatter plot at 2 dimensional coordinate system.
+my.object<-RunUMAP(object = my.object,dims = 1:30,umap.method="uwot")
+#clustering by using Seurat KNN. 
+# clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
+# here has one problems: whether should we define the clustering number?
+
+# find clustering, there will be changing the default cell type, if want to use customized cell type. 
+# use Idents() function.
+
+
+#dist.matrix <- dist(x = Embeddings(object = my.object[['pca']])[,1:30])
+dist.matrix <- dist(x = Embeddings(object = my.object[['umap']]))
 sil <- silhouette(x = as.numeric(x = cell_info), dist = dist.matrix)
 silh_out <- cbind(cell_info,cell_names,sil[,3])
 silh_out <- silh_out[order(silh_out[,1]),]
@@ -461,19 +483,6 @@ if (label_use_sc3 =='2'){
 
 my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
 Idents(my.object)<-as.factor(my.object$Customized.idents)
-
-###########################################
-# CORE part: Run TSNE and UMAP######################
-###########################################
-#my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
-# run umap to get high dimension scatter plot at 2 dimensional coordinate system.
-my.object<-RunUMAP(object = my.object,dims = 1:30,umap.method="uwot")
-#clustering by using Seurat KNN. 
-# clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
-# here has one problems: whether should we define the clustering number?
-
-# find clustering, there will be changing the default cell type, if want to use customized cell type. 
-# use Idents() function.
 
 
 Get.MarkerGene<-function(my.object, customized=T){
