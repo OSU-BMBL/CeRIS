@@ -4,12 +4,12 @@
 # regulon_motif
 library(tidyverse)
 
-#library(dabestr)
+library(dabestr)
 ###test
 #wd <- "d:/Users/flyku/Documents/IRIS3-data/20190816170235"
-setwd("/var/www/html/iris3/data/2019090635812")
-jobid <-2019090635812 
- wd <- getwd()
+setwd("/var/www/html/iris3/data/20190906120624")
+jobid <-20190906120624 
+wd <- getwd()
 setwd(wd)
 
 quiet <- function(x) { 
@@ -151,11 +151,11 @@ df <- rbind(df1,df2,df3)
 
 #colnames(df) <- c("dminda_and_meme","meme_only","dminda_only")
 
-unpaired_mean_diff <- dabest(df,group, value,
+#unpaired_mean_diff <- dabest(df,group, value,
                              idx =  c("dminda_and_meme","meme_only","dminda_only"),
                              paired = FALSE)
 
-plot(unpaired_mean_diff)
+#plot(unpaired_mean_diff)
 total_regulon
 total_multiple_regulon
 

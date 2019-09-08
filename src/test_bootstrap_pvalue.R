@@ -227,7 +227,7 @@ iteration <- 10000
 
 library(foreach)
 library(doParallel)
-registerDoParallel(16)  # use multicore, set to the number of our cores
+registerDoParallel(8)  # use multicore, set to the number of our cores
 
 #ggplot(rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
 calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
@@ -275,3 +275,13 @@ if (this_rss < mean(res1)){
 }
 pvalue
 
+ct=1
+calc_rss_pvalue <- function(this_rss,this_bootstrap_rss,ct){
+  ef <- ecdf(this_bootstrap_rss)
+  if (this_rss < mean(this_bootstrap_rss)){
+    pvalue <- ef(this_rss)
+  } else {
+    pvalue <- 1 - ef(this_rss)
+  }
+  return(pvalue)
+}

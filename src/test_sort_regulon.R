@@ -4,7 +4,7 @@
 # filtered exp matrix
 # cell label
 # regulon_gene_symbol, regulon_gene_id, regulon_motif, motif_ranks (from merge_bbc.R)
-library("ggpubr")
+#library("ggpubr")
 library(scales)
 library(sgof)
 library(ggplot2)
@@ -14,9 +14,9 @@ library(dabestr)
 #jobid <- args[2] # user job id
 #wd<-getwd()
 ####test
-jobid <-20190822164428 
+jobid <-20190906120624 
 
-wd <- paste("D:/Users/flyku/Documents/IRIS3-data/",jobid,sep="")
+wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
 #wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 labelFile <- paste(jobid,"_cell_label.txt",sep = "")
@@ -214,7 +214,7 @@ total_gene_list<- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
 total_rank<- lapply(strsplit(total_rank,"\\t"), function(x){x[-1]})
 
 regulon_with_marker_index <- lapply(total_rank, function(x){
-  if(length(x) > 4){
+  if(length(x) > 5){
     return(T)
   }else{
     return(F)
@@ -222,14 +222,15 @@ regulon_with_marker_index <- lapply(total_rank, function(x){
 })
 
   total_rss <- lapply(total_rank, function(x){
-    return(x[4])
+    return(x[5])
   })
   
   #total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "gsva")
 
   #activity_score <- read.table(paste(jobid,"_CT_",ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 
-  label_data <- label_data[order(label_data[,2]),]
+  #label_data <- label_data[order(label_data[,2]),]
+  
   marker_vec <- ifelse(regulon_with_marker_index == T, "have_marker", "otherwise")
   #total_ras <- normalize_ras(total_ras)
   #ras <- total_ras
