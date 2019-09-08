@@ -6,16 +6,15 @@ library(Polychrome)
 library(ggplot2)
 #library(monocle)
 args <- commandArgs(TRUE) 
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
-#setwd("/var/www/html/iris3/data/20190802103754")
+#setwd("/var/www/html/iris3/data/20190906120624")
 #srcDir <- getwd()
-#gene_symbol <-"CA8" 
-#jobid <- "20190802103754"
+#gene_symbol <-"Ccl4" 
+#jobid <- "20190906120624"
 srcDir <- args[1]
 gene_symbol <- args[2]
 jobid <- args[3]
 
-Plot.GeneTSNE<-function(gene.name=NULL){
+Plot.GeneTSNE<-function(gene.name=NULL,pt_size=0.5){
   tmp.gene.expression<- my.object@assays$RNA@data
   tmp.dim<-as.data.frame(my.object@reductions$tsne@cell.embeddings)
   tmp.MatchIndex<- match(colnames(tmp.gene.expression),rownames(tmp.dim))
@@ -24,12 +23,12 @@ Plot.GeneTSNE<-function(gene.name=NULL){
   tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=tSNE_1,y=tSNE_2,color=Gene))
-  g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
+  g<-g+geom_point(stroke=pt_size,size=pt_size)+scale_color_gradient(low="grey",high = "red")
   g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
 
-Plot.GeneUMAP<-function(gene.name=NULL){
+Plot.GeneUMAP<-function(gene.name=NULL,pt_size=0.5){
   tmp.gene.expression<- my.object@assays$RNA@data
   tmp.dim<-as.data.frame(my.object@reductions$umap@cell.embeddings)
   tmp.MatchIndex<- match(colnames(tmp.gene.expression),rownames(tmp.dim))
@@ -38,30 +37,40 @@ Plot.GeneUMAP<-function(gene.name=NULL){
   tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=UMAP_1,y=UMAP_2,color=Gene))
-  g<-g+geom_point()+scale_color_gradient(low="grey",high = "red")
+  g<-g+geom_point(stroke=pt_size,size=pt_size) + scale_colour_distiller(palette = "YlOrRd", direction = 1)
   g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
 
-Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,...){
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=T,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
-  if(!customized){
+  
+  if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=as.factor(my.object$Customized.idents))
   }
-  p.cluster<-ggplot(my.plot.all.source,
-                    aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster<-p.cluster+geom_point(aes(col=my.plot.all.source[,"Cell_type"]))+scale_color_manual(values  = as.character(palette36.colors(36))[-2])
-  #p.cluster<-theme_linedraw()
-  p.cluster<-p.cluster + labs(col="cell type")
-  p.cluster+theme_classic()+scale_fill_continuous(name="cell type")+coord_fixed(1)
+  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
+  p.cluster <- ggplot(my.plot.all.source,
+                      aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
+  p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
   
+  p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
+  
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                               breaks=tmp.celltype,
+                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  
+  # + labs(col="cell type")           
+  p.cluster <- p.cluster + theme_classic() 
+  p.cluster <- p.cluster + coord_fixed(ratio=1)
+  p.cluster
 }
+
 
 
 
@@ -117,8 +126,17 @@ quiet <- function(x) {
   on.exit(sink()) 
   invisible(force(x)) 
 } 
+# point size function from test datasets
+x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
+y <- c(1,1,0.89,0.33,0.30,0.22,0.205,0.195,0.16,0.1,0.1,0.1)
+get_point_size <- approxfun(x, y)
 
 setwd(srcDir)
+
+num_cells <- ncol(activity_score)
+
+quiet(dir.create("regulon_id",showWarnings = F))
+pt_size <- get_point_size(num_cells)
 
 png(paste("regulon_id/",gene_symbol,".umap.png",sep = ""),width=2000, height=1500,res = 300)
 if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
@@ -126,7 +144,7 @@ if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.GeneUMAP(gene_symbol)
+  Plot.GeneUMAP(gene_symbol,pt_size = pt_size)
 }
 quiet(dev.off())
 
@@ -137,6 +155,6 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.cluster2D(reduction.method = "umap",customized = T)
+  Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
 }
 quiet(dev.off())

@@ -5,17 +5,17 @@ library(ggplot2)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/2019081835706")
+#setwd("/var/www/html/iris3/data/20190906120624")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
-#jobid <- "2019081835706"
+#jobid <- "20190906120624"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
 
 
-Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1,...){
+Plot.cluster2D<-function(reduction.method="umap",module=1,customized=T,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
@@ -62,11 +62,10 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   # }
   # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
-  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
-  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-  p.regulon <- p.regulon + theme_classic()+labs(col="Regulon\nscore")
-  p.regulon <- p.regulon + theme_classic()
-
+  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2])) + xlab(colnames(my.plot.regulon)[1]) + ylab(colnames(my.plot.regulon)[2])
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"])) + scale_colour_distiller(palette = "YlOrRd", direction = 1)
+  #+ scale_color_gradient(low = "grey",high = "red")
+  p.regulon <- p.regulon + theme_classic() + labs(col="Regulon\nscore")
   #message("finish!")
   
   p.regulon <- p.regulon + coord_fixed(ratio=1)
@@ -129,7 +128,7 @@ quiet <- function(x) {
 
 # point size function from test datasets
 x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
-y <- c(1,1,0.89,0.36,0.32,0.25,0.23,0.22,0.18,0.1,0.1,0.1)
+y <- c(1,1,0.89,0.33,0.30,0.22,0.205,0.195,0.16,0.1,0.1,0.1)
 get_point_size <- approxfun(x, y)
 
 #curve(get_point_size,100,5000)
@@ -150,7 +149,7 @@ pt_size <- get_point_size(num_cells)
 
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
-if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
+if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){ 
   if(!exists("my.object")){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
@@ -166,7 +165,7 @@ if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size)
+  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size-0.03)
 }
 quiet(dev.off())
 
