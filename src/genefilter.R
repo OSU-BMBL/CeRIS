@@ -660,7 +660,12 @@ quiet <- function(x) {
   invisible(force(x)) 
 } 
 
-pt_size <- (5.001*10^(-1)) - 3.002*10^(-5) * ncol(my.object)
+# point size function from test datasets
+x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
+y <- c(1,1,0.89,0.36,0.32,0.25,0.23,0.22,0.18,0.1,0.1,0.1)
+get_point_size <- approxfun(x, y)
+
+pt_size <- get_point_size(ncol(my.object))
 dir.create("regulon_id")
 png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)

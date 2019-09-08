@@ -5,12 +5,11 @@ library(ggplot2)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("D:/Users/flyku/Documents/IRIS3-data/20190802103754")
+#setwd("/var/www/html/iris3/data/2019081835706")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
-#wd <- "D:/Users/flyku/Documents/IRIS3-data/20190802103754"
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
-#jobid <- "20190830171050"
+#jobid <- "2019081835706"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -128,6 +127,13 @@ quiet <- function(x) {
   invisible(force(x)) 
 } 
 
+# point size function from test datasets
+x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
+y <- c(1,1,0.89,0.36,0.32,0.25,0.23,0.22,0.18,0.1,0.1,0.1)
+get_point_size <- approxfun(x, y)
+
+#curve(get_point_size,100,5000)
+
 setwd(srcDir)
 
 regulon_ct <-gsub( "-.*$", "", id)
@@ -140,7 +146,8 @@ activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activit
 num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
-pt_size <- (5.001*10^(-1)) - 3.002*10^(-5) * num_cells
+pt_size <- get_point_size(num_cells)
+
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
 if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
@@ -149,6 +156,7 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
     my.object <- readRDS("seurat_obj.rds")
   }
   Plot.cluster2D(reduction.method = "umap",customized = T, pt_size = pt_size)
+  #Plot.cluster2D(reduction.method = "tsne",customized = T, pt_size = pt_size)
 }
 quiet(dev.off())
 
