@@ -6,10 +6,10 @@ library(Polychrome)
 library(ggplot2)
 #library(monocle)
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190906120624")
+#setwd("/var/www/html/iris3/data/20190907182105")
 #srcDir <- getwd()
 #gene_symbol <-"Ccl4" 
-#jobid <- "20190906120624"
+#jobid <- "20190907182105"
 srcDir <- args[1]
 gene_symbol <- args[2]
 jobid <- args[3]
@@ -133,10 +133,9 @@ get_point_size <- approxfun(x, y)
 
 setwd(srcDir)
 
-num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
-pt_size <- get_point_size(num_cells)
+
 
 png(paste("regulon_id/",gene_symbol,".umap.png",sep = ""),width=2000, height=1500,res = 300)
 if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
@@ -144,6 +143,8 @@ if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
+  num_cells <- ncol(my.object)
+  pt_size <- get_point_size(num_cells)
   Plot.GeneUMAP(gene_symbol,pt_size = pt_size)
 }
 quiet(dev.off())
@@ -155,6 +156,8 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
+  num_cells <- ncol(my.object)
+  pt_size <- get_point_size(num_cells)
   Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
 }
 quiet(dev.off())
