@@ -41,8 +41,7 @@ Plot.GeneUMAP<-function(gene.name=NULL,pt_size=0.5){
   g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
-
-Plot.cluster2D<-function(reduction.method="umap",module=1,customized=T,pt_size=1,...){
+Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
@@ -52,9 +51,9 @@ Plot.cluster2D<-function(reduction.method="umap",module=1,customized=T,pt_size=1
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=as.factor(my.object$Customized.idents))
+                                         Cell_type=Idents(my.object))
   }
-  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
+  tmp.celltype <- levels(unique(my.plot.all.source$Cell_type))
   p.cluster <- ggplot(my.plot.all.source,
                       aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
   p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
@@ -70,7 +69,6 @@ Plot.cluster2D<-function(reduction.method="umap",module=1,customized=T,pt_size=1
   p.cluster <- p.cluster + coord_fixed(ratio=1)
   p.cluster
 }
-
 
 
 

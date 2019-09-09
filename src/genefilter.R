@@ -56,10 +56,10 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/20190906120624/")
+  # setwd("/var/www/html/iris3/data/20190908171731/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "Zeisel_expression.csv"
-  jobid <- "20190906120624"
+  jobid <- "20190908171731"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
@@ -540,7 +540,7 @@ reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
 saveRDS(my.trajectory,file="trajectory_obj.rds")
 
 
-Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1,...){
+Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
@@ -550,9 +550,9 @@ Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=as.factor(my.object$Customized.idents))
+                                         Cell_type=Idents(my.object))
   }
-  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
+  tmp.celltype <- levels(unique(my.plot.all.source$Cell_type))
   p.cluster <- ggplot(my.plot.all.source,
                       aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
   p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
@@ -662,7 +662,7 @@ quiet <- function(x) {
 
 # point size function from test datasets
 x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
-y <- c(1,1,0.89,0.36,0.32,0.25,0.23,0.22,0.18,0.1,0.1,0.1)
+y <- c(1,1,0.89,0.33,0.30,0.22,0.205,0.195,0.16,0.1,0.1,0.1)
 get_point_size <- approxfun(x, y)
 
 pt_size <- get_point_size(ncol(my.object))
