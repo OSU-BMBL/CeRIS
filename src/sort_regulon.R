@@ -17,8 +17,8 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 # wd<-getwd()
 ####test
-# wd <- "/var/www/html/iris3/data/2019090643259"
-# jobid <-2019090643259 
+# wd <- "/var/www/html/iris3/data/20190909221555"
+# jobid <-20190909221555 
 # setwd(wd)
 
 quiet <- function(x) { 
@@ -206,7 +206,6 @@ calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
 
 
 calc_bootstrap_rss <- function(boot_ras,ct){
-  boot_ras <- normalize_ras(boot_ras)
   this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
   return(this_rss)
 }
@@ -238,12 +237,22 @@ total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",
 
 #### bootstrap resampling to calculate p-value
 bootstrap_ras <- calc_bootstrap_ras(rankings=rankings,iteration=10000,regulon_size=40)
-bootstrap_rss <- foreach (i=1:total_ct) %dopar% {
-  calc_bootstrap_rss(bootstrap_ras,i)
-} %>%
-  set_names(seq(1:total_ct)) %>%
-  as.tibble() %>%
-  gather(CT,RSS)
+#bootstrap_ras <- t1
+norm_bootstrap_ras <- normalize_ras(bootstrap_ras)
+#bootstrap_rss <- foreach (i=1:total_ct) %dopar% {
+#  calc_bootstrap_rss(norm_bootstrap_ras,i)
+#} 
+
+bootstrap_rss <- sapply (1:total_ct, function(x){
+  calc_bootstrap_rss(norm_bootstrap_ras,x)
+})
+colnames(bootstrap_rss) <- as.character(seq(1:total_ct))
+#bootstrap_rss <- t1
+bootstrap_rss <- as_tibble(as.matrix(bootstrap_rss))
+bootstrap_rss <- gather(bootstrap_rss,CT,RSS) 
+  
+
+#ggplot(bootstrap_rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
 
 #i=1
 # genes=x= gene_name_list[[1]]
@@ -284,7 +293,7 @@ for (i in 1:total_ct) {
   ##  motif_list <- motif_list[rss_keep_index]
   ##}
   this_bootstrap_rss <- bootstrap_rss %>%
-    as.tibble()%>%
+    as_tibble()%>%
     dplyr::filter(CT==i)%>%
     pull(RSS)
   
