@@ -388,16 +388,16 @@ for (i in 1:length(select_idx_result)) {
   fn_data <- readLines(fn_handle)
   close(fn_handle)
   fn_data <- strsplit(fn_data,"\\t")
-  
+  #x=fn_data[[1]]
   rank_value <- as.numeric(unlist(lapply(fn_data, function(x){
-    return(x[3])
+    return(length(strsplit(x[8]," ")[[1]]))
   })))
   this_atac_result <- vector()
   top_idx <- top_n_idx(rank_value)
   if (length(top_idx) > 0){
     for (j in 1:length(top_idx)) {
       this_data <- fn_data[[top_idx[j]]]
-      tmp_result <- c(this_data[1],this_data[3])
+      tmp_result <- c(this_data[1],length(strsplit(this_data[8]," ")[[1]]))
       this_atac_result <- rbind(this_atac_result,tmp_result)
     }
     this_tissue <- paste(this_atac_result[,1],sep = "",collapse = ",")
@@ -422,3 +422,4 @@ write.table(alternative_regulon_result,paste(jobid,"_alternative_regulon_result.
 
 
 #write.table(atac_result,paste(jobid,"_atac_result.txt",sep = ""),col.names = T,row.names = F,quote = F,sep = "\t")
+

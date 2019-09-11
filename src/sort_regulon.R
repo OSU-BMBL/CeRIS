@@ -214,7 +214,35 @@ total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_C
 
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
+ #g1 <- c("Sf3b5","Sin3b","Srsf5","Stk17b","Thy1","Txnip","Uba52","Ubald2","Ywhae")
+l1 <- c(3,4,6)
+df1 <- exp_data[which(rownames(exp_data) %in% g1),]
+label1 <- label_data[which(label_data[,2] %in% l1),]
+df2 <- df1[,which(colnames(df1) %in% label1[,1])]
+mat <- df2
+# Data frame with column annotations.
+mat_col <- data.frame(group = label1[,2])
+rownames(mat_col) <- colnames(mat)
 
+# List with colors for each annotation.
+mat_colors <- list(group = brewer.pal(3, "Set1"))
+names(mat_colors$group) <- unique(label1[,2])
+
+pheatmap(
+  mat               = mat,
+  color             = inferno(10),
+  border_color      = NA,
+  show_colnames     = FALSE,
+  show_rownames     = T,
+  annotation_col    = mat_col,
+  annotation_colors = mat_colors,
+  drop_levels       = TRUE,
+  fontsize          = 14,
+  main              = "Expression Heatmap",
+  cluster_cols=F
+)
+
+heatmap(df2)
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
