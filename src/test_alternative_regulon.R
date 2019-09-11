@@ -9,6 +9,7 @@ library(dabestr)
 require(xml2)
 require(XML)
 library(seqinr)
+registerDoParallel(16) 
 #args <- commandArgs(TRUE)
 #wd <- args[1] # filtered expression file name
 #jobid <- args[2] # user job id
@@ -23,6 +24,7 @@ labelFile <- paste(jobid,"_cell_label.txt",sep = "")
 # wd <- getwd()
 setwd(wd)
 total_ct_number <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
+
 
 
 quiet <- function(x) { 
@@ -336,13 +338,19 @@ tf_name_regulon <- cbind(tf_name_regulon,total_rank_df)
 #tf_name_regulon <- tf_name_regulon[,-2]
 
 ct_seq=seq(1:total_ct)
-regulon_seq <- 1:5
 select_idx <- paste("CT",ct_seq,"S-R",sep="")
 select_idx_result<-vector()
-for (i in regulon_seq) {
-  tmp <- paste(select_idx,i,sep="")
+#x=total_rank[[1]]
+for (i in ct_seq) {
+  num_regulons_in_this_ct <- length(which(unlist(lapply(total_rank,function(x){
+    return(any(grepl(select_idx[i],x)))
+  }))))
+  tmp <- paste(select_idx[i],seq(1:num_regulons_in_this_ct),sep="")
   select_idx_result <- c(select_idx_result,tmp)
 }
+
+## run atac
+#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i], "Mouse",sep = " "))}
 
 alternative_regulon_result <- vector()
 for (i in 1:length(select_idx_result)) {
@@ -351,10 +359,66 @@ for (i in 1:length(select_idx_result)) {
   all_tf_idx <- which(tf_name_regulon$tf == this_tf)
   all_alternative_regulon <- tf_name_regulon[all_tf_idx,]
   for (j in 1:length(all_tf_idx)) {
-    all_alternative_regulon[j,7] <- as.list(paste(total_gene_list[[all_tf_idx[j]]],",",collapse = "",sep = ""))
+    all_alternative_regulon[j,7] <- length(total_gene_list[[all_tf_idx[j]]])
+    all_alternative_regulon[j,8] <- as.list(paste(total_gene_list[[all_tf_idx[j]]],",",collapse = "",sep = ""))
   }
-  alternative_regulon_result <- rbind(alternative_regulon_result,all_alternative_regulon)
+  tmp_df <- data.frame(tf=rep(this_tf,total_ct),cell_type=seq(1:total_ct))
+  tmp_result <- merge(tmp_df,all_alternative_regulon,by.x=2,by.y=6,all=T)
+  alternative_regulon_result <- rbind(alternative_regulon_result,tmp_result)
 }
-alternative_regulon_result <- alternative_regulon_result[-2]
-names(alternative_regulon_result)[6] <- "genes"
-write.table(alternative_regulon_result,paste(jobid,"alternative_regulon_result.txt",sep = ""),col.names = T,row.names = F,quote = F,sep = "\t")
+alternative_regulon_result <- alternative_regulon_result[c(-3,-4)]
+names(alternative_regulon_result)[6] <- "num_genes"
+names(alternative_regulon_result)[7] <- "genes"
+names(alternative_regulon_result)[2] <- "tf"
+alternative_regulon_result <- alternative_regulon_result[!duplicated(alternative_regulon_result), ]
+
+top_n_idx <- function(x, n=10) {
+  nx <- length(x)
+  p <- nx-n
+  xp <- sort(x, partial=p)[p]
+  rev(which(x > xp)[order(x[which(x > xp)])])
+  
+}
+
+atac_result <- vector()
+for (i in 1:length(select_idx_result)) {
+  this_regulon <- select_idx_result[i]
+  fn <- paste("atac/",select_idx_result[i],".atac_overlap_result.txt",sep = "")
+  fn_handle <- file(fn,"r")
+  fn_data <- readLines(fn_handle)
+  close(fn_handle)
+  fn_data <- strsplit(fn_data,"\\t")
+  
+  rank_value <- as.numeric(unlist(lapply(fn_data, function(x){
+    return(x[3])
+  })))
+  this_atac_result <- vector()
+  top_idx <- top_n_idx(rank_value)
+  if (length(top_idx) > 0){
+    for (j in 1:length(top_idx)) {
+      this_data <- fn_data[[top_idx[j]]]
+      tmp_result <- c(this_data[1],this_data[3])
+      this_atac_result <- rbind(this_atac_result,tmp_result)
+    }
+    this_tissue <- paste(this_atac_result[,1],sep = "",collapse = ",")
+    this_num_overlap_genes <- paste(this_atac_result[,2],sep = "",collapse = ",")
+    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=this_tissue,num_overlap_genes=this_num_overlap_genes)
+  } else {
+    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=NA,num_overlap_genes=NA)
+  }
+  tmp_df <- as.list(tmp_df)
+  atac_result <- rbind(atac_result,tmp_df)
+}
+atac_result <- as.data.frame(atac_result)
+alternative_regulon_result <- merge(alternative_regulon_result,atac_result,by.x=3,by.y=1,all = T)
+alternative_regulon_result <- alternative_regulon_result[c(1,2,3,4,5,6,8,9,7)]
+alternative_regulon_result <- alternative_regulon_result[order(alternative_regulon_result$tf, alternative_regulon_result$cell_type),]
+alternative_regulon_result <- apply(alternative_regulon_result, 2, as.character)
+write.table(alternative_regulon_result,paste(jobid,"_alternative_regulon_result.txt",sep = ""),col.names = T,row.names = F,quote = F,sep = "\t")
+
+#t1 <- read.table(paste(jobid,"_alternative_regulon_result.txt",sep = ""),sep = "\t",header = T)
+#t1 <- t1[!duplicated(t1), ]
+#write.table(t1,paste(jobid,"_alternative_regulon_result.txt",sep = ""),col.names = T,row.names = F,quote = F,sep = "\t")
+
+
+#write.table(atac_result,paste(jobid,"_atac_result.txt",sep = ""),col.names = T,row.names = F,quote = F,sep = "\t")
