@@ -29,10 +29,10 @@ do
 	#TOMTOM human&mouse 
 	#nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa.meme)/ -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &
 	if [ "$species" == "Human" ]; then
-	nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa.meme)/ -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme &
+	nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa.meme)/ -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -thresh 0.05 $file /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme &
 	fi
 	if [ "$species" == "Mouse" ]; then
-	nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa.meme)/ -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $file /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &
+	nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc tomtom/$(basename "$file" .fsa.meme)/ -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -thresh 0.05 $file /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &
 fi
 done
 wait
