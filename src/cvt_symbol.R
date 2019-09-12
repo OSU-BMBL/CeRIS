@@ -31,20 +31,20 @@ suppressPackageStartupMessages(library(org.Dr.eg.db))
 
 #setwd("C:/Users/flyku/Desktop/iris3")
 args <- commandArgs(TRUE)
-srcDir <- args[1]
-expName <- args[2]
+wd <- args[1]
+expFile <- args[2]
 jobid <-args[3]
 promoter_len <- args[4]
-setwd(srcDir)
+setwd(wd)
 getwd()
 # setwd("/home/www/html/iris3/data/2019030481235")
 # setwd("d:/Users/flyku/Documents/IRIS3-data/test_id")
 # jobid <-20190408222612
-# srcDir <-  getwd()
-# expName <- "20190408222612_filtered_expression.txt"
+# wd <-  getwd()
+# expFile <- "20190408222612_filtered_expression.txt"
 # promoter_len <- '1000'
-srcFile <- list.files(srcDir,pattern = "*_bic.txt")
-expFile <- read.table(expName,sep="\t",header = T,row.names = 1,check.names = F)
+srcFile <- list.files(wd,pattern = "*_bic.txt")
+expFile <- read.table(expFile,sep="\t",header = T,row.names = 1,check.names = F)
 promoter_len <- as.numeric(promoter_len)
 
 get_row_num <- function (this){
@@ -103,9 +103,9 @@ if(length(species_file) == 2) {
 generate_seq_file <- function(filename){
   print(filename)
   genes <- read.table(as.character(filename),header = T,sep = "\t");
-  new_dir <- paste(srcDir,"/",gsub(".txt", "", filename,".txt"),sep="")
+  new_dir <- paste(wd,"/",gsub(".txt", "", filename,".txt"),sep="")
   dir.create(new_dir, showWarnings = FALSE)
-  #i=2
+  #i=1
   for (i in 1:ncol(genes)) {
     this_genes <- as.character(genes[,i])
     this_genes <- this_genes[!this_genes==""]
