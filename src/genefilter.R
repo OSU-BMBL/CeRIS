@@ -56,10 +56,10 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/20190908171731/")
+  # setwd("/var/www/html/iris3/data/2019091223657/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "Zeisel_expression.csv"
-  jobid <- "20190908171731"
+  jobid <- "2019091223657"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
@@ -87,10 +87,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
         gene_file <- grep("genes",all_files)
         feature_file <- grep("features",all_files)
         
-        #try(system(paste("gunzip",(all_files[barcode_file]))),silent = T)
-        #try(system(paste("gunzip",(all_files[matrix_file]))),silent = T)
-        #try(system(paste("gunzip",(all_files[gene_file]))),silent = T)
-        #try(system(paste("gunzip",(all_files[feature_file]))),silent = T)
+        
         
         all_files <- list.files(getwd())
         barcode_file <- grep("barcodes",all_files)
@@ -103,7 +100,21 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
         tryCatch(file.rename(all_files[gene_file],paste("genes",gsub(".*genes","",all_files[gene_file]),sep = "")),error = function(e) 0)
         tryCatch(file.rename(all_files[feature_file],paste("features",gsub(".*features","",all_files[features]),sep = "")),error = function(e) 0)
         
-        tmp_x<-Read10X(getwd())
+        
+        tmp_x<-tryCatch(Read10X(getwd()),error = function(e) {
+          all_files <- list.files(getwd())
+          barcode_file <- grep("barcodes",all_files)
+          matrix_file <- grep("matrix",all_files)
+          gene_file <- grep("genes",all_files)
+          feature_file <- grep("features",all_files)
+          try(system(paste("gunzip",(all_files[barcode_file]))),silent = T)
+          try(system(paste("gunzip",(all_files[matrix_file]))),silent = T)
+          try(system(paste("gunzip",(all_files[gene_file]))),silent = T)
+          try(system(paste("gunzip",(all_files[feature_file]))),silent = T)
+        })
+        tmp_x<-tryCatch(Read10X(getwd()),error = function(e){
+          0
+        })
         return(tmp_x)
       } else if(read.method == "CellGene"){# read in cell * gene matrix, if there is error report, back to 18 line to run again.
         tmp_x<-read.delim(x,header = T,row.names = NULL,check.names = F,sep=sep,...)
