@@ -220,12 +220,30 @@ my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputated
 # export data from seurat object(normalized, imputed) .################
 #######################################################################
 my.export.for_LFMG<-my.imputated.data
-# you can write table. 
-# write.table(my.export.for_LFMG,
-#             file = "RNA_RAW_EXPRESSION.txt",
-#             quote = F,
-#             sep = "\t")
+my.export.rownames<-c(rownames(my.imputated.data))
+my.export.for_LFMG<-data.frame(Gene=my.export.rownames,my.imputated.data,check.names = F)
+write.table(my.export.for_LFMG,"Imputated.expressionMatirx.txt",quote = F,row.names=F,sep="\t")
 #######################################################################
+##run pca, tnse, umap via ltmg matrix
+
+# my.object@assays$RNA@data
+my.ltmg<-read.delim("Imputated.expressionMatirx.txt.em.chars",header = T)
+rownames(my.ltmg)<-my.ltmg$o
+my.ltmg<-my.ltmg[,-1]
+# judge index whether greater than 1, if so -1 for each element.
+signal.replace<-function(x){
+  tmp.GreatThanOne.index<-which(x>1)
+  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
+  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
+  return(x)
+}
+my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
+
+# setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
+# x<-Read10X(data.dir = getwd())
+
+my.object@assays$RNA@data<-as.sparse(my.ltmg.pure)
+
 #######################################################################
 # find high variable gene
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 2000)

@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+
+
+
 setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190906114155/")
 my.raw.data<-read_data(x = "20190906114155_raw_expression.txt",sep="\t",read.method = "CellGene")
 my.object<-CreateSeuratObject(my.raw.data)
