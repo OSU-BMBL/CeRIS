@@ -1,20 +1,60 @@
-setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050//")
-my.object<-readRDS("seurat_obj.rds")
-my.ltmg<-read.delim("20190830171050_filtered_expression.txt.em.chars",header = T)
-my.ltmg2<-read.csv("LTMG.matrix.csv",header = T,sep = ",")
-my.ltmg.line<-readLines("20190830171050_filtered_expression.txt.em.chars")
-my.ltmg.pure<-my.ltmg[-which(duplicated(my.ltmg$o)==T),1:5]
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190906114155/")
+my.raw.data<-read_data(x = "20190906114155_raw_expression.txt",sep="\t",read.method = "CellGene")
+my.object<-CreateSeuratObject(my.raw.data)
+my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
+sce<-SingleCellExperiment(list(counts=my.count.data))
 
-rownames(my.ltmg.pure)<-my.ltmg.pure$o
-my.ltmg.pure<-my.ltmg.pure[,-1]
+## if all values are integers, perform normalization, otherwise skip to imputation
+if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
+  ## normalization##############################
+  sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
+  sce<-scater::normalize(sce,return_log=F)
+  my.normalized.data <- normcounts(sce)
+} else {
+  my.normalized.data <- my.count.data
+}
 
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
+colnames(my.imputated.data)<-colnames(my.count.data)
+rownames(my.imputated.data)<-rownames(my.count.data)
+my.imputated.data<- as.sparse(my.imputated.data)
+my.imputatedLog.data<-log1p(my.imputated.data)
+my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputatedLog.data,assay="RNA")
+my.export.for_LFMG<-my.imputated.data
+my.export.rownames<-c(rownames(my.imputated.data))
+my.export.for_LFMG<-data.frame(Gene=my.export.rownames,my.imputated.data,check.names = F)
+save(my.export.for_LFMG,file = "my.export.for_LFMG.RDS")
+write.table(my.export.for_LFMG,"Imputated.expressionMatirx.txt",quote = F,row.names=F,sep="\t")
+# my.object@assays$RNA@data
+my.ltmg<-read.delim("Imputated.expressionMatirx.txt.em.chars",header = T)
+rownames(my.ltmg)<-my.ltmg$o
+my.ltmg<-my.ltmg[,-1]
+# judge index whether greater than 1, if so -1 for each element.
+signal.replace<-function(x){
+  tmp.GreatThanOne.index<-which(x>1)
+  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
+  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
+  return(x)
+}
+my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
+
+# setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
+# x<-Read10X(data.dir = getwd())
 
 my.object@assays$RNA@data<-as.sparse(my.ltmg.pure)
-
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 2000)
 all.gene<-my.object@assays$RNA@var.features
 my.object<-ScaleData(my.object,features = all.gene)
 my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
+my.object<-RunUMAP(object = my.object,dims = 1:30,umap.method="uwot")
+# silhouette score calculation
+#dist.matrix <- dist(x = Embeddings(object = my.object[['pca']])[,1:30])
+dist.matrix <- dist(x = Embeddings(object = my.object[['umap']]))
+sil <- silhouette(x = as.numeric(x = cell_info), dist = dist.matrix)
+silh_out <- cbind(cell_info,cell_names,sil[,3])
+silh_out <- silh_out[order(silh_out[,1]),]
+write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
+
 # ElbowPlot(object = my.object)
 my.object<-RunTSNE(my.object,dims = 1:10,perplexity=10,dim.embed = 3)
 my.object<-RunUMAP(my.object,dims=1:10)

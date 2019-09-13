@@ -120,14 +120,14 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
 #|-----------------|---------------|
 
 #Read in data ###################################################
-my.raw.data<-read_data(x = "20190816170235_filtered_expression.txt",sep="\t",read.method = "CellGene")
+my.raw.data<-read_data(x = "20190830171050_raw_expression.txt",sep="\t",read.method = "CellGene")
 ######################################################
 # create Seurat object
 my.object<-CreateSeuratObject(my.raw.data)
 # check how many cell and genes
 dim(my.object)
-VlnPlot(my.object, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-plot(log(1:length(my.object$nCount_RNA)),log(sort(my.object$nCount_RNA,decreasing = T)))
+#VlnPlot(my.object, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+#plot(log(1:length(my.object$nCount_RNA)),log(sort(my.object$nCount_RNA,decreasing = T)))
 #################################################################
 # filter some outlier gene, only for 10X data####################
 #################################################################
@@ -194,22 +194,17 @@ Idents(my.object)<-as.factor(my.object$Customized.idents)
 my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
 # normalization##############################
 sce<-SingleCellExperiment(list(counts=my.count.data))
-# is.ercc<-function(x) {
-#   tmp.ercc.index<-grep("^ERCC",ignore.case=T,rownames(x))
-#   is.ercc<-length(grep("^ERCC",ignore.case=T,rownames(x)))>0
-#   tmp.data<-sce@assays@.xData$data@listData$counts
-#   is.exist<-rowSums(tmp.data[grep("^ERCC",ignore.case=T,rownames(x)),]>0) == 0
-#   return(is.ercc & is.exist)
-#   }
-# if (is.ercc(sce)){
-#   isSpike(sce,"MySpike")<-grep("^ERCC",ignore.case = T,rownames(sce))
-#   sce<-computeSpikeFactors(sce)
-# } else {sce<-computeSumFactors(sce)}
-sce<-computeSumFactors(sce,positive=T)
 
-sce<-scater::normalize(sce,return_log=F)
+## if all values are integers, perform normalization, otherwise skip to imputation
+if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
+  ## normalization##############################
+  sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
+  sce<-scater::normalize(sce,return_log=F)
+  my.normalized.data <- normcounts(sce)
+} else {
+  my.normalized.data <- my.count.data
+}
 
-my.normalized.data <-sce@assays@.xData$data@listData$normcounts
 # imputation#################################
 
 my.imputated.data <- DrImpute(as.matrix(my.normalized.data))
@@ -221,7 +216,7 @@ my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputated
 #######################################################################
 # export data from seurat object(normalized, imputed) .################
 #######################################################################
-my.export.for_LFMG<-GetAssayData(object = my.object,slot = "data")
+my.export.for_LFMG<-my.imputated.data
 # you can write table. 
 # write.table(my.export.for_LFMG,
 #             file = "RNA_RAW_EXPRESSION.txt",
@@ -305,22 +300,34 @@ Get.RegulonScore()
 
 ##############################
 
-Plot.cluster2D<-function(reduction.method="umap",module=1,customized=F,pt_size=1,...){
+Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
+  # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
+  # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
+  # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
+  
   if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=my.object$seurat_clusters)
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=as.factor(my.object$Customized.idents))
+                                         Cell_type=Idents(my.object))
   }
-  tmp.celltype <- as.character(unique(my.plot.all.source$Cell_type))
+  tmp.celltype <- levels(unique(my.plot.all.source$Cell_type))
   p.cluster <- ggplot(my.plot.all.source,
                       aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
   p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
-  p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell Type",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+  
+  if(my.plot.all.source[,"Cell_type"]>=10){
+    p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5),ncol = 2))
+  }else{
+    p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
+  }
+  
+  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
                                                breaks=tmp.celltype,
                                                labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  
+  # + labs(col="cell type")           
   p.cluster <- p.cluster + theme_classic() 
   p.cluster <- p.cluster + coord_fixed(ratio=1)
   p.cluster
@@ -334,14 +341,28 @@ Plot.cluster2D(customized = T)
 
 
 Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customized=T,pt_size=1,...){
+  #message("plotting regulon ",regulon," of cell type ",cell.type,"...")
   my.plot.regulon<-Get.RegulonScore(reduction.method = reduction.method,
                                     cell.type = cell.type,
                                     regulon = regulon,
                                     customized = customized)
-
-  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2]))+xlab(colnames(my.plot.regulon)[1])+ylab(colnames(my.plot.regulon)[2])
-  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+scale_color_gradient(low = "grey",high = "red")
-  p.regulon <- p.regulon + theme_classic()
+  # if(!customized){
+  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+  #                                        Cell_type=my.object$seurat_clusters)
+  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
+  # }else{
+  #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
+  #                                        Cell_type=as.factor(my.object$Customized.idents))
+  #   my.plot.all.source<-my.plot.all.source[,grep("*\\_[1,2,a-z]",colnames(my.plot.all.source))]
+  # }
+  # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
+  # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
+  p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2])) + xlab(colnames(my.plot.regulon)[1]) + ylab(colnames(my.plot.regulon)[2])
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"])) + scale_colour_distiller(palette = "YlOrRd", direction = 1)
+  #+ scale_color_gradient(low = "grey",high = "red")
+  p.regulon <- p.regulon + theme_classic() + labs(col="Regulon\nscore")
+  #message("finish!")
+  
   p.regulon <- p.regulon + coord_fixed(ratio=1)
   p.regulon
 }
