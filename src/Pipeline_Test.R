@@ -182,46 +182,116 @@ write.table(cell.label,"Raw_Nor_imputation_cell_label.txt",quote = F,row.names =
 
 
 ###################pheatmap
-# input imputed data
-exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
+# input imputed data, changable
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/500_cell_10X/Raw_Nor_nonLTMG/QUBIC2_k15_f0.5__o1000/")
+# input matrix changable
+exp_data<- read.delim("Raw_Nor.txt",check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
 # label cell name, cluster
-label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
-# module name
-g1 <- c("Sf3b5","Sin3b","Srsf5","Stk17b","Thy1","Txnip","Uba52","Ubald2","Ywhae")
+label_data <- read.table("Raw_Nor_cell_label.txt",sep="\t",header = T)
+# module gene name
+g.list<-readLines("_blocks.gene.txt")
+g1.select<-g.list[c(1:50)]
+
+g1 <- unlist(strsplit(g1.select," "))
+g1 <- g1[-which(g1=="")]
+length(g1)
+which(duplicated(g1)==T)
 #l1 <- c(3,4,6)
 # label number
-l1 <- c(1:9)
+l1 <- c(3,8,1,2,0,7,9,11,4,5,10,6)
 library(pheatmap)
 library(RColorBrewer)
 library(viridis)
+library(Polychrome)
 
 df1 <- exp_data[which(rownames(exp_data) %in% g1),]
 label1 <- label_data[which(label_data[,2] %in% l1),]
 df2 <- df1[,which(colnames(df1) %in% label1[,1])]
+
+label1<-label1[order(label1$cell.lable),]
+df2<-df2[,as.character(label1$cell.name)]
 
 # Data frame with column annotations.
 mat_col <- data.frame(group = label1[,2])
 rownames(mat_col) <- colnames(df2)
 
 # List with colors for each annotation.
-mat_colors <- list(group = brewer.pal(length(l1), "Set1"))
+mat_colors <- list(group = as.character(palette36.colors(36))[-2][1:length(l1)])
 names(mat_colors$group) <- unique(label1[,2])
 
 pheatmap(
   mat               = df2,
-  color             = inferno(10),
+  color             = colorRampPalette(c("blue","white","red"))(n=100),
+  scale = "row",
   border_color      = NA,
   show_colnames     = FALSE,
-  show_rownames     = T,
+  show_rownames     = F,
   annotation_col    = mat_col,
   annotation_colors = mat_colors,
   drop_levels       = TRUE,
   fontsize          = 14,
   main              = "Expression Heatmap",
-  cluster_cols=F
+  cluster_cols=F,
+  cluster_rows = F
 )
+##########################################
+#########################################
+######################################
+###################pheatmap
+# input imputed data, changable
+setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/500_cell_10X/Raw_Nor_Imp_nonLTMG/QUBIC2_k15_f0.5__o1000/")
+# input matrix changable
+exp_data<- read.delim("Raw_Nor_imputation.txt",check.names = FALSE, header=TRUE,row.names = 1)
+exp_data <- as.matrix(exp_data)
+# label cell name, cluster
+label_data <- read.table("Raw_Nor_imputation_cell_label.txt",sep="\t",header = T)
+# module gene name
+g.list<-readLines("_blocks.gene.txt")
+g1.select<-g.list[c(1:50)]
 
+g1 <- unlist(strsplit(g1.select," "))
+g1 <- g1[-which(g1=="")]
+length(g1)
+which(duplicated(g1)==T)
+#l1 <- c(3,4,6)
+# label number
+l1 <- c(3,8,1,2,0,7,9,11,4,5,10,6)
+library(pheatmap)
+library(RColorBrewer)
+library(viridis)
+library(Polychrome)
+
+df1 <- exp_data[which(rownames(exp_data) %in% g1),]
+label1 <- label_data[which(label_data[,2] %in% l1),]
+df2 <- df1[,which(colnames(df1) %in% label1[,1])]
+
+label1<-label1[order(label1$cell.lable),]
+df2<-df2[,as.character(label1$cell.name)]
+
+# Data frame with column annotations.
+mat_col <- data.frame(group = label1[,2])
+rownames(mat_col) <- colnames(df2)
+
+# List with colors for each annotation.
+mat_colors <- list(group = as.character(palette36.colors(36))[-2][1:length(l1)])
+names(mat_colors$group) <- unique(label1[,2])
+
+pheatmap(
+  mat               = df2,
+  color             = colorRampPalette(c("blue","white","red"))(n=100),
+  scale = "row",
+  border_color      = NA,
+  show_colnames     = FALSE,
+  show_rownames     = F,
+  annotation_col    = mat_col,
+  annotation_colors = mat_colors,
+  drop_levels       = TRUE,
+  fontsize          = 14,
+  main              = "Expression Heatmap",
+  cluster_cols=F,
+  cluster_rows = F
+)
 
 
 
