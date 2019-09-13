@@ -133,9 +133,12 @@ dim(my.object)
 #################################################################
 
 
-Data.Preprocessing<-function(TenX = FALSE) {
+Data.Preprocessing<-function(TenX = FALSE,Species=c("human","mouse")) {
   if(TenX== TRUE){
-    my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
+    if(Species=="human"){
+      my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
+    }else {my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^mt-")}
+    
     my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
   }
   return(my.object)
