@@ -7,13 +7,13 @@ require(xml2)
 require(XML)
 library(seqinr)
 args <- commandArgs(TRUE)
-srcDir <- args[1]
+wd <- args[1]
 jobid <- args[2]
 motif_length <- args[3]
-setwd(srcDir)
+setwd(wd)
 getwd()
 #setwd("/var/www/html/iris3/data/2019090643259")
-#srcDir <- getwd()
+#wd <- getwd()
 #jobid <-2019090643259 
 #motif_length <- 12
 sort_dir <- function(dir) {

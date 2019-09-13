@@ -126,7 +126,9 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
 #normalization
 normalize_ras <- function(score_vec){
   #normalize score_vec(regulon activity score) to range(0,1) and sum=1
-  score_vec <- apply(score_vec, 1, rescale)
+  score_vec <- tryCatch(apply(score_vec, 1, rescale), error=function(e){
+    rescale(score_vec)
+  })
   score_vec <- t(score_vec)
   score_vec <- as.data.frame(t(apply(data.frame(score_vec), 1, function(x){
     x <- x/sum(x)
@@ -248,7 +250,7 @@ label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
 total_gene_list <- vector()
-total_gene_index <- 1
+
 #i=2
 ## to speed up gsva process, read all genes  to one lists
 for (i in 1:total_ct) {
@@ -266,7 +268,7 @@ total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",
 
 #### bootstrap resampling to calculate p-value
 bootstrap_ras <- calc_bootstrap_ras(rankings=rankings,iteration=10000,regulon_size=40)
-#bootstrap_ras <- t1
+
 norm_bootstrap_ras <- normalize_ras(bootstrap_ras)
 #bootstrap_rss <- foreach (i=1:total_ct) %dopar% {
 #  calc_bootstrap_rss(norm_bootstrap_ras,i)
@@ -276,7 +278,7 @@ bootstrap_rss <- sapply (1:total_ct, function(x){
   calc_bootstrap_rss(norm_bootstrap_ras,x)
 })
 colnames(bootstrap_rss) <- as.character(seq(1:total_ct))
-#bootstrap_rss <- t1
+
 bootstrap_rss <- as_tibble(as.matrix(bootstrap_rss))
 bootstrap_rss <- gather(bootstrap_rss,CT,RSS) 
   
@@ -285,6 +287,7 @@ bootstrap_rss <- gather(bootstrap_rss,CT,RSS)
 
 #i=1
 # genes=x= gene_name_list[[1]]
+total_gene_index <- 1
 for (i in 1:total_ct) {
   
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
@@ -307,6 +310,9 @@ for (i in 1:total_ct) {
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
   
   ras <- total_ras[total_gene_index:(total_gene_index + length(gene_name_list) - 1),]
+  if (length(motif_list) == 1) {
+    ras <- t(as.matrix(ras))
+  } 
   total_gene_index <- total_gene_index + length(gene_name_list) 
   originak_ras <- ras
   ras <- normalize_ras(ras)
@@ -334,50 +340,55 @@ for (i in 1:total_ct) {
       return (1)
     else return(0)
   })
-  rss_keep_index <- which(unlist(rss_keep_index) == 0)
-  rss_list <- rss_list[rss_keep_index]
-  gene_name_list <- gene_name_list[rss_keep_index]
-  gene_id_list <- gene_id_list[rss_keep_index]
-  motif_list <- motif_list[rss_keep_index]
-  ras <- ras[rss_keep_index,]
-  originak_ras <- originak_ras[rss_keep_index,]
-
-  rss_rank <- order(unlist(rss_list),decreasing = T)
-  # x <- gene_name_list[[1]]
-  gene_name_list <- gene_name_list[rss_rank]
-  gene_id_list <- gene_id_list[rss_rank]
-  motif_list <- motif_list[rss_rank]
-  ras <- ras[rss_rank,]
-  originak_ras <- originak_ras[rss_rank,]
-  rss_list <- rss_list[rss_rank]
-
-  marker <- lapply(gene_name_list, function(x){
-    x[which(x%in%marker_data[,i])]
-  })
   
-  if(sum(sapply(marker, length))>0){
-    rss_rank<-order(sapply(marker,length),decreasing=T)
-    marker <- marker[rss_rank]
-    rss_list <- rss_list[rss_rank]
+  if (length(motif_list) > 1) {
+    rss_keep_index <- which(unlist(rss_keep_index) == 0)
+    rss_list <- rss_list[rss_keep_index]
+    gene_name_list <- gene_name_list[rss_keep_index]
+    gene_id_list <- gene_id_list[rss_keep_index]
+    motif_list <- motif_list[rss_keep_index]
+    ras <- ras[rss_keep_index,]
+    originak_ras <- originak_ras[rss_keep_index,]
+    
+    rss_rank <- order(unlist(rss_list),decreasing = T)
+    # x <- gene_name_list[[1]]
     gene_name_list <- gene_name_list[rss_rank]
     gene_id_list <- gene_id_list[rss_rank]
-    # put marker genes on top
-    gene_id_list <- mapply(function(X,Y,Z){
-      id <- which(Y %in% X)
-      return(unique(append(Z[id],Z)))
-    },X=marker,Y=gene_name_list,Z=gene_id_list)
-    
-    gene_name_list <- mapply(function(X,Y){
-      return(unique(append(X,Y)))
-    },X=marker,Y=gene_name_list)
-    
     motif_list <- motif_list[rss_rank]
     ras <- ras[rss_rank,]
     originak_ras <- originak_ras[rss_rank,]
-  }
-
-  colnames(ras) <- label_data[,1]
-  colnames(originak_ras) <- label_data[,1]
+    rss_list <- rss_list[rss_rank]
+    
+    
+    marker <- lapply(gene_name_list, function(x){
+      x[which(x%in%marker_data[,i])]
+    })
+    
+    if(sum(sapply(marker, length))>0){
+      rss_rank<-order(sapply(marker,length),decreasing=T)
+      marker <- marker[rss_rank]
+      rss_list <- rss_list[rss_rank]
+      gene_name_list <- gene_name_list[rss_rank]
+      gene_id_list <- gene_id_list[rss_rank]
+      # put marker genes on top
+      gene_id_list <- mapply(function(X,Y,Z){
+        id <- which(Y %in% X)
+        return(unique(append(Z[id],Z)))
+      },X=marker,Y=gene_name_list,Z=gene_id_list)
+      
+      gene_name_list <- mapply(function(X,Y){
+        return(unique(append(X,Y)))
+      },X=marker,Y=gene_name_list)
+      
+      motif_list <- motif_list[rss_rank]
+      ras <- ras[rss_rank,]
+      originak_ras <- originak_ras[rss_rank,]
+    }
+    
+  } 
+  
+  #colnames(ras) <- label_data[,1]
+  #colnames(originak_ras) <- label_data[,1]
   
   write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.regulon_activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
   total_motif_list <- append(total_motif_list,unlist(motif_list))

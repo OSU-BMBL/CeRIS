@@ -10,13 +10,16 @@ require(xml2)
 require(XML)
 library(seqinr)
 registerDoParallel(16) 
-#args <- commandArgs(TRUE)
+args <- commandArgs(TRUE)
 #wd <- args[1] # filtered expression file name
-#jobid <- args[2] # user job id
+jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-jobid <-20190910233253   
+jobid <-2019091224403   
 label_use_sc3 = 0
+#exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
+#exp_data <- as.matrix(exp_data)
+
 wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
 #wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
@@ -350,7 +353,7 @@ for (i in ct_seq) {
 }
 
 ## run atac
-#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i], "Mouse",sep = " "))}
+#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i], "Human",sep = " "))}
 
 alternative_regulon_result <- vector()
 for (i in 1:length(select_idx_result)) {
@@ -424,8 +427,7 @@ write.table(alternative_regulon_result,paste(jobid,"_alternative_regulon_result.
 colnames(alternative_regulon_result)
 regulon_tf_vector <- unique(alternative_regulon_result[,3])
 
-#exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
-#exp_data <- as.matrix(exp_data)
+
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 
@@ -433,10 +435,13 @@ rate_ct <- sapply(seq(1:total_ct), function(x){
   length(which(label_data[,2] %in% x)) / nrow(label_data)
 })
 
-small_cell_idx <- sample.int(ncol(exp_data), 500)
+if (ncol(exp_data) > 500) {
+  small_cell_idx <- sample.int(ncol(exp_data), 500)
+} else {
+  small_cell_idx <- seq(1:ncol(exp_data))
+}
 small_exp_data <- exp_data[,small_cell_idx]
 small_cell_label <- label_data[small_cell_idx,]
-
 
 exp_file <- small_exp_data
 label_file <- label_data[which(label_data[,1] %in% colnames(small_exp_data)),]
@@ -575,7 +580,7 @@ for(i in 1: length(regulon_tf_vector)){
     sapply(data.list, function(g2)
     {round(length(intersect(g1, g2)) / length(g2) * 100)}))
   
-  if(any(overlaps > 30 & overlaps < 70) & length(gene_row) < 400){
+  if(any(overlaps > 30 & overlaps < 70) & length(gene_row) < 4000){
     
     file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),]
     dim(file_heat_matrix)

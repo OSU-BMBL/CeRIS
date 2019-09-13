@@ -24,6 +24,7 @@ labelFile <- paste(jobid,"_cell_label.txt",sep = "")
 setwd(wd)
 total_ct_number <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
 
+
 quiet <- function(x) { 
   sink(tempfile()) 
   on.exit(sink()) 
@@ -41,18 +42,40 @@ calc_jsd <- function(v1,v2) {
 }
 
 
+calc_ranking <- function(expr){
+  require(data.table)
+  if(!data.table::is.data.table(expr))
+    expr <- data.table::data.table(expr, keep.rownames=TRUE)
+  data.table::setkey(expr, "rn") # (reorders rows)
+  colsNam <- colnames(expr)[-1] # 1=row names
+  #names(genes) <- 1:length(genes)
+  rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="random", na.last="keep"),
+                   .SDcols=colsNam]
+  rn <- rankings$rn
+  rankings <- as.matrix(rankings[,-1])
+  rownames(rankings) <- rn
+  return(rankings)
+}
+
+
 #num_ct <- 1
 #genes <- c("ANAPC11","APLP2","ATP6V1C2","DHCR7","GSPT1","HDGF","HMGA1")
 #calculate regulon activity score (RAS) 
-#expr <- as.matrix(exp_data)
-# genes <- gene_name_list
-calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea")) {
+# expr <- exp_data
+# genes <- total_gene_list
+calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea","custom_auc"), rankings) {
+  print(Sys.time())
   if (method=="aucell"){ #use top 10% cutoff
     require(AUCell)
+    expr <- as.matrix(expr)
     names(genes) <- 1:length(genes)
-    cells_rankings <- AUCell_buildRankings(exp_data,plotStats = F) 
+    cells_rankings <- AUCell_buildRankings(expr,plotStats = F) 
     cells_AUC <- AUCell_calcAUC(genes, cells_rankings, aucMaxRank=nrow(cells_rankings)*0.1)
-    score_vec <- cells_AUC@assays@data@listData[['AUC']]
+    #score_vec <- cells_AUC@assays@data@listData[['AUC']]
+    #score_vec <- cells_AUC@assays@.xData$data$AUC
+    ## AUCell modified object structure
+    tryCatch(score_vec <- cells_AUC@assays@data@listData[['AUC']],error = function(e) score_vec <- cells_AUC@assays@.xData$data$AUC)
+    
   } else if (method=="zscore"){
     require("GSVA")
     score_vec <- gsva(expr,gset=genes,method="zscore")
@@ -62,14 +85,47 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
   } else if (method=="ssgsea"){
     require("GSVA")
     score_vec <- gsva(expr,gset=genes,method="ssgsea")
-  } 
-  else if (method=="gsva"){
+  } else if (method=="gsva"){
     require("GSVA")
     require("snow")
-    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T)
-  } 
+    score_vec <- gsva(expr,gset=genes,method="gsva",kcdf="Gaussian",abs.ranking=F,verbose=T,parallel.sz=8)
+  } else if (method=="wmw_test"){
+    require(BioQC)
+    require(data.table)
+    geneset <- as.data.frame(lapply(genes, function(x){
+      return(rownames(rankings) %in% x)
+    }))
+    names(geneset) <- 1:ncol(geneset)
+    dim(geneset)
+    score_vec <- wmwTest(rankings, geneset, valType="abs.log10p.greater", simplify = T)
+    
+    #score_vec[score_vec < 1] <- 0
+    #for (i in 1:nrow(score_vec)) {
+    #  tmp <- as.numeric(quantile(score_vec[i,])[2])
+    #  #tmp2 <- mean(score_vec[i,])
+    #  #tmp3 <- median(score_vec[i,])
+    #  #snr1 <- mean(score_vec[i,])/sd(score_vec[i,])
+    #  score_vec[i,which(as.numeric(score_vec[i,]) < tmp)] <- 0
+    #  #c1 <- pass.filt(score_vec[i,], W=0.05, type="stop", method="ChebyshevI")
+    #  #barplot(score_vec[i,])
+    #  #barplot(c1)
+    #}
+    
+    #barplot(score_vec1[1,])
+    ##### test two u-test function speed
+    #library(microbenchmark)
+    #microbenchmark(
+    #  sapply(indx, function(i) wmwTest(rankings[,i], set_in_list, valType="p.two.sided")),times = 10
+    #)
+    #microbenchmark(
+    #  sapply(indx, function(i) wilcox.test(gSetRanks[,i], other_ranking[,i])$p.value),times = 10
+    #)
+    #
+  }
+  print(Sys.time())
   return(score_vec)
 }
+
 
 #normalization
 normalize_ras <- function(score_vec){
@@ -82,8 +138,7 @@ normalize_ras <- function(score_vec){
   return(score_vec)
 }
 
-# test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
-#score_vec <- ras
+# [Deprecated].test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
 calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
@@ -121,6 +176,13 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #}
 }
 
+calc_rss_pvalue <- function(this_rss=0.66,this_bootstrap_rss,ct=1){
+  #ef <- ecdf(this_bootstrap_rss)
+  #pvalue <- 1 - ef(this_rss)
+  pvalue <- length(which(this_rss < this_bootstrap_rss))/length(this_bootstrap_rss)
+  return(pvalue)
+}
+
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   
@@ -138,6 +200,20 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   return(rss)
 }
 
+calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
+  random_genes <- as.data.frame(replicate(iteration, sample.int(nrow(rankings), regulon_size)))
+  boot_vec <- wmwTest(rankings, random_genes, valType="abs.log10p.greater", simplify = T)
+  #random_genes <- replicate(iteration, list(rownames(rankings)[sample.int(nrow(rankings), regulon_size)]))
+  #boot_vec <- gsva(exp_data,gset=random_genes,method="zscore")
+  return(boot_vec)
+}
+
+
+calc_bootstrap_rss <- function(boot_ras,ct){
+  boot_ras <- normalize_ras(boot_ras)
+  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
+  return(this_rss)
+}
 
 
 sort_dir <- function(dir) {
@@ -176,6 +252,7 @@ for (i in 1:total_ct_number) {
   total_gene_list <- append(total_gene_list,regulon_gene_name)
   total_rank <- append(total_rank,regulon_rank)
 }
+
 t1 <- "CT4S-R122"
 length(grep("CT3.*?",t1))
 length(grep("CT4.*?",t1))
