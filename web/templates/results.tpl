@@ -809,6 +809,10 @@ var xmlhttp = new XMLHttpRequest()
                                                         </button>
                                                         <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
                                                         </button>-->
+														<!--<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=module{{$sec0+1}}.json" target="_blank"> <button type="button" class="btn btn-default extra-button" data-toggle="collapse" data-target="#">Alternative regulon heatmap
+                                                        </button>
+                                                        </a>-->
+														
 														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">UMAP plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon UMAP
@@ -835,7 +839,7 @@ var xmlhttp = new XMLHttpRequest()
 									<tbody>
 									{{section name=tomtom_idx start=0 loop=$tomtom_result.$motif_num_jaspar}}
 									<tr><td >TOMTOM</td><td>
-									<a href="http://jaspar2018.genereg.net/matrix/{{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}</a></td>
+									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}</a></td>
 									<td class="tomtom_pvalue">
 									{{$tomtom_result.$motif_num_jaspar[tomtom_idx][3]|string_format:"%.2e"}}</td><td>
 									{{$tomtom_result.$motif_num_jaspar[tomtom_idx][4]|string_format:"%.2e"}}</td><td>
