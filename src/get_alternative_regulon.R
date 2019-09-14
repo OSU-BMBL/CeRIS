@@ -16,7 +16,7 @@ args <- commandArgs(TRUE)
 jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-jobid <-20190913134923   
+#jobid <-20190913230125   
 label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
@@ -168,7 +168,7 @@ for (i in ct_seq) {
 
 ## run atac
 species_file 
-#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i],species_file ,sep = " "))}
+foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i],species_file ,sep = " "))}
 
 alternative_regulon_result <- vector()
 for (i in 1:length(select_idx_result)) {
@@ -218,9 +218,9 @@ for (i in 1:length(select_idx_result)) {
       tmp_result <- c(this_data[1],length(strsplit(this_data[8]," ")[[1]]))
       this_atac_result <- rbind(this_atac_result,tmp_result)
     }
-    this_tissue <- paste(this_atac_result[,1],sep = "",collapse = ",")
-    this_num_overlap_genes <- paste(this_atac_result[,2],sep = "",collapse = ",")
-    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=this_tissue,num_overlap_genes=this_num_overlap_genes)
+    this_tissue <- as.character(paste(this_atac_result[,1],sep = "",collapse = ","))
+    this_num_overlap_genes <- as.character(paste(this_atac_result[,2],sep = "",collapse = ","))
+    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=this_tissue,num_overlap_genes=this_num_overlap_genes,stringsAsFactors = F)
   } else {
     tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=NA,num_overlap_genes=NA)
   }
