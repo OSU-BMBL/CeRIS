@@ -56,10 +56,10 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/2019091330153/")
+  # setwd("/var/www/html/iris3/data/20190918125222/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
   srcFile = "Zeisel_expression.csv"
-  jobid <- "2019091330153"
+  jobid <- "20190918125222"
   delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
@@ -317,6 +317,7 @@ dim(expFile)
 
 my.object<-CreateSeuratObject(expFile)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputated.data,assay="RNA")
+
 cell_names <- colnames(my.object)
 rm(my.imputated.data)
 
@@ -345,51 +346,59 @@ write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",se
 write.table(data.frame("Gene"=rownames(exp_data),exp_data,check.names = F),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,sep="\t",quote=FALSE)
 
 #######################################################################
-##run pca, tnse, umap via ltmg matrix
-
-## my.object@assays$RNA@data
-#my.ltmg<-read.delim(paste(jobid,"_filtered_expression.txt.em.chars",sep=""),header = T)
-#my.ltmg[which(duplicated.default(my.ltmg[,1])),1]
-#
-##remove duplicated rows with same gene 
-#if(length(which(duplicated.default(my.ltmg[,1]))) > 0 ){
-#  my.ltmg <- my.ltmg[-which(duplicated.default(my.ltmg[,1])==T),]
-#}	
-#
-#rownames(my.ltmg) <- my.ltmg[,1]
-#my.ltmg<- my.ltmg[,-1]
-#length(is.na(my.ltmg[1:10,1:10]))
-#colnames(my.ltmg) <-  gsub('([[:punct:]])|\\s+','_',colnames(my.ltmg))
-### remove rows with empty gene name
-#if(length(which(rownames(my.ltmg)=="")) > 0){
-#  my.ltmg <- my.new.ltmg[-which(rownames(my.ltmg)==""),]
-#}
-## judge index whether greater than 1, if so -1 for each element.
-#signal.replace<-function(x){
-#  x <- as.numeric(x)
-#  tmp.GreatThanOne.index<-which(x>1)
-#  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
-#  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
-#  return(x)
-#}
-#
-#my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
-#
-#
-## setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
-## x<-Read10X(data.dir = getwd())
-#
-###my.object@assays$RNA@data<-as.sparse(my.new.ltmg)
-#
-#
-#my.new.ltmg1 <- as.sparse(my.new.ltmg)
-#rownames(my.new.ltmg) <- rownames(my.ltmg)
-#colnames(my.new.ltmg) <- colnames(my.ltmg)
-##my.object<-CreateSeuratObject(my.new.ltmg)
-#my.object<-CreateSeuratObject(my.new.ltmg)
-#my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.new.ltmg,assay="RNA")
-#
-
+#####run pca, tnse, umap via ltmg matrix
+###exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
+####exp_data<- as.data.frame(my.count.data)
+####exp_data<- read.delim(paste(jobid,"_raw_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
+###
+###exp_data <- as.matrix(exp_data)
+##### my.object@assays$RNA@data
+###label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+###dim(exp_data)
+###
+###my.ltmg<-read.delim(paste("Raw_Nor.txt.em.chars",sep=""),header = T)
+###
+####remove duplicated rows with same gene 
+###if(length(which(duplicated.default(my.ltmg[,1]))) > 0 ){
+###  my.ltmg <- my.ltmg[-which(duplicated.default(my.ltmg[,1])==T),]
+###}	
+###
+###rownames(my.ltmg) <- my.ltmg[,1]
+###my.ltmg<- my.ltmg[,-1]
+###my.ltmg<-my.ltmg[,which(colnames(my.ltmg) %in% label_data[,1])]
+###
+###length(is.na(my.ltmg[1:10,1:10]))
+###colnames(my.ltmg) <-  gsub('([[:punct:]])|\\s+','_',colnames(my.ltmg))
+##### remove rows with empty gene name
+###if(length(which(rownames(my.ltmg)=="")) > 0){
+###  my.ltmg <- my.new.ltmg[-which(rownames(my.ltmg)==""),]
+###}
+#### judge index whether greater than 1, if so -1 for each element.
+###signal.replace<-function(x){
+###  x <- as.numeric(x)
+###  tmp.GreatThanOne.index<-which(x>1)
+###  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
+###  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
+###  return(x)
+###}
+###
+###my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
+###
+###
+#### setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
+#### x<-Read10X(data.dir = getwd())
+###
+#####my.object@assays$RNA@data<-as.sparse(my.new.ltmg)
+###
+###
+####my.new.ltmg1 <- as.sparse(my.new.ltmg)
+###rownames(my.new.ltmg) <- rownames(my.ltmg)
+###colnames(my.new.ltmg) <- colnames(my.ltmg)
+####my.object<-CreateSeuratObject(my.new.ltmg)
+###my.object<-CreateSeuratObject(my.new.ltmg)
+###my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.new.ltmg,assay="RNA")
+###cell_names <- colnames(my.object)
+###
 #######################################################################
 
 rm(expFile)
@@ -539,6 +548,7 @@ if (label_use_sc3 =='2'){
     cell_info <- cell_info[,-1]
   } else {
     cell_info <-  my.object$seurat_clusters
+    #cell_info <- as.factor(mydata1$MMdetail)
   }
 } 
 
@@ -626,9 +636,16 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
   
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
-                                               breaks=tmp.celltype,
-                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  if (length(tmp.celltype) > 30){
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(rainbow(length(tmp.celltype))),
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  } else {
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  }
+  
   
   # + labs(col="cell type")           
   p.cluster <- p.cluster + theme_classic() 

@@ -61,9 +61,16 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
   
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
-                                               breaks=tmp.celltype,
-                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  if (length(tmp.celltype) > 30){
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(rainbow(length(tmp.celltype))),
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  } else {
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  }
+  
   
   # + labs(col="cell type")           
   p.cluster <- p.cluster + theme_classic() 

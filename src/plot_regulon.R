@@ -5,11 +5,11 @@ library(ggplot2)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190906120624")
+#setwd("/var/www/html/iris3/data/20190915164515")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #srcDir <- getwd()
-#id <-"CT1S-R1" 
-#jobid <- "20190906120624"
+#id <-"CT7S-R11" 
+#jobid <- "20190915164515"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -33,9 +33,16 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
   
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
-                                               breaks=tmp.celltype,
-                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  if (length(tmp.celltype) > 30){
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(rainbow(length(tmp.celltype))),
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  } else {
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  }
+  
   
   # + labs(col="cell type")           
   p.cluster <- p.cluster + theme_classic() 
@@ -62,8 +69,9 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
   p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2])) + xlab(colnames(my.plot.regulon)[1]) + ylab(colnames(my.plot.regulon)[2])
-  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"])) + scale_colour_distiller(palette = "YlOrRd", direction = 1)
-  #+ scale_color_gradient(low = "grey",high = "red")
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+ scale_color_gradient(low = "grey",high = "red")
+  #+ scale_colour_distiller(palette = "YlOrRd", direction = 1)
+  
   p.regulon <- p.regulon + theme_classic() + labs(col="Regulon\nscore")
   #message("finish!")
   
@@ -145,7 +153,7 @@ activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activit
 num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
-pt_size <- get_point_size(num_cells)*1.5
+pt_size <- get_point_size(num_cells)*2.8
 
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
