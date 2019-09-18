@@ -159,12 +159,12 @@ if (isset($_POST['submit']))
 	$delim = detectDelimiter("$workdir2/$expfile");
 	if($delim=="\t"){
 		$delim = "tab";
-	}
-	if($delim==" "){
+	} else if($delim==" "){
 		$delim = "space";
-	}
-	if($delim==";"){
+	} else if($delim==";"){
 		$delim = "semicolon";
+	} else {
+		$delim = ",";
 	}
 	$delim_label = detectDelimiter("$workdir2/$labelfile");
 		if($delim_label=="\t"){
@@ -206,7 +206,7 @@ motif_min_length=12
 motif_max_length=12
 #perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
 Rscript /var/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter \$label_file $delim_label $param_k $label_use_sc3
-/var/www/html/iris3/program/qubic2/qubic -i \$wd\$jobid\_filtered_expression.txt -d
+/var/www/html/iris3/program/qubic2/qubic -i \$wd\$jobid\_filtered_expression.txt -k 10
 for file in *blocks
 do
 grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
@@ -216,8 +216,8 @@ do
 grep Genes \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.gene.txt)\"
 done
 Rscript /var/www/html/iris3/program/ari_score.R \$label_file \$jobid $delim_label $label_use_sc3
-Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd\$jobid\_filtered_expression.txt \$jobid \$wd\$jobid\_cell_label.txt $gene_module_file $delim_gene_module \n
-Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
+Rscript /var/www/html/iris3/program/cts_gene_list.R \$wd \$jobid $promoter_arg $gene_module_file $delim_gene_module \n
+#Rscript /var/www/html/iris3/program/cvt_symbol.R \$wd \$wd\$jobid\_filtered_expression.txt \$jobid $promoter_arg\n 
 /var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 1
 Rscript /var/www/html/iris3/program/convert_meme.R \$wd \$motif_min_length
 /var/www/html/iris3/program/get_motif.sh \$wd \$motif_min_length \$motif_max_length 0
@@ -239,6 +239,7 @@ Rscript /var/www/html/iris3/program/merge_tomtom.R \$wd \$jobid \$motif_min_leng
 Rscript /var/www/html/iris3/program/sort_regulon.R \$wd \$jobid\n
 #cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
 Rscript /var/www/html/iris3/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
+Rscript /var/www/html/iris3/program/get_alternative_regulon.R \$jobid\n
 mkdir json
 /var/www/html/iris3/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
 
@@ -252,7 +253,7 @@ chmod -R 777 .
 	fclose($fp);
 	session_destroy();
 	system("chmod -R 777 $workdir2");
-	system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);

@@ -16,7 +16,7 @@ args <- commandArgs(TRUE)
 jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-#jobid <-20190915164515   
+#jobid <-20190913230125   
 label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
