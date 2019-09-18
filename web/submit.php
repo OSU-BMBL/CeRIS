@@ -76,6 +76,7 @@ if (isset($_POST['submit']))
 	}
 	$email = $_POST['email'];
 	$c_arg = '1.0';
+	$c_arg = '20';
 	$f_arg = '0.5';
 	$o_arg = '100';
 	$promoter_arg = '1000';
@@ -206,7 +207,7 @@ motif_min_length=12
 motif_max_length=12
 #perl /var/www/html/iris3/program/prepare_email.pl \$jobid\n
 Rscript /var/www/html/iris3/program/genefilter.R \$wd\$exp_file \$jobid $delim $is_gene_filter $is_cell_filter \$label_file $delim_label $param_k $label_use_sc3
-/var/www/html/iris3/program/qubic2/qubic -i \$wd\$jobid\_filtered_expression.txt -k 10
+/var/www/html/iris3/program/qubic2/qubic -i \$wd\$jobid\_filtered_expression.txt -k $k_arg -o $o_arg -f $f_arg
 for file in *blocks
 do
 grep Conds \$file |cut -d ':' -f2 >\"$(basename \$jobid\_blocks.conds.txt)\"
@@ -253,7 +254,7 @@ chmod -R 777 .
 	fclose($fp);
 	session_destroy();
 	system("chmod -R 777 $workdir2");
-	#system("cd $workdir; nohup sh qsub.sh > output.txt &");
+	system("cd $workdir; nohup sh qsub.sh > output.txt &");
 	##shell_exec("$workdir/qsub.sh>$workdir/output.txt &");
 	#header("Location: results.php?jobid=$jobid");
 	$smarty->assign('o_arg',$o_arg);
