@@ -248,7 +248,7 @@ exp_data <- as.matrix(exp_data)
 label_data <- read.table("Raw_Nor_imputation_cell_label.txt",sep="\t",header = T)
 # module gene name
 g.list<-readLines("_blocks.gene.txt")
-g1.select<-g.list[c(1:50)]
+g1.select<-g.list[c(1)]
 
 g1 <- unlist(strsplit(g1.select," "))
 g1 <- g1[-which(g1=="")]
