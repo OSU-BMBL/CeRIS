@@ -427,16 +427,17 @@ $(document).ready(function() {
 							<div class="form-group">
 								<div class="row">
 									<div class="col-md-2">
-										<label for="ex1">Consistancy level: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Parameter in QUBIC that affect the consistancy level of a bicluster. Lower value allows more genes included during the growth of bicluster and 1 means no growth. Default is 1. "> </span> 
+										<label for="ex1">Overlap rate: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. 0 means no overlap and 1 means complete overlap. Default is 0.5."> </span> 
 										</label>
 									</div>
 									<div class="col-md-2">
-										<select class="selectpicker" name="c_arg" data-width="auto">
+										<select class="selectpicker" name="f_arg" data-width="auto">
+											<option data-subtext="Default" selected="selected">0.5</option>
 											<option>0.6</option>
 											<option>0.7</option>
 											<option>0.8</option>
 											<option>0.9</option>
-											<option data-subtext="Default" selected="selected">1.0</option>
+											<option>1.0</option>
 										</select>
 									</div>
 								</div>
@@ -450,29 +451,30 @@ $(document).ready(function() {
 										<select class="selectpicker" name="o_arg" data-width="auto">
 											<option>20</option>
 											<option>50</option>
-											<option data-subtext="Default" selected="selected">100</option>
+											<option>100</option>
 											<option>200</option>
+											<option data-subtext="Default" selected="selected">500</option>
+											<option>1000</option>
 										</select>
 									</div>
 								</div>
 								<br>
 								<div class="row">
 									<div class="col-md-2">
-										<label for="ex2">Overlap rate: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. 0 means no overlap and 1 means complete overlap. Default is 0.5."> </span>
+										<label for="ex2">Minimal cell width: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Minimum column width of the bicluster block. Default is 20."> </span>
 										</label>
 									</div>
 									<div class="col-md-2">
-										<select class="selectpicker" name="f_arg" data-width="auto">
-											<option>0.1</option>
-											<option>0.2</option>
-											<option>0.3</option>
-											<option>0.4</option>
-											<option data-subtext="Default" selected="selected">0.5</option>
-											<option>0.6</option>
-											<option>0.7</option>
-											<option>0.8</option>
-											<option>0.9</option>
-											<option>1.0</option>
+										<select class="selectpicker" name="k_arg" data-width="auto">
+											<option>5</option>
+											<option>10</option>
+											<option>15</option>
+											<option data-subtext="Default" selected="selected">20</option>
+											<option>30</option>
+											<option>40</option>
+											<option>50</option>
+											<option>60</option>
+											<option>70</option>
 										</select>
 									</div>
 								</div>
@@ -610,8 +612,8 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_exp" name="is_load_exp" value="0">
 			<input type="hidden" id="is_load_label" name="is_load_label" value="0">
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
-			<input type="hidden" id="k_arg" name="k_arg" value="18">
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=2019081954006';" />
+			<!--<input type="hidden" id="k_arg" name="k_arg" value="18">-->
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20190913134923';" />
 
 		</div>
 		<div class="form-group">

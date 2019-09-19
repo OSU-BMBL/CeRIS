@@ -41,6 +41,7 @@ Plot.GeneUMAP<-function(gene.name=NULL,pt_size=0.5){
   g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }
+
 Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
@@ -60,15 +61,23 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   
   p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
   
-  p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
-                                               breaks=tmp.celltype,
-                                               labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  if (length(tmp.celltype) > 30){
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(rainbow(length(tmp.celltype))),
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  } else {
+    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
+                                                 breaks=tmp.celltype,
+                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  }
+  
   
   # + labs(col="cell type")           
   p.cluster <- p.cluster + theme_classic() 
   p.cluster <- p.cluster + coord_fixed(ratio=1)
   p.cluster
 }
+
 
 
 
@@ -142,7 +151,7 @@ if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
     my.object <- readRDS("seurat_obj.rds")
   }
   num_cells <- ncol(my.object)
-  pt_size <- get_point_size(num_cells)
+  pt_size <- get_point_size(num_cells)*2
   Plot.GeneUMAP(gene_symbol,pt_size = pt_size)
 }
 quiet(dev.off())
@@ -155,7 +164,7 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
     my.object <- readRDS("seurat_obj.rds")
   }
   num_cells <- ncol(my.object)
-  pt_size <- get_point_size(num_cells)
+  pt_size <- get_point_size(num_cells)*2
   Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
 }
 quiet(dev.off())

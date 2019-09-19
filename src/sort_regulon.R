@@ -216,9 +216,13 @@ total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_C
 
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
+label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 #g1 <- c("Sf3b5","Sin3b","Srsf5","Stk17b","Thy1","Txnip","Uba52","Ubald2","Ywhae")
-#l1 <- c(3,4,6)
+##l1 <- c(3,4,6)
 #l1 <- c(1:9)
+#library(pheatmap)
+#library(RColorBrewer)
+#library(viridis)
 #
 #df1 <- exp_data[which(rownames(exp_data) %in% g1),]
 #label1 <- label_data[which(label_data[,2] %in% l1),]
