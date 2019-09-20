@@ -17,11 +17,10 @@ jobid <- args[2] # user job id
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # setwd("/var/www/html/iris3/data/2019083104715")
-  wd <- "/var/www/html/iris3/data/2019083104715"
-  jobid <- "2019083104715"
+  wd <- "/var/www/html/iris3/data/20190915164515"
+  jobid <- "20190915164515"
   setwd(wd)
 }
-
 quiet <- function(x) { 
   sink(tempfile()) 
   on.exit(sink()) 
@@ -45,7 +44,7 @@ calc_ranking <- function(expr){
   data.table::setkey(expr, "rn") # (reorders rows)
   colsNam <- colnames(expr)[-1] # 1=row names
   #names(genes) <- 1:length(genes)
-  rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="random", na.last="keep"),
+  rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="max", na.last="keep"),
                    .SDcols=colsNam]
   rn <- rankings$rn
   rankings <- as.matrix(rankings[,-1])
@@ -123,17 +122,12 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
 }
 
 
-
-calc_bootstrap_rss <- function(boot_ras,ct){
-  boot_ras <- normalize_ras(boot_ras)
-  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
-  return(this_rss)
-}
-
 #normalization
 normalize_ras <- function(score_vec){
   #normalize score_vec(regulon activity score) to range(0,1) and sum=1
-  score_vec <- apply(score_vec, 1, rescale)
+  score_vec <- tryCatch(apply(score_vec, 1, rescale), error=function(e){
+    rescale(score_vec)
+  })
   score_vec <- t(score_vec)
   score_vec <- as.data.frame(t(apply(data.frame(score_vec), 1, function(x){
     x <- x/sum(x)
@@ -179,6 +173,12 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #}
 }
 
+calc_rss_pvalue <- function(this_rss=0.29828905,this_bootstrap_rss,ct=5){
+  #ef <- ecdf(this_bootstrap_rss)
+  #pvalue <- 1 - ef(this_rss)
+  pvalue <- length(which(this_rss < this_bootstrap_rss))/length(this_bootstrap_rss)
+  return(pvalue)
+}
 
 # calculate regulon specificity score (RSS), based on regulon activity score and cell type specific infor,
 calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
@@ -197,19 +197,35 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   return(rss)
 }
 
+calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
+  random_genes <- as.data.frame(replicate(iteration, sample.int(nrow(rankings), regulon_size)))
+  boot_vec <- wmwTest(rankings, random_genes, valType="abs.log10p.greater", simplify = T)
+  #random_genes <- replicate(iteration, list(rownames(rankings)[sample.int(nrow(rankings), regulon_size)]))
+  #boot_vec <- gsva(exp_data,gset=random_genes,method="zscore")
+  return(boot_vec)
+}
+
+
+calc_bootstrap_rss <- function(boot_ras,ct){
+  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
+  return(this_rss)
+}
 total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
 
-exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
+exp_data <- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+label_data <- label_data[which(label_data[,2] == c(5,7)),]
+exp_data <- exp_data[,which(colnames(exp_data) %in% label_data1[,1])]
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
 total_gene_list <- vector()
 total_gene_index <- 1
 #i=2
 ## to speed up gsva process, read all genes  to one list
-for (i in 1:total_ct) {
+#for (i in 1:total_ct) {
+  for (i in c(5,7)) {
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
   close(regulon_gene_name_handle)
@@ -220,25 +236,19 @@ total_gene_list <- lapply(strsplit(total_gene_list,"\\t"), function(x){x[-1]})
 #total_gene_list <- total_gene_list[1:10]
 #total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test")
 rankings <- calc_ranking(exp_data)
-total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",rankings = rankings)
+total_ras <- calc_ras(expr = exp_data1,genes=total_gene_list,method = "wmw_test",rankings = rankings)
 
-regulon_size <- 40
+regulon_size <- 10
 iteration <- 10000
 
 library(foreach)
 library(doParallel)
 registerDoParallel(8)  # use multicore, set to the number of our cores
 
-#ggplot(rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
-calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
-  random_genes <- as.data.frame(replicate(iteration, sample.int(nrow(rankings), regulon_size)))
-  boot_vec <- wmwTest(rankings, random_genes, valType="abs.log10p.greater", simplify = T)
-  #random_genes <- replicate(iteration, list(rownames(rankings)[sample.int(nrow(rankings), regulon_size)]))
-  #boot_vec <- gsva(exp_data,gset=random_genes,method="zscore")
-  return(boot_vec)
-}
 
 ras <- calc_bootstrap_ras(rankings,iteration,regulon_size)
+
+norm_bootstrap_ras <- normalize_ras(ras)
 
 ##### Test performance enable parallel RSS
 #microbenchmark(
@@ -250,13 +260,16 @@ ras <- calc_bootstrap_ras(rankings,iteration,regulon_size)
 #  }),
 #  times = 1
 #)
-rss<-foreach (i=1:total_ct) %dopar% {
-  calc_bootstrap_rss(ras,i)
-  } %>%
-  set_names(paste("CT",seq(1:total_ct),sep = "")) %>%
-  as.tibble() %>%
-  gather(CT,RSS)
 
+bootstrap_rss <- sapply (1:total_ct, function(x){
+  calc_bootstrap_rss(norm_bootstrap_ras,x)
+})
+colnames(bootstrap_rss) <- as.character(seq(1:total_ct))
+
+bootstrap_rss <- as_tibble(as.matrix(bootstrap_rss))
+bootstrap_rss <- gather(bootstrap_rss,CT,RSS) 
+
+#ggplot(bootstrap_rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
 
 this_rss <- 0.40658853
 this_ct <- "CT4"
@@ -266,22 +279,3 @@ res1 <- rss %>%
   filter(CT==this_ct)%>%
   pull(RSS)
 #%>%filter(cume_dist(RSS) > this_rss)
-
-ef <- ecdf(res1)
-if (this_rss < mean(res1)){
-  pvalue <- ef(this_rss)
-} else {
-  pvalue <- 1 - ef(this_rss)
-}
-pvalue
-
-ct=1
-calc_rss_pvalue <- function(this_rss,this_bootstrap_rss,ct){
-  ef <- ecdf(this_bootstrap_rss)
-  if (this_rss < mean(this_bootstrap_rss)){
-    pvalue <- ef(this_rss)
-  } else {
-    pvalue <- 1 - ef(this_rss)
-  }
-  return(pvalue)
-}

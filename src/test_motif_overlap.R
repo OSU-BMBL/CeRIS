@@ -152,8 +152,8 @@ df <- rbind(df1,df2,df3)
 #colnames(df) <- c("dminda_and_meme","meme_only","dminda_only")
 
 #unpaired_mean_diff <- dabest(df,group, value,
-                             idx =  c("dminda_and_meme","meme_only","dminda_only"),
-                             paired = FALSE)
+#                             idx =  c("dminda_and_meme","meme_only","dminda_only"),
+#                             paired = FALSE)
 
 #plot(unpaired_mean_diff)
 total_regulon
