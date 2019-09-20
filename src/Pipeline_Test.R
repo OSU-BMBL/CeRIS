@@ -64,7 +64,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
         })
         return(tmp_x)
       } else if(read.method == "CellGene"){# read in cell * gene matrix, if there is error report, back to 18 line to run again.
-        tmp_x<-read.delim(x,header = T,row.names = NULL,check.names = F,sep=sep,...)
+        tmp_x<-read.delim(x,header = T,check.names = F,sep=sep,...)
         
         return(tmp_x)
       }
@@ -94,21 +94,22 @@ run.analysis<-function(my.object=my.object){
   return(my.object)
 }
 ####
-set.seed(42)
-setwd("D:\\my_analysis\\Hazem_data_explore_parameters\\32.Hazem_D7_P14_Cl13_1/")
-AR.gene<-readRDS("SP2_TF_genes.rds")
-AR.gene.list<-unique(unlist(AR.gene))
-
-# set Raw_Nor 
-Raw_Nor<-function(x,read.method ="TenX.folder",...){
-  my.raw<-read_data(x,read.method ="TenX.folder")
+setwd("D:\\my_analysis\\Hazem_data_explore_parameters\\All_cell/S0021-Chen-A//")
+x="D:\\my_analysis\\Hazem_data_explore_parameters\\All_cell/23.Fan/GSE110499_GEO_processed_MM_raw_TPM_matrix.txt"
+#'TenX.h5','TenX.folder', or 'CellGene'
+  my.raw<-read_data(x,read.method ="CellGene")
+  # my.raw=my.raw[-which(duplicated(my.raw$cell_id)==T),]
+  # rownames(my.raw)<-my.raw$cell_id
+  # my.raw<-my.raw[,-1]
   my.object<-CreateSeuratObject(my.raw)
-  my.object<-Data.Preprocessing(TenX = T,Species = "mouse")
+  my.object<-Data.Preprocessing(x=my.object,TenX = F,Species = "human")
+  #my.raw2<-my.object@assays$RNA@counts
+  #sum(my.raw2==0)/sum(my.raw2>=0)
   # VlnPlot(my.object, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
   # plot(log(1:ncol(my.object)),sort(colSums(my.object@assays$RNA@counts>0),decreasing = T))
   my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
   sce<-SingleCellExperiment(list(counts=my.count.data))
-  if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
+  if(all(as.numeric(unlist(my.count.data[1:nrow(my.count.data),]))%%1==0)){
     ## normalization##############################
     sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
     sce<-scater::normalize(sce,return_log=F)
@@ -116,69 +117,70 @@ Raw_Nor<-function(x,read.method ="TenX.folder",...){
   } else {
     my.normalized.data <- my.count.data
   }
-  my.object@assays$RNA@data<-as.sparse(my.normalized.data)
-  return(my.object)
-}
-# set Raw_Nor 
-Raw_Nor_imputation<-function(x,read.method ="TenX.folder",...){
-  my.raw<-read_data(x,read.method ="TenX.folder")
-  my.object<-CreateSeuratObject(my.raw)
-  my.object<-Data.Preprocessing(TenX = T,Species = "mouse")
-  # VlnPlot(my.object, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-  # plot(log(1:ncol(my.object)),sort(colSums(my.object@assays$RNA@counts>0),decreasing = T))
-  my.count.data<-GetAssayData(object = my.object[['RNA']],slot="counts")
-  sce<-SingleCellExperiment(list(counts=my.count.data))
-  if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
-    ## normalization##############################
-    sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
-    sce<-scater::normalize(sce,return_log=F)
-    my.normalized.data <- normcounts(sce)
-  } else {
-    my.normalized.data <- my.count.data
-  }
+  my.export.for_LFMG<-my.normalized.data
+  my.export.rownames<-c(rownames(my.normalized.data))
+  my.export.for_LFMG<-data.frame(Gene=my.export.rownames, my.export.for_LFMG,check.names = F)
+  #run the label
+  my.object@assays$RNA@data<-my.normalized.data
+  my.object<-run.analysis(my.object=my.object)
+  normlize.cluster<-my.object$seurat_clusters
+  cell.label<-data.frame(cell.name=as.character(colnames(my.object)),cell.lable=as.character(my.object$seurat_clusters))
+  identical(as.character(cell.label$cell.name),colnames(my.export.for_LFMG)[-1])
+  write.table(my.export.for_LFMG,"Raw_Nor.txt",quote = F,row.names=F,sep="\t")
+  write.table(cell.label,"Raw_Nor_cell_label.txt",quote = F,row.names = F,sep = "\t")
+  # doing imputation
   my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
   colnames(my.imputated.data)<-colnames(my.count.data)
   rownames(my.imputated.data)<-rownames(my.count.data)
   my.object@assays$RNA@data<-as.sparse(my.imputated.data)
-  return(my.object)
-}
+  my.export.for_LFMG<-my.imputated.data
+  my.export.rownames<-c(rownames(my.imputated.data))
+  my.export.for_LFMG<-data.frame(Gene=my.export.rownames, my.export.for_LFMG,check.names = F)
+  my.object<-run.analysis(my.object=my.object)
+  # check imputation and normalization cluster label 
+  impuation.cluster<-my.object$seurat_clusters
+  identical(normlize.cluster,impuation.cluster)
+  cell.label<-data.frame(cell.name=as.character(colnames(my.object)),cell.lable=as.character(my.object$seurat_clusters))
+  identical(as.character(cell.label$cell.name),colnames(my.export.for_LFMG)[-1])
+  write.table(my.export.for_LFMG,"Raw_Nor_imputation.txt",quote = F,row.names=F,sep="\t")
+  write.table(cell.label,"Raw_Nor_imputation_cell_label.txt",quote = F,row.names = F,sep = "\t")
+  
 
+#  # generate Raw_norm 500 cells expression matrix
 
-# generate Raw_norm 500 cells expression matrix
-x="D:\\my_analysis\\Hazem_data_explore_parameters\\32.Hazem_D7_P14_Cl13_1"
-
-
-my.object<-Raw_Nor(x,read.method ="TenX.folder")
-my.normalized.data<-(my.object@assays$RNA@data)
-set.seed(43)
-index<-sample(1:ncol(my.object),500)
-my.export.for_LFMG<-my.normalized.data[,index]
-my.export.rownames<-c(rownames(my.normalized.data))
-my.export.for_LFMG<-data.frame(Gene=my.export.rownames, my.export.for_LFMG,check.names = F)
-#run the label
-my.object<-run.analysis(my.object=my.object)
-cell.label<-data.frame(cell.name=as.character(colnames(my.object)[index]),cell.lable=as.character(my.object$seurat_clusters[index]))
-identical(as.character(cell.label$cell.name),colnames(my.export.for_LFMG)[-1])
-write.table(my.export.for_LFMG,"Raw_Nor.txt",quote = F,row.names=F,sep="\t")
-write.table(cell.label,"Raw_Nor_cell_label.txt",quote = F,row.names = F,sep = "\t")
-
-# generate Raw_norm_impute 500 cells expression matrix
-x="D:\\my_analysis\\Hazem_data_explore_parameters\\32.Hazem_D7_P14_Cl13_1"
-
-
-my.object<-Raw_Nor_imputation(x,read.method ="TenX.folder")
-my.imputed.data<-(my.object@assays$RNA@data)
-set.seed(43)
-index<-sample(1:ncol(my.object),500)
-my.export.for_LFMG<-my.imputed.data[,index]
-my.export.rownames<-c(rownames(my.imputed.data))
-my.export.for_LFMG<-data.frame(Gene=my.export.rownames, my.export.for_LFMG,check.names = F)
-# run the label
-my.object<-run.analysis(my.object=my.object)
-cell.label<-data.frame(cell.name=as.character(colnames(my.object)[index]),cell.lable=as.character(my.object$seurat_clusters[index]))
-identical(as.character(cell.label$cell.name),colnames(my.export.for_LFMG)[-1])
-write.table(my.export.for_LFMG,"Raw_Nor_imputation.txt",quote = F,row.names=F,sep="\t")
-write.table(cell.label,"Raw_Nor_imputation_cell_label.txt",quote = F,row.names = F,sep = "\t")
+# 
+# my.object<-Raw_Nor("GSE110499_GEO_processed_MM_raw_TPM_matrix.txt",read.method ="CellGene")
+# my.normalized.data<-(my.object@assays$RNA@data)
+# # set.seed(43)
+# # index<-sample(1:ncol(my.object),500)
+# # my.export.for_LFMG<-my.normalized.data[,index]
+# my.export.for_LFMG<-my.normalized.data
+# my.export.rownames<-c(rownames(my.normalized.data))
+# my.export.for_LFMG<-data.frame(Gene=my.export.rownames, my.export.for_LFMG,check.names = F)
+# #run the label
+# my.object<-run.analysis(my.object=my.object)
+# cell.label<-data.frame(cell.name=as.character(colnames(my.object)[index]),cell.lable=as.character(my.object$seurat_clusters[index]))
+# identical(as.character(cell.label$cell.name),colnames(my.export.for_LFMG)[-1])
+# write.table(my.export.for_LFMG,"Raw_Nor.txt",quote = F,row.names=F,sep="\t")
+# write.table(cell.label,"Raw_Nor_cell_label.txt",quote = F,row.names = F,sep = "\t")
+# 
+# # generate Raw_norm_impute 500 cells expression matrix
+# x="D:\\my_analysis\\Hazem_data_explore_parameters\\32.Hazem_D7_P14_Cl13_1/"
+# 
+# 
+# my.object<-Raw_Nor_imputation(x,read.method ="TenX.folder")
+# my.imputed.data<-(my.object@assays$RNA@data)
+# # set.seed(43)
+# # index<-sample(1:ncol(my.object),500)
+# my.export.for_LFMG<-my.imputed.data[,index]
+# my.export.rownames<-c(rownames(my.imputed.data))
+# my.export.for_LFMG<-data.frame(Gene=my.export.rownames, my.export.for_LFMG,check.names = F)
+# # run the label
+# my.object<-run.analysis(my.object=my.object)
+# cell.label<-data.frame(cell.name=as.character(colnames(my.object)[index]),cell.lable=as.character(my.object$seurat_clusters[index]))
+# identical(as.character(cell.label$cell.name),colnames(my.export.for_LFMG)[-1])
+# write.table(my.export.for_LFMG,"Raw_Nor_imputation.txt",quote = F,row.names=F,sep="\t")
+# write.table(cell.label,"Raw_Nor_imputation_cell_label.txt",quote = F,row.names = F,sep = "\t")
 
 
 ###################pheatmap
@@ -248,7 +250,7 @@ exp_data <- as.matrix(exp_data)
 label_data <- read.table("Raw_Nor_imputation_cell_label.txt",sep="\t",header = T)
 # module gene name
 g.list<-readLines("_blocks.gene.txt")
-g1.select<-g.list[c(1:50)]
+g1.select<-g.list[c(1)]
 
 g1 <- unlist(strsplit(g1.select," "))
 g1 <- g1[-which(g1=="")]
@@ -293,6 +295,8 @@ pheatmap(
   cluster_rows = F
 )
 
-
+setwd("D:\\my_analysis\\Hazem_data_explore_parameters\\All_cell/12.Zeisel/Raw_Nor_Imp_LTMG/")
+x<-read.table("Raw_Nor_imputation.txt",header = T,row.names = 1)
+x<-read.table(ble("Raw_Nor"))
 
  
