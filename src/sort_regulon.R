@@ -45,7 +45,7 @@ calc_ranking <- function(expr){
   data.table::setkey(expr, "rn") # (reorders rows)
   colsNam <- colnames(expr)[-1] # 1=row names
   #names(genes) <- 1:length(genes)
-  rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="random", na.last="keep"),
+  rankings <- expr[, (colsNam):=lapply(-.SD, data.table::frankv,order=-1L, ties.method="min", na.last="keep"),
                    .SDcols=colsNam]
   rn <- rankings$rn
   rankings <- as.matrix(rankings[,-1])
@@ -124,17 +124,21 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
 
 
 #normalization
-normalize_ras <- function(score_vec){
+normalize_ras <- function(label_data=NULL,score_vec=NULL, num_ct=1, total_ct=7){
   #normalize score_vec(regulon activity score) to range(0,1) and sum=1
+  ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
+  score_vec[,which(ct_vec==1)] <- score_vec[,which(ct_vec==1)] * 1
   score_vec <- tryCatch(apply(score_vec, 1, rescale), error=function(e){
     rescale(score_vec)
   })
   score_vec <- t(score_vec)
+  
   score_vec <- as.data.frame(t(apply(data.frame(score_vec), 1, function(x){
     x <- x/sum(x)
   })))
   return(score_vec)
 }
+
 
 # [Deprecated].test if difference in ras among two groups (whether in this cell type), FDR=0.05(default) used by Benjamini-Hochberg procedure
 calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
@@ -174,7 +178,7 @@ calc_ras_pval <- function(label_data=NULL,score_vec=NULL, num_ct=1){
   #}
 }
 
-calc_rss_pvalue <- function(this_rss=0.66,this_bootstrap_rss,ct=1){
+calc_rss_pvalue <- function(this_rss=0.31,this_bootstrap_rss,ct=1){
   #ef <- ecdf(this_bootstrap_rss)
   #pvalue <- 1 - ef(this_rss)
   pvalue <- length(which(this_rss < this_bootstrap_rss))/length(this_bootstrap_rss)
@@ -186,7 +190,7 @@ calc_rss <- function (label_data=NULL,score_vec=NULL, num_ct=1){
   
   # get cell type vector, add 1 if in this cell type
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
-
+  
   # also normalize ct_vec to sum=1
   sum_ct_vec <- sum(ct_vec)
   ct_vec <- ct_vec/sum_ct_vec
@@ -207,8 +211,8 @@ calc_bootstrap_ras <- function(rankings,iteration=100,regulon_size=45){
 }
 
 
-calc_bootstrap_rss <- function(boot_ras,ct){
-  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = boot_ras,num_ct = ct))
+calc_bootstrap_rss <- function(label_data,score_vec,num_ct){
+  this_rss <- as.numeric(calc_rss(label_data=label_data,score_vec = score_vec,num_ct = num_ct))
   return(this_rss)
 }
 
@@ -217,6 +221,12 @@ total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_C
 exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
 exp_data <- as.matrix(exp_data)
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+label_data <- label_data[order(label_data[,1]),]
+
+cell_idx <- as.character(sort(label_data[,1]))
+exp_data <- exp_data[,cell_idx]
+
+
 #g1 <- c("Sf3b5","Sin3b","Srsf5","Stk17b","Thy1","Txnip","Uba52","Ubald2","Ywhae")
 ##l1 <- c(3,4,6)
 #l1 <- c(1:9)
@@ -250,7 +260,6 @@ label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header
 #  cluster_cols=F
 #)
 
-label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
 total_gene_list <- vector()
@@ -271,21 +280,21 @@ rankings <- calc_ranking(exp_data)
 total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",rankings = rankings)
 
 #### bootstrap resampling to calculate p-value
-bootstrap_ras <- calc_bootstrap_ras(rankings=rankings,iteration=10000,regulon_size=40)
+bootstrap_ras <- calc_bootstrap_ras(rankings=rankings,iteration=10000,regulon_size=20)
 
-norm_bootstrap_ras <- normalize_ras(bootstrap_ras)
 #bootstrap_rss <- foreach (i=1:total_ct) %dopar% {
 #  calc_bootstrap_rss(norm_bootstrap_ras,i)
 #} 
 
 bootstrap_rss <- sapply (1:total_ct, function(x){
-  calc_bootstrap_rss(norm_bootstrap_ras,x)
+  norm_bootstrap_ras <- normalize_ras(label_data,bootstrap_ras,x,total_ct = total_ct)
+  return(calc_bootstrap_rss(label_data,norm_bootstrap_ras,x))
 })
 colnames(bootstrap_rss) <- as.character(seq(1:total_ct))
 
 bootstrap_rss <- as_tibble(as.matrix(bootstrap_rss))
 bootstrap_rss <- gather(bootstrap_rss,CT,RSS) 
-  
+
 
 #ggplot(bootstrap_rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
 
@@ -319,7 +328,9 @@ for (i in 1:total_ct) {
   } 
   total_gene_index <- total_gene_index + length(gene_name_list) 
   originak_ras <- ras
-  ras <- normalize_ras(ras)
+  ras <- normalize_ras(label_data, ras, num_ct = i,total_ct = total_ct)
+  #hist(as.numeric(ras[1,]),main="original ras")
+  #hist(as.numeric(originak_ras[1,]),main = "weighted ras")
   ##adj_pval <- calc_ras_pval(label_data=label_data,score_vec = ras,num_ct = i)
   ## remove regulons adjust pval >= 0.05
   ## disabled
@@ -337,6 +348,8 @@ for (i in 1:total_ct) {
     pull(RSS)
   
   rss_list <- calc_rss(label_data=label_data,score_vec = ras,num_ct = i)
+  #boxplot(unlist(rss_list))
+  #mean(unlist(rss_list))
   rss_list <- as.list(rss_list)
   # calculate to be removed regulons index, if no auc score or less than 0.05
   rss_keep_index <- lapply(rss_list, function(x){
@@ -417,7 +430,7 @@ for (i in 1:total_ct) {
   }
   
   ## calculate rss p-value
-
+  
   #write.table(regulon_rank_result,paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),sep = "\t",col.names = F,row.names = F,quote = F)
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""))
   cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""))
@@ -439,7 +452,7 @@ for (i in 1:total_ct) {
     
     cat("\t",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
     cat(rss_list[[j]],file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T,sep = "\t")
-
+    
     cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
   }
 }
