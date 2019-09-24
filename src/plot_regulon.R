@@ -5,11 +5,11 @@ library(ggplot2)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190915164515")
+#setwd("/var/www/html/iris3/data/20190921231010")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #srcDir <- getwd()
-#id <-"CT7S-R11" 
-#jobid <- "20190915164515"
+#id <-"CT3S-R76" 
+#jobid <- "20190921231010"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -57,6 +57,8 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
                                     cell.type = cell.type,
                                     regulon = regulon,
                                     customized = customized)
+  my.plot.regulon <- my.plot.regulon[order(my.plot.regulon$regulon.score),]
+  
   # if(!customized){
   #   my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
   #                                        Cell_type=my.object$seurat_clusters)
@@ -69,9 +71,8 @@ Plot.regulon2D<-function(reduction.method="umap",regulon=1,cell.type=1,customize
   # my.plot.source.matchNumber<-match(rownames(my.plot.all.source),rownames(my.plot.regulon))
   # my.plot.source<-cbind.data.frame(my.plot.all.source,regulon.score=my.plot.regulon[my.plot.source.matchNumber,]$regulon.score)
   p.regulon <- ggplot(my.plot.regulon, aes(x=my.plot.regulon[,1],y=my.plot.regulon[,2])) + xlab(colnames(my.plot.regulon)[1]) + ylab(colnames(my.plot.regulon)[2])
-  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"]))+ scale_color_gradient(low = "grey",high = "red")
-  #+ scale_colour_distiller(palette = "YlOrRd", direction = 1)
-  
+  p.regulon <- p.regulon + geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.regulon[,"regulon.score"])) + scale_color_gradient(low = "grey",high = "red")
+  # + scale_colour_distiller(palette = "YlOrRd", direction = 1)
   p.regulon <- p.regulon + theme_classic() + labs(col="Regulon\nscore")
   #message("finish!")
   
@@ -149,11 +150,13 @@ regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
+activity_score <- activity_score^1.4
+#activity_score <- rescale(as.matrix(activity_score))
 
 num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
-pt_size <- get_point_size(num_cells)*2.8
+pt_size <- get_point_size(num_cells)*3
 
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
@@ -167,18 +170,17 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
 }
 quiet(dev.off())
 
-png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))
 if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size-0.03)
+  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size)
 }
 quiet(dev.off())
 
 
-#CairoPDF(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,
+ #CairoPDF(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,
 #          pointsize = 12, bg = "white")
 #Plot.cluster2D(reduction.method = "umap",customized = T)
 #quiet(dev.off())
