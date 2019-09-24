@@ -17,8 +17,8 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 # wd<-getwd()
 ####test
-# wd <- "/var/www/html/iris3/data/20190909221555"
-# jobid <-20190909221555 
+# wd <- "/var/www/html/iris3/data/20190913134923"
+# jobid <-20190913134923 
 # setwd(wd)
 
 quiet <- function(x) { 
@@ -127,7 +127,7 @@ calc_ras <- function(expr=NULL, genes,method=c("aucell","zscore","plage","ssgsea
 normalize_ras <- function(label_data=NULL,score_vec=NULL, num_ct=1, total_ct=7){
   #normalize score_vec(regulon activity score) to range(0,1) and sum=1
   ct_vec <- ifelse(label_data[,2] %in% num_ct, 1, 0)
-  score_vec[,which(ct_vec==1)] <- score_vec[,which(ct_vec==1)] * 1
+  score_vec[,which(ct_vec==1)] <- score_vec[,which(ct_vec==1)] * 2
   score_vec <- tryCatch(apply(score_vec, 1, rescale), error=function(e){
     rescale(score_vec)
   })
