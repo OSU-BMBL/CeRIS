@@ -149,7 +149,7 @@ $(document).ready(function() {
 
     dz_exp = $("#dropzone_exp").dropzone({
         dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
-        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5",
+        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5,.mtx",
         url: "upload.php",
         maxFiles: 3,
         maxFilesize: 1000,
