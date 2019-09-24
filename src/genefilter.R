@@ -344,61 +344,55 @@ write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",se
 #write.table(as.data.frame(expFile),paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
 #write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,col.names = c(colnames(exp_data)),sep="\t",quote=FALSE)
 write.table(data.frame("Gene"=rownames(exp_data),exp_data,check.names = F),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,sep="\t",quote=FALSE)
+gene_name <- rownames(exp_data)
+write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names = F,col.names = F,quote = F)
 
 #######################################################################
-#####run pca, tnse, umap via ltmg matrix
-###exp_data<- read.delim(paste(jobid,"_filtered_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
-####exp_data<- as.data.frame(my.count.data)
-####exp_data<- read.delim(paste(jobid,"_raw_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
-###
-###exp_data <- as.matrix(exp_data)
-##### my.object@assays$RNA@data
-###label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
-###dim(exp_data)
-###
-###my.ltmg<-read.delim(paste("Raw_Nor.txt.em.chars",sep=""),header = T)
-###
-####remove duplicated rows with same gene 
-###if(length(which(duplicated.default(my.ltmg[,1]))) > 0 ){
-###  my.ltmg <- my.ltmg[-which(duplicated.default(my.ltmg[,1])==T),]
-###}	
-###
-###rownames(my.ltmg) <- my.ltmg[,1]
-###my.ltmg<- my.ltmg[,-1]
-###my.ltmg<-my.ltmg[,which(colnames(my.ltmg) %in% label_data[,1])]
-###
-###length(is.na(my.ltmg[1:10,1:10]))
-###colnames(my.ltmg) <-  gsub('([[:punct:]])|\\s+','_',colnames(my.ltmg))
-##### remove rows with empty gene name
-###if(length(which(rownames(my.ltmg)=="")) > 0){
-###  my.ltmg <- my.new.ltmg[-which(rownames(my.ltmg)==""),]
-###}
-#### judge index whether greater than 1, if so -1 for each element.
-###signal.replace<-function(x){
-###  x <- as.numeric(x)
-###  tmp.GreatThanOne.index<-which(x>1)
-###  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
-###  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
-###  return(x)
-###}
-###
-###my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
-###
-###
-#### setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
-#### x<-Read10X(data.dir = getwd())
-###
-#####my.object@assays$RNA@data<-as.sparse(my.new.ltmg)
-###
-###
-####my.new.ltmg1 <- as.sparse(my.new.ltmg)
-###rownames(my.new.ltmg) <- rownames(my.ltmg)
-###colnames(my.new.ltmg) <- colnames(my.ltmg)
-####my.object<-CreateSeuratObject(my.new.ltmg)
-###my.object<-CreateSeuratObject(my.new.ltmg)
-###my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.new.ltmg,assay="RNA")
-###cell_names <- colnames(my.object)
-###
+##run pca, tnse, umap via ltmg matrix
+
+## my.object@assays$RNA@data
+#my.ltmg<-read.delim(paste(jobid,"_filtered_expression.txt.em.chars",sep=""),header = T)
+#my.ltmg[which(duplicated.default(my.ltmg[,1])),1]
+#
+##remove duplicated rows with same gene 
+#if(length(which(duplicated.default(my.ltmg[,1]))) > 0 ){
+#  my.ltmg <- my.ltmg[-which(duplicated.default(my.ltmg[,1])==T),]
+#}	
+#
+#rownames(my.ltmg) <- my.ltmg[,1]
+#my.ltmg<- my.ltmg[,-1]
+#length(is.na(my.ltmg[1:10,1:10]))
+#colnames(my.ltmg) <-  gsub('([[:punct:]])|\\s+','_',colnames(my.ltmg))
+### remove rows with empty gene name
+#if(length(which(rownames(my.ltmg)=="")) > 0){
+#  my.ltmg <- my.new.ltmg[-which(rownames(my.ltmg)==""),]
+#}
+## judge index whether greater than 1, if so -1 for each element.
+#signal.replace<-function(x){
+#  x <- as.numeric(x)
+#  tmp.GreatThanOne.index<-which(x>1)
+#  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
+#  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
+#  return(x)
+#}
+#
+#my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
+#
+#
+## setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
+## x<-Read10X(data.dir = getwd())
+#
+###my.object@assays$RNA@data<-as.sparse(my.new.ltmg)
+#
+#
+#my.new.ltmg1 <- as.sparse(my.new.ltmg)
+#rownames(my.new.ltmg) <- rownames(my.ltmg)
+#colnames(my.new.ltmg) <- colnames(my.ltmg)
+##my.object<-CreateSeuratObject(my.new.ltmg)
+#my.object<-CreateSeuratObject(my.new.ltmg)
+#my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.new.ltmg,assay="RNA")
+#
+
 #######################################################################
 
 rm(expFile)
@@ -760,6 +754,4 @@ png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
-gene_name <- rownames(exp_data)
-write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names = F,col.names = F,quote = F)
 
