@@ -61,7 +61,7 @@ getwd()
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 label_file <- paste(jobid,"_cell_label.txt",sep = "")
 
-# jobid <-20190910233253
+# jobid <-20190922103834
 # wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
 # gene_module_file <- '1'
 # delim_gene_module <- ','
@@ -77,6 +77,7 @@ gene_file <- readLines(gene_file_handle)
 close(gene_file_handle)
 gene_file <- strsplit(gene_file," ")
 gene_file <- lapply(gene_file, function(x) x[-1])
+len <- sapply(gene_file,length)
 
 cell_label <- read.table(label_file,sep="\t",header = T)
 #exp_data <- read.table(expFile,sep="\t",header = T,row.names = 1,check.names = F)
@@ -316,7 +317,7 @@ dir.create(new_dir, showWarnings = FALSE)
         if (length(na.omit(all_match)) != 0) {
           all_match <- all_match[!duplicated(all_match[,3]),]
           all_match <- na.omit(all_match)
-          if (nrow(all_match) > 0) {
+          if (nrow(all_match) < 400) {
             this_genes_id <- all_match[!duplicated(all_match[,3]),3]
             this_grangelist <-  second_grangelist[which(names(second_grangelist) %in% this_genes_id)]
             promoter_seqs <- getPromoterSeq(this_grangelist,second_bsgenome, upstream=promoter_len, downstream=0)
