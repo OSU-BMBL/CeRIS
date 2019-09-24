@@ -16,7 +16,7 @@ args <- commandArgs(TRUE)
 jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-#jobid <-20190913230125   
+#jobid <-20190921231010   
 label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
@@ -238,9 +238,20 @@ write.table(alternative_regulon_result,paste(jobid,"_alternative_regulon_result.
 colnames(alternative_regulon_result)
 regulon_tf_vector <- unique(alternative_regulon_result[,3])
 
-
+BinMean <- function (vec, every, na.rm = FALSE) {
+  n <- length(vec)
+  x <- .colMeans(vec, every, n %/% every, na.rm)
+  r <- n %% every
+  if (r) x <- c(x, mean.default(vec[(n - r + 1):n], na.rm = na.rm))
+  x
+}
 
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
+label_data <- label_data[order(label_data[,2]),]
+
+cell_idx <- as.character(label_data[,1])
+exp_data <- exp_data[,cell_idx]
+
 
 rate_ct <- sapply(seq(1:total_ct), function(x){
   length(which(label_data[,2] %in% x)) / nrow(label_data)
@@ -249,11 +260,17 @@ rate_ct <- sapply(seq(1:total_ct), function(x){
 if (ncol(exp_data) > 500) {
   small_cell_idx <- sample.int(ncol(exp_data), 500)
 } else {
-  small_cell_idx <- seq(1:ncol(exp_data))
+  small_cell_idx <- seq(1,ncol(exp_data),by=10)
+  small_exp_data <- t(apply(exp_data, 1, function(x){
+    BinMean(x, every = 10)
+  }))
+  
+  small_cell_label <- label_data[small_cell_idx,]
+  colnames(small_exp_data) <- small_cell_label[,1]
+  nrow(small_cell_label) == ncol(small_exp_data)
 }
-small_exp_data <- exp_data[,small_cell_idx]
-small_cell_label <- label_data[small_cell_idx,]
 
+#small_exp_data <- exp_data[,small_cell_idx]
 exp_file <- small_exp_data
 label_file <- label_data[which(as.character(label_data[,1]) %in% colnames(small_exp_data)),]
 
@@ -267,8 +284,10 @@ module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 library(matrixStats)
 
 length(rowSds(as.matrix(exp_file), na.rm=TRUE))
-#exp_file1 <- log1p(t1)
+#exp_file <- exp_file - rowMeans(exp_file)
+
 exp_file <- (exp_file - rowMeans(exp_file))/rowSds(as.matrix(exp_file), na.rm=TRUE)
+#exp_file <- exp_file ^ 3
 user_label_name <- read.table(paste(jobid,"_user_label_name.txt",sep = ""),stringsAsFactors = F,header = F,check.names = F)
 user_label_name <- user_label_name[small_cell_idx,]
 i=j=k=1
@@ -304,7 +323,7 @@ heat_matrix <- heat_matrix[,heat_matrix_cell_idx]
 
 # get CT#-regulon1-# heat matrix
 regulon_tf_vector <- na.omit(regulon_tf_vector)
-#i <- which(regulon_tf_vector == "PRDM6")
+#i <- which(regulon_tf_vector == "EGR3")
 for(i in 1: length(regulon_tf_vector)){
   this_tf_name <- regulon_tf_vector[i]
   a1 <- as.data.frame(alternative_regulon_result)
@@ -316,7 +335,7 @@ for(i in 1: length(regulon_tf_vector)){
   this_total_regulon <- 0
   
   for (j in 1:nrow(this_alternative_regulon_result)) {
-  #for (j in c(3,4)) {
+  #for (j in c(1,3)) {
     this_regulon_name <- paste(this_alternative_regulon_result[j,1],": ",sep = "")
     gene_row <- append(gene_row,strsplit(as.character(this_alternative_regulon_result[j,2]),",")[[1]])
     regulon_ct <-gsub( "-.*$", "", this_regulon_name)
@@ -339,7 +358,7 @@ for(i in 1: length(regulon_tf_vector)){
     sapply(data.list, function(g2)
     {round(length(intersect(g1, g2)) / length(g2) * 100)}))
   
-  if(any(overlaps > 30 & overlaps < 70) & length(gene_row) < 500){
+  if(any(overlaps > 0 & overlaps < 1000) & length(gene_row) < 5000){
     
     file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),label_file[,2] %in% ct_row]
     dim(file_heat_matrix)
@@ -357,7 +376,7 @@ for(i in 1: length(regulon_tf_vector)){
     #file_heat_matrix <- file_heat_matrix[,order(file_heat_matrix[1,])]
     #j=84
   for (j in 1:nrow(this_alternative_regulon_result)) {
-  #for (j in c(3,4)) {
+  #for (j in c(1,3)) {
       regulon_label_col <- as.data.frame(paste(this_alternative_regulon_result[j,1],": ",(rownames(file_heat_matrix) %in% strsplit(this_alternative_regulon_result[j,2],",")[[1]])*1,sep = ""),stringsAsFactors=F)
       #print(regulon_label_col)
       #regulon_label_col[1,1] <- ""
@@ -382,3 +401,4 @@ for(i in 1: length(regulon_tf_vector)){
 }
 
 heatmap(file_heat_matrix)
+
