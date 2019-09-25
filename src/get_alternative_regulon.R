@@ -16,7 +16,7 @@ args <- commandArgs(TRUE)
 jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-#jobid <-20190921231010   
+#jobid <-20190924164726   
 label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
@@ -258,16 +258,16 @@ rate_ct <- sapply(seq(1:total_ct), function(x){
 })
 
 if (ncol(exp_data) > 500) {
-  small_cell_idx <- sample.int(ncol(exp_data), 500)
-} else {
-  small_cell_idx <- seq(1,ncol(exp_data),by=10)
-  small_exp_data <- t(apply(exp_data, 1, function(x){
-    BinMean(x, every = 10)
+  #small_cell_idx <- sample.int(ncol(exp_data), 500)
+  small_cell_idx <- seq(1,ncol(exp_data),by=5)
+  small_exp_data <<- t(apply(exp_data, 1, function(x){
+    BinMean(x, every = 5)
   }))
-  
   small_cell_label <- label_data[small_cell_idx,]
   colnames(small_exp_data) <- small_cell_label[,1]
   nrow(small_cell_label) == ncol(small_exp_data)
+} else {
+  small_exp_data <- exp_data
 }
 
 #small_exp_data <- exp_data[,small_cell_idx]
@@ -283,7 +283,6 @@ short_dir <- sort_dir(short_dir)
 module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 library(matrixStats)
 
-length(rowSds(as.matrix(exp_file), na.rm=TRUE))
 #exp_file <- exp_file - rowMeans(exp_file)
 
 exp_file <- (exp_file - rowMeans(exp_file))/rowSds(as.matrix(exp_file), na.rm=TRUE)
@@ -400,5 +399,4 @@ for(i in 1: length(regulon_tf_vector)){
   
 }
 
-heatmap(file_heat_matrix)
 
