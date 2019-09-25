@@ -5,11 +5,11 @@ library(ggplot2)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190921231010")
+#setwd("/var/www/html/iris3/data/20190924164726")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #srcDir <- getwd()
-#id <-"CT3S-R76" 
-#jobid <- "20190921231010"
+#id <-"CT5S-R1" 
+#jobid <- "20190924164726"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -151,7 +151,6 @@ regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 activity_score <- activity_score^1.4
-#activity_score <- rescale(as.matrix(activity_score))
 
 num_cells <- ncol(activity_score)
 
@@ -170,17 +169,18 @@ if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
 }
 quiet(dev.off())
 
+png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))
 if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
   if(!exists("my.object")){
     library(Seurat)
     my.object <- readRDS("seurat_obj.rds")
   }
-  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size)
+  Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size/1.5)
 }
 quiet(dev.off())
 
 
- #CairoPDF(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,
+#CairoPDF(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,
 #          pointsize = 12, bg = "white")
 #Plot.cluster2D(reduction.method = "umap",customized = T)
 #quiet(dev.off())
