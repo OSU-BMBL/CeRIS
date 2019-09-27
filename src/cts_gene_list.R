@@ -317,7 +317,7 @@ dir.create(new_dir, showWarnings = FALSE)
         if (length(na.omit(all_match)) != 0) {
           all_match <- all_match[!duplicated(all_match[,3]),]
           all_match <- na.omit(all_match)
-          if (nrow(all_match) < 400) {
+          if (nrow(all_match) > 0) {
             this_genes_id <- all_match[!duplicated(all_match[,3]),3]
             this_grangelist <-  second_grangelist[which(names(second_grangelist) %in% this_genes_id)]
             promoter_seqs <- getPromoterSeq(this_grangelist,second_bsgenome, upstream=promoter_len, downstream=0)
@@ -327,7 +327,7 @@ dir.create(new_dir, showWarnings = FALSE)
           }
         }
       }
-      if(length(result) > 3){
+      if(length(result) < 350 & length(result) > 3){
         writeXStringSet(result, paste(new_dir,"/","bic",k,".txt.fa",sep=""),format = "fasta",width=2000)
         #write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt.fa",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
       }
