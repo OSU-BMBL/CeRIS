@@ -743,7 +743,7 @@ x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
 y <- c(1,1,0.89,0.33,0.30,0.25,0.235,0.205,0.18,0.1,0.1,0.1)
 get_point_size <- approxfun(x, y)
 
-pt_size <- get_point_size(ncol(my.object))
+pt_size <- get_point_size(ncol(my.object)) * 2
 dir.create("regulon_id")
 png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
