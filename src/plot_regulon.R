@@ -2,14 +2,16 @@
 library(RColorBrewer)
 library(Polychrome)
 library(ggplot2)
+library(scales)
+
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190925163138")
+#setwd("/var/www/html/iris3/data/20190927122444")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #srcDir <- getwd()
-#id <-"CT4S-R15" 
-#jobid <- "20190925163138"
+#id <-"CT3S-R2" 
+#jobid <- "20190927122444"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -151,7 +153,7 @@ regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 activity_score <- activity_score ^ 1
-activity_score <- as.data.frame(rescale(as.matrix(activity_score),c(1,10)))
+#activity_score <- as.data.frame(rescale(as.matrix(activity_score),c(1,10)))
 num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
