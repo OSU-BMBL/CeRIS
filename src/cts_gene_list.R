@@ -69,6 +69,8 @@ label_file <- paste(jobid,"_cell_label.txt",sep = "")
 conds_file_handle <- file(paste(jobid,"_blocks.conds.txt",sep = ""),"r")
 conds_file <- readLines(conds_file_handle)
 close(conds_file_handle)
+conds_file <- strsplit(conds_file," ")
+conds_file <- lapply(conds_file, function(x) x[-1])
 
 #gene_file <- read.delim(paste(jobid,"_blocks.gene.txt",sep = ""),sep=" ",header = F)[,-1]
 
@@ -78,6 +80,17 @@ close(gene_file_handle)
 gene_file <- strsplit(gene_file," ")
 gene_file <- lapply(gene_file, function(x) x[-1])
 len <- sapply(gene_file,length)
+
+filter_bic_index <- sapply(gene_file, function(x){
+  if (length(x) <= 350 & length(x) > 3){
+    return (T)
+  } else {
+    return (F)
+  }
+})
+gene_file <- gene_file[filter_bic_index]
+conds_file <- conds_file[filter_bic_index]
+
 
 cell_label <- read.table(label_file,sep="\t",header = T)
 #exp_data <- read.table(expFile,sep="\t",header = T,row.names = 1,check.names = F)
@@ -106,7 +119,7 @@ get_pvalue <- function(df){
   result <- list()
   for (i in 1:count_cluster) {
     A <- as.character(unlist(cell_label[which(cell_label$label==i),1]))
-    B <- strsplit(df,"\\s+")[[1]][-1]
+    B <- df
     m=length(A)
     n=nrow(cell_label)-m
     x=length(A[(A%in%B)])
