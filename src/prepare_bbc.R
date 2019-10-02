@@ -4,9 +4,9 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("d:/Users/flyku/Documents/IRIS3-data/test_dzscore")
+#setwd("/var/www/html/iris3/data/20190930154650")
 #srcDir <- getwd()
-#jobid <-20190926101913 
+#jobid <-20190930154650 
 #motif_len <- 12
 srcDir <- args[1]
 motif_len <- args[2]
@@ -94,7 +94,7 @@ for (i in 1:length(alldir)) {
       #test
       #motif_seq <- convert_motif(paste(all_closure[j],".test",sep = ""))[,c(1,5,7)]
       convert_result <- convert_motif(all_closure[j])
-      if (convert_result != 0) {
+      if (any(convert_result != 0)) {
         motif_seq <- convert_result[,c(1,5,7)]
         motif_pos <- convert_result[,c(1,2,3,4,7)]
         gene_pos <- merge(motif_pos,gene_info,by.x = "Info",by.y = 'V2')
