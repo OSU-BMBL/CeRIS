@@ -784,7 +784,7 @@ var xmlhttp = new XMLHttpRequest()
 																		<tr><td>
 																		<table class="table table-sm " cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
 																		<tr><td colspan="2"> <div class='regulon-heading'> {{$regulon_result[$sec0][sec1][0]}}</div></td></tr>
-																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][5]|string_format:"%.8f"}}</td><td class="gene-score">Regulon specificity score p-value: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.3f"}}</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][5]|string_format:"%.8f"}} (p-value{{if $regulon_rank_result[$sec0][sec1][4]|string_format:"%.5f" == 0}}&lt;1.0e-4{{else}}: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.1e"}}{{/if}})</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr><td class="gene-table">
                                                                             <div style="width:100%; font-size:14px;">
 																				<table class="table table-hover table-sm" ><tbody>
