@@ -1,6 +1,7 @@
 {{extends file="base.tpl"}} {{block name="extra_js"}} {{/block}} {{block name="extra_style"}} {{/block}} {{block name="main"}}
 
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script><script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
 var flag = [];
 window.addEventListener('scroll', function(e) {
 if(document.getElementById("myTab").getBoundingClientRect().y == 10){
@@ -58,7 +59,10 @@ $(document).ready(function() {
 
 });
 	function show_peak_table(item){
-		window.location = "#"+$(item).attr("id")
+		id_name = "#"+$(item).attr("id")
+			$('html, body').animate({
+					scrollTop: $(id_name).offset().top
+				}, 500);
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(8)
 		table_id = "table-"+regulon_id
@@ -122,7 +126,6 @@ $(document).ready(function() {
 	
 	
 	function show_tad_table(item){
-		window.location = "#"+$(item).attr("id")
 		match_id = $(item).attr("id").match(/\d+/gm)
 		regulon_id = $(item).attr("id").substring(7)
 		table_id = "tad-table-"+regulon_id
@@ -131,6 +134,10 @@ $(document).ready(function() {
 		jobid = location.search.match(/\d+/gm)
 		table_content_id = "tad-table-content-"+regulon_id
 		table_jquery_id="#"+table_content_id
+		id_name = "#"+$(item).attr("id")
+		$('html, body').animate({
+			scrollTop: $(id_name).offset().top
+		}, 500);
 		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
 			if(match_species=='Human'){
 			$(table_jquery_id).DataTable( {
@@ -197,7 +204,10 @@ $(document).ready(function() {
 		document.getElementById(table_id).innerHTML=""
 	}
 	function show_similar_table(item) {
-	window.location = "#"+$(item).attr("id")
+	id_name = "#"+$(item).attr("id")
+		$('html, body').animate({
+				scrollTop: $(id_name).offset().top
+			}, 500);
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
 	table_id = "similar-table-" + regulon_id
@@ -235,7 +245,6 @@ $(document).ready(function() {
 	}
 	
 	function show_regulon_table(item) {
-	window.location = "#"+$(item).attr("id")
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(11)
 	ct_id= regulon_id.substring(
@@ -246,11 +255,15 @@ $(document).ready(function() {
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "regulon-table-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id
+	//id_name = "#"+$(item).attr("id")
 	$.ajax({
 		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading UMAP plot...</h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading UMAP plot...</h3></div>'
+		$('html, body').animate({
+				scrollTop: $('#scroll_'+table_content_id).offset().top-100
+			}, 500)
 		},
 		data: {'id': regulon_id},
 		dataType: 'json',
@@ -263,7 +276,7 @@ $(document).ready(function() {
 	}
 	
 	function show_trajectory_table(item) {
-	window.location = "#"+$(item).attr("id")
+	
 	match_id = $(item).attr("id").match(/\d+/gm)
 	regulon_id = $(item).attr("id").substring(14)
 	ct_id= regulon_id.substring(
@@ -278,7 +291,10 @@ $(document).ready(function() {
 		url: "prepare_trajectory.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading trajectory plot...</h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading trajectory plot...</h3></div>'
+		$('html, body').animate({
+				scrollTop: $('#scroll_'+table_content_id).offset().top-100
+			}, 500)
 		},
 		data: {'id': regulon_id},
 		dataType: 'json',
@@ -289,8 +305,8 @@ $(document).ready(function() {
 	})
 	document.getElementById(table_id).innerHTML = ""
 	}
+	
 	function show_gene_tsne(item) {
-	window.location = "#"+$(item).attr("id")
 	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
 	ct_id= regulon_id.substring(
     regulon_id.lastIndexOf("CT") + 2, 
@@ -301,20 +317,22 @@ $(document).ready(function() {
 	jobid = location.search.match(/\d+/gm)
 	table_content_id = "gene-tsne-content-" + regulon_id
 	table_jquery_id = "#" + table_content_id
+	
 	$.ajax({
 		url: "prepare_gene_tsne.php?jobid=" + jobid + "&id=" + gene_symbol,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div class="col-sm-6"><h3>Loading gene UMAP plot...</h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading gene UMAP plot...</h3></div>'
+		$('html, body').animate({
+				scrollTop: $('#scroll_'+table_content_id).offset().top-100
+			}, 500)
 		},
 		data: {'id': gene_symbol},
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
 		let tmp = document.getElementById(table_id).innerHTML
-		console.log(tmp)
 		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
-		console.log(document.getElementById(table_id).innerHTML)
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -788,7 +806,7 @@ var xmlhttp = new XMLHttpRequest()
 										  {{if !empty($regulon_rank_result[$sec0][sec1][17]) && $regulon_rank_result[$sec0][sec1][17]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][18]) && $regulon_rank_result[$sec0][sec1][18]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
                                          <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
-                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="show_gene_tsne(this);$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
+                                         <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();show_gene_tsne(this);$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
                                                         </button><button type="button" style="display:none;" id="gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide
                                                         </button></td>{{/section}}</tr></tbody></table></div></td>
 																			<td rowspan="2" class="vert-aligned">
@@ -810,11 +828,11 @@ var xmlhttp = new XMLHttpRequest()
                                                         <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
                                                         </button>-->
 														
-														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">UMAP plot
+														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">UMAP plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon UMAP
                                                         </button>
-														<button type="button" id="trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_trajectory_table(this);$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Trajectory plot
+														<button type="button" id="trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').show();show_trajectory_table(this);$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Trajectory plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Trajectory plot
                                                         </button>
@@ -1365,6 +1383,7 @@ var xmlhttp = new XMLHttpRequest()
 
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();
+
 color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
 "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
 "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
@@ -1466,7 +1485,7 @@ var score_config = {
 		},
         }
         Plotly.react('sankey_div', sankey_data, sankey_layout,score_config)
-
+		
 		 </script>
 		{{/if}}
 <div class="push"></div></main>
