@@ -17,8 +17,8 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 # wd<-getwd()
 ####test
-# wd <- "/var/www/html/iris3/data/20190913134923"
-# jobid <-20190913134923 
+# wd <- "/var/www/html/iris3/data/20191003114503"
+# jobid <-20191003114503 
 # setwd(wd)
 
 quiet <- function(x) { 
@@ -406,8 +406,7 @@ for (i in 1:total_ct) {
   
   #colnames(ras) <- label_data[,1]
   #colnames(originak_ras) <- label_data[,1]
-  
-  write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.regulon_activity_score.txt",sep = ""),sep = "\t",col.names = T,row.names = T,quote = F)
+  rownames(originak_ras)
   total_motif_list <- append(total_motif_list,unlist(motif_list))
   #j=1
   rss_pvalue_list <- lapply(rss_list, calc_rss_pvalue,this_bootstrap_rss,i)
@@ -428,6 +427,8 @@ for (i in 1:total_ct) {
     this_motif_value <- cbind(regulon_tag,this_motif_value)
     regulon_rank_result <- rbind(regulon_rank_result,this_motif_value)
   }
+  rownames(originak_ras) <- regulon_rank_result[,1]
+  write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.regulon_activity_score.txt",sep = ""),sep = "\t",col.names = NA,row.names = T,quote = F)
   
   ## calculate rss p-value
   
