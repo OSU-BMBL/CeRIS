@@ -56,14 +56,14 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/20190918125222/")
+  # setwd("/var/www/html/iris3/data/2019101503613/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "Zeisel_expression.csv"
-  jobid <- "20190918125222"
-  delim <- ","
+  srcFile = "iris3_example_hdf5.h5"
+  jobid <- "2019101503613"
+  delim <- ";"
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'Zeisel_cell_label.csv'
+  label_file<-'1'
   delimiter <- ','
   param_k<-0
   label_use_sc3 <- 0
@@ -221,6 +221,7 @@ if(length(species_file) == 2) {
 all_match <- AnnotationDbi::select(main_db, keys = rownames(expFile), columns = c("SYMBOL","ENSEMBL"),keytype = main_identifier)
 
 expFile <- merge(expFile,all_match,by.x=0,by.y=main_identifier)
+dim(expFile)
 expFile <- na.omit(expFile)
 
 ## merge expression values with same gene names
@@ -265,7 +266,7 @@ my.object<-CreateSeuratObject(expFile)
 
 if (upload_type == "TenX.folder" | upload_type == "TenX.h5"){
   my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
-  my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 3000 & percent.mt < 5))
+  my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 4000 & percent.mt < 20))
 }
 
 ## get raw data################################  
@@ -284,8 +285,8 @@ if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
 }
 
 ## imputation#################################
-my.imputated.data <- my.normalized.data
-#my.imputated.data <- DrImpute(as.matrix(my.normalized.data),ks=12,dists = "spearman")
+#my.imputated.data <- my.normalized.data
+my.imputated.data <- DrImpute(as.matrix(my.normalized.data),dists = "spearman")
 rm(my.normalized.data)
 
 colnames(my.imputated.data)<-colnames(my.count.data)
@@ -295,27 +296,11 @@ rm(my.count.data)
 my.imputated.data<- as.sparse(my.imputated.data)
 my.imputated.data<-log1p(my.imputated.data)
 
-thres_genes <- nrow(my.imputated.data) * 0.01
-thres_cells <- ncol(my.imputated.data) * 0.05
-dim(my.imputated.data)
-## apply gene filtering
-if(is_gene_filter == "1"){
-  gene_index <- as.vector(apply(my.imputated.data, 1, filter_gene_func))
-  my.imputated.data <- my.imputated.data[which(gene_index == 1),]
-  expFile <- expFile[which(gene_index == 1),]
-} 
-## apply cell filtering
-if(is_cell_filter == "1"){
-  cell_index <- as.vector(apply(my.imputated.data, 2, filter_cell_func))
-  my.imputated.data <- my.imputated.data[,which(cell_index == 1)]
-  expFile <- expFile[,colnames(my.imputated.data)]
-} 
-
 dim(my.imputated.data)
 dim(expFile)
 
 
-my.object<-CreateSeuratObject(expFile)
+my.object<-CreateSeuratObject(my.imputated.data)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputated.data,assay="RNA")
 
 cell_names <- colnames(my.object)
@@ -490,15 +475,11 @@ all.gene<-rownames(my.object)
 my.object<-ScaleData(my.object,features = all.gene)
 # after scaling, perform PCA
 
-if(ncol(my.object) < 50) {
-  my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object), npcs = ncol(my.object)-1)
-} else {
-  my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object))
-}
+my.object<-RunPCA(my.object,rev.pca = F,features = VariableFeatures(object = my.object), npcs = 10)
 
-my.object<-FindNeighbors(my.object,dims = 1:30)
+
+my.object<-FindNeighbors(my.object,dims = 1:10)
 my.object<-FindClusters(my.object)
-
 
 
 cell_info <- my.object$seurat_clusters
@@ -514,7 +495,7 @@ write.table(cell_label,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.name
 ###########################################
 #my.object<-RunTSNE(my.object,dims = 1:30,perplexity=10,dim.embed = 3)
 # run umap to get high dimension scatter plot at 2 dimensional coordinate system.
-my.object<-RunUMAP(object = my.object,dims = 1:30,umap.method="uwot")
+my.object<-RunUMAP(object = my.object,dims = 1:10,umap.method="uwot")
 #clustering by using Seurat KNN. 
 # clustering by using KNN, this is seurat cluster algorithm, this part only for cell categorization
 # here has one problems: whether should we define the clustering number?
@@ -524,7 +505,7 @@ my.object<-RunUMAP(object = my.object,dims = 1:30,umap.method="uwot")
 
 
 #dist.matrix <- dist(x = Embeddings(object = my.object[['pca']])[,1:30])
-dist.matrix <- dist(x = Embeddings(object = my.object[['umap']]))
+dist.matrix <- dist(x = Embeddings(object = my.object[['pca']]))
 sil <- silhouette(x = as.numeric(x = cell_info), dist = dist.matrix)
 silh_out <- cbind(cell_info,cell_names,sil[,3])
 silh_out <- silh_out[order(silh_out[,1]),]
