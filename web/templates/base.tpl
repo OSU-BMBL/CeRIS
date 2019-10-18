@@ -10,8 +10,8 @@
     <meta name="description" content="integrated cell type specific Regulon inference from single-cell rna seq" />
     <meta name="keywords" content="scrnaseq, regulon, single cell rna seq,Cell-type-specific Regulon Single-cell RNA-Seq" />
     <title>IRIS3 - Integrated Cell-type-specific Regulon Inference Server from Single-cell RNA-Seq</title>
-    <script src="assets/js/vendor/jquery-1.12.4.min.js"></script>
-    <script src="assets/js/vendor/bootstrap.min.js"></script>
+    <script src="assets/js/jquery-1.12.4.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/wow.min.js"></script>
     <script src="assets/js/jquery.ajaxchimp.js"></script>
     <script src="assets/js/jquery.sticky.js"></script>
@@ -24,14 +24,14 @@
     <!--====== STYLESHEETS ======-->
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
-	<link href="css/heroic-features.css" rel="stylesheet">
+	<link href="assets/css/heroic-features.css" rel="stylesheet">
     <link href="assets/css/plugins.css" rel="stylesheet">
     <link href="assets/css/theme.css" rel="stylesheet">
     <link href="assets/css/icons.css" rel="stylesheet">
     <!--====== MAIN STYLESHEETS ======-->
-    <link href="style.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
     <link href="assets/css/responsive.css" rel="stylesheet">
-    <script src="assets/js/vendor/modernizr-2.8.3.min.js"></script>
+    <script src="assets/js/modernizr-2.8.3.min.js"></script>
 
 
 	</head>
