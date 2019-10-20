@@ -607,7 +607,7 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   
   if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=my.object$seurat_clusters)
+                                         Cell_type=as.factor(as.numeric(my.object$seurat_clusters)))
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=Idents(my.object))
@@ -732,15 +732,31 @@ x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
 y <- c(1,1,0.89,0.33,0.30,0.25,0.235,0.205,0.18,0.1,0.1,0.1)
 get_point_size <- approxfun(x, y)
 
-pt_size <- get_point_size(ncol(my.object)) * 2
+pt_size <- get_point_size(ncol(my.object)) 
 dir.create("regulon_id")
 png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
 #Plot.cluster2D(reduction.method = "tsne",customized = T,pt_size = pt_size)
 quiet(dev.off())
 
+png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_predict_ct.png",sep = ""))
+Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size)
+quiet(dev.off())
+
 png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
+
+pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.cluster2D(reduction.method = "umap",customized = T)
+quiet(dev.off())
+
+pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.cluster2D(reduction.method = "umap",customized = F)
+quiet(dev.off())
+
+pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+quiet(dev.off())
 

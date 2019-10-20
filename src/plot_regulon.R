@@ -7,11 +7,11 @@ library(Seurat)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190927122444")
+#setwd("/var/www/html/iris3/data/20190913134923")
 #setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
 #srcDir <- getwd()
 #id <-"CT3S-R2" 
-#jobid <- "20190927122444"
+#jobid <- "20190913134923"
 srcDir <- args[1]
 id <- args[2]
 jobid <- args[3]
@@ -24,7 +24,7 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   
   if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
-                                         Cell_type=my.object$seurat_clusters)
+                                         Cell_type=as.factor(as.numeric(my.object$seurat_clusters)))
   }else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=Idents(my.object))
@@ -160,12 +160,13 @@ activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activit
 num_cells <- ncol(activity_score)
 
 quiet(dir.create("regulon_id",showWarnings = F))
-pt_size <- get_point_size(num_cells)*2
-
+pt_size <- get_point_size(num_cells)
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
 Plot.cluster2D(reduction.method = "umap",customized = T, pt_size = pt_size)
 quiet(dev.off())
+
+
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))
 Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*1.3)
@@ -184,6 +185,12 @@ quiet(dev.off())
 #quiet(dev.off())
 
 
+png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_predict_ct.png",sep = ""))
+Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size)
+quiet(dev.off())
 
+pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.cluster2D(reduction.method = "umap",customized = F)
+quiet(dev.off())
 
 
