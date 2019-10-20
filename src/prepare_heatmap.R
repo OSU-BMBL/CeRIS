@@ -59,6 +59,7 @@ if (ncol(exp_data) > 300) {
   colnames(small_exp_data) <- small_cell_label[,1]
   nrow(small_cell_label) == ncol(small_exp_data)
 } else {
+  small_cell_idx <- seq(1:ncol(exp_data))
   small_exp_data <- exp_data
 }
 
