@@ -56,17 +56,17 @@ if(is.na(delim)){
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/2019101503613/")
+  # setwd("/var/www/html/iris3/data/20190913134923/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "iris3_example_hdf5.h5"
-  jobid <- "2019101503613"
-  delim <- ";"
+  srcFile = "Zeisel_expression.csv"
+  jobid <- "20190913134923"
+  delim <- ","
   is_gene_filter <- 1
   is_cell_filter <- 1
-  label_file<-'1'
+  label_file<-'Zeisel_cell_label.csv'
   delimiter <- ','
   param_k<-0
-  label_use_sc3 <- 0
+  label_use_sc3 <- 2
 }
 
 ##############################
@@ -508,7 +508,15 @@ my.object<-RunUMAP(object = my.object,dims = 1:10,umap.method="uwot")
 dist.matrix <- dist(x = Embeddings(object = my.object[['pca']]))
 sil <- silhouette(x = as.numeric(x = cell_info), dist = dist.matrix)
 silh_out <- cbind(cell_info,cell_names,sil[,3])
-silh_out <- silh_out[order(silh_out[,1]),]
+silh_out <- silh_out[order(as.numeric(silh_out[,1])),]
+
+
+# set max row,
+if (total_cell_num > 500) {
+  this_bin <- total_cell_num %/% 500
+  small_cell_idx <- seq(1,total_cell_num,by=this_bin)
+  silh_out <- silh_out[small_cell_idx,]
+} 
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
 
 #write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
