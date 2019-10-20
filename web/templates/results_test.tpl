@@ -1,6 +1,7 @@
 {{extends file="base.tpl"}} {{block name="extra_js"}} {{/block}} {{block name="extra_style"}} {{/block}} {{block name="main"}}
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 <script>
 var flag = [];
 window.addEventListener('scroll', function(e) {
@@ -34,6 +35,9 @@ $(document).ready(function() {
 
     $('a[tabtype="main"]').on('shown.bs.tab', function(e) {
 		window.location = "#"+$(e.target).attr("id")
+		//$('html, body').animate({
+		//	scrollTop: $('#nav_scroll').offset().top
+		//}, 500);
         var json_file = $(e.target).attr("json")
 		$('.nav-tabs>li>a').removeClass('hover')
 		$(e.target).addClass('hover')
@@ -56,7 +60,7 @@ $(document).ready(function() {
             flag.push(root_id)
         }
     });
-
+$('input[type="range"]').rangeslider()
 });
 	function show_peak_table(item){
 		id_name = "#"+$(item).attr("id")
@@ -269,7 +273,10 @@ $(document).ready(function() {
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		overview_filepath = "./data/"+jobid+"/regulon_id/overview_ct.pdf"
+		regulon_score_filepath = "./data/"+jobid+"/regulon_id/"+ regulon_id +".pdf"
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><p>Point size:</p><input type="range" min="0.1" max="2" step="0.01" value="0.2"><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><input style="float:right; "class="btn btn-default" type="button" value="Resize!" onClick="" /><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><p>Point size:</p><input type="range" min="0.1" max="2" step="0.01" value="0.2"><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><input style="float:right; "class="btn btn-default" type="button" value="Resize!" onClick="" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -772,7 +779,7 @@ var xmlhttp = new XMLHttpRequest()
 																						<h2 class='wait_message'>Loading heatmap ...</h2>
 																					</div></div></div></div></div></div></div> 
 																					
-																					
+																	<div id="nav_scroll"></div>
 																	<div class="flatPanel panel panel-default">
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
@@ -839,36 +846,40 @@ var xmlhttp = new XMLHttpRequest()
 														</td></tr>
 														
 														<tr><td class="motif-table">
-																				{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
-																				{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
+																				
 																				<div class="row">
-																					<div class="col-md-3"><p class="motif-text">{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}</p><a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="motif-logo lozad " data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png"/></a><p class="motif-score">P-value: {{$regulon_rank_result[$sec0][sec1][1]}}</p><p class="motif-score">Z-score: {{$regulon_rank_result[$sec0][sec1][3]|string_format:"%.2f"}}</p></div>
-																					<div class="col-md-9"> 
-									<input class="btn btn-default" type="button" value="Motif details" onClick="window.open('motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}');"/>
-									<input class="btn btn-default" type="button" value="Motif comparison" onClick="window.open('/iris3/data/{{$jobid}}/tomtom/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}/tomtom.html');"  />
-									<!--<input class="btn btn-default" type="button" value="HOCOMOCO" onClick="window.open('prepare_tomtom.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&m={{$this_motif[2]}}&db=HOCOMOCO');"  />-->
-									{{assign var=motif_num_jaspar value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`"}}
-									{{assign var=motif_num_homo value="ct`$this_motif[0]`bic`$this_motif[1]`m`$this_motif[2]`_HOCOMOCO"}}
-									<table id="tomtom_table" class="table table-hover tomtom_table table-sm" cellpadding="0" cellspacing="0" width="100%">
-									<thead><tr><td>Database</td><td>Matched TF</td><td>P-value</td><td>E-value</td><td>Q-value</td></tr></thead>
-									<tbody>
-									{{section name=tomtom_idx start=0 loop=$tomtom_result.$motif_num_jaspar}}
+																				{{assign var="this_tf" value=","|explode:$regulon_motif_result[$sec0][sec1][1]}}
+																				{{assign var=motif_num_jaspar value="ct`$this_tf[0]`bic`$this_tf[1]`m`$this_tf[2]`"}}
+																				<div class="col-md-3"><a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" class="motif-text" target="_blank">{{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}</a>
+																				<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" target="_blank"><img class="motif-logo lozad " data-src="http://hocomoco11.autosome.ru/final_bundle/hocomoco11/full/{{$main_species|upper}}/mono/logo_large/{{$tomtom_result.$motif_num_jaspar[0][1]}}_direct.png"/></a><p class="motif-score">p-value: {{$tomtom_result.$motif_num_jaspar[0][3]|string_format:"%.2e"}}</p><p class="motif-score">e-value: {{$tomtom_result.$motif_num_jaspar[0][4]|string_format:"%.2e"}}</p><p class="motif-score">q-value: {{$tomtom_result.$motif_num_jaspar[0][5]|string_format:"%.2e"}}</p></div>
+																					
+									<div class="col-md-9"> 
+									<input class="btn btn-default tf-button" type="button" value="TF-alternative regulon" onClick="window.open('/iris3/heatmap.php?jobid={{$jobid}}&file={{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}.json');"/><input class="btn btn-default tf-button" type="button" value="TF-details" onClick="window.open('http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}');"  /><input class="btn btn-default tf-button" type="button" value="Motif comparison" onClick="window.open('/iris3/data/{{$jobid}}/tomtom/ct{{$this_tf[0]}}bic{{$this_tf[1]}}m{{$this_tf[2]}}/tomtom.html');"  />
 									
-									<tr><td ><a href="/iris3/heatmap.php?jobid={{$jobid}}&file={{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]|regex_replace:"/_.+/":""}}.json" target="_blank"> Alternative regulon
-                                    </a></td><td>
-									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_jaspar[tomtom_idx][1]|regex_replace:"/_.+/":""}}</a></td>
+									<table id="tomtom_table" class="table table-hover tomtom_table table-sm" cellpadding="0" cellspacing="0" width="100%">
+									<thead><tr><td>Motif name</td><td>Motif logo</td><td>Motif p-value</td><td>Motif z-score</td><td>Motif details</td></tr></thead>
+									<tbody>
+									{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
+									{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
+									<tr><td >{{$regulon_result[$sec0][sec1][0]}}-Motif-{{$smarty.section.sec3.index}}
+                                    </td><td>
+									<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="motif-predict-logo lozad " data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png"/></a></td>
 									<td class="tomtom_pvalue">
-									{{$tomtom_result.$motif_num_jaspar[tomtom_idx][3]|string_format:"%.2e"}}</td><td>
-									{{$tomtom_result.$motif_num_jaspar[tomtom_idx][4]|string_format:"%.2e"}}</td><td>
-									{{$tomtom_result.$motif_num_jaspar[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>
+									{{section name=sec4  start=0 loop=$motif_rank_result[$sec0]}}
+									{{if $regulon_motif_result[$sec0][sec1][sec3] == $motif_rank_result[$sec0][sec4][0]}}
+									{{$motif_rank_result[$sec0][sec4][1]|string_format:"%.2e"}}</td>
+										{{if $motif_rank_result[$sec0][sec4][3]|string_format:"%.2f" < 10}}
+										<td> {{$motif_rank_result[$sec0][sec4][3]|string_format:"%.2f"}}</td>
+										{{else}} <td> NA</td>
+										{{/if}}
+									{{/if}}
 									{{/section}}
-									{{section name=tomtom_idx  start=0 loop=$tomtom_result.$motif_num_homo}}
-									<tr><td>HOCOMOCO</td><td>
-									<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_homo[tomtom_idx][1]}}" target="_blank"> {{$tomtom_result.$motif_num_homo[tomtom_idx][1]|regex_replace:"/_.+/":""}} </a></td>
-									<td class="tomtom_pvalue">
-									{{$tomtom_result.$motif_num_homo[tomtom_idx][3]|string_format:"%.2e"}}</td><td>
-									{{$tomtom_result.$motif_num_homo[tomtom_idx][4]|string_format:"%.2e"}}</td><td>
-									{{$tomtom_result.$motif_num_homo[tomtom_idx][5]|string_format:"%.2e"}}</td></tr>{{/section}}</tbody></table><hr></div></div>{{/section}}
+									
+									<td><a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank">Open
+                                    </a></td></tr>
+									{{/section}}</tbody></table>  
+																				
+																				</div></div>
 									</td></tr>
 														<tr><td colspan=2 style="border:none">
 																					<div id="heatmap-{{$regulon_result[$sec0][sec1][0]}}" class="col-md-12" style="display:none;">
@@ -920,7 +931,8 @@ var xmlhttp = new XMLHttpRequest()
 																					<div class="col-md-12" id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
-                                                                                    </div>
+                                                                                    
+																					</div>
                                                                                 </div>
 																				<div class="col-md-12"  id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='trajectory-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
@@ -1372,6 +1384,8 @@ var xmlhttp = new XMLHttpRequest()
                 </div>
         </div>
     </div>
+	<link href="assets/css/rangeslider.css" rel="stylesheet">
+	<script src="assets/js/rangeslider.min.js"></script>
 	<script src="assets/js/d3.js"></script>
     <script src="assets/js/underscore-min.js"></script>
     <script src='assets/js/clustergrammer.js'></script>
@@ -1462,7 +1476,8 @@ var score_config = {
                 },
                 label: {{$sankey_nodes}},
                 //color: 'RdBu'
-				color:[{{section name=clust loop=$silh_trace}} color_array3[{{$silh_trace[clust]}}],{{/section}}{{for $clust= 0 to $sankey_nodes_count-1}} color_array3[64-{{$sankey_label_order[$clust]}}],{{/for}}]
+				color:[{{section name=clust loop=$silh_trace}} color_array3[{{$silh_trace[clust]}}],{{/section}}{{for $clust= 0 to $sankey_nodes_count-1}} color_array3[64-{{$clust}}],{{/for}}]
+				//{{$sankey_label_order[$clust]}}
             },
             link: {
                 source: {{$sankey_src}},

@@ -82,7 +82,7 @@ gene_file <- lapply(gene_file, function(x) x[-1])
 len <- sapply(gene_file,length)
 
 filter_bic_index <- sapply(gene_file, function(x){
-  if (length(x) <= 350 & length(x) > 3){
+  if (length(x) <= 500 & length(x) > 3){
     return (T)
   } else {
     return (F)
@@ -341,7 +341,7 @@ dir.create(new_dir, showWarnings = FALSE)
         }
       }
       if(length(result) < 350 & length(result) > 3){
-        writeXStringSet(result, paste(new_dir,"/","bic",k,".txt.fa",sep=""),format = "fasta",width=2000)
+        writeXStringSet(result, paste(new_dir,"/","bic",k,".txt.fa",sep=""),format = "fasta",width=1000)
         #write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt.fa",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
       }
     }
