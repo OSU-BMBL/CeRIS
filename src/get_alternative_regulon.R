@@ -16,7 +16,7 @@ args <- commandArgs(TRUE)
 jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-#jobid <-20190924164726   
+#jobid <-20191018130101   
 label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
@@ -168,7 +168,7 @@ for (i in ct_seq) {
 
 ## run atac
 species_file 
-foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i],species_file ,sep = " "))}
+#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i],species_file ,sep = " "))}
 
 alternative_regulon_result <- vector()
 for (i in 1:length(select_idx_result)) {
@@ -198,45 +198,45 @@ top_n_idx <- function(x, n=10) {
   
 }
 
-atac_result <- vector()
-for (i in 1:length(select_idx_result)) {
-  this_regulon <- select_idx_result[i]
-  fn <- paste("atac/",select_idx_result[i],".atac_overlap_result.txt",sep = "")
-  fn_handle <- file(fn,"r")
-  fn_data <- readLines(fn_handle)
-  close(fn_handle)
-  fn_data <- strsplit(fn_data,"\\t")
-  #x=fn_data[[1]]
-  rank_value <- as.numeric(unlist(lapply(fn_data, function(x){
-    return(length(strsplit(x[8]," ")[[1]]))
-  })))
-  this_atac_result <- vector()
-  top_idx <- top_n_idx(rank_value)
-  if (length(top_idx) > 0){
-    for (j in 1:length(top_idx)) {
-      this_data <- fn_data[[top_idx[j]]]
-      tmp_result <- c(this_data[1],length(strsplit(this_data[8]," ")[[1]]))
-      this_atac_result <- rbind(this_atac_result,tmp_result)
-    }
-    this_tissue <- as.character(paste(this_atac_result[,1],sep = "",collapse = ","))
-    this_num_overlap_genes <- as.character(paste(this_atac_result[,2],sep = "",collapse = ","))
-    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=this_tissue,num_overlap_genes=this_num_overlap_genes,stringsAsFactors = F)
-  } else {
-    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=NA,num_overlap_genes=NA)
-  }
-  tmp_df <- as.list(tmp_df)
-  atac_result <- rbind(atac_result,tmp_df)
-}
-atac_result <- as.data.frame(atac_result)
-alternative_regulon_result <- merge(alternative_regulon_result,atac_result,by.x=3,by.y=1,all = T)
-alternative_regulon_result <- alternative_regulon_result[c(1,2,3,4,5,6,8,9,7)]
+##atac_result <- vector()
+##for (i in 1:length(select_idx_result)) {
+##  this_regulon <- select_idx_result[i]
+##  fn <- paste("atac/",select_idx_result[i],".atac_overlap_result.txt",sep = "")
+##  fn_handle <- file(fn,"r")
+##  fn_data <- readLines(fn_handle)
+##  close(fn_handle)
+##  fn_data <- strsplit(fn_data,"\\t")
+##  #x=fn_data[[1]]
+##  rank_value <- as.numeric(unlist(lapply(fn_data, function(x){
+##    return(length(strsplit(x[8]," ")[[1]]))
+##  })))
+##  this_atac_result <- vector()
+##  top_idx <- top_n_idx(rank_value)
+##  if (length(top_idx) > 0){
+##    for (j in 1:length(top_idx)) {
+##      this_data <- fn_data[[top_idx[j]]]
+##      tmp_result <- c(this_data[1],length(strsplit(this_data[8]," ")[[1]]))
+##      this_atac_result <- rbind(this_atac_result,tmp_result)
+##    }
+##    this_tissue <- as.character(paste(this_atac_result[,1],sep = "",collapse = ","))
+##    this_num_overlap_genes <- as.character(paste(this_atac_result[,2],sep = "",collapse = ","))
+##    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=this_tissue,num_overlap_genes=this_num_overlap_genes,stringsAsFactors = F)
+##  } else {
+##    tmp_df <- data.frame(regulon_id=this_regulon,atac_tissue=NA,num_overlap_genes=NA)
+##  }
+##  tmp_df <- as.list(tmp_df)
+##  atac_result <- rbind(atac_result,tmp_df)
+##}
+##atac_result <- as.data.frame(atac_result)
+##alternative_regulon_result <- merge(alternative_regulon_result,atac_result,by.x=3,by.y=1,all = T)
+##alternative_regulon_result <- alternative_regulon_result[c(1,2,3,4,5,6,8,9,7)]
 alternative_regulon_result <- alternative_regulon_result[order(alternative_regulon_result$tf, alternative_regulon_result$cell_type),]
 alternative_regulon_result <- apply(alternative_regulon_result, 2, as.character)
 write.table(alternative_regulon_result,paste(jobid,"_alternative_regulon_result.txt",sep = ""),col.names = T,row.names = F,quote = F,sep = "\t")
 
 
 colnames(alternative_regulon_result)
-regulon_tf_vector <- unique(alternative_regulon_result[,3])
+regulon_tf_vector <- unique(alternative_regulon_result[,2])
 
 BinMean <- function (vec, every, na.rm = FALSE) {
   n <- length(vec)
@@ -267,6 +267,7 @@ if (ncol(exp_data) > 500) {
   colnames(small_exp_data) <- small_cell_label[,1]
   nrow(small_cell_label) == ncol(small_exp_data)
 } else {
+  small_cell_idx <- seq(1,ncol(exp_data))
   small_exp_data <- exp_data
 }
 
@@ -322,12 +323,12 @@ heat_matrix <- heat_matrix[,heat_matrix_cell_idx]
 
 # get CT#-regulon1-# heat matrix
 regulon_tf_vector <- na.omit(regulon_tf_vector)
-#i <- which(regulon_tf_vector == "EGR3")
+#i <- which(regulon_tf_vector == "EGR4")
 for(i in 1: length(regulon_tf_vector)){
   this_tf_name <- regulon_tf_vector[i]
-  a1 <- as.data.frame(alternative_regulon_result)
-  this_alternative_regulon_result <- a1[a1$tf == this_tf_name,]
-  this_alternative_regulon_result <- this_alternative_regulon_result[!is.na(this_alternative_regulon_result$regulon_id),c(1,9)]
+  alternative_regulon_result <- as.data.frame(alternative_regulon_result)
+  this_alternative_regulon_result <- alternative_regulon_result[alternative_regulon_result$tf == this_tf_name,]
+  this_alternative_regulon_result <- this_alternative_regulon_result[!is.na(this_alternative_regulon_result$regulon_id),c(3,7)]
   this_alternative_regulon_result[,2] <- as.character(this_alternative_regulon_result[,2])
   gene_row <- character()
   ct_row <- character()
