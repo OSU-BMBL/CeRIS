@@ -1,6 +1,7 @@
 #######  get DoRothEA overlaped genes report the score in this regulon ##########
 
-library(tidyverse)
+library(tibble)
+library(readr)
 args <- commandArgs(TRUE)
 
 # regulon <- 'CT1S-R2'
@@ -10,7 +11,7 @@ args <- commandArgs(TRUE)
 regulon <- args[1] # CT3S-R5
 species <- args[2] #Human, Mouse
 jobid <- args[3]
-
+this_tf <- args[4]
 
 wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
 setwd(wd)
@@ -40,13 +41,11 @@ close(regulon_file_connection)
 regulon_gene_list <- regulon_file[[as.numeric(regulon_id)]][-1]
 
 
-this_tf_db <- tf_db[which(tf_db[,1] == "VEZF1"),]
+this_tf_db <- tf_db[which(tf_db[,1] == this_tf),]
 result_gene_mapping <- this_tf_db[this_tf_db[,2] %in% regulon_gene_list,]
-result_gene_mapping <- this_tf_db[1:10,]
+#result_gene_mapping <- this_tf_db[1:10,]
 if(nrow(result_gene_mapping) > 0){
-  write.table(result_gene_mapping,paste("regulon_id/",regulon,".dorothea_overlap.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+  write.table(result_gene_mapping,paste("regulon_id/",regulon,".dorothea_overlap.txt",sep = ""),quote = F,row.names = F,sep = "\t",col.names = F)
 } else {
-  write.table(0,paste("regulon_id/",regulon,".dorothea_overlap.txt",sep = ""),quote = F,row.names = F,sep = "\t")
+  write.table(t(matrix(rep(NA,3))) ,paste("regulon_id/",regulon,".dorothea_overlap.txt",sep = ""),quote = F,row.names = F,sep = "\t",col.names = F)
 }
-invisible(capture.output(file.create(paste("regulon_id/",regulon,".tad.txt",sep = ""))))
-invisible(capture.output(lapply(0, write,paste("tad/",regulon,".tad.txt",sep = ""),sep="\t", append=TRUE, ncolumns=1000)))
