@@ -141,7 +141,7 @@ $('input[type="range"]').rangeslider()
 		id_name = "#"+$(item).attr("id")
 		$('html, body').animate({
 			scrollTop: $(id_name).offset().top
-		}, 500);
+		}, 500)
 		if ( ! $.fn.DataTable.isDataTable(table_jquery_id) ){
 			if(match_species=='Human'){
 			$(table_jquery_id).DataTable( {
@@ -207,6 +207,88 @@ $('input[type="range"]').rangeslider()
 		}
 		document.getElementById(table_id).innerHTML=""
 	}
+	
+	function show_dorothea_table(item,this_tf){
+		match_id = $(item).attr("id").match(/\d+/gm)
+		regulon_id = $(item).attr("id").substring(12)
+		table_id = "dorothea-table-"+regulon_id
+		species = document.getElementById("species").innerHTML
+		match_species =  species.match(/[^Species: ].+/gm)[0]
+		jobid = location.search.match(/\d+/gm)
+		table_content_id = "dorothea-table-content-"+regulon_id
+		table_jquery_id="#"+table_content_id
+		id_name = "#"+$(item).attr("id")
+		$('html, body').animate({
+			scrollTop: $(id_name).offset().top
+		}, 500)
+		if ( !$.fn.DataTable.isDataTable(table_jquery_id) ){
+			if(match_species=='Human'){
+			$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_dorothea_overlap_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_dorothea_overlap_genes'
+				}
+				],
+				"ajax": "prepare_dorothea_overlap.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id+"&this_tf="+this_tf,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
+				"iDisplayLength": 5,
+				columnDefs: [/*{
+                "targets": [2],
+                render: function (data, type, row, meta){	
+						return data.length
+					}
+				},*/{
+                "targets": [1],
+                render: function (data, type, row, meta){	
+						var dat=new Array
+						if (type === 'display')
+						{
+							res=data.split(" ")
+							for(i=0;i < res.length;i++) {
+								if (res[i] != "NA") {
+									dat[i] = '<a  href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								} else {
+									dat[i] = res[i]
+								}
+							}
+						}
+						return dat
+					}
+				}
+				],
+			})
+			} else if (match_species == 'Mouse'){
+			$(table_jquery_id).DataTable( {
+				dom: 'lBfrtip',
+				buttons: [
+				{
+				extend:'copy',
+				title: jobid+'_'+regulon_id+'_dorothea_overlap_genes'
+				},
+				{
+				extend:'csv',
+				title: jobid+'_'+regulon_id+'_dorothea_overlap_genes'
+				}
+				],
+				"ajax": "prepare_dorothea_overlap.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id,
+				"searching": false,
+				"bInfo" : false,
+				"aLengthMenu": [[ -1], [ "All"]],
+				"iDisplayLength": -1,
+		})
+			}
+		}
+		document.getElementById(table_id).innerHTML=""
+	}
+	
 	function show_similar_table(item) {
 	id_name = "#"+$(item).attr("id")
 		$('html, body').animate({
@@ -830,6 +912,12 @@ var xmlhttp = new XMLHttpRequest()
                                                         </button>
 														<button type="button" style="display:none;" id="tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#tadbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#tad_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#tad-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide additional TAD covered genes
                                                         </button>
+														{{assign var="this_tf" value=","|explode:$regulon_motif_result[$sec0][sec1][1]}}
+														{{assign var=motif_num_jaspar value="ct`$this_tf[0]`bic`$this_tf[1]`m`$this_tf[2]`"}}
+														<button type="button" id="dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_dorothea_table(this,'{{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:'/_.+/':""}}');$('#dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorothea-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >DoRothEA overlapped genes
+                                                        </button>
+														<button type="button" style="display:none;" id="dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#dorothea-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide DoRothEA overlapped genes
+                                                        </button>
 														<!--<button type="button" id="similarbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_similar_table(this);$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Similar CTS-Rs
                                                         </button>
                                                         <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
@@ -848,8 +936,6 @@ var xmlhttp = new XMLHttpRequest()
 														<tr><td class="motif-table">
 																				
 																				<div class="row">
-																				{{assign var="this_tf" value=","|explode:$regulon_motif_result[$sec0][sec1][1]}}
-																				{{assign var=motif_num_jaspar value="ct`$this_tf[0]`bic`$this_tf[1]`m`$this_tf[2]`"}}
 																				<div class="col-md-3"><a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" class="motif-text" target="_blank">{{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}</a>
 																				<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" target="_blank"><img class="motif-logo lozad " data-src="http://hocomoco11.autosome.ru/final_bundle/hocomoco11/full/{{$main_species|upper}}/mono/logo_large/{{$tomtom_result.$motif_num_jaspar[0][1]}}_direct.png"/></a><p class="motif-score">p-value: {{$tomtom_result.$motif_num_jaspar[0][3]|string_format:"%.2e"}}</p><p class="motif-score">e-value: {{$tomtom_result.$motif_num_jaspar[0][4]|string_format:"%.2e"}}</p><p class="motif-score">q-value: {{$tomtom_result.$motif_num_jaspar[0][5]|string_format:"%.2e"}}</p></div>
 																					
@@ -913,6 +999,19 @@ var xmlhttp = new XMLHttpRequest()
 																								<th>Tissue/ Cell type</th>
 																								<th>Species</th>
 																								<th>Additional cell type specific genes found in TAD</th>
+																							</tr>
+																						</thead>
+																					</table>
+																					</div>
+																					<div id="dorothea-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
+																						<div id='dorothea-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
+																					</div>
+																					<table id="dorothea-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
+																						<thead>
+																							<tr>
+																								<th>TF</th>
+																								<th>Gene</th>
+																								<th>Score</th>
 																							</tr>
 																						</thead>
 																					</table>
