@@ -31,14 +31,13 @@ args <- commandArgs(TRUE)
 srcFile <- args[1] # raw user filename
 jobid <- args[2] # user job id
 delim <- args[3] #delimiter
-is_gene_filter <- args[4] #1 for enable gene filtering
-is_cell_filter <- args[5] #1 for enable cell filtering
+is_imputation <- args[4] #1 for enable imputation
 label_file <- 1
-label_file <- args[6] # user label file name or 1
-delimiter <- args[7] 
+label_file <- args[5] # user label file name or 1
+delimiter <- args[6] 
 param_k <- character()
-param_k <- args[8] #k parameter for sc3
-label_use_sc3 <- args[9] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
+param_k <- args[7] #k parameter for sc3
+label_use_sc3 <- args[8] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 
 
 if(is.na(delim)){
@@ -52,18 +51,18 @@ if(is.na(delim)){
 }else {
   delim <- ','
 }
+label_file
 
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/20190913134923/")
+  # setwd("/var/www/html/iris3/data/20191019124109/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "Zeisel_expression.csv"
-  jobid <- "20190913134923"
+  srcFile = "iris3_example_expression_matrix.csv"
+  jobid <- "20191019124109"
   delim <- ","
-  is_gene_filter <- 1
-  is_cell_filter <- 1
-  label_file<-'Zeisel_cell_label.csv'
+  is_imputation <- 1
+  label_file<-'iris3_example_expression_label.csv'
   delimiter <- ','
   param_k<-0
   label_use_sc3 <- 2
@@ -285,8 +284,11 @@ if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
 }
 
 ## imputation#################################
-#my.imputated.data <- my.normalized.data
-my.imputated.data <- DrImpute(as.matrix(my.normalized.data),dists = "spearman")
+if (is_imputation == '1') {
+  my.imputated.data <- DrImpute(as.matrix(my.normalized.data),dists = "spearman")
+} else {
+  my.imputated.data <- my.normalized.data
+}
 rm(my.normalized.data)
 
 colnames(my.imputated.data)<-colnames(my.count.data)
@@ -736,8 +738,8 @@ pt_size <- get_point_size(ncol(my.object))
 dir.create("regulon_id")
 png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
-#Plot.cluster2D(reduction.method = "tsne",customized = T,pt_size = pt_size)
 quiet(dev.off())
+
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_predict_ct.png",sep = ""))
 Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size)
@@ -760,3 +762,22 @@ pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 16, 
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
+if (label_use_sc3 =='1'){
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
+  ## check if user's label has valid number of rows, if not just use predicted value
+  if (nrow(cell_info) == nrow(cell_label)){
+    original_cell_info <- as.factor(cell_info[,2])
+    cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
+    rownames(cell_info) <- cell_info[,1]
+    cell_info <- cell_info[,-1]
+  } 
+} 
+my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
+Idents(my.object)<-as.factor(my.object$Customized.idents)
+png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
+Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
+quiet(dev.off())
+
+pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.cluster2D(reduction.method = "umap",customized = T)
+quiet(dev.off())

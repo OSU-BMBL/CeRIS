@@ -411,16 +411,10 @@ $(document).ready(function() {
 						<h4 class="font-italic text-left">Pre-processing</h4>
 						<div class="form-group row">
 						<div class="form-check col-sm-12 ">
-							<input class="form-check-input" type="checkbox" name="is_gene_filter" id="is_gene_filter" value="1" checked>
-							<label class="form-check-label" for="is_gene_filter">Enable gene filtering (default: Yes) 
-							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes genes that are expressed in less than 5% of total cells."> </span> 
+							<input class="form-check-input" type="checkbox" name="is_imputation" id="is_imputation" value="1" checked>
+							<label class="form-check-label" for="is_imputation">Enable imputation (Using <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2226-y" target="_blank"/>DrImpute</a>) (default: Yes) 
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional enable imputation."> </span> 
 							</label>
-						</div>
-						<div class="form-check col-sm-12 ">
-							<input class="form-check-input" type="checkbox" name="is_cell_filter" id="is_cell_filter" value="1" checked>
-							<label class="form-check-label" for="is_cell_filter">Enable cell filtering (default: Yes) 
-							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional filtering step removes cells that are expressed in less than 1% of total genes."> </span>
-							<!-- </label> -->
 						</div>
 					</div>
 							<h4 class="font-italic text-left">Biclustering parameters</h4>
@@ -432,9 +426,9 @@ $(document).ready(function() {
 									</div>
 									<div class="col-md-2">
 										<select class="selectpicker" name="f_arg" data-width="auto">
-											<option data-subtext="Default" selected="selected">0.5</option>
+											<option>0.5</option>
 											<option>0.6</option>
-											<option>0.7</option>
+											<option data-subtext="Default" selected="selected">0.7</option>
 											<option>0.8</option>
 											<option>0.9</option>
 											<option>1.0</option>
@@ -521,17 +515,17 @@ $(document).ready(function() {
 										</div>
 									</div>
 							</div>
-							<h4 class="font-italic text-left">CTS-bicluster inference <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from SC3 or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
+							<h4 class="font-italic text-left">Cell type source <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from SC3 or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
 							<div class="row">
 								<div class="form-check col-sm-2 ">
 									<input type="radio" value="1" id="enable_sc3" name="bicluster_inference" class="custom-control-input" checked="">
-									<label class="custom-control-label" for="enable_sc3">Seurat <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
+									<label class="custom-control-label" for="enable_sc3">Predict by Seurat <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A clustering based cell type prediction tool. Default parameters are used."> </span>
 									</label>
 									
 								</div>
 								<div class="col-sm-2">
 									<input type="radio" value="2" id="enable_labelfile" name="bicluster_inference" disabled="true" class="custom-control-input">
-									<label class="custom-control-label" for="enable_labelfile">Your cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Enable this option by uploading your cell label file."> </span>
+									<label class="custom-control-label" for="enable_labelfile">Upload cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Enable this option by uploading your cell label file."> </span>
 									</label>
 								</div>
 								
