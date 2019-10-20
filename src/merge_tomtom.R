@@ -12,9 +12,9 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(wd)
 getwd()
-#setwd("/var/www/html/iris3/data/2019090643259")
+#setwd("/var/www/html/iris3/data/20191018130143")
 #wd <- getwd()
-#jobid <-2019090643259 
+#jobid <-20191018130143 
 #motif_length <- 12
 sort_dir <- function(dir) {
   tmp <- sort(dir)
@@ -73,7 +73,7 @@ for (i in 1:length(unique(total_motif_name[,2]))) {
   tmp_list <- c(as.character(unique(total_motif_name[,2])[i]),as.character(total_motif_name[this_tf_index,1]))
   total_tf_list <- append(list(tmp_list),total_tf_list)
 }
-
+total_motif_list <- vector()
 for (i in 1:total_ct) {
   res_id <- paste(short_dir[i],".regulon_gene_id.txt",sep="")
   res_symbol<- paste(short_dir[i],".regulon_gene_symbol.txt",sep="")
@@ -137,6 +137,7 @@ for (i in 1:total_ct) {
         this_motif_label <- paste(regulon_idx_module,this_bic,this_id,sep = ",")
       }
       this_motif_label <- unique(this_motif_label)
+      total_motif_list <- append(total_motif_list,this_motif_label)
       genes <- as.character(genes[!duplicated(genes)])
       if(length(genes) > 10000000 | length(genes) < 5) {
         next
@@ -180,4 +181,13 @@ count_num_regulon <- count_num_regulon - length(alldir)
 write(paste("total_ct,",as.character(length(alldir)),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_regulon,",as.character(count_num_regulon),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 
+tmp_list <- strsplit(unique(total_motif_list),",")
+tmp_list <- unlist(sapply(tmp_list, function(x){
+  if(length(x) > 2) {
+    paste("ct",x[1],"bic",x[2],"m",x[3],sep = "")
+  }
+}))
+remove_motifs <- paste("tomtom/",list.files("tomtom")[!list.files("tomtom") %in% tmp_list],sep = "")
+unlink(remove_motifs, recursive = TRUE)
+## remove unused motifs
 
