@@ -116,7 +116,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   clustering_Accuracy <- Accuracy(as.numeric(target$cluster),as.numeric(target$label))
   #clustering_sensitivity <- sensitivity(as.numeric(target$cluster),as.numeric(target$label))
   #clustering_specificity <- specificity(as.numeric(target$cluster),as.numeric(target$label))
-
+  
   #res <- cbind(clustering_ARI,clustering_RI,clustering_JI,clustering_FMI,clustering_F1_Score,
   #clustering_Accuracy,clustering_Precision,clustering_Recall,clustering_entropy,clustering_purity)
   
@@ -131,7 +131,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   
   # step2 change label names
   user_label$label <- sub("^", "User label:", user_label_name )
-  sc3_cluster$cluster <- sub("^", "SC3 label:", sc3_cluster$cluster )
+  sc3_cluster$cluster <- sub("^", "Predicted label:", sc3_cluster$cluster )
   
   # step3 rbind two labels to create node matrix
   comb.label.list <- as.data.frame(rbind(matrix(user_label$label),matrix(sc3_cluster$cluster)))
@@ -195,7 +195,7 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   write(paste("value,",links$value,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("label_order,",order(label_order),sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   # title left: cell label; right:sc3 cluster
- 
+  
 }
 
 
