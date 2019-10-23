@@ -109,6 +109,10 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
           try(system(paste("gunzip",(all_files[matrix_file]))),silent = T)
           try(system(paste("gunzip",(all_files[gene_file]))),silent = T)
           try(system(paste("gunzip",(all_files[feature_file]))),silent = T)
+		  try(system(paste("unzip",(all_files[barcode_file]))),silent = T)
+          try(system(paste("unzip",(all_files[matrix_file]))),silent = T)
+          try(system(paste("unzip",(all_files[gene_file]))),silent = T)
+          try(system(paste("unzip",(all_files[feature_file]))),silent = T)
         })
         tmp_x<-tryCatch(Read10X(getwd()),error = function(e){
           0
@@ -141,6 +145,7 @@ total_gene_num <- nrow(expFile)
 
 ## deal with some edge cases on gene symbols/id 
 if (upload_type == "CellGene"){
+	is_imputation  <- '0'
   ## case: gene with id with ENSG########.X, remove part after dot, e.g:
   ## a <- c("ENSG00000064545.10","ENSG000031230064545","ENMUSG00003213004545.31234s")
   match_index <- grep("^ENSG.+\\.[0-9]",ignore.case = T,expFile[,1])
@@ -265,7 +270,7 @@ my.object<-CreateSeuratObject(expFile)
 
 if (upload_type == "TenX.folder" | upload_type == "TenX.h5"){
   my.object[["percent.mt"]] <- PercentageFeatureSet(my.object, pattern = "^MT-")
-  my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 4000 & percent.mt < 20))
+  my.object <- (subset(my.object, subset = nFeature_RNA > 200 & nFeature_RNA < 4000 & percent.mt < 5))
 }
 
 ## get raw data################################  
