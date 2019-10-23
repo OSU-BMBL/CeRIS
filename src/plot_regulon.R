@@ -178,7 +178,7 @@ Plot.cluster2D(reduction.method = "umap",customized = T)
 quiet(dev.off())
 
 pdf(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*1.3)
+Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*3)
 quiet(dev.off())
 #emf(file=paste("regulon_id/overview_ct.emf",sep = ""),width=8,height = 6, emfPlus = FALSE)
 #Plot.cluster2D(reduction.method = "tsne",customized = T)
