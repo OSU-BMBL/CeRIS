@@ -1,5 +1,5 @@
 <?php
-
+set_time_limit(30000);
 require_once("config/common.php");
 require_once("config/smarty.php");
 require_once("lib/spyc.php");
@@ -273,7 +273,7 @@ $silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 if ($silh_file) {
 	$silh_trace = $silh_x = $silh_y  = $line_cell = $line_result = array(); 
 	
-	for ($i=1;$i <= count($regulon_gene_symbol_file);$i++){
+	for ($i=1;$i <= $predict_label;$i++){
 		$silh_file = fopen("$DATAPATH/$jobid/$jobid"."_silh.txt", "r");
 		$line_cell = $line_result = array(); 
 		while (($line = fgets($silh_file)) !== false) {
@@ -372,7 +372,13 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	$fp = fopen("$this_regulon_motif_file", 'r');
 	if ($fp){
 	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
-		if ($line) {$regulon_motif_result[$key][] = array_map('trim',$line);}
+		if ($line) {
+			$tmp =array_map('trim',$line);
+			if (count($tmp) > 5) {
+				$tmp = array_slice($tmp, 0, 5, true);
+			}
+			$regulon_motif_result[$key][] = $tmp;
+			}
 	} else{
 		die("Unable to open file");
 	}
@@ -564,7 +570,7 @@ $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
-#print_r($motif_rank_result[0]);
+#print_r($motif_rank_result);
 $smarty->setCacheLifetime(3600000);
 $smarty->display('results.tpl');
 
