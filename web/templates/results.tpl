@@ -1,7 +1,7 @@
 {{extends file="base.tpl"}} {{block name="extra_js"}} {{/block}} {{block name="extra_style"}} {{/block}} {{block name="main"}}
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.pagination.js/0.1.1/list.pagination.min.js"></script>
 <script>
 var flag = [];
 window.addEventListener('scroll', function(e) {
@@ -12,56 +12,6 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 }
 });
 
-$(document).ready(function() {
-
-	$('#tablePreview').DataTable({
-        "searching": false,
-        "paging": false,
-        "bInfo": false,
-    })
-	$('.regulon_table').DataTable({
-	"aaSorting": []
-	})
-
-    $("#to_enrichr").click(function() {
-        get_gene_list(1, 2);
-    });
-    make_clust_main('data/{{$jobid}}/json/CT1.json', '#container-id-1');
-    flag.push("#container-id-1")
-
-    function arrayContains(needle, arrhaystack) {
-        return (arrhaystack.indexOf(needle) > -1)
-    }
-
-    $('a[tabtype="main"]').on('shown.bs.tab', function(e) {
-		window.location = "#"+$(e.target).attr("id")
-		//$('html, body').animate({
-		//	scrollTop: $('#nav_scroll').offset().top
-		//}, 500);
-        var json_file = $(e.target).attr("json")
-		$('.nav-tabs>li>a').removeClass('hover')
-		$(e.target).addClass('hover')
-        var root_id = $(e.target).attr("root")
-        if (!arrayContains(root_id, flag)) {
-            make_clust_main(json_file, root_id)
-            flag.push(root_id)
-            //var element_group = document.getElementsByClassName('row_slider_group');
-            //for (i in element_group)
-            //	i.style.display='none'
-        }
-    });
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-        //console.log(flag)
-        var json_file = $(e.target).attr("json")
-        var root_id = $(e.target).attr("root")
-        //console.log(!arrayContains(root_id,flag))
-        if (!arrayContains(root_id, flag)) {
-            make_clust(json_file, root_id)
-            flag.push(root_id)
-        }
-    });
-$('input[type="range"]').rangeslider()
-});
 	function show_peak_table(item){
 		id_name = "#"+$(item).attr("id")
 			$('html, body').animate({
@@ -238,8 +188,8 @@ $('input[type="range"]').rangeslider()
 				"ajax": "prepare_dorothea_overlap.php?jobid="+jobid+"&regulon_id="+regulon_id+"&species="+match_species+"&table="+table_content_id+"&this_tf="+this_tf,
 				"searching": false,
 				"bInfo" : false,
-				"aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
-				"iDisplayLength": 5,
+				"aLengthMenu": [[5, 10,20, -1], [5, 10,20, "All"]],
+				"iDisplayLength": 10,
 				columnDefs: [/*{
                 "targets": [2],
                 render: function (data, type, row, meta){	
@@ -357,7 +307,7 @@ $('input[type="range"]').rangeslider()
 		document.getElementById(table_content_id).innerHTML = ''
 		overview_filepath = "./data/"+jobid+"/regulon_id/overview_ct.pdf"
 		regulon_score_filepath = "./data/"+jobid+"/regulon_id/"+ regulon_id +".pdf"
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><p>Point size:</p><input type="range" min="0.1" max="2" step="0.01" value="0.2"><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><input style="float:right; "class="btn btn-default" type="button" value="Resize!" onClick="" /><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><p>Point size:</p><input type="range" min="0.1" max="2" step="0.01" value="0.2"><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><input style="float:right; "class="btn btn-default" type="button" value="Resize!" onClick="" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 
 		},
 	})
@@ -546,6 +496,63 @@ var xmlhttp = new XMLHttpRequest()
   }
 }
 	
+	$(document).ready(function() {
+
+		$('#tablePreview').DataTable({
+			"searching": false,
+			"paging": false,
+			"bInfo": false,
+		})
+		/*
+		$("#to_enrichr").click(function() {
+			get_gene_list(1, 2);
+		});*/
+		make_clust_main('data/{{$jobid}}/json/CT1.json', '#container-id-1');
+		flag.push("#container-id-1")
+
+		function arrayContains(needle, arrhaystack) {
+			return (arrhaystack.indexOf(needle) > -1)
+		}
+
+		$('a[tabtype="main"]').on('shown.bs.tab', function(e) {
+			window.location = "#"+$(e.target).attr("id")
+			//$('html, body').animate({
+			//	scrollTop: $('#nav_scroll').offset().top
+			//}, 500);
+			var json_file = $(e.target).attr("json")
+			$('.nav-tabs>li>a').removeClass('hover')
+			$(e.target).addClass('hover')
+			var root_id = $(e.target).attr("root")
+			if (!arrayContains(root_id, flag)) {
+				make_clust_main(json_file, root_id)
+				flag.push(root_id)
+				//var element_group = document.getElementsByClassName('row_slider_group');
+				//for (i in element_group)
+				//	i.style.display='none'
+			}
+		});
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+			//console.log(flag)
+			var json_file = $(e.target).attr("json")
+			var root_id = $(e.target).attr("root")
+			//console.log(!arrayContains(root_id,flag))
+			if (!arrayContains(root_id, flag)) {
+				make_clust(json_file, root_id)
+				flag.push(root_id)
+			}
+		});
+		var monkeyList = new List('test-list', {
+			valueNames: ['name'],
+			page: 3,
+			pagination: true
+		});
+		/*
+		 $('#regulon_table1').DataTable({
+				"ordering": false,
+				"paging": true,
+				"info": false
+		})*/
+	});
 	
  </script>
 <main role="main" class="container" style="min-height: calc(100vh - 182px);">
@@ -737,16 +744,43 @@ var xmlhttp = new XMLHttpRequest()
 												</div>
 											</div>
 											-->
+											{{if $label_use_sc3 == 'user\'s label'}}
+											<div class="CT-result-img">
+                                                <div class="col-sm-6">
+												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Provided Cell Types</h4>
+                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_provide_ct.pdf')" />
+												   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_provide_ct.png"></img>
+												</div>
+												<div class="col-sm-6">
+												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Predicted Cell Types</h4>
+                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_predict_ct.pdf')" />
+												   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_predict_ct.png"></img>
+												</div>
+											</div>
+											<div class="CT-result-img">
+												<div class="col-sm-6">
+												<h4 style="text-align:center;margin-top:50px"> Trajectory Plot Colored by Cell Types</h4>
+                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_ct.trajectory.pdf')" />
+												   <img style="width:100%" src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
+												</div>
+												<div class="row">
+												</div>
+											</div>	
+											{{else}}
 											<div class="CT-result-img">
                                                 <div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Cell Types</h4>
-                                                   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.png"></img>
+                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_ct.pdf')" />
+												   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.png"></img>
 												</div>
 												<div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> Trajectory Plot Colored by Cell Types</h4>
-                                                   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
+                                                    <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_ct.trajectory.pdf')" />
+													<img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
 												</div>
 											</div>
+											{{/if}}
+											
                                             <div class="CT-result-img">
                                                 <div class="col-sm-6">
 												<hr>
@@ -866,9 +900,9 @@ var xmlhttp = new XMLHttpRequest()
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																	
-																	<table class="regulon_table" cellpadding="0" cellspacing="0" width="100%">
+																	<table id="regulon_table{{$sec0+1}}" cellpadding="0" cellspacing="0" width="100%">
 																	<thead><tr><th></th></tr></thead>
-                                                                    <tbody>
+                                                                    <tbody> 
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
 																		<tr><td>
 																		<table class="table table-sm " cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
@@ -880,6 +914,7 @@ var xmlhttp = new XMLHttpRequest()
 	                                <tr><td>Marker gene</td><td>Gene Symbol  <button class="btn btn-default" id="symbol-{{$regulon_result[$sec0][sec1][0]}}" onclick="copy_list(this)">Copy</button></td><td>Enesmbl ID  <button class="btn btn-default" id="id-{{$regulon_result[$sec0][sec1][0]}}"onclick="copy_list(this)">Copy</button></td><td>Gene UMAP plot</td>
 									</tr>
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
+							
 										  <tr><td>
 										  {{if !empty($regulon_rank_result[$sec0][sec1][6]) && $regulon_rank_result[$sec0][sec1][6]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
@@ -918,11 +953,6 @@ var xmlhttp = new XMLHttpRequest()
                                                         </button>
 														<button type="button" style="display:none;" id="dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#dorothea-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide DoRothEA overlapped genes
                                                         </button>
-														<!--<button type="button" id="similarbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="show_similar_table(this);$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">Similar CTS-Rs
-                                                        </button>
-                                                        <button type="button" style="display:none;" id="similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default" data-toggle="collapse" onclick="$('#similarbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#similar_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#similar-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide similar CTS-Rs
-                                                        </button>-->
-														
 														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">UMAP plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon UMAP
@@ -932,9 +962,7 @@ var xmlhttp = new XMLHttpRequest()
                                                         <button type="button" style="display:none;" id="trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#trajectorybtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#trajectory_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#trajectory-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Trajectory plot
                                                         </button>
 														</td></tr>
-														
 														<tr><td class="motif-table">
-																				
 																				<div class="row">
 																				<div class="col-md-3"><a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" class="motif-text" target="_blank">{{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}</a>
 																				<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" target="_blank"><img class="motif-logo lozad " data-src="http://hocomoco11.autosome.ru/final_bundle/hocomoco11/full/{{$main_species|upper}}/mono/logo_large/{{$tomtom_result.$motif_num_jaspar[0][1]}}_direct.png"/></a><p class="motif-score">p-value: {{$tomtom_result.$motif_num_jaspar[0][3]|string_format:"%.2e"}}</p><p class="motif-score">e-value: {{$tomtom_result.$motif_num_jaspar[0][4]|string_format:"%.2e"}}</p><p class="motif-score">q-value: {{$tomtom_result.$motif_num_jaspar[0][5]|string_format:"%.2e"}}</p></div>
@@ -951,6 +979,7 @@ var xmlhttp = new XMLHttpRequest()
                                     </td><td>
 									<a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank"><img class="motif-predict-logo lozad " data-src="data/{{$jobid}}/logo/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}.fsa.png"/></a></td>
 									<td class="tomtom_pvalue">
+									{{$motif_rank_result[$sec0][sec4][0]}}
 									{{section name=sec4  start=0 loop=$motif_rank_result[$sec0]}}
 									{{if $regulon_motif_result[$sec0][sec1][sec3] == $motif_rank_result[$sec0][sec4][0]}}
 									{{$motif_rank_result[$sec0][sec4][1]|string_format:"%.2e"}}</td>
@@ -1006,31 +1035,11 @@ var xmlhttp = new XMLHttpRequest()
 																					<div id="dorothea-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
 																						<div id='dorothea-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
 																					</div>
-																					<table id="dorothea-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
-																						<thead>
-																							<tr>
-																								<th>TF</th>
-																								<th>Gene</th>
-																								<th>Score</th>
-																							</tr>
-																						</thead>
-																					</table>
+																					<table id="dorothea-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%"><thead><tr><th>TF</th><th>Gene</th><th>Score</th></tr></thead></table>
 																					</div>
-																					<!--<div id="similar-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
-                                                                                    <div id='similar-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
-                                                                                    </div>
-                                                                                    <table id="similar-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
-                                                                                        <thead>
-                                                                                            <tr>
-                                                                                                <th>Similar CTS-Rs in other cell types</th>
-                                                                                            </tr>
-                                                                                        </thead>
-                                                                                    </table>
-																					</div>-->
 																					<div class="col-md-12" id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
-                                                                                    
 																					</div>
                                                                                 </div>
 																				<div class="col-md-12"  id="trajectory-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
@@ -1248,9 +1257,29 @@ var xmlhttp = new XMLHttpRequest()
 																	</div></div></div>
                                                             </div>	
 															{{/foreach}}
-
-															
-															</div>
+														
+														<div id="test-list">
+															<input type="text" class="search" />
+															<ul class="list">
+																<li><p class="name">Guybrush Threepwood</p></li>
+																<li><p class="name">Elaine Marley</p></li>
+																<li><p class="name">LeChuck</p></li>
+																<li><p class="name">Stan</p></li>
+																<li><p class="name">Voodoo Lady</p></li>
+																<li><p class="name">Herman Toothrot</p></li>
+																<li><p class="name">Meathook</p></li>
+																<li><p class="name">Carla</p></li>
+																<li><p class="name">Otis</p></li>
+																<li><p class="name">Rapp Scallion</p></li>
+																<li><p class="name">Rum Rogers Sr.</p></li>
+																<li><p class="name">Men of Low Moral Fiber</p></li>
+																<li><p class="name">Murray</p></li>
+																<li><p class="name">Cannibals</p></li>
+															</ul>
+															<ul class="pagination"></ul>
+														</div>
+													
+										</div>
                                 </div>
                             </div>
                         </div>
@@ -1483,8 +1512,6 @@ var xmlhttp = new XMLHttpRequest()
                 </div>
         </div>
     </div>
-	<link href="assets/css/rangeslider.css" rel="stylesheet">
-	<script src="assets/js/rangeslider.min.js"></script>
 	<script src="assets/js/d3.js"></script>
     <script src="assets/js/underscore-min.js"></script>
     <script src='assets/js/clustergrammer.js'></script>
