@@ -503,13 +503,20 @@ var xmlhttp = new XMLHttpRequest()
 			"paging": false,
 			"bInfo": false,
 		})
-		/*
-		$("#to_enrichr").click(function() {
-			get_gene_list(1, 2);
-		});*/
+		
 		make_clust_main('data/{{$jobid}}/json/CT1.json', '#container-id-1');
 		flag.push("#container-id-1")
 
+		for (i=1;i<={{$count_ct|count}};i++) {
+		    new List('regulon_pagination'+i, {
+			valueNames: ['page_item'+i],
+			page: 10,
+			pagination: true,
+			innerWindow: 5,
+			outerWindow: 2
+			})
+		}
+		
 		function arrayContains(needle, arrhaystack) {
 			return (arrhaystack.indexOf(needle) > -1)
 		}
@@ -523,6 +530,7 @@ var xmlhttp = new XMLHttpRequest()
 			$('.nav-tabs>li>a').removeClass('hover')
 			$(e.target).addClass('hover')
 			var root_id = $(e.target).attr("root")
+			//this_ct = root_id.split("-")[2].match(/(\d+?)/)[0]
 			if (!arrayContains(root_id, flag)) {
 				make_clust_main(json_file, root_id)
 				flag.push(root_id)
@@ -541,11 +549,7 @@ var xmlhttp = new XMLHttpRequest()
 				flag.push(root_id)
 			}
 		});
-		var monkeyList = new List('test-list', {
-			valueNames: ['name'],
-			page: 3,
-			pagination: true
-		});
+
 		/*
 		 $('#regulon_table1').DataTable({
 				"ordering": false,
@@ -900,12 +904,16 @@ var xmlhttp = new XMLHttpRequest()
 																			<div class="row" >
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																	
-																	<table id="regulon_table{{$sec0+1}}" cellpadding="0" cellspacing="0" width="100%">
+																	<!--<table id="regulon_table{{$sec0+1}}" cellpadding="0" cellspacing="0" width="100%">
 																	<thead><tr><th></th></tr></thead>
                                                                     <tbody> 
+																	-->
+															<div id="regulon_pagination{{$sec0+1}}">
+															<label style="margin-left: 0.5em;">Search: <input type="text" class="search regulon_search" placeholder=""/></label>
+															<ul class="list" style="list-style-type:none;padding:0;">
                                                                         {{section name=sec1 loop=$regulon_result[$sec0]}}
-																		<tr><td>
-																		<table class="table table-sm " cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
+																		<li>
+																		<table class="table table-sm page_item{{$sec0+1}}" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
 																		<tr><td colspan="2"> <div class='regulon-heading'> {{$regulon_result[$sec0][sec1][0]}}</div></td></tr>
 																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][5]|string_format:"%.8f"}} (p-value{{if $regulon_rank_result[$sec0][sec1][4]|string_format:"%.5f" == 0}}&lt;1.0e-4{{else}}: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.1e"}}{{/if}})</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
                                                                         <tr><td class="gene-table">
@@ -1055,9 +1063,8 @@ var xmlhttp = new XMLHttpRequest()
 																		</td>
 																		</tr>
 																		</tbody></table>
-																		</td>
-																		</tr>
-                                                                        {{/section}} </tbody></table></div></div></div>
+																		</li>
+                                                                        {{/section}} </ul> <ul class="pagination pagination-lg regulon_pagination_bar"></ul></div></div></div></div>
 																	
                                                             </div>	
 															{{/if}}
@@ -1257,28 +1264,6 @@ var xmlhttp = new XMLHttpRequest()
 																	</div></div></div>
                                                             </div>	
 															{{/foreach}}
-														
-														<div id="test-list">
-															<input type="text" class="search" />
-															<ul class="list">
-																<li><p class="name">Guybrush Threepwood</p></li>
-																<li><p class="name">Elaine Marley</p></li>
-																<li><p class="name">LeChuck</p></li>
-																<li><p class="name">Stan</p></li>
-																<li><p class="name">Voodoo Lady</p></li>
-																<li><p class="name">Herman Toothrot</p></li>
-																<li><p class="name">Meathook</p></li>
-																<li><p class="name">Carla</p></li>
-																<li><p class="name">Otis</p></li>
-																<li><p class="name">Rapp Scallion</p></li>
-																<li><p class="name">Rum Rogers Sr.</p></li>
-																<li><p class="name">Men of Low Moral Fiber</p></li>
-																<li><p class="name">Murray</p></li>
-																<li><p class="name">Cannibals</p></li>
-															</ul>
-															<ul class="pagination"></ul>
-														</div>
-													
 										</div>
                                 </div>
                             </div>
