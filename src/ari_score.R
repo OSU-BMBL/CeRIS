@@ -64,6 +64,8 @@ user_label_name <- user_label[order(user_label[,2]),2]
 sc3_cluster <- sc3_cluster[order(user_label[,2]),]
 user_label <- user_label[order(user_label[,2]),]
 user_label[,2] <- factor(user_label[,2])
+user_label[,1] <-  gsub('([[:punct:]])|\\s+','_',user_label[,1])
+
 label_order <- unique(user_label[,2])
 levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
 colnames(sc3_cluster) <- c("cell_name","cluster")
