@@ -1,7 +1,7 @@
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("d:/Users/flyku/Documents/IRIS3-data/test_meme")
+#setwd("d:/Users/flyku/Documents/CeRIS-data/test_meme")
 #srcDir <- getwd()
 #jobid <-20190731144519 
 #motif_len <- 12

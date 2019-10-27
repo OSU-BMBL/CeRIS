@@ -3,8 +3,8 @@
 	$regulon_id=$_GET['regulon_id'];
 	$species=$_GET['species'];
 	$this_tf=$_GET['this_tf'];
-	$wd = "/var/www/html/iris3/data/$jobid/";
-	system("cd $wd; nohup Rscript /var/www/html/iris3/program/get_dorothea_overlap.R $regulon_id $species $jobid $this_tf&");
+	$wd = "/var/www/html/CeRIS/data/$jobid/";
+	system("cd $wd; nohup Rscript /var/www/html/CeRIS/program/get_dorothea_overlap.R $regulon_id $species $jobid $this_tf&");
 	#echo "<table id='$table_content_id' border='1'>
 	#<tr>
 	#<th>$jobid</th>

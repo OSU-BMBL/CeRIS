@@ -62,7 +62,7 @@ expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 label_file <- paste(jobid,"_cell_label.txt",sep = "")
 
 # jobid <-20190922103834
-# wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
+# wd <- paste("/var/www/html/CeRIS/data/",jobid,sep="")
 # gene_module_file <- '1'
 # delim_gene_module <- ','
 # promoter_len <- 1000

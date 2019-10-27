@@ -15,7 +15,7 @@
 <script src="assets/js/help.js"></script>
 <script type="text/javascript">
 if(window.location.hash == ""){
- window.location.href = "http://bmbl.sdstate.edu/iris3/news.php#1version";
+ window.location.href = "http://bmbl.sdstate.edu/CeRIS/news.php#1version";
 }
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">

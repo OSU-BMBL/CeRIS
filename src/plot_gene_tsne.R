@@ -6,7 +6,7 @@ library(Polychrome)
 library(ggplot2)
 #library(monocle)
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190907182105")
+#setwd("/var/www/html/CeRIS/data/20190907182105")
 #srcDir <- getwd()
 #gene_symbol <-"Ccl4" 
 #jobid <- "20190907182105"
@@ -37,7 +37,7 @@ Plot.GeneUMAP<-function(gene.name=NULL,pt_size=0.5){
   tmp.One.gene.value<-tmp.gene.expression[grep(tmp.gene.name,rownames(tmp.gene.expression)),]
   tmp.dim.df<-cbind.data.frame(tmp.dim,Gene=tmp.One.gene.value)
   g<-ggplot(tmp.dim.df,aes(x=UMAP_1,y=UMAP_2,color=Gene))
-  g<-g+geom_point(stroke=pt_size,size=pt_size) + scale_colour_distiller(palette = "YlOrRd", direction = 1)
+  g<-g+geom_point(stroke=pt_size,size=pt_size) + scale_color_gradient(low="grey",high = "red")
   g<-g+theme_classic()+labs(color=paste0(gene.name,"\nexpression\nvalue")) + coord_fixed(1)
   g
 }

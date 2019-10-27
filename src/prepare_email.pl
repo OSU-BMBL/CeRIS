@@ -1,7 +1,7 @@
 $jobid = $ARGV[0];
 
 
-open CC,"/var/www/html/iris3/data/".$jobid."/email.txt" or die "Can't open : $!";
+open CC,"/var/www/html/CeRIS/data/".$jobid."/email.txt" or die "Can't open : $!";
 $line_email = <CC>;
 chomp($line_email);
 close(CC);
@@ -27,7 +27,7 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 <tr>
 <td class='h1' style='padding: 5px 0 0 0;'><br />
 <div>
-<div><span>Your IRIS3 job is done.<br /><br /></span><span>Your email: $line_email </span></div>
+<div><span>Your CeRIS job is done.<br /><br /></span><span>Your email: $line_email </span></div>
 </div>
 </td>
 </tr>
@@ -41,7 +41,7 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 <table style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;' border='0' cellspacing='0' cellpadding='0'>
 <tbody>
 <tr>
-<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 5px; text-align: center;'><a style='display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;' href='https://bmbl.bmi.osumc.edu/iris3/results.php?jobid=$jobid' target='_blank' rel='noopener'>Click to Check your result</a></td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 5px; text-align: center;'><a style='display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;' href='https://bmbl.bmi.osumc.edu/CeRIS/results.php?jobid=$jobid' target='_blank' rel='noopener'>Click to Check your result</a></td>
 </tr>
 </tbody>
 </table>
@@ -55,7 +55,7 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 </tr>
 </tbody>
 </table>
-<span>&nbsp;</span><span>https://bmbl.bmi.osumc.edu/iris3/results.php?jobid=$jobid<br /></span></td>
+<span>&nbsp;</span><span>https://bmbl.bmi.osumc.edu/CeRIS/results.php?jobid=$jobid<br /></span></td>
 </tr>
 </tbody>
 </table>
@@ -88,9 +88,9 @@ $email_content = "<table class='body' style='border-collapse: separate; mso-tabl
 </tr>
 </tbody>
 </table>";
-$message_file = "/var/www/html/iris3/data/".$jobid."/message_file.txt";
+$message_file = "/var/www/html/CeRIS/data/".$jobid."/message_file.txt";
 open CA,">$message_file";
 print CA "$email_content";
 close CA;
 
-system("perl /var/www/html/iris3/program/send_email.pl $jobid $line_email $message_file");
+system("perl /var/www/html/CeRIS/program/send_email.pl $jobid $line_email $message_file");

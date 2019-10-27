@@ -12,7 +12,7 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(wd)
 getwd()
-#setwd("/var/www/html/iris3/data/20191018130143")
+#setwd("/var/www/html/CeRIS/data/20191018130143")
 #wd <- getwd()
 #jobid <-20191018130143 
 #motif_length <- 12

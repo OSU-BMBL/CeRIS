@@ -5,12 +5,12 @@ dir=$1
 file=atac/$2.bed
 species=$3
 if [ "$species" == "Human" ]; then
-atac_dir=/var/www/html/iris3/program/db/human_atac_seq
-atac_summary=/var/www/html/iris3/program/db/human_atac_seq/human_atac_data.txt
+atac_dir=/var/www/html/CeRIS/program/db/human_atac_seq
+atac_summary=/var/www/html/CeRIS/program/db/human_atac_seq/human_atac_data.txt
 fi
 if [ "$species" == "Mouse" ]; then
-atac_dir=/var/www/html/iris3/program/db/mouse_atac_seq
-atac_summary=/var/www/html/iris3/program/db/mouse_atac_seq/mouse_atac_data.txt
+atac_dir=/var/www/html/CeRIS/program/db/mouse_atac_seq
+atac_summary=/var/www/html/CeRIS/program/db/mouse_atac_seq/mouse_atac_data.txt
 fi
 
 #files="$(find $dir -maxdepth 2 -name "*.regulon_motif.txt" -print)"

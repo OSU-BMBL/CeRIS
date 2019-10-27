@@ -21,8 +21,8 @@ label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
 
-wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
-#wd <- paste("C:/Users/wan268/Documents/iris3_data/",jobid,sep="")
+wd <- paste("/var/www/html/CeRIS/data/",jobid,sep="")
+#wd <- paste("C:/Users/wan268/Documents/CeRIS_data/",jobid,sep="")
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 labelFile <- paste(jobid,"_cell_label.txt",sep = "")
 # wd <- getwd()
@@ -168,7 +168,7 @@ for (i in ct_seq) {
 
 ## run atac
 species_file 
-#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/iris3/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i],species_file ,sep = " "))}
+#foreach (i=1:length(select_idx_result)) %dopar% {system(paste("/var/www/html/CeRIS/program/count_peak_overlap_single_file.sh", getwd(),select_idx_result[i],species_file ,sep = " "))}
 
 alternative_regulon_result <- vector()
 for (i in 1:length(select_idx_result)) {

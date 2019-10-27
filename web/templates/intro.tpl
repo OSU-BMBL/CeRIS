@@ -61,7 +61,7 @@ $(document).ready(function () {
         <!-- Example row of columns -->
        
             <hr>
-            <h2 class="text-center">What is IRIS3</h2>
+            <h2 class="text-center">What is CeRIS</h2>
             <p class="text-justify">Paragraph 1</P>
 <hr>
 

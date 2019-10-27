@@ -10,10 +10,10 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(srcDir)
 getwd()
-#setwd("/home/www/html/iris3/data/2019030481235")
-#setwd("D:/Users/flyku/Documents/IRIS3-data/20190906120624")
+#setwd("/home/www/html/CeRIS/data/2019030481235")
+#setwd("D:/Users/flyku/Documents/CeRIS-data/new_example")
 #srcDir <- getwd()
-#jobid <-20190906120624 
+#jobid <-20190326211512 
 #motif_length <- 12
 sort_dir <- function(dir) {
   tmp <- sort(dir)

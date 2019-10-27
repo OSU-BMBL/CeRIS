@@ -7,8 +7,8 @@ library(Seurat)
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
-#setwd("/var/www/html/iris3/data/20190913134923")
-#setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/20190830171050")
+#setwd("/var/www/html/CeRIS/data/20190913134923")
+#setwd("/fs/project/PAS1475/Yuzhou_Chang/CeRIS/test_data/20190830171050")
 #srcDir <- getwd()
 #id <-"CT3S-R2" 
 #jobid <- "20190913134923"
@@ -165,7 +165,6 @@ pt_size <- get_point_size(num_cells)
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
 Plot.cluster2D(reduction.method = "umap",customized = T, pt_size = pt_size)
 quiet(dev.off())
-
 
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))

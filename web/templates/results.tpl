@@ -1,7 +1,7 @@
 {{extends file="base.tpl"}} {{block name="extra_js"}} {{/block}} {{block name="extra_style"}} {{/block}} {{block name="main"}}
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/list.pagination.js/0.1.1/list.pagination.min.js"></script>
+<script src="assets/js/jquery.simplePagination.js"></script>
 <script>
 var flag = [];
 window.addEventListener('scroll', function(e) {
@@ -517,6 +517,9 @@ var xmlhttp = new XMLHttpRequest()
 			})
 		}
 		
+		const observer = lozad(); // lazy loads elements with default selector as '.lozad'
+		observer.observe();
+
 		function arrayContains(needle, arrhaystack) {
 			return (arrhaystack.indexOf(needle) > -1)
 		}
@@ -565,7 +568,7 @@ var xmlhttp = new XMLHttpRequest()
             <br/>
             <div class="flatPanel panel panel-default" >
                     {{if $status == "1"}}
-					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong><input style="float:right; "class="btn btn-default" type="button" value="Download" onClick="javascript:location.href = '/iris3/data/{{$jobid}}/{{$jobid}}.zip';" /></div>
+					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong><input style="float:right; "class="btn btn-default" type="button" value="Download" onClick="javascript:location.href = '/CeRIS/data/{{$jobid}}/{{$jobid}}.zip';" /></div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
@@ -882,13 +885,13 @@ var xmlhttp = new XMLHttpRequest()
 																			<div class="row">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																			<p class="ct-panel-description" >CTS Cell-Gene-Regulon Heatmap for Cell Type {{$sec0+1}}</p>
-																			<a class="ct-panel-a" href="/iris3/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
+																			<a class="ct-panel-a" href="/CeRIS/heatmap.php?jobid={{$jobid}}&file=CT{{$sec0+1}}.json" target="_blank">
                                                                         <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Open in new tab
                                                                         </button>
-                                                                    </a><a class="ct-panel-a"  href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_symbol.txt" target="_blank">
+                                                                    </a><a class="ct-panel-a"  href="/CeRIS/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_symbol.txt" target="_blank">
                                                                         <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Download CT-{{$sec0+1}} regulon-gene list (Gene Symbol) 
                                                                         </button> </a>
-																		<a class="ct-panel-a"  href="/iris3/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_id.txt" target="_blank">
+																		<a class="ct-panel-a"  href="/CeRIS/data/{{$jobid}}/{{$jobid}}_CT_{{$sec0+1}}_bic.regulon_gene_id.txt" target="_blank">
 																		<button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Download CT-{{$sec0+1}} regulon-gene list (Ensembl gene ID)
                                                                         </button>
                                                                     </a>
@@ -976,7 +979,7 @@ var xmlhttp = new XMLHttpRequest()
 																				<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" target="_blank"><img class="motif-logo lozad " data-src="http://hocomoco11.autosome.ru/final_bundle/hocomoco11/full/{{$main_species|upper}}/mono/logo_large/{{$tomtom_result.$motif_num_jaspar[0][1]}}_direct.png"/></a><p class="motif-score">p-value: {{$tomtom_result.$motif_num_jaspar[0][3]|string_format:"%.2e"}}</p><p class="motif-score">e-value: {{$tomtom_result.$motif_num_jaspar[0][4]|string_format:"%.2e"}}</p><p class="motif-score">q-value: {{$tomtom_result.$motif_num_jaspar[0][5]|string_format:"%.2e"}}</p></div>
 																					
 									<div class="col-md-9"> 
-									<input class="btn btn-default tf-button" type="button" value="TF-alternative regulon" onClick="window.open('/iris3/heatmap.php?jobid={{$jobid}}&file={{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}.json');"/><input class="btn btn-default tf-button" type="button" value="TF-details" onClick="window.open('http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}');"  /><input class="btn btn-default tf-button" type="button" value="Motif comparison" onClick="window.open('/iris3/data/{{$jobid}}/tomtom/ct{{$this_tf[0]}}bic{{$this_tf[1]}}m{{$this_tf[2]}}/tomtom.html');"  />
+									<input class="btn btn-default tf-button" type="button" value="TF-alternative regulon" onClick="window.open('/CeRIS/heatmap.php?jobid={{$jobid}}&file={{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}.json');"/><input class="btn btn-default tf-button" type="button" value="TF-details" onClick="window.open('http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}');"  /><input class="btn btn-default tf-button" type="button" value="Motif comparison" onClick="window.open('/CeRIS/data/{{$jobid}}/tomtom/ct{{$this_tf[0]}}bic{{$this_tf[1]}}m{{$this_tf[2]}}/tomtom.html');"  />
 									
 									<table id="tomtom_table" class="table table-hover tomtom_table table-sm" cellpadding="0" cellspacing="0" width="100%">
 									<thead><tr><td>Motif name</td><td>Motif logo</td><td>Motif p-value</td><td>Motif z-score</td><td>Motif details</td></tr></thead>
@@ -1076,13 +1079,13 @@ var xmlhttp = new XMLHttpRequest()
 																			<div class="row" style="">
 																			<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																			<strong>Uploaded gene module heatmap {{$sec0+1}}</strong><br>
-																			<a href="/iris3/heatmap.php?jobid={{$jobid}}&file=module{{$sec0+1}}.json" target="_blank">
+																			<a href="/CeRIS/heatmap.php?jobid={{$jobid}}&file=module{{$sec0+1}}.json" target="_blank">
                                                                         <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Open in new tab
                                                                         </button>
-                                                                    </a>&nbsp;<a href="/iris3/data/{{$jobid}}/{{$jobid}}_module_{{$sec0+1}}_bic.regulon_gene_symbol.txt" target="_blank">
+                                                                    </a>&nbsp;<a href="/CeRIS/data/{{$jobid}}/{{$jobid}}_module_{{$sec0+1}}_bic.regulon_gene_symbol.txt" target="_blank">
                                                                         <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Download module-{{$sec0+1}} regulon-gene list (Gene symbol)
                                                                         </button></a>
-																		<a href="/iris3/data/{{$jobid}}/{{$jobid}}_module_{{$sec0+1}}_bic.regulon_gene_id.txt" target="_blank">
+																		<a href="/CeRIS/data/{{$jobid}}/{{$jobid}}_module_{{$sec0+1}}_bic.regulon_gene_id.txt" target="_blank">
 																		<button type="button" class="btn btn-default" data-toggle="collapse" data-target="#">Download module-{{$sec0+1}} regulon-gene list (Ensembl gene ID) 
                                                                         </button>
                                                                     </a><div class="panel-body"><div class="flatPanel panel panel-default">
@@ -1287,7 +1290,7 @@ var xmlhttp = new XMLHttpRequest()
 						<div class="panel-body">
 					<div style="text-align: left;">
                         <strong><h3>Sorry, there has been an error.</h3></strong>
-						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="https://bmbl.bmi.osumc.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics">tutorial</a> for more information. </p>
 						<!---
 						
 						<p>Perhaps you are here because: </p>
@@ -1338,8 +1341,8 @@ var xmlhttp = new XMLHttpRequest()
 					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
 						<div class="panel-body">
 					<div style="text-align: left;">
-                        <strong><h3>Sorry, there has been an error:</h3></strong> <p style="color:red">IRIS3 did not find enough bi-clusters in your data.</p>
-						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="https://bmbl.bmi.osumc.edu/iris3/tutorial.php#1basics">tutorial</a> for more information. </p>
+                        <strong><h3>Sorry, there has been an error:</h3></strong> <p style="color:red">CeRIS did not find enough bi-clusters in your data.</p>
+						<p>Note that currently we accept human and mouse expression matrix for submission, Each gene measured in the expression dataset should have an identifier listed in the first column, both Gene Symbols (e.g. HSPA9) and Gene IDs (e.g. ENSG00000113013) are allowed. Pleas check our <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics">tutorial</a> for more information. </p>
 						<!---
 						
 						<p>Perhaps you are here because: </p>
@@ -1452,7 +1455,7 @@ var xmlhttp = new XMLHttpRequest()
                             <br> You can remember your jobid <font color="red"> <strong>{{$jobid}}</strong> </font>
                             <br> Or you can choose to stay at this page, which will be automatically refreshed every <b>60</b> seconds.
                             <br/> Link:&nbsp
-                            <a href="{{$LINKPATH}}/iris3/results.php?jobid={{$jobid}}">https://bmbl.bmi.osumc.edu/{{$LINKPATH}}iris3/results.php?jobid={{$jobid}}</a></p>
+                            <a href="{{$LINKPATH}}/CeRIS/results.php?jobid={{$jobid}}">https://bmbl.bmi.osumc.edu/{{$LINKPATH}}CeRIS/results.php?jobid={{$jobid}}</a></p>
 							
 							
 							<strong>Job settings:</strong><br>
@@ -1505,10 +1508,6 @@ var xmlhttp = new XMLHttpRequest()
     <script src='assets/js/send_to_Enrichr.js'></script>
     <script src='assets/js/load_clustergram.js'></script>
     <script>
-
-const observer = lozad(); // lazy loads elements with default selector as '.lozad'
-observer.observe();
-
 color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
 "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
 "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",

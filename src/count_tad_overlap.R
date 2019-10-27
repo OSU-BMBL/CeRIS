@@ -2,22 +2,22 @@
 
 
 args <- commandArgs(TRUE)
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_missing_heatmap")
+# setwd("D:/Users/flyku/Documents/CeRIS-data/test_missing_heatmap")
 # srcDir <- getwd()
-# tad_dir <- 'D:/Users/flyku/Documents/IRIS3-data/tad/mm10'
+# tad_dir <- 'D:/Users/flyku/Documents/CeRIS-data/tad/mm10'
 # regulon <- 'CT1S-R2'
 # jobid <- '20190404232115'
 # species <- 'Human'
-srcDir <- args[1] # /var/www/html/iris3/data/20190404232115
+srcDir <- args[1] # /var/www/html/CeRIS/data/20190404232115
 regulon <- args[2] # CT3S-R5
 species <- args[3] #Human, Mouse
 jobid <- args[4]
 setwd(srcDir)
 
 if (species == "Human") {
-  tad_dir <- '/var/www/html/iris3/program/db/tad/hg38'
+  tad_dir <- '/var/www/html/CeRIS/program/db/tad/hg38'
 } else if (species == "Mouse"){
-  tad_dir <- '/var/www/html/iris3/program/db/tad/mm10'
+  tad_dir <- '/var/www/html/CeRIS/program/db/tad/mm10'
 }
 # parse 'CT3S-R5' to 'CT', '3', '5'
 #regulon_ct <- strsplit(regulon,"S-R")[[1]][1]
@@ -89,7 +89,7 @@ invisible(capture.output(lapply(result_gene_list, write,paste("tad/",regulon,".t
 #i=1
 #j=1932
 #
-#tad_files <- list.files( "D:/Users/flyku/Documents/IRIS3-data/tad/hg38",pattern = "*.bed$",full.names = T)
+#tad_files <- list.files( "D:/Users/flyku/Documents/CeRIS-data/tad/hg38",pattern = "*.bed$",full.names = T)
 #for (i in 1:length(tad_files)) {
 #  test_tad <- read.table(tad_files[i],header = F)
 #  tad_gene_list <- list()

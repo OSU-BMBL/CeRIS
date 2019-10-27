@@ -22,7 +22,7 @@ files="$(find $dir -maxdepth 2 -name "20*.bbc.txt" -print)"
 for file in $files ;
 do
 	fbname=$(basename "$file")
-	perl /var/www/html/iris3/program/dminda/BBC.pl bg $fbname -1 0.4 0.8
+	perl /var/www/html/CeRIS/program/dminda/BBC.pl bg $fbname -1 0.4 0.8
 done
 
-#perl /var/www/html/iris3/program/dminda/BBC.pl bg combine_bbc.bbc.txt -1 0.4 0.8
+#perl /var/www/html/CeRIS/program/dminda/BBC.pl bg combine_bbc.bbc.txt -1 0.4 0.8

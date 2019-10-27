@@ -75,12 +75,12 @@ function addPreviewTable(response, metadata = true, type) {
             if (percent > 0.85 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset (' + percent * 100 + '%), errors are likely to occur when you submit job to IRIS3.</span></label>'));
+                }).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset (' + percent * 100 + '%), errors are likely to occur when you submit job to CeRIS.</span></label>'));
             }
             if (response['columns'][0].length < 40 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">WARNING: Your dataset has (' + response['columns'][0].length + ') cells, errors may occur when you submit to IRIS3. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
+                }).html('<span class="bold highlight">WARNING: Your dataset has (' + response['columns'][0].length + ') cells, errors may occur when you submit to CeRIS. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
                 document.getElementById("k_arg").value = 5;
             }
             var check_cell_name_start_with_number = function(array) {
@@ -95,7 +95,7 @@ function addPreviewTable(response, metadata = true, type) {
             if (check_cell_name_start_with_number(response['columns'][0]) && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, IRIS3 will try to rename them in data pre-processing.  </span></label><br/>'));
+                }).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, CeRIS will try to rename them in data pre-processing.  </span></label><br/>'));
             }
             break;
         case 'hdf':
@@ -149,7 +149,7 @@ $(document).ready(function() {
 
     dz_exp = $("#dropzone_exp").dropzone({
         dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
-        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.h5,.hdf5,.mtx",
+        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.zip,.h5,.hdf5,.mtx",
         url: "upload.php",
         maxFiles: 3,
         maxFilesize: 1000,
@@ -348,11 +348,11 @@ $(document).ready(function() {
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" >Download example gene expression matrix</a>
+						<li><a class="dropdown-item" href="storage/CeRIS_example_expression_matrix.csv" >Download example gene expression matrix</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/iris3_example_hdf5.h5" >Download example HDF5 feature barcode matrix</a>
+						<li><a class="dropdown-item" href="storage/CeRIS_example_hdf5.h5" >Download example HDF5 feature barcode matrix</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/iris3_example_10x_matrices.zip" >Download example gene-barcode matrices (3 files in 10X output)</a>
+						<li><a class="dropdown-item" href="storage/CeRIS_example_10x_matrices.zip" >Download example gene-barcode matrices (3 files in 10X output)</a>
 						</li>
 					</ul>
 				</div>
@@ -364,7 +364,7 @@ $(document).ready(function() {
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/iris3_example_expression_matrix.csv" >Download example gene expression file</a>
+						<li><a class="dropdown-item" href="storage/CeRIS_example_expression_matrix.csv" >Download example gene expression file</a>
 						</li>
 					</ul>
 				</div>
@@ -411,14 +411,20 @@ $(document).ready(function() {
 						<h4 class="font-italic text-left">Pre-processing</h4>
 						<div class="form-group row">
 						<div class="form-check col-sm-12 ">
-							<input class="form-check-input" type="checkbox" name="is_imputation" id="is_imputation" value="1" checked>
-							<label class="form-check-label" for="is_imputation">Enable imputation (Using <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2226-y" target="_blank"/>DrImpute</a>) (default: Yes) 
+							<input class="form-check-input" type="checkbox" name="is_imputation" id="is_imputation" value="1">
+							<label class="form-check-label" for="is_imputation">Enable imputation (Using <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2226-y" target="_blank"/>DrImpute</a>) (Recommendation: disable for C1 data, enable for 10X data) 
 							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional enable imputation."> </span> 
 							</label>
 						</div>
 					</div>
 							<h4 class="font-italic text-left">Biclustering parameters</h4>
 							<div class="form-group">
+							<div class="row"><div class="form-check col-sm-12 ">
+							<input class="form-check-input" type="checkbox" name="is_c" id="is_c" value="1">
+							<label class="form-check-label" for="is_c">Enable dual strategy.(Recommendation: enable for C1 data, disable for 10X data) 
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Dual description."> </span> 
+							</label>
+						</div></div>
 								<div class="row">
 									<div class="col-md-2">
 										<label for="ex1">Overlap rate: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. 0 means no overlap and 1 means complete overlap. Default is 0.5."> </span> 
@@ -505,7 +511,7 @@ $(document).ready(function() {
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 													<li><a id="load_label" class="dropdown-item" href="#dropzone_label">Load example file</a>
 													</li>
-													<li><a class="dropdown-item" href="/iris3/storage/iris3_example_expression_label.csv" download>Download example cell label file</a>
+													<li><a class="dropdown-item" href="/CeRIS/storage/CeRIS_example_label.csv" download>Download example cell label file</a>
 													</li>
 												</ul>
 											</div>
@@ -532,7 +538,7 @@ $(document).ready(function() {
 							</div>
 							<br>
 							<h4 class="font-italic text-left">Upload gene module: (Optional) 
-							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The developed gene modules that you are interested in or identified by preferred module detection methods can be uploaded to IRIS3 and have them analyzed to identify the “module-specific regulons”. Each column should represents a gene module, check example gene module file for more details."> </span> 
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The developed gene modules that you are interested in or identified by preferred module detection methods can be uploaded to CeRIS and have them analyzed to identify the “module-specific regulons”. Each column should represents a gene module, check example gene module file for more details."> </span> 
 							</h4>
 			
 							<div id="upload_gene_module">
@@ -544,7 +550,7 @@ $(document).ready(function() {
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 													<!--<li><a id="load_gene_module" class="dropdown-item" href="#dropzone_label">Load example file</a>
 													</li>-->
-													<li><a class="dropdown-item" href="/iris3/storage/iris3_example_gene_module.csv" download>Download example gene module file</a>
+													<li><a class="dropdown-item" href="/CeRIS/storage/CeRIS_example_gene_module.csv" download>Download example gene module file</a>
 													</li>
 												</ul>
 											</div>
@@ -592,7 +598,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 		</div>
 		<div class="form-check col-sm-12 ">
 				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="1">
-				<label class="form-check-label" for="allowstorage">Allow permanent storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By checking this option, you allow us to store your data in IRIS3 database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
+				<label class="form-check-label" for="allowstorage">Allow permanent storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By checking this option, you allow us to store your data in CeRIS database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
 				</label>
 			</div>
 		<div id="emailfd" class="section" style="position:relative;top:10px;">&nbsp;&nbsp;Optional: Please leave your email below; you will be notified by email when the job is done.
@@ -607,7 +613,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_label" name="is_load_label" value="0">
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
 			<!--<input type="hidden" id="k_arg" name="k_arg" value="18">-->
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/iris3/results.php?jobid=20190913134923';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/CeRIS/results.php?jobid=20190913134923';" />
 
 		</div>
 		<div class="form-group">

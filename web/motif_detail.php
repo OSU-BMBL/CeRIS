@@ -9,8 +9,8 @@ $bic=$_GET['bic'];
 $id=$_GET['id'];
 $from=$_GET['from'];
 $max=0;
-$DATAPATH="/var/www/html/iris3/data";
-$TOOLPATH="/var/www/html/iris3/program/dminda";
+$DATAPATH="/var/www/html/CeRIS/data";
+$TOOLPATH="/var/www/html/CeRIS/program/dminda";
    session_start();
 $motif_tmp_filename="ct".$ct."bic".$bic."m".$id;
    
@@ -266,9 +266,11 @@ $select = $motif_tmp_filename;
 	  	   			  'end'=>$annotation1[$i]['Motifs'][$z]['end'],
                 'id'=>$annotation1[$i]['Motifs'][$z]['id'],
 	  	   			  );
-	  	   		
-	  	   			       
-	  	   			  array_push($show[(int)$annotation1[$i]['Motifs'][$z]['Seq']]['motifs'],$result);
+						   if(1){
+							   error_reporting(E_ERROR | E_PARSE);
+							   array_push($show[(int)$annotation1[$i]['Motifs'][$z]['Seq']]['motifs'],$result);
+						   }
+	  	   			  
                 //print_r();
 	  	   			}
 	  	   		

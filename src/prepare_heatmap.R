@@ -15,7 +15,7 @@ args <- commandArgs(TRUE)
 wd <- args[1]
 jobid <- args[2]
 label_use_sc3 <- args[3]
-#setwd("/var/www/html/iris3/data/20190913134923")
+#setwd("/var/www/html/CeRIS/data/20190913134923")
 #wd <- getwd()
 #jobid <-20190913134923
 #label_use_sc3 <- 2

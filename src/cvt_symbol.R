@@ -29,7 +29,7 @@ suppressPackageStartupMessages(library(org.Sc.sgd.db))
 suppressPackageStartupMessages(library(org.Dr.eg.db))
 
 
-#setwd("C:/Users/flyku/Desktop/iris3")
+#setwd("C:/Users/flyku/Desktop/CeRIS")
 args <- commandArgs(TRUE)
 wd <- args[1]
 expFile <- args[2]
@@ -37,8 +37,8 @@ jobid <-args[3]
 promoter_len <- args[4]
 setwd(wd)
 getwd()
-# setwd("/home/www/html/iris3/data/2019030481235")
-# setwd("d:/Users/flyku/Documents/IRIS3-data/test_id")
+# setwd("/home/www/html/CeRIS/data/2019030481235")
+# setwd("d:/Users/flyku/Documents/CeRIS-data/test_id")
 # jobid <-20190408222612
 # wd <-  getwd()
 # expFile <- "20190408222612_filtered_expression.txt"

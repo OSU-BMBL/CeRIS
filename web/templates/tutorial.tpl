@@ -24,7 +24,7 @@ $(document).ready(function() {
 });
 if(window.location.hash == ""){
 console.log(window.location.hash);
- window.location.href = "http://bmbl.sdstate.edu/iris3/tutorial.php#1basics";
+ window.location.href = "http://bmbl.sdstate.edu/CeRIS/tutorial.php#1basics";
 }
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">
@@ -39,8 +39,8 @@ console.log(window.location.hash);
 			<ul>
 				<li>
 					<a href="#1basics" class="highlight">
-						<span class="section">The Basics of IRIS3</span>
-						<span class="description">Learn the concept and background of IRIS3</span>
+						<span class="section">The Basics of CeRIS</span>
+						<span class="description">Learn the concept and background of CeRIS</span>
 					</a>
 					<div class="submenu" id="submenu-1basics"></div>
 				</li>
@@ -54,7 +54,7 @@ console.log(window.location.hash);
 				<li>
 					<a href="#3example" class="last">
 						<span class="section">Example result illustration</span>
-						<span class="description">A guide to the result interpretation of IRIS3</span>
+						<span class="description">A guide to the result interpretation of CeRIS</span>
 					</a>
 					<div class="submenu" id="submenu-3example"></div>
 					</li>

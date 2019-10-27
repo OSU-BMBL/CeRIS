@@ -56,13 +56,13 @@ label_file
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/iris3/data/20191019124109/")
+  # setwd("/var/www/html/CeRIS/data/20191019124109/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "iris3_example_expression_matrix.csv"
+  srcFile = "CeRIS_example_expression_matrix.csv"
   jobid <- "20191019124109"
   delim <- ","
   is_imputation <- 1
-  label_file<-'iris3_example_expression_label.csv'
+  label_file<-'CeRIS_example_expression_label.csv'
   delimiter <- ','
   param_k<-0
   label_use_sc3 <- 2
@@ -371,7 +371,7 @@ write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names
 #my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
 #
 #
-## setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
+## setwd("/fs/project/PAS1475/Yuzhou_Chang/CeRIS/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
 ## x<-Read10X(data.dir = getwd())
 #
 ###my.object@assays$RNA@data<-as.sparse(my.new.ltmg)

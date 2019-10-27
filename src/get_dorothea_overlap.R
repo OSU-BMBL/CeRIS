@@ -13,12 +13,12 @@ species <- args[2] #Human, Mouse
 jobid <- args[3]
 this_tf <- args[4]
 
-wd <- paste("/var/www/html/iris3/data/",jobid,sep="")
+wd <- paste("/var/www/html/CeRIS/data/",jobid,sep="")
 setwd(wd)
 if (species == "Human") {
-  tf_db <- read_tsv(paste("/var/www/html/iris3/program/db/human_tfregulons_database_v01_20180216__limit.tsv"))
+  tf_db <- read_tsv(paste("/var/www/html/CeRIS/program/db/human_tfregulons_database_v01_20180216__limit.tsv"))
 } else if (species == "Mouse"){
-  tf_db <- read_tsv(paste("/var/www/html/iris3/program/db/mouse_tfregulons_database_v01_20180216__limit.tsv"))
+  tf_db <- read_tsv(paste("/var/www/html/CeRIS/program/db/mouse_tfregulons_database_v01_20180216__limit.tsv"))
 }
 
 # parse 'CT3S-R5' to 'CT', '3', '5'

@@ -2,11 +2,11 @@
 
 
 args <- commandArgs(TRUE)
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_similar_regulon")
+# setwd("D:/Users/flyku/Documents/CeRIS-data/test_similar_regulon")
 # srcDir <- getwd()
 # regulon <- 'CT1S-R2'
 # jobid <- '20190406210706'
-srcDir <- args[1] # /var/www/html/iris3/data/20190406210706
+srcDir <- args[1] # /var/www/html/CeRIS/data/20190406210706
 regulon <- args[2] # CT3S-R5
 jobid <- args[3]
 setwd(srcDir)

@@ -41,6 +41,12 @@ if (!empty($_FILES)) {
 		fwrite($fp,"TenX.folder\n");
 		fclose($fp);
 		break;
+	case "application/zip":
+		$new_array['type'][] = 'zip';
+		$fp = fopen("$workdir/upload_type.txt", 'w');
+		fwrite($fp,"TenX.folder\n");
+		fclose($fp);
+		break;
 	case "text/plain":
 		#$new_array = array();
 		#foreach ($array as $line) {
@@ -67,7 +73,7 @@ if (!empty($_FILES)) {
 					}
 				}
 				$idx = $idx + 1;
-				if ($idx == 1000) {
+				if ($idx == 10) {
 					break;
 				}
 				/*if ($new_array['columns'][0] > 1000) {
@@ -153,14 +159,14 @@ if (!empty($_FILES)) {
     if (!file_exists($workdir)) {
         mkdir($workdir);
     }
-    system("cp ./upload/iris3_example_expression_matrix.csv $workdir");
-    system("cp ./upload/iris3_example_expression_label.csv $workdir");
-    #system("cp ./upload/iris3_example_gene_module.csv $workdir");
-    $expfile = 'iris3_example_expression_matrix.csv';
+    system("cp ./upload/CeRIS_example_expression_matrix.csv $workdir");
+    system("cp ./upload/CeRIS_example_label.csv $workdir");
+    #system("cp ./upload/CeRIS_example_gene_module.csv $workdir");
+    $expfile = 'CeRIS_example_expression_matrix.csv';
     $_SESSION['expfile'] = $expfile;
-    $labelfile = 'iris3_example_expression_label.csv';
+    $labelfile = 'CeRIS_example_label.csv';
     $_SESSION['labelfile'] = $labelfile;
-    #$gene_module_file = 'iris3_example_gene_module.csv';
+    #$gene_module_file = 'CeRIS_example_gene_module.csv';
     #$_SESSION['gene_module_file'] = $gene_module_file;
     
 }

@@ -4,7 +4,7 @@
 	$species=$_GET['species'];
 	$table_content_id=$_GET['table'];
 	$wd = "./data/$jobid/";
-	system("cd $wd; /var/www/html/iris3/program/count_peak_overlap_single_file.sh $wd $regulon_id $species");
+	system("cd $wd; /var/www/html/CeRIS/program/count_peak_overlap_single_file.sh $wd $regulon_id $species");
 	#echo "<table id='$table_content_id' border='1'>
 	#<tr>
 	#<th>$jobid</th>

@@ -9,13 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="integrated cell type specific Regulon inference from single-cell rna seq" />
     <meta name="keywords" content="scrnaseq, regulon, single cell rna seq,Cell-type-specific Regulon Single-cell RNA-Seq" />
-    <title>IRIS3 - Integrated Cell-type-specific Regulon Inference Server from Single-cell RNA-Seq</title>
+    <title>CeRIS: Cell-type-specific Regulon Inference from Single-cell RNA-Seq</title>
     <script src="assets/js/jquery-1.12.4.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/wow.min.js"></script>
     <script src="assets/js/jquery.ajaxchimp.js"></script>
     <script src="assets/js/jquery.sticky.js"></script>
-    <script src="assets/js/jquery.simplePagination.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
@@ -44,16 +43,16 @@
                 <nav class="navbar">
                     <div class="container">
                         <div class="navbar-header">
-                            <a class="navbar-brand" href="/iris3/index.php" style="color:white;font-size:24px">IRIS3</a>
+                            <a class="navbar-brand" href="/CeRIS/index.php" style="color:white;font-size:24px">CeRIS</a>
                         </div>
                         <div id="main-nav" class="stellarnav">
                             <ul id="nav" class="nav navbar-nav pull-right">
-                                <li><a href="/iris3/index.php">Home</a></li>
-                                <li><a href="/iris3/submit.php">Submit</a></li>
-                                <li><a href="/iris3/tutorial.php#1basics">Tutorial</a></li>
-								<li><a href="/iris3/news.php#1version">What's new</a></li>
-								<li><a href="https://groups.google.com/forum/#!forum/iris3-discussion-board">Forum</a></li>
-								<li><a href="/iris3/more.php#4FAQ">More</a></li>
+                                <li><a href="/CeRIS/index.php">Home</a></li>
+                                <li><a href="/CeRIS/submit.php">Submit</a></li>
+                                <li><a href="/CeRIS/tutorial.php#1basics">Tutorial</a></li>
+								<li><a href="/CeRIS/news.php#1version">What's new</a></li>
+								<li><a href="https://groups.google.com/forum/#!forum/CeRIS-discussion-board">Forum</a></li>
+								<li><a href="/CeRIS/more.php#4FAQ">More</a></li>
                             </ul>
                         </div>
                     </div>

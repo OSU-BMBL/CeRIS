@@ -2,7 +2,7 @@
 	header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 	header("Cache-Control: post-check=0, pre-check=0", false);
 	header("Pragma: no-cache");
-#http://bmbl.sdstate.edu/iris3/prepare_tomtom.php?jobid=2018122581354&ct=6&bic=3&m=3&db=HOCOMOCO
+#http://bmbl.sdstate.edu/CeRIS/prepare_tomtom.php?jobid=2018122581354&ct=6&bic=3&m=3&db=HOCOMOCO
 require_once("config/common.php");
 require_once("config/smarty.php");
 require_once("lib/spyc.php");
@@ -16,22 +16,22 @@ $db=$_GET['db'];
 //$encodedString = json_encode($annotation1);
 $done_file="a";
 if(strlen($module) > 0){
-	$motif_filename = "/var/www/html/iris3/data/$jobid/logo/$module"."bic$bic"."m$motif".".fsa.meme";
-	$check_dir = "/var/www/html/iris3/data/$jobid/tomtom/module$module"."bic$bic"."m$motif"."/JASPAR/tomtom.html";
+	$motif_filename = "/var/www/html/CeRIS/data/$jobid/logo/$module"."bic$bic"."m$motif".".fsa.meme";
+	$check_dir = "/var/www/html/CeRIS/data/$jobid/tomtom/module$module"."bic$bic"."m$motif"."/JASPAR/tomtom.html";
 	if (!file_exists($check_dir)){
 	header("Refresh: 1;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
 	#print_r ("start running");
-	#mkdir ("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif");
-	#mkdir ("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO");
-	#mkdir ("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR");
+	#mkdir ("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif");
+	#mkdir ("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO");
+	#mkdir ("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR");
 	#
-	#$run_hoco = "nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &";
-	#$run_jas = "nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /var/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme &";
+	#$run_hoco = "nohup /var/www/html/CeRIS/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/CeRIS/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/CeRIS/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &";
+	#$run_jas = "nohup /var/www/html/CeRIS/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/CeRIS/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /var/www/html/CeRIS/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme &";
 	#
 	#system($run_hoco);
 	#system($run_jas);
 	
-}   else if (file_exists("/var/www/html/iris3/data/$jobid/tomtom/module$module"."bic$bic"."m$motif/$db")){
+}   else if (file_exists("/var/www/html/CeRIS/data/$jobid/tomtom/module$module"."bic$bic"."m$motif/$db")){
 	$status = "0";
 	header("Location: data/$jobid/tomtom/module$module"."bic$bic"."m$motif/$db/tomtom.html");
 }	else {
@@ -39,22 +39,22 @@ if(strlen($module) > 0){
 	header("Refresh: 30;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
 }
 } else {
-	$motif_filename = "/var/www/html/iris3/data/$jobid/logo/ct$ct"."bic$bic"."m$motif".".fsa.meme";
-	$check_dir = "/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif"."/JASPAR/tomtom.html";
+	$motif_filename = "/var/www/html/CeRIS/data/$jobid/logo/ct$ct"."bic$bic"."m$motif".".fsa.meme";
+	$check_dir = "/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif"."/JASPAR/tomtom.html";
 	if (!file_exists($check_dir)){
 	header("Refresh: 1;url='prepare_tomtom.php?jobid=$jobid&ct=$ct&bic=$bic&m=$motif&db=$db'");
 	#print_r ("start running");
-	#mkdir ("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif");
-	#mkdir ("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO");
-	#mkdir ("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR");
+	#mkdir ("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif");
+	#mkdir ("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO");
+	#mkdir ("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR");
 	#
-	#$run_hoco = "nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/iris3/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/iris3/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &";
-	#$run_jas = "nohup /var/www/html/iris3/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /var/www/html/iris3/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme &";
+	#$run_hoco = "nohup /var/www/html/CeRIS/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/HOCOMOCO -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/CeRIS/program/motif_databases/HUMAN/HOCOMOCOv11_full_HUMAN_mono_meme_format.meme /var/www/html/CeRIS/program/motif_databases/MOUSE/HOCOMOCOv11_full_MOUSE_mono_meme_format.meme &";
+	#$run_jas = "nohup /var/www/html/CeRIS/program/meme/bin/tomtom  -no-ssc -oc /var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/JASPAR -verbosity 1 -min-overlap 5 -mi 1 -dist pearson -evalue -thresh 10.0 $motif_filename /var/www/html/CeRIS/program/motif_databases/JASPAR/JASPAR2018_CORE_non-redundant.meme /var/www/html/CeRIS/program/motif_databases/JASPAR/JASPAR2018_CORE_vertebrates_non-redundant.meme &";
 	#
 	#system($run_hoco);
 	#system($run_jas);
 	
-}   else if (file_exists("/var/www/html/iris3/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/$db")){
+}   else if (file_exists("/var/www/html/CeRIS/data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/$db")){
 	$status = "0";
 	header("Location: data/$jobid/tomtom/ct$ct"."bic$bic"."m$motif/$db/tomtom.html");
 }	else {

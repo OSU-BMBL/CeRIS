@@ -6,14 +6,14 @@ library(Polychrome)
 library(ggplot2)
 
 args <- commandArgs(TRUE) 
-#setwd("D:/Users/flyku/Documents/IRIS3-data/test_dzscore")
-#setwd("/var/www/html/iris3/data/20190802103754")
+#setwd("D:/Users/flyku/Documents/CeRIS-data/test_dzscore")
+#setwd("/var/www/html/CeRIS/data/20190802103754")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
-#jobid <- "20190802103754"
+#jobid <- "2019083104715"
 #########################################################################################
 # yuzhou test
-# setwd("/fs/project/PAS1475/Yuzhou_Chang/IRIS3/test_data/11.Klein/20190818121919/")
+# setwd("/fs/project/PAS1475/Yuzhou_Chang/CeRIS/test_data/11.Klein/20190818121919/")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
 #jobid <- "20190818121919"
@@ -117,7 +117,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   #
   
   layout(matrix(1:2,nrow=1),widths=c(0.7,0.3))
-  grPal <- colorRampPalette(c("grey","red"))
+  grPal <- colorRampPalette(c("blue","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
   
   par(mar=c(5.1,2.1,1.1,2.1))
