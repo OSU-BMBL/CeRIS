@@ -436,7 +436,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
   form.submit()
   document.body.removeChild(form)
 }
-function copyToClipboard(text){
+	function copyToClipboard(text){
     const ele = document.createElement('textarea')
     ele.value = text; 
     ele.setAttribute('readonly', true)
@@ -452,49 +452,49 @@ function copyToClipboard(text){
     document.body.removeChild(ele);
   }
  
-function copy_list(item){
-$(item).tooltip({
-  trigger: 'click',
-  placement: 'bottom'
-})
-function setTooltip(message) {
-  $(item).tooltip('show')
-	.attr('data-original-title', message)
-	.tooltip('show')
-}
-function hideTooltip() {
-  setTimeout(function() {
-	$(item).tooltip('hide')
-  }, 3000)
-}
-match_ct = $(item).attr("id").match(/\d+/gm)
-match_type = ($(item).attr("id")[0] == "s") ? '_bic.regulon_gene_symbol.txt' : '_bic.regulon_gene_id.txt'
-//match_type = '_bic.regulon_gene_symbol.txt'
-if($(item).attr("id").includes("CT")) {
-	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_ct[0] + match_type
-} else {
-	file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_ct[0] + match_type
-}
+	function copy_list(item){
+	$(item).tooltip({
+	  trigger: 'click',
+	  placement: 'bottom'
+	})
+	function setTooltip(message) {
+	  $(item).tooltip('show')
+		.attr('data-original-title', message)
+		.tooltip('show')
+	}
+	function hideTooltip() {
+	  setTimeout(function() {
+		$(item).tooltip('hide')
+	  }, 3000)
+	}
+	match_ct = $(item).attr("id").match(/\d+/gm)
+	match_type = ($(item).attr("id")[0] == "s") ? '_bic.regulon_gene_symbol.txt' : '_bic.regulon_gene_id.txt'
+	//match_type = '_bic.regulon_gene_symbol.txt'
+	if($(item).attr("id").includes("CT")) {
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_CT_'+match_ct[0] + match_type
+	} else {
+		file_path = 'data/'+ {{$jobid}} +'/'+{{$jobid}} + '_module_'+match_ct[0] + match_type
+	}
 
-var xmlhttp = new XMLHttpRequest()
- xmlhttp.open("GET", file_path, false)
- xmlhttp.send();
-  if (xmlhttp.status==200) {
-	txt = xmlhttp.responseText
-	var lines = txt.split("\n")
-	gene_idx = match_ct[1] - 1
-	lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
-	gene_list = lines[gene_idx].split("\t")
-	gene_list.shift()
-	//console.log(gene_list.join("\n"))
-	copyToClipboard(gene_list.join("\n"))
-	setTooltip('Copied!')
-	hideTooltip()
-  } else {
-	setTooltip('Failed!')
-	hideTooltip()
-  }
-}
+	var xmlhttp = new XMLHttpRequest()
+	 xmlhttp.open("GET", file_path, false)
+	 xmlhttp.send();
+	  if (xmlhttp.status==200) {
+		txt = xmlhttp.responseText
+		var lines = txt.split("\n")
+		gene_idx = match_ct[1] - 1
+		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
+		gene_list = lines[gene_idx].split("\t")
+		gene_list.shift()
+		//console.log(gene_list.join("\n"))
+		copyToClipboard(gene_list.join("\n"))
+		setTooltip('Copied!')
+		hideTooltip()
+	  } else {
+		setTooltip('Failed!')
+		hideTooltip()
+	  }
+	}
 	
 	$(document).ready(function() {
 
@@ -552,7 +552,37 @@ var xmlhttp = new XMLHttpRequest()
 				flag.push(root_id)
 			}
 		});
-
+		$('#marker_table').DataTable( {
+			"ajax": '/CeRIS/data/{{$jobid}}/{{$jobid}}_marker_genes.json',
+			dom: 'lBfrtip',
+			buttons: [
+				{
+				extend:'copy',
+				title: {{$jobid}}+'_marker_genes'
+				},
+				{
+				extend:'csv',
+				title: {{$jobid}}+'_marker_genes'
+				}
+				],
+			columnDefs: [
+				{
+                "targets": [1],
+                render: function (data, type, row, meta){	
+						var dat=new Array
+						if (type === 'display')
+						{
+							res=data.split(" ")
+							for(i=0;i < res.length;i++) {
+								dat[i] = '<a  href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+							}
+						}
+						return dat
+					}
+				}
+				]
+		} )
+		
 		/*
 		 $('#regulon_table1').DataTable({
 				"ordering": false,
@@ -578,7 +608,8 @@ var xmlhttp = new XMLHttpRequest()
                                     <ul class="nav nav-tabs">
                                         <li class="active"><a href="#tab1default" data-toggle="tab">General results</a></li>
                                         <li><a href="#tab2default" data-toggle="tab">Cell Type Prediction</a></li>
-                                        <li><a href="#tab3default" data-toggle="tab">Job settings</a></li>
+										<li><a href="#tab3default" data-toggle="tab">Marker genes</a></li>
+                                        <li><a href="#tab4default" data-toggle="tab">Job settings</a></li>
                                     </ul>
                                 </div>
                                 <div class="panel-body">
@@ -756,19 +787,19 @@ var xmlhttp = new XMLHttpRequest()
                                                 <div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Provided Cell Types</h4>
                                                    <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_provide_ct.pdf')" />
-												   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_provide_ct.png"></img>
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/overview_provide_ct.png"></img>
 												</div>
 												<div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Predicted Cell Types</h4>
                                                    <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_predict_ct.pdf')" />
-												   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_predict_ct.png"></img>
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/overview_predict_ct.png"></img>
 												</div>
 											</div>
 											<div class="CT-result-img">
 												<div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> Trajectory Plot Colored by Cell Types</h4>
                                                    <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_ct.trajectory.pdf')" />
-												   <img style="width:100%" src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
 												</div>
 												<div class="row">
 												</div>
@@ -778,12 +809,12 @@ var xmlhttp = new XMLHttpRequest()
                                                 <div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> UMAP Plot Colored by Cell Types</h4>
                                                    <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_ct.pdf')" />
-												   <img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.png"></img>
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/overview_ct.png"></img>
 												</div>
 												<div class="col-sm-6">
 												<h4 style="text-align:center;margin-top:50px"> Trajectory Plot Colored by Cell Types</h4>
                                                     <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/overview_ct.trajectory.pdf')" />
-													<img style="width:100%"src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
+													<img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/overview_ct.trajectory.png"></img>
 												</div>
 											</div>
 											{{/if}}
@@ -803,7 +834,22 @@ var xmlhttp = new XMLHttpRequest()
 											</div>
 										</div>
                                         <div class="tab-pane fade" id="tab3default">
-                                            <div class="flatPanel panel panel-default">
+                                            <table id="marker_table" class="display" style="width:100%">
+												<thead>
+													<tr>
+														<th>Cell type</th>
+														<th>Gene</th>
+														<th>P-value</th>
+														<th>Avg_logFC</th>
+														<th>Pct.1</th>
+														<th>Pct.2</th>
+														<th>Adjusted p-value</th>
+													</tr>
+												</thead>
+											</table>
+											
+                                        </div>
+                                        <div class="tab-pane fade" id="tab4default"><div class="flatPanel panel panel-default">
                         <div class="panel-body">
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
@@ -825,7 +871,7 @@ var xmlhttp = new XMLHttpRequest()
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -835,9 +881,7 @@ var xmlhttp = new XMLHttpRequest()
                                 </div>
                             </div>
                         </div>
-                    </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="tab5default">Default 5</div>
+                    </div></div>
                                     </div>
                                 </div>
                             </div>
@@ -845,7 +889,6 @@ var xmlhttp = new XMLHttpRequest()
                         <div class="panel-body">
                             <div class="row" style="">
                                 <div class="form-group col-md-12 col-sm-12" style="height:100%">
-								
 									     <ul class="nav nav-tabs nav-sticky" id="myTab" role="tablist">
 														   <!--
 															<li class="nav-item">
@@ -900,7 +943,20 @@ var xmlhttp = new XMLHttpRequest()
 																				<div id="heatmap">
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h2 class='wait_message'>Loading heatmap ...</h2>
-																					</div></div></div></div></div></div></div> 
+																					</div></div></div></div></div>
+																					<div class="col-md-12">
+																					<div class="form-group col-md-12 col-sm-12" style="height:100%">
+																			<p class="ct-panel-description" >Top 10 marker genes violin plot for Cell Type {{$sec0+1}}</p>
+                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_violin.pdf')" />
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_violin.png"></img>
+												</div></div><div class="col-md-12">
+												<div class="form-group col-md-12 col-sm-12" style="height:100%">
+																			<p class="ct-panel-description" >Top 10 marker genes heatmap for Cell Type {{$sec0+1}}</p>
+                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_heatmap.pdf')" />
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_heatmap.png"></img>
+												</div></div>
+																					
+																					</div></div> 
 																					
 																	<div id="nav_scroll"></div>
 																	<div class="flatPanel panel panel-default">
@@ -1323,7 +1379,7 @@ var xmlhttp = new XMLHttpRequest()
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -1375,7 +1431,7 @@ var xmlhttp = new XMLHttpRequest()
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -1427,7 +1483,7 @@ var xmlhttp = new XMLHttpRequest()
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
@@ -1479,7 +1535,7 @@ var xmlhttp = new XMLHttpRequest()
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>CTS-regulon prediction using {{$label_use_sc3}} and {{$motif_program}}</p>
+                                    <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>

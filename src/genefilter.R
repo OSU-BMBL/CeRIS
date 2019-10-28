@@ -12,7 +12,7 @@ suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(hdf5r))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(SingleCellExperiment))
-#suppressPackageStartupMessages(library(SC3))
+suppressPackageStartupMessages(library(jsonlite))
 suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(devEMF))
 suppressPackageStartupMessages(library(dplyr))
@@ -56,16 +56,16 @@ label_file
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/CeRIS/data/20191019124109/")
+  # setwd("/var/www/html/CeRIS/data/20191027225322/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "CeRIS_example_expression_matrix.csv"
-  jobid <- "20191019124109"
+  srcFile = "Biase_expression.csv"
+  jobid <- "20191027225322"
   delim <- ","
-  is_imputation <- 1
-  label_file<-'CeRIS_example_expression_label.csv'
+  is_imputation <-0
+  label_file<-'1'
   delimiter <- ','
   param_k<-0
-  label_use_sc3 <- 2
+  label_use_sc3 <- 0
 }
 
 ##############################
@@ -109,7 +109,7 @@ read_data<-function(x=NULL,read.method=NULL,sep="\t",...){
           try(system(paste("gunzip",(all_files[matrix_file]))),silent = T)
           try(system(paste("gunzip",(all_files[gene_file]))),silent = T)
           try(system(paste("gunzip",(all_files[feature_file]))),silent = T)
-		  try(system(paste("unzip",(all_files[barcode_file]))),silent = T)
+          try(system(paste("unzip",(all_files[barcode_file]))),silent = T)
           try(system(paste("unzip",(all_files[matrix_file]))),silent = T)
           try(system(paste("unzip",(all_files[gene_file]))),silent = T)
           try(system(paste("unzip",(all_files[feature_file]))),silent = T)
@@ -145,7 +145,7 @@ total_gene_num <- nrow(expFile)
 
 ## deal with some edge cases on gene symbols/id 
 if (upload_type == "CellGene"){
-	is_imputation  <- '0'
+  is_imputation  <- '0'
   ## case: gene with id with ENSG########.X, remove part after dot, e.g:
   ## a <- c("ENSG00000064545.10","ENSG000031230064545","ENMUSG00003213004545.31234s")
   match_index <- grep("^ENSG.+\\.[0-9]",ignore.case = T,expFile[,1])
@@ -545,28 +545,30 @@ if (label_use_sc3 =='2'){
 my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
 Idents(my.object)<-as.factor(my.object$Customized.idents)
 
-
-Get.MarkerGene<-function(my.object, customized=T){
-  if(customized){
-    Idents(my.object)<-my.object$Customized.idents
-    my.marker<-FindAllMarkers(my.object,only.pos = T)
-  } else {
-    Idents(my.object)<-my.object$seurat_clusters
-    my.marker<-FindAllMarkers(my.object,only.pos = T)
-  }
-  my.cluster<-as.character(sort(unique(as.numeric(Idents(my.object)))))
-  my.top<-c()
-  for( i in 1:length(my.cluster)){
-    my.cluster.data.frame<-my.marker[my.marker$cluster==my.cluster[i],]
-    my.top.tmp<-list(my.cluster.data.frame$gene[1:100])
-    my.top<-append(my.top,my.top.tmp)
-  }
-  names(my.top)<-paste0("CT",my.cluster)
-  my.top<-as.data.frame(my.top)
-  return(my.top)
+## get marker genes
+my.cluster<-as.character(sort(unique(as.numeric(Idents(my.object)))))
+my.marker<-FindAllMarkers(my.object,only.pos = T)
+#my.marker <- read.table(paste(jobid,"_marker_genes.txt",sep=""),header=T)
+my.top<-c()
+for( i in 1:length(my.cluster)){
+  my.cluster.data.frame<-my.marker[my.marker$cluster==my.cluster[i],]
+  my.top.tmp<-list(my.cluster.data.frame$gene[1:100])
+  my.top<-append(my.top,my.top.tmp)
 }
+names(my.top)<-paste0("CT",my.cluster)
+my.top<-as.data.frame(my.top)
+write.table(my.marker,paste(jobid,"_marker_genes.txt",sep=""),quote = F,col.names = T,row.names = F)
 
-my.cluster.uniq.marker<-Get.MarkerGene(my.object,customized = T)
+## save marker genes to json format, used in result page
+my.marker_json <- list(NULL)
+names(my.marker_json) <- 'data'
+colnames(my.marker) <- NULL
+my.marker[,6] <- paste("CT",my.marker[,6],sep = "")
+my.marker <- my.marker[,c(6,7,1:5)]
+my.marker_json$data <- my.marker
+my.marker_json <- toJSON(my.marker_json,pretty = T, simplifyDataFrame =F)
+write(my.marker_json, paste(jobid,"_marker_genes.json",sep=""))
+
 
 sort_column <- function(df) {
   tmp <- colnames(df)
@@ -574,8 +576,10 @@ sort_column <- function(df) {
   split <- as.numeric(sapply(split, function(x) x <- sub("", "", x[2])))
   return(order(split))
 }
-my.cluster.uniq.marker <- my.cluster.uniq.marker[,sort_column(my.cluster.uniq.marker)]
-write.table(my.cluster.uniq.marker,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
+
+dir.create("regulon_id",showWarnings = F)
+my.top <- my.top[,sort_column(my.top)]
+write.table(my.top,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
 saveRDS(my.object,file="seurat_obj.rds")
 
 ###### Remove Monocle trajectory ###########
@@ -606,6 +610,11 @@ rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
 reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
 saveRDS(my.trajectory,file="trajectory_obj.rds")
 
+quiet <- function(x) {
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+} 
 
 Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
@@ -728,11 +737,6 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   reset_par()
 }
 
-quiet <- function(x) {
-  sink(tempfile()) 
-  on.exit(sink()) 
-  invisible(force(x)) 
-} 
 
 # point size function from test datasets
 x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
@@ -740,7 +744,6 @@ y <- c(1,1,0.89,0.33,0.30,0.25,0.235,0.205,0.18,0.1,0.1,0.1)
 get_point_size <- approxfun(x, y)
 
 pt_size <- get_point_size(ncol(my.object)) 
-dir.create("regulon_id")
 png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
 quiet(dev.off())
@@ -786,3 +789,19 @@ quiet(dev.off())
 pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
 Plot.cluster2D(reduction.method = "umap",customized = T)
 quiet(dev.off())
+
+## save top 10 marker plots
+for (i in 1:length(levels(Idents(my.object)))) {
+  png(paste("regulon_id/CT",i,"_top10_marker_violin.png",sep = ""),width=4000, height=1500,res = 300)
+  print(VlnPlot(my.object, features = my.top[1:10,i],assay = "RNA",ncol=5))
+  quiet(dev.off())
+  pdf(file = paste("regulon_id/CT",i,"_top10_marker_violin.pdf",sep = ""), width = 20, height = 7,  pointsize = 12, bg = "white")
+  print(VlnPlot(my.object, features = my.top[1:10,i],assay = "RNA",ncol=5))
+  quiet(dev.off())
+  png(paste("regulon_id/CT",i,"_top10_marker_heatmap.png",sep = ""),width=2500, height=1200,res = 300)
+  print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
+  quiet(dev.off())
+  pdf(file = paste("regulon_id/CT",i,"_top10_marker_heatmap.pdf",sep = ""), width = 16, height = 8,  pointsize = 12, bg = "white")
+  print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
+  quiet(dev.off())
+}
