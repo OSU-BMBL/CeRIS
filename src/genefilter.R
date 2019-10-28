@@ -134,6 +134,9 @@ upload_type <- as.character(read.table("upload_type.txt",stringsAsFactors = F)[1
 #upload_type <- "CellGene"
 #expFile <- read_data(x = srcFile,read.method = "CellGene",sep = delim)
 expFile <- read_data(x = srcFile,read.method = upload_type,sep = delim)
+if(class(expFile) == "list"){
+  expFile <- expFile[[1]]
+}
 colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
 dim(expFile)
 ##check if [1,1] is empty
