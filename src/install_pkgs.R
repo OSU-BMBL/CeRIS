@@ -11,13 +11,15 @@ install_all <- function(){
     
   )
   cran_packages <- c(
-    "seqinr","base","stringr","Seurat","tidyverse","rlist","hdf5r","Matrix","plotly","RColorBrewer","Polychrome"
+    "seqinr","base","stringr","Seurat","tidyverse","rlist","hdf5r","Matrix","plotly","RColorBrewer","Polychrome","ggplot2"
   )
   bioc_np <- bioc_packages[!(bioc_packages %in% installed.packages()[,"Package"])]
   cran_np <- cran_packages[!(cran_packages %in% installed.packages()[,"Package"])]
   if (!require("BiocManager")) install.packages("BiocManager")
   BiocManager::install(bioc_np)
   install.packages(cran_np)
+  
+  
 }
 
 detach_all <- function() {
