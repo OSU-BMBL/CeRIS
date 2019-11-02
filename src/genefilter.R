@@ -56,10 +56,10 @@ label_file
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/CeRIS/data/20191027225322/")
+  # setwd("/var/www/html/CeRIS/data/2019110105003/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "Biase_expression.csv"
-  jobid <- "20191027225322"
+  srcFile = "Rosenzweig_expression.csv"
+  jobid <- "2019110105003"
   delim <- ","
   is_imputation <-0
   label_file<-'1'
@@ -284,8 +284,8 @@ write.table(as.data.frame(my.count.data),paste(jobid,"_raw_expression.txt",sep =
 ## if all values are integers, perform normalization, otherwise skip to imputation
 if(all(as.numeric(unlist(my.count.data[nrow(my.count.data),]))%%1==0)){
   ## normalization##############################
-  sce <- tryCatch(computeSumFactors(sce),error = function(e) computeSumFactors(sce, sizes=seq(21, 201, 5)))
-  sce<-scater::normalize(sce,return_log=F)
+  sce <- tryCatch(computeSumFactors(sce),error = function(e) normalizeSCE(sce))
+  sce <- scater::normalize(sce,return_log=F)
   my.normalized.data <- normcounts(sce)
 } else {
   my.normalized.data <- my.count.data
@@ -649,21 +649,21 @@ Plot.cluster2D(reduction.method = "umap",customized = T)
 quiet(dev.off())
 
 ## save top 10 marker plots
-for (i in 1:length(levels(Idents(my.object)))) {
-  png(paste("regulon_id/CT",i,"_top10_marker_violin.png",sep = ""),width=4000, height=1500,res = 300)
-  print(VlnPlot(my.object, features = my.top[1:10,i],assay = "RNA",ncol=5))
-  quiet(dev.off())
-  pdf(file = paste("regulon_id/CT",i,"_top10_marker_violin.pdf",sep = ""), width = 20, height = 7,  pointsize = 12, bg = "white")
-  print(VlnPlot(my.object, features = my.top[1:10,i],assay = "RNA",ncol=5))
-  quiet(dev.off())
-  png(paste("regulon_id/CT",i,"_top10_marker_heatmap.png",sep = ""),width=2500, height=1200,res = 300)
-  print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
-  quiet(dev.off())
-  pdf(file = paste("regulon_id/CT",i,"_top10_marker_heatmap.pdf",sep = ""), width = 16, height = 8,  pointsize = 12, bg = "white")
-  print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
-  quiet(dev.off())
-}
-
+#for (i in 1:length(levels(Idents(my.object)))) {
+#  png(paste("regulon_id/CT",i,"_top10_marker_violin.png",sep = ""),width=4000, height=1500,res = 300)
+#  print(VlnPlot(my.object, features = my.top[1:10,i],assay = "RNA",ncol=5))
+#  quiet(dev.off())
+#  pdf(file = paste("regulon_id/CT",i,"_top10_marker_violin.pdf",sep = ""), width = 20, height = 7,  pointsize = 12, bg = "white")
+#  print(VlnPlot(my.object, features = my.top[1:10,i],assay = "RNA",ncol=5))
+#  quiet(dev.off())
+#  png(paste("regulon_id/CT",i,"_top10_marker_heatmap.png",sep = ""),width=2500, height=1200,res = 300)
+#  print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
+#  quiet(dev.off())
+#  pdf(file = paste("regulon_id/CT",i,"_top10_marker_heatmap.pdf",sep = ""), width = 16, height = 8,  pointsize = 12, bg = "white")
+#  print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
+#  quiet(dev.off())
+#}
+#
 
 #my.trajectory<-SingleCellExperiment(assays=List(counts=GetAssayData(object = my.object[['RNA']],slot="counts")))
 my.trajectory<-SingleCellExperiment(
