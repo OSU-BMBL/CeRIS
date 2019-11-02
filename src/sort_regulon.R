@@ -296,7 +296,7 @@ bootstrap_rss <- as_tibble(as.matrix(bootstrap_rss))
 bootstrap_rss <- gather(bootstrap_rss,CT,RSS) 
 
 
-#ggplot(bootstrap_rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",regulon_size,"iteration:",iteration))
+#ggplot(bootstrap_rss, aes(x=RSS,color=CT,fill=CT))+theme_bw() + geom_density(alpha=0.25)+ ggtitle(paste("Bootstrap RSS Density plot\nRegulon size:",40,"iteration:",10000))
 
 #i=1
 # genes=x= gene_name_list[[1]]
@@ -380,28 +380,28 @@ for (i in 1:total_ct) {
     marker <- lapply(gene_name_list, function(x){
       x[which(x%in%marker_data[,i])]
     })
-    
-    if(sum(sapply(marker, length))>0){
-      rss_rank<-order(sapply(marker,length),decreasing=T)
-      marker <- marker[rss_rank]
-      rss_list <- rss_list[rss_rank]
-      gene_name_list <- gene_name_list[rss_rank]
-      gene_id_list <- gene_id_list[rss_rank]
-      # put marker genes on top
-      gene_id_list <- mapply(function(X,Y,Z){
-        id <- which(Y %in% X)
-        return(unique(append(Z[id],Z)))
-      },X=marker,Y=gene_name_list,Z=gene_id_list)
-      
-      gene_name_list <- mapply(function(X,Y){
-        return(unique(append(X,Y)))
-      },X=marker,Y=gene_name_list)
-      
-      motif_list <- motif_list[rss_rank]
-      ras <- ras[rss_rank,]
-      originak_ras <- originak_ras[rss_rank,]
-    }
-    
+    # 
+    # if(sum(sapply(marker, length))>0){
+    #   rss_rank<-order(sapply(marker,length),decreasing=T)
+    #   marker <- marker[rss_rank]
+    #   rss_list <- rss_list[rss_rank]
+    #   gene_name_list <- gene_name_list[rss_rank]
+    #   gene_id_list <- gene_id_list[rss_rank]
+    #   # put marker genes on top
+    #   gene_id_list <- mapply(function(X,Y,Z){
+    #     id <- which(Y %in% X)
+    #     return(unique(append(Z[id],Z)))
+    #   },X=marker,Y=gene_name_list,Z=gene_id_list)
+    #   
+    #   gene_name_list <- mapply(function(X,Y){
+    #     return(unique(append(X,Y)))
+    #   },X=marker,Y=gene_name_list)
+    #   
+    #   motif_list <- motif_list[rss_rank]
+    #   ras <- ras[rss_rank,]
+    #   originak_ras <- originak_ras[rss_rank,]
+    # }
+    # 
   } 
   
   #colnames(ras) <- label_data[,1]

@@ -134,6 +134,9 @@ upload_type <- as.character(read.table("upload_type.txt",stringsAsFactors = F)[1
 #upload_type <- "CellGene"
 #expFile <- read_data(x = srcFile,read.method = "CellGene",sep = delim)
 expFile <- read_data(x = srcFile,read.method = upload_type,sep = delim)
+if(class(expFile) == "list"){
+  expFile <- expFile[[1]]
+}
 colnames(expFile) <-  gsub('([[:punct:]])|\\s+','_',colnames(expFile))
 dim(expFile)
 ##check if [1,1] is empty
@@ -325,7 +328,6 @@ if(filter_cell_num == 0){
 
 
 exp_data <- GetAssayData(object = my.object,slot = "data")
-#write.table(cbind(filter_num,filter_rate,nrow(expFile)), paste(jobid,"_filtered_rate.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
 write(paste("filter_gene_num,",as.character(filter_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_gene_num,",as.character(total_gene_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("filter_gene_rate,",as.character(filter_gene_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
@@ -333,59 +335,9 @@ write(paste("filter_cell_num,",as.character(filter_cell_num),sep=""),file=paste(
 write(paste("total_cell_num,",as.character(total_cell_num),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("filter_cell_rate,",as.character(filter_cell_rate),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("main_species,",main_species,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-#write.table(as.data.frame(expFile),paste(jobid,"_raw_expression.txt",sep = ""), row.names = T,col.names = T,sep="\t",quote=FALSE)
-#write.table(as.data.frame(exp_data),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,col.names = c(colnames(exp_data)),sep="\t",quote=FALSE)
 write.table(data.frame("Gene"=rownames(exp_data),exp_data,check.names = F),paste(jobid,"_filtered_expression.txt",sep = ""), row.names = F,sep="\t",quote=FALSE)
 gene_name <- rownames(exp_data)
 write.table(gene_name,paste(jobid,"_gene_name.txt",sep = ""), sep="\t",row.names = F,col.names = F,quote = F)
-
-#######################################################################
-##run pca, tnse, umap via ltmg matrix
-
-## my.object@assays$RNA@data
-#my.ltmg<-read.delim(paste(jobid,"_filtered_expression.txt.em.chars",sep=""),header = T)
-#my.ltmg[which(duplicated.default(my.ltmg[,1])),1]
-#
-##remove duplicated rows with same gene 
-#if(length(which(duplicated.default(my.ltmg[,1]))) > 0 ){
-#  my.ltmg <- my.ltmg[-which(duplicated.default(my.ltmg[,1])==T),]
-#}	
-#
-#rownames(my.ltmg) <- my.ltmg[,1]
-#my.ltmg<- my.ltmg[,-1]
-#length(is.na(my.ltmg[1:10,1:10]))
-#colnames(my.ltmg) <-  gsub('([[:punct:]])|\\s+','_',colnames(my.ltmg))
-### remove rows with empty gene name
-#if(length(which(rownames(my.ltmg)=="")) > 0){
-#  my.ltmg <- my.new.ltmg[-which(rownames(my.ltmg)==""),]
-#}
-## judge index whether greater than 1, if so -1 for each element.
-#signal.replace<-function(x){
-#  x <- as.numeric(x)
-#  tmp.GreatThanOne.index<-which(x>1)
-#  tmp.GreatThanOne.value<-as.numeric(x[which(x>1)])-1
-#  x[tmp.GreatThanOne.index]<-tmp.GreatThanOne.value
-#  return(x)
-#}
-#
-#my.new.ltmg<- apply(my.ltmg, 2, signal.replace)
-#
-#
-## setwd("/fs/project/PAS1475/Yuzhou_Chang/CeRIS/scRNA-Seq/32.Hazem_D7_P14_Cl13_1/ungiz/")
-## x<-Read10X(data.dir = getwd())
-#
-###my.object@assays$RNA@data<-as.sparse(my.new.ltmg)
-#
-#
-#my.new.ltmg1 <- as.sparse(my.new.ltmg)
-#rownames(my.new.ltmg) <- rownames(my.ltmg)
-#colnames(my.new.ltmg) <- colnames(my.ltmg)
-##my.object<-CreateSeuratObject(my.new.ltmg)
-#my.object<-CreateSeuratObject(my.new.ltmg)
-#my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.new.ltmg,assay="RNA")
-#
-
-#######################################################################
 
 rm(expFile)
 rm(sce)
@@ -403,77 +355,6 @@ if (label_file == 0 | label_file==1){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   cell_info[,2] <- as.factor(cell_info[,2])
 }
-## sc3 disabled
-if(label_use_sc3 == 3){
-  # create a SingleCellExperiment object
-  sce <- SingleCellExperiment(
-    assays = list(
-      counts = as.matrix(exp_data),
-      logcounts = log2(as.matrix(exp_data) + 1)
-    ), 
-    colData = cell_info
-  )
-  
-  # define feature names in feature_symbol column
-  rowData(sce)$feature_symbol <- rownames(sce)
-  # remove features with duplicated names
-  sce <- sce[!duplicated(rowData(sce)$feature_symbol), ]
-  sce <- sc3_prepare(sce)
-  
-  if (as.numeric(param_k)>0){
-    sce <- sc3_calc_dists(sce)
-    sce <- sc3_calc_transfs(sce)
-    sce <- sc3_kmeans(sce, ks = as.numeric(param_k))
-  } else {
-    sce <- sc3_estimate_k(sce)
-    sce <- sc3_calc_dists(sce)
-    sce <- sc3_calc_transfs(sce)
-    sce <- sc3_kmeans(sce, ks = metadata(sce)$sc3$k_estimation)
-  }
-  
-  sce <- sc3_calc_consens(sce)
-  # get row data for section 5.2 Silhouette Plot
-  # silh stores the bar width
-  # modify k to the number of cluster
-  silh <- metadata(sce)$sc3$consensus[[1]]$silhouette
-  #silh[,2] = seq(1:nrow(silh))
-  save_image <- function(type,filetype){
-    if(filetype == "jpeg" || filetype == "png"){
-      type(file=paste("saving_plot1.",as.character(filetype),sep=""),width=1200, height=1200)
-    } else if (filetype == "pdf"){
-      type(file=paste("saving_plot1.",as.character(filetype),sep=""))
-    } else if (filetype == "emf"){
-      library(devEMF)
-      emf(file="saving_plot1.emf", emfPlus = FALSE)
-    }
-    if (as.numeric(param_k)>0){
-      sc3_plot_consensus(sce,param_k,show_pdata=c(colnames(colData(sce))[2]))
-    } else {
-      sc3_plot_consensus(sce,metadata(sce)$sc3$k_estimation,show_pdata=c(colnames(colData(sce))[2]))
-    }
-    dev.off()
-  }
-  
-  if (label_file == 1){
-    silh_out <- cbind(silh[,1],as.character(cell_info),silh[,3])
-  } else {
-    silh_out <- cbind(silh[,1],as.character(cell_info[,1]),silh[,3])
-  }
-  
-  save_image(pdf,"pdf")
-  save_image(emf,"emf")
-  save_image(png,"png")
-  save_image(jpeg,"jpeg")
-  silh_out <- silh_out[order(silh[,1]),]
-  write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
-  #apply(silh, 1, write,file=paste(jobid,"_silh.txt",sep=""),append=TRUE,sep = ",")
-  
-  cell_info <- as.data.frame(colData(sce))
-  cell_info <- cbind(rownames(cell_info),cell_info[,ncol(cell_info)])
-  colnames(cell_info) <- c("cell_name","label")
-  write.table(cell_info,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
-  
-} 
 
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
 
@@ -519,9 +400,9 @@ silh_out <- silh_out[order(as.numeric(silh_out[,1])),]
 
 
 # set max row,
-if (total_cell_num > 500) {
-  this_bin <- total_cell_num %/% 500
-  small_cell_idx <- seq(1,total_cell_num,by=this_bin)
+if (ncol(my.object) > 500) {
+  this_bin <- ncol(my.object) %/% 500
+  small_cell_idx <- seq(1,ncol(my.object),by=this_bin)
   silh_out <- silh_out[small_cell_idx,]
 } 
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
@@ -577,7 +458,7 @@ sort_column <- function(df) {
   return(order(split))
 }
 
-dir.create("regulon_id",showWarnings = F)
+dir.create("regulon_id")
 my.top <- my.top[,sort_column(my.top)]
 write.table(my.top,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
 saveRDS(my.object,file="seurat_obj.rds")
@@ -595,20 +476,6 @@ saveRDS(my.object,file="seurat_obj.rds")
 #saveRDS(cds,file="monocle_obj.rds")
 ###### Remove Monocle trajectory ###########
 
-
-#my.trajectory<-SingleCellExperiment(assays=List(counts=GetAssayData(object = my.object[['RNA']],slot="counts")))
-my.trajectory<-SingleCellExperiment(
-  assays = list(
-    counts = GetAssayData(object = my.object[['RNA']],slot="counts")
-  ), 
-  colData = Idents(my.object)
-)
-SummarizedExperiment::assays(my.trajectory)$norm<-GetAssayData(object = my.object,slot = "data")
-
-dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
-rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
-reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
-saveRDS(my.trajectory,file="trajectory_obj.rds")
 
 quiet <- function(x) {
   sink(tempfile()) 
@@ -753,21 +620,12 @@ png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_predict_c
 Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size)
 quiet(dev.off())
 
-png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
-Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
-quiet(dev.off())
-
-
 pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
 Plot.cluster2D(reduction.method = "umap",customized = T)
 quiet(dev.off())
 
 pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
 Plot.cluster2D(reduction.method = "umap",customized = F)
-quiet(dev.off())
-
-pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
 if (label_use_sc3 =='1'){
@@ -805,3 +663,25 @@ for (i in 1:length(levels(Idents(my.object)))) {
   print(DoHeatmap(my.object, features = as.character(my.top[1:10,i]),assay = "RNA"))
   quiet(dev.off())
 }
+
+
+#my.trajectory<-SingleCellExperiment(assays=List(counts=GetAssayData(object = my.object[['RNA']],slot="counts")))
+my.trajectory<-SingleCellExperiment(
+  assays = list(
+    counts = GetAssayData(object = my.object[['RNA']],slot="counts")
+  ), 
+  colData = Idents(my.object)
+)
+SummarizedExperiment::assays(my.trajectory)$norm<-GetAssayData(object = my.object,slot = "data")
+dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
+rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
+reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
+saveRDS(my.trajectory,file="trajectory_obj.rds")
+
+png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+quiet(dev.off())
+
+pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+quiet(dev.off())
