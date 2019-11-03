@@ -557,10 +557,6 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 			dom: 'lBfrtip',
 			buttons: [
 				{
-				extend:'copy',
-				title: {{$jobid}}+'_marker_genes'
-				},
-				{
 				extend:'csv',
 				title: {{$jobid}}+'_marker_genes'
 				}
@@ -944,17 +940,17 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 																						<div id='container-id-{{$sec0+1}}' style="height:95%;max-height:95%;max-width:100%;display:block">
 																						<h2 class='wait_message'>Loading heatmap ...</h2>
 																					</div></div></div></div></div>
-																					<div class="col-md-12">
+																					<div class="col-md-4">
 																					<div class="form-group col-md-12 col-sm-12" style="height:100%">
-																			<p class="ct-panel-description" >Top 10 marker genes violin plot for Cell Type {{$sec0+1}}</p>
-                                                   <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_violin.pdf')" />
-												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_violin.png"></img>
-												</div></div><div class="col-md-12">
+																			<p class="ct-panel-description" >Regulon specificity score scatter plot for Cell Type {{$sec0+1}}</p>
+                                                   <!--<input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_violin.pdf')" />-->
+												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/ct{{$sec0+1}}_rss_scatter.png"></img>
+												</div></div><!--<div class="col-md-12">
 												<div class="form-group col-md-12 col-sm-12" style="height:100%">
 																			<p class="ct-panel-description" >Top 10 marker genes heatmap for Cell Type {{$sec0+1}}</p>
                                                    <input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open('data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_heatmap.pdf')" />
 												   <img class="lozad" style="width:100%" data-src="data/{{$jobid}}/regulon_id/CT{{$sec0+1}}_top10_marker_heatmap.png"></img>
-												</div></div>
+												</div></div>-->
 																					
 																					</div></div> 
 																					
@@ -983,7 +979,10 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
                                   {{section name=sec2 start=1 loop=$regulon_result[$sec0][sec1]}}
 							
 										  <tr><td>
-										  {{if !empty($regulon_rank_result[$sec0][sec1][6]) && $regulon_rank_result[$sec0][sec1][6]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{section name=marker_idx start=6 loop=$regulon_rank_result[$sec0][sec1]}}
+										  {{if !empty($regulon_rank_result[$sec0][sec1][marker_idx]) && $regulon_rank_result[$sec0][sec1][marker_idx]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
+										  {{/section}}
+										  <!--
 										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][8]) && $regulon_rank_result[$sec0][sec1][8]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][9]) && $regulon_rank_result[$sec0][sec1][9]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
@@ -995,8 +994,8 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 										  {{if !empty($regulon_rank_result[$sec0][sec1][15]) && $regulon_rank_result[$sec0][sec1][15]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][16]) && $regulon_rank_result[$sec0][sec1][16]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][17]) && $regulon_rank_result[$sec0][sec1][17]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][18]) && $regulon_rank_result[$sec0][sec1][18]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}</td>
-                                         <td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
+										  {{if !empty($regulon_rank_result[$sec0][sec1][18]) && $regulon_rank_result[$sec0][sec1][18]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}} 
+										  --></td><td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
                                          <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();show_gene_tsne(this);$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
                                                         </button><button type="button" style="display:none;" id="gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide
                                                         </button></td>{{/section}}</tr></tbody></table></div></td>
