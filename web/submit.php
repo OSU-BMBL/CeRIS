@@ -244,6 +244,7 @@ Rscript /var/www/html/CeRIS/program/sort_regulon.R \$wd \$jobid\n
 #cat *CT*.regulon_motif.txt > combine_regulon_motif.txt\n
 Rscript /var/www/html/CeRIS/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
 Rscript /var/www/html/CeRIS/program/get_alternative_regulon.R \$jobid\n
+Rscript /var/www/html/CeRIS/program/generate_rss_scatter.R \$jobid\n
 mkdir json
 /var/www/html/CeRIS/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
 
