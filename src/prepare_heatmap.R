@@ -178,8 +178,8 @@ for(i in 1: length(unique(label_data[,2]))){
       }
     }
   }
-  if (this_total_regulon >=15) {
-    max_show <- 15
+  if (this_total_regulon >=10) {
+    max_show <- 10
   } else {
     max_show <- this_total_regulon
   }
@@ -218,8 +218,8 @@ for(i in 1: length(unique(label_data[,2]))){
       #regulon_label_col[1,1] <- ""
       file_heat_matrix <- cbind(regulon_label_col,file_heat_matrix)
       k <- k + 1
-      if(k>=15){
-        #file_heat_matrix <- file_heat_matrix[,-15]
+      if(k>=10){
+        #file_heat_matrix <- file_heat_matrix[,-10]
         break
       }
     }
@@ -246,8 +246,8 @@ if ((length(all_regulon)-total_ct) > 0) {
     gene_row <- character()
     this_total_regulon <- sum(str_count(names(combine_regulon_label), paste("module",i,"-R",sep="")))
     
-    if (this_total_regulon >=15) {
-      max_show <- 15
+    if (this_total_regulon >=10) {
+      max_show <- 10
     } else {
       max_show <- this_total_regulon
     }
@@ -283,8 +283,8 @@ if ((length(all_regulon)-total_ct) > 0) {
         #regulon_label_col[1,1] <- ""
         file_heat_matrix <- cbind(regulon_label_col,file_heat_matrix)
         k <- k + 1
-        if(k>=15){
-          #file_heat_matrix <- file_heat_matrix[,-15]
+        if(k>=10){
+          #file_heat_matrix <- file_heat_matrix[,-10]
           break
         }
       }
