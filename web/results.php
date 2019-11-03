@@ -39,7 +39,7 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 				}
 			} else if($split_line[0] == "label_use_sc3"){
 				if( $split_line[1] == 0 || $split_line[1] == 1) {
-					$label_use_sc3 = "SC3";
+					$label_use_sc3 = "Seurat";
 				} else{
 					$label_use_sc3 = "user's label";
 				}
