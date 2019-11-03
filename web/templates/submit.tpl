@@ -152,7 +152,7 @@ $(document).ready(function() {
         acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.zip,.h5,.hdf5,.mtx",
         url: "upload.php",
         maxFiles: 3,
-        maxFilesize: 1000,
+        maxFilesize: 5000,
         maxfilesexceeded: function(file) {
             this.removeFile(this.files[0]);
             this.addFile(file);
@@ -475,6 +475,9 @@ $(document).ready(function() {
 											<option>50</option>
 											<option>60</option>
 											<option>70</option>
+											<option>80</option>
+											<option>90</option>
+											<option>100</option>
 										</select>
 									</div>
 								</div>
@@ -596,11 +599,11 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 				</div>
 			</div>
 		</div>
-		<div class="form-check col-sm-12 ">
+		<!--<div class="form-check col-sm-12 ">
 				<input class="form-check-input" type="checkbox" name="allowstorage" id="allowstorage" value="1">
 				<label class="form-check-label" for="allowstorage">Allow permanent storage in our database <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="By checking this option, you allow us to store your data in CeRIS database (both submitted and results) for the future database construction. Be cautious if your data have not been published."> </span>
 				</label>
-			</div>
+			</div>-->
 		<div id="emailfd" class="section" style="position:relative;top:10px;">&nbsp;&nbsp;Optional: Please leave your email below; you will be notified by email when the job is done.
 			<br/>
 			<div class="bootstrap-iso" style="margin-top: 5px;">&nbsp; <strong>E-mail</strong>&nbsp;:
@@ -613,7 +616,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_label" name="is_load_label" value="0">
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
 			<!--<input type="hidden" id="k_arg" name="k_arg" value="18">-->
-			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/CeRIS/results.php?jobid=20190913134923';" />
+			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/CeRIS/results.php?jobid=20191024223952';" />
 
 		</div>
 		<div class="form-group">
