@@ -10,10 +10,10 @@ label_use_sc3 <- 0 #default 0
 label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 #delim <- args[3]
 # setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
-# srcFile = "iris3_example_expression_label.csv"
-# jobid <- "2018122223516"
+# srcFile = "Zeisel_cell_label.csv"
+# jobid <- "20191024223952"
 # delim <- ","
-# label_use_sc3 <- 1
+# label_use_sc3 <- 2
 if(delim == 'tab'){
   delim <- '\t'
 }
@@ -43,13 +43,13 @@ library(gdata)
 library(data.table)
 
 
-sc3_cluster <- read.table(paste(jobid,"_sc3_label.txt",sep=""),header=T,sep='\t',check.names = FALSE)
+predict_cluster <- read.table(paste(jobid,"_sc3_label.txt",sep=""),header=T,sep='\t',check.names = FALSE)
 # srcFile <- 'iris3_example_expression_label.csv'
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
 if (srcFile == '1') {
-  user_label_file <- sc3_cluster
+  user_label_file <- predict_cluster
 } else {
   user_label_file <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
 }
@@ -59,19 +59,21 @@ user_label_index <- 2
 user_cellname_index <- 1
 user_label <- data.frame(user_label_file[,user_cellname_index],user_label_file[,user_label_index],stringsAsFactors = F)
 
-#test
+
 user_label_name <- user_label[order(user_label[,2]),2]
-sc3_cluster <- sc3_cluster[order(user_label[,2]),]
+predict_cluster <- predict_cluster[order(predict_cluster[,2]),]
+
+
 user_label <- user_label[order(user_label[,2]),]
 user_label[,2] <- factor(user_label[,2])
 user_label[,1] <-  gsub('([[:punct:]])|\\s+','_',user_label[,1])
 
 label_order <- unique(user_label[,2])
 levels(user_label[,2]) <- 1: length(levels(user_label[,2]))
-colnames(sc3_cluster) <- c("cell_name","cluster")
+colnames(predict_cluster) <- c("cell_name","cluster")
 colnames(user_label) <- c("cell_name","label")
 
-write.table(sc3_cluster, paste(jobid,"_sc3_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+write.table(predict_cluster, paste(jobid,"_sc3_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
 
 if (label_use_sc3 == 2) {
   is_evaluation <- 'yes'
@@ -79,21 +81,21 @@ if (label_use_sc3 == 2) {
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
   write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-  write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+  write(paste("predict_label,",max(predict_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
 } else if (label_use_sc3 == 1){
   is_evaluation <- 'yes'
-  write.table(sc3_cluster, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
+  write.table(predict_cluster, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
   write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-  write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+  write(paste("predict_label,",max(predict_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
 } else {
   is_evaluation <- 'no'
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
-  write.table(sc3_cluster[,2], paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+  write.table(predict_cluster[,2], paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   write(paste("provide_label,","0",sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
-  write(paste("predict_label,",max(sc3_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
+  write(paste("predict_label,",max(predict_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
 }
 
@@ -101,9 +103,12 @@ write(paste("is_evaluation,",is_evaluation,sep=""),file=paste(jobid,"_info.txt",
 
 # prepare data for sankey plot
 if (label_use_sc3 == 2 | label_use_sc3 == 1) {
-  # sc3_cluster <- read.delim("123456_sc3_cluster.txt",header=T,sep=" ",check.names = FALSE)
-  target <- merge(sc3_cluster,user_label,by.x = "cell_name",by.y = "cell_name" )
-  
+  predict_cluster <- predict_cluster[order(predict_cluster[,1]),]
+  user_label_index <- order(user_label[,1])
+  user_label <- user_label[user_label_index,]
+  user_label_name <- user_label_name[user_label_index]
+
+  target <- merge(predict_cluster,user_label,by.x = "cell_name",by.y = "cell_name" )
   clustering_purity <- purity(as.factor(target$cluster),as.factor(target$label))
   clustering_entropy <- entropy(as.factor(target$cluster),as.factor(target$label))
   clustering_nmi <- igraph::compare(as.factor(target$cluster),as.factor(target$label),method="nmi")
@@ -129,14 +134,14 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   res_colname <- colnames(res)
   res_colname <- gsub(".*\\_","",res_colname)
   colnames(res) <- res_colname
-  write.table(format(t(res), digits=4), paste(jobid,"_sc3_cluster_evaluation.txt",sep = ""),sep = ",", row.names = T,col.names = F,quote = F)
+  write.table(format(t(res), digits=4), paste(jobid,"_predict_cluster_evaluation.txt",sep = ""),sep = ",", row.names = T,col.names = F,quote = F)
   
   # step2 change label names
   user_label$label <- sub("^", "User label:", user_label_name )
-  sc3_cluster$cluster <- sub("^", "Predicted label:", sc3_cluster$cluster )
+  predict_cluster$cluster <- sub("^", "Predicted label:", predict_cluster$cluster )
   
   # step3 rbind two labels to create node matrix
-  comb.label.list <- as.data.frame(rbind(matrix(user_label$label),matrix(sc3_cluster$cluster)))
+  comb.label.list <- as.data.frame(rbind(matrix(user_label$label),matrix(predict_cluster$cluster)))
   colnames(comb.label.list) <- c("name")
   comb.label.list[,1] <- as.character(comb.label.list[,1])
   i=1
@@ -152,11 +157,16 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
   map.label <- mapLevels(x=comb.label.list)
   map.label <- c(unlist(map.label$name))
   map.label <- map.label-1
+  
   nodes <- data.table(name=names(map.label))
-  nodes <- data.table(name=names(map.label))
+  name1 <- gsub("\\(.+", "",  nodes$name)
+  predict_idx <-  order(as.numeric(gsub("[^0-9.]", "",  name1[grep("Predict.*",  name1)])))
+  user_idx <-  order(as.numeric(gsub("[^0-9.]", "",  name1[grep("User.*",  name1)]))) + length(predict_idx)
+  new_index <- c(predict_idx,user_idx)
+  nodes <- nodes[new_index,]
   
   # step5 create link matrix
-  links <- as.data.frame(cbind(user_label$label,sc3_cluster$cluster))
+  links <- as.data.frame(cbind(user_label$label,predict_cluster$cluster))
   #link_test<- links
   #links<- link_test
   colnames(links) <- c("label","pred_label")
@@ -191,6 +201,8 @@ if (label_use_sc3 == 2 | label_use_sc3 == 1) {
                 Value = "value", NodeID = "name",
                 fontSize= 12, nodeWidth =30)
   
+  
+  cat("",file=paste(jobid,"_sankey.txt",sep=""),append=F)
   write(paste("nodes,",nodes$name,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("src,",links$src,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
   write(paste("target,",links$target,sep=""),file=paste(jobid,"_sankey.txt",sep=""),append=TRUE)
