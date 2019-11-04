@@ -25,7 +25,7 @@ unique_array=df.iloc[:,0].unique()
 
 net.load_file(filename)
 color_array=['#92896B','#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ff0000', '#000000']
-color_array2=["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
+color_array1=["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
         "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
         "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
         "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
@@ -59,7 +59,7 @@ color_array2=["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", 
         "#061203", "#DFFB71", "#868E7E", "#98D058", "#6C8F7D", "#D7BFC2", "#3C3E6E", "#D83D66",
         "#2F5D9B", "#6C5E46", "#D25B88", "#5B656C", "#00B57F", "#545C46", "#866097", "#365D25",
         "#252F99", "#00CCFF", "#674E60", "#FC009C", "#92896B"]
-color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
+color_array2=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
 "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
 "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
 "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
@@ -72,15 +72,24 @@ color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", 
 "#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
 "#549E79", "#FFF69F", "#201625", "#CB7E98", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
 "#5B4534", "#FDE8DC", "#404E55", "#FAD09F", "#A4E804", "#f58231", "#324E72", "#402334"]
-for i in range(len(color_array3)):
-	label='SC3 label: _'+str(i)+'_'
-	net.set_cat_color(axis='col', cat_index=1, cat_name=label, inst_color=color_array3[i])
-    #console.log(color_array[i]);
+
+color_array3=["#5A5156","#F6222E","#FE00FA","#16FF32","#3283FE","#FEAF16","#B00068","#1CFFCE","#90AD1C","#2ED9FF","#DEA0FD","#AA0DFE","#F8A19F","#325A9B","#C4451C","#1C8356","#85660D","#B10DA1","#FBE426","#1CBE4F","#FA0087","#FC1CBF","#F7E1A0","#C075A6","#782AB6","#AAF400","#BDCDFF","#822E1C",
+"#B5EFB5","#7ED7D1","#1C7F93","#D85FF7","#683B79","#66B0FF","#3B00FB"]
+if use_user_label == '0':
+    for i in range(len(color_array3)):
+        label='Predicted label: _'+str(i+1)+'_'
+        net.set_cat_color(axis='col', cat_index=1, cat_name=label, inst_color=color_array3[i])
 	
-if use_user_label == '1':
+if use_user_label == '2' or use_user_label == '1':
 	for j in range(len(unique_array)):
 		userlabel='User\'s label: _'+str(unique_array[j])+'_'
-		net.set_cat_color(axis='col', cat_index=2, cat_name=userlabel, inst_color=color_array3[63-j])
+		net.set_cat_color(axis='col', cat_index=1, cat_name=userlabel, inst_color=color_array3[j])
+        
+if use_user_label == '2' or use_user_label == '1':        
+    for i in range(len(color_array3)):
+        label='Predicted label: _'+str(i+1)+'_'
+        net.set_cat_color(axis='col', cat_index=2, cat_name=label, inst_color=color_array3[34-i])
+     
 net.cluster(dist_type='cos', enrichrgram=True, run_clustering=False)
 # write jsons for front-end visualizations
 out = wd + 'json/' + outname + '.json'
