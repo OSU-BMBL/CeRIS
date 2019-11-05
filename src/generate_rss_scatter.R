@@ -11,7 +11,7 @@ library(seqinr)
 
 args <- commandArgs(TRUE)
 jobid <- args[1] # job id
-jobid <-20191024223952 
+#jobid <-20191026133824 
 wd <- paste("/var/www/html/CeRIS/data/",jobid,sep="")
 setwd(wd)
 
@@ -77,28 +77,31 @@ for (i in 1:length(alldir)) {
   regulon_rank_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),"r")
   regulon_rank <- readLines(regulon_rank_handle)
   close(regulon_rank_handle)
-  motif_list <- unlist(lapply(strsplit(regulon_motif,"\\t"), function(x){x[[2]]}))
-  rank_list <- unlist(lapply(strsplit(regulon_rank,"\\t"), function(x){x[[6]]}))
-  motif_list <- lapply(strsplit(motif_list,","), function(x){
-    paste("ct",x[[1]],"bic",x[[2]],"m",x[[3]],sep = "")
-  })
-  tf_idx <- unlist(lapply(motif_list, function(x){
-    which(total_motif_name[,1] %in% x)    
-  }))
-  tf_names <- total_motif_name[tf_idx,2]
-  tf_rss <- tibble(index=seq(1:length(rank_list)),tf=total_motif_name[tf_idx,2],rss=rank_list)
-  total_tf_name_list <- append(total_tf_name_list,total_motif_name[tf_idx,2])
-  rss_plot <- ggplot(tf_rss, aes(x=index, y=as.numeric(rss), label=ifelse(index<6,as.character(tf),''))) +
-    geom_point(color=ifelse(tf_rss$index<6,"#2775b6",'grey'),size=3) + 
-    scale_x_continuous("Regulon",breaks = scales::pretty_breaks(n = 4)) +
-    geom_text_repel(point.padding =0.2) +
-    scale_y_continuous("Regulon specificity score",breaks = scales::pretty_breaks(n = 7)) +
-    theme_linedraw() +
-    theme(text = element_text(size=16))
   
-  png(paste("regulon_id/ct",i,"_rss_scatter.png",sep = ""),width=1200, height=2000,res = 300)
-  print(rss_plot)
-  quiet(dev.off())
+  if(length(regulon_motif) > 0){
+    motif_list <- unlist(lapply(strsplit(regulon_motif,"\\t"), function(x){x[[2]]}))
+    rank_list <- unlist(lapply(strsplit(regulon_rank,"\\t"), function(x){x[[6]]}))
+    motif_list <- lapply(strsplit(motif_list,","), function(x){
+      paste("ct",x[[1]],"bic",x[[2]],"m",x[[3]],sep = "")
+    })
+    tf_idx <- unlist(lapply(motif_list, function(x){
+      which(total_motif_name[,1] %in% x)    
+    }))
+    tf_names <- total_motif_name[tf_idx,2]
+    tf_rss <- tibble(index=seq(1:length(rank_list)),tf=total_motif_name[tf_idx,2],rss=rank_list)
+    total_tf_name_list <- append(total_tf_name_list,total_motif_name[tf_idx,2])
+    rss_plot <- ggplot(tf_rss, aes(x=index, y=as.numeric(rss), label=ifelse(index<6,as.character(tf),''))) +
+      geom_point(color=ifelse(tf_rss$index<6,"#2775b6",'grey'),size=3) + 
+      scale_x_continuous("Regulon",breaks = scales::pretty_breaks(n = 4)) +
+      geom_text_repel(point.padding =0.2) +
+      scale_y_continuous("Regulon specificity score",breaks = scales::pretty_breaks(n = 7)) +
+      theme_linedraw() +
+      theme(text = element_text(size=16))
+    
+    png(paste("regulon_id/ct",i,"_rss_scatter.png",sep = ""),width=1200, height=2000,res = 300)
+    print(rss_plot)
+    quiet(dev.off())
+  }
 }
 
 total_rank_list <- list()
@@ -134,6 +137,7 @@ total_rank_list <- t(sapply(total_rank_list, function(x){
   return(x[1:6])
 })
 )
+
 total_gene_symbol_list1 <- lapply(total_gene_symbol_list, function(x){
   paste(x,sep = ",")
 })
