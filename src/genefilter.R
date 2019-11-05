@@ -56,16 +56,16 @@ label_file
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/CeRIS/data/2019110105003/")
+  # setwd("/var/www/html/CeRIS/data/20191024223952/")
   # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "Rosenzweig_expression.csv"
-  jobid <- "2019110105003"
+  srcFile = "Zeisel_expression.csv"
+  jobid <- "20191024223952"
   delim <- ","
   is_imputation <-0
-  label_file<-'1'
+  label_file<-'Zeisel_cell_label.csv'
   delimiter <- ','
   param_k<-0
-  label_use_sc3 <- 0
+  label_use_sc3 <- 2
 }
 
 ##############################
@@ -483,7 +483,7 @@ quiet <- function(x) {
   invisible(force(x)) 
 } 
 
-Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
+Plot.cluster2D <- function(reduction.method="umap",customized=T,pt_size=1,reverse_color=F,...){
   # my.plot.source<-GetReduceDim(reduction.method = reduction.method,module = module,customized = customized)
   # my.module.mean<-colMeans(my.gene.module[[module]]@assays$RNA@data)
   # my.plot.source<-cbind.data.frame(my.plot.source,my.module.mean)
@@ -491,32 +491,32 @@ Plot.cluster2D<-function(reduction.method="umap",customized=T,pt_size=1,...){
   if(customized==F){
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=as.factor(as.numeric(my.object$seurat_clusters)))
-  }else{
+  } else{
     my.plot.all.source<-cbind.data.frame(Embeddings(my.object,reduction = reduction.method),
                                          Cell_type=Idents(my.object))
   }
   tmp.celltype <- levels(unique(my.plot.all.source$Cell_type))
-  p.cluster <- ggplot(my.plot.all.source,
-                      aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2]))+xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2])
-  p.cluster <- p.cluster+geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) 
   
-  p.cluster <- p.cluster + guides(colour = guide_legend(override.aes = list(size=5)))
-  
-  if (length(tmp.celltype) > 30){
-    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(rainbow(length(tmp.celltype))),
-                                                 breaks=tmp.celltype,
-                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+  if(length(tmp.celltype) > 30) {
+    color_array <- as.character(rainbow(length(tmp.celltype)))
   } else {
-    p.cluster <- p.cluster + scale_colour_manual(name  ="Cell type:(Cells)",values  = as.character(palette36.colors(36))[-2][1:length(tmp.celltype)],
-                                                 breaks=tmp.celltype,
-                                                 labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")"))
+    color_array <- as.character(palette36.colors(36))[-2]
+  }
+  if (reverse_color == T) {
+    color_array <- rev(color_array)
   }
   
-  
-  # + labs(col="cell type")           
-  p.cluster <- p.cluster + theme_classic() 
-  p.cluster <- p.cluster + coord_fixed(ratio=1)
-  p.cluster
+  p.cluster <- ggplot(my.plot.all.source,
+                      aes(x=my.plot.all.source[,1],y=my.plot.all.source[,2])) + 
+    xlab(colnames(my.plot.all.source)[1])+ylab(colnames(my.plot.all.source)[2]) + 
+    geom_point(stroke=pt_size,size=pt_size,aes(col=my.plot.all.source[,"Cell_type"])) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) + 
+    scale_colour_manual(name  ="Cell type:(Cells)",values  = color_array[1:length(tmp.celltype)],
+                        breaks=tmp.celltype,
+                        labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")")) +
+    theme_classic() + 
+    coord_fixed(ratio=1)
+  return(p.cluster)
 }
 
 
@@ -617,7 +617,7 @@ quiet(dev.off())
 
 
 png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_predict_ct.png",sep = ""))
-Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size)
+Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size, reverse_color = T)
 quiet(dev.off())
 
 pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
@@ -625,7 +625,7 @@ Plot.cluster2D(reduction.method = "umap",customized = T)
 quiet(dev.off())
 
 pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.cluster2D(reduction.method = "umap",customized = F)
+Plot.cluster2D(reduction.method = "umap",customized = F, reverse_color = T)
 quiet(dev.off())
 
 if (label_use_sc3 =='1'){
@@ -641,11 +641,11 @@ if (label_use_sc3 =='1'){
 my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
 Idents(my.object)<-as.factor(my.object$Customized.idents)
 png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
-Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
+Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = T)
 quiet(dev.off())
 
 pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.cluster2D(reduction.method = "umap",customized = T)
+Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = T)
 quiet(dev.off())
 
 ## save top 10 marker plots
