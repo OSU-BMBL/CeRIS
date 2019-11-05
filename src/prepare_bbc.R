@@ -1,12 +1,12 @@
 #######  Read all motif result, convert to input for BBC ##########
 # remove all empty files before this
-
+library(stringi)
 library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
-#setwd("/var/www/html/CeRIS/data/20190930154650")
+#setwd("/var/www/html/CeRIS/data/20191020160119")
 #srcDir <- getwd()
-#jobid <-20190930154650 
+#jobid <-20191020160119 
 #motif_len <- 12
 srcDir <- args[1]
 motif_len <- args[2]
@@ -160,6 +160,12 @@ for (i in 1:length(alldir)) {
   motif_rank[,6] <- paste(i,this_bic,this_id,sep=",")
   write.table(motif_rank[,c(6,4,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 }
+
+gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""),sep = "\t", header = T)
+
+result_gene_pos <- merge(result_gene_pos,gene_id_name,by.x="Info",by.y="ENSEMBL")
+result_gene_pos <- result_gene_pos[order(result_gene_pos$V11),]
+result_gene_pos <- result_gene_pos[,c(2,3,4,7,5,6)]
 write.table(result_gene_pos,paste("motif_position.bed",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
 
 
