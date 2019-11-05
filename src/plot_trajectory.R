@@ -117,7 +117,7 @@ Plot.Regulon.Trajectory<-function(customized=T,cell.type=1,regulon=1,start.clust
   #
   
   layout(matrix(1:2,nrow=1),widths=c(0.7,0.3))
-  grPal <- colorRampPalette(c("blue","red"))
+  grPal <- colorRampPalette(c("grey","red"))
   tmp.color<-grPal(10)[as.numeric(cut(val,breaks=10))]
   
   par(mar=c(5.1,2.1,1.1,2.1))
