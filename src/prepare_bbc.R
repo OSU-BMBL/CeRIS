@@ -118,20 +118,20 @@ for (i in 1:length(alldir)) {
           colnames(seq_file) <- c("info","genes")
           combined_seq <- rbind(combined_seq,motif_seq)
           combined_gene <- rbind(combined_gene,seq_file)
-          res <- paste(alldir[i],".bbc.txt",sep="")
-          #res <- file("filename", "w")
-          cat("", file=res)
-          for (info in levels(combined_seq[,1])) {
-            cat(paste(">",as.character(info),sep=""), file=res,sep="\n",append = T)
-            if (length(as.character(combined_seq[which(combined_seq[,1]== info),2])) >= 100) {
-              sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])[1:99]
-            } else {
-              sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])
-            }
-            cat(sequence, file=res,sep="\n",append = T)
-          }
         }
       }
+    }
+    res <- paste(alldir[i],".bbc.txt",sep="")
+    #res <- file("filename", "w")
+    cat("", file=res)
+    for (info in levels(combined_seq[,1])) {
+      cat(paste(">",as.character(info),sep=""), file=res,sep="\n",append = T)
+      if (length(as.character(combined_seq[which(combined_seq[,1]== info),2])) >= 100) {
+        sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])[1:99]
+      } else {
+        sequence <- as.character(combined_seq[which(combined_seq[,1]== info),2])
+      }
+      cat(sequence, file=res,sep="\n",append = T)
     }
   } else {
     cat("", file= paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
