@@ -6,11 +6,11 @@ library(Polychrome)
 library(ggplot2)
 
 args <- commandArgs(TRUE) 
-#setwd("D:/Users/flyku/Documents/CeRIS-data/test_dzscore")
-#setwd("/var/www/html/CeRIS/data/20190802103754")
+ #setwd("D:/IRIS3_data_test/CeRIS_Run/2.Yan/")
+#setwd("/var/www/html/CeRIS/data/20191020160119")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
-#jobid <- "2019083104715"
+#jobid <- "20191024223952"
 #########################################################################################
 # yuzhou test
 # setwd("/fs/project/PAS1475/Yuzhou_Chang/CeRIS/test_data/11.Klein/20190818121919/")
@@ -90,12 +90,12 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   if(length(tmp.color.cat$CellName)>10){
     legend("topright",legend = tmp.color.cat$CellName,
            inset=c(0.1,0), ncol=2,
-           col = as.character(tmp.color.cat$Color),pch = 20,
-           cex=0.8,title="cluster",bty='n')
+           col = as.character(tmp.color.cat$Color),pch = 19,
+           cex=1.5,title="cluster",bty='n')
   } else {legend("topright",legend = tmp.color.cat$CellName,
                  inset=c(0.1,0), ncol=1,
-                 col = as.character(tmp.color.cat$Color),pch = 20,
-                 cex=0.8,title="cluster",bty='n')}
+                 col = as.character(tmp.color.cat$Color),pch = 19,
+                 cex=1.5,title="cluster",bty='n')}
   
   
   if(add.line==T){
@@ -247,4 +247,10 @@ if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
 }
 quiet(dev.off())
 
+my.trajectory<-SingleCellExperiment(
+  assays = list(
+    counts = GetAssayData(object = my.object[['RNA']],slot="counts")
+  ), 
+  colData = Idents(my.object)
+)
 
