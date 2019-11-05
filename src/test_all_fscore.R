@@ -1,6 +1,6 @@
 #install.packages("enrichR")
 library(enrichR)
-
+library(data.table)
 # check all enrichr databases
 dbs <- listEnrichrDbs()
 
@@ -18,9 +18,9 @@ for (i in 1:length(job_list)) {
   #system(paste("chmod 777 ",job_list[i],"_combine_regulon.txt",sep = "")) 
   
   wd <- paste("/var/www/html/CeRIS/data/",job_list[i],sep="")
-  combine_result <-read.table(paste(job_list[i],"_combine_regulon.txt",sep = ""), sep="\t",header = T)
+  combine_result <-read.table(paste(job_list[i],"_combine_regulon.txt",sep = ""), sep="\t",header = T,stringsAsFactors = F)
   setwd(wd)
-  species <- as.character(read.table("species_main.txt"))
+  species <- as.character(read.table("species_main.txt")[,1])
   if (species == "Human") {
     test.terms <- c("ENCODE_TF_ChIP-seq_2015","WikiPathways_2015", 
                     "KEGG_2019_Human", "Enrichr_Submissions_TF-Gene_Coocurrence")
@@ -38,7 +38,7 @@ for (i in 1:length(job_list)) {
   Wiki_reg_num <- 0
   ENCODE_reg_num <-0
   regulon <- strsplit(combine_result$gene_symbol,",")
-  
+  #j=regulon[[1]]
   for (j in regulon){
     enriched <- enrichr(j, test.terms)
     # subset enrichment results: terms, number of genes, adj.p-value
@@ -90,11 +90,11 @@ for (i in 1:length(job_list)) {
   KEGG_F <- 2/(1/KEGG_pre+1/KEGG_recall)
   Wiki_F <- 2/(1/Wiki_pre+1/Wiki_recall)
   ENCODE_F <- 2/(1/ENCODE_pre+1/ENCODE_recall)
-  this_output <- c(as.character(job[i,2]),KEGG_F,Wiki_F,ENCODE_F)
+  this_output <- c(as.character(job[i,2]),KEGG_pre,KEGG_recall,KEGG_F,Wiki_pre,Wiki_recall, Wiki_F,ENCODE_pre, ENCODE_recall, ENCODE_F)
   output <- rbind(output,this_output)
 }
 
-colnames(output) <- c("data","KEGG","WIKI")
+colnames(output) <- c("data","KEGG_pre","KEGG_recall","KEGG_F","Wiki_pre","Wiki_recall", "Wiki_F","ENCODE_pre", "ENCODE_recall", "ENCODE_F")
 write.table(Wiki,"Wiki_enrichment_result.txt")
 
 # export file
