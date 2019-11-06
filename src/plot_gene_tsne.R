@@ -153,18 +153,22 @@ if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
   num_cells <- ncol(my.object)
   pt_size <- get_point_size(num_cells)*2
   Plot.GeneUMAP(gene_symbol,pt_size = pt_size)
+  
+  pdf(file = paste("regulon_id/",id,".umap.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.GeneUMAP(gene_symbol,pt_size = pt_size))
+  quiet(dev.off())
 }
 quiet(dev.off())
 
 
-png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
-if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
-  if(!exists("my.object")){
-    library(Seurat)
-    my.object <- readRDS("seurat_obj.rds")
-  }
-  num_cells <- ncol(my.object)
-  pt_size <- get_point_size(num_cells)*2
-  Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
-}
-quiet(dev.off())
+#png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
+#if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
+#  if(!exists("my.object")){
+#    library(Seurat)
+#    my.object <- readRDS("seurat_obj.rds")
+#  }
+#  num_cells <- ncol(my.object)
+#  pt_size <- get_point_size(num_cells)*2
+#  Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size)
+#}
+#quiet(dev.off())

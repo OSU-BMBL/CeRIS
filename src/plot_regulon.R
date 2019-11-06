@@ -3,7 +3,7 @@ library(RColorBrewer)
 library(Polychrome)
 library(ggplot2)
 library(scales)
-library(Seurat)
+
 #library(Cairo) 
 
 args <- commandArgs(TRUE) 
@@ -152,7 +152,6 @@ regulon_ct <-gsub("[[:alpha:]]","",regulon_ct)
 regulon_id <- gsub( ".*R", "", id)
 regulon_id <- gsub("[[:alpha:]]","",regulon_id)
 
-my.object <- readRDS("seurat_obj.rds")
 
 activity_score <- read.table(paste(jobid,"_CT_",regulon_ct,"_bic.regulon_activity_score.txt",sep = ""),row.names = 1,header = T,check.names = F)
 #activity_score <- activity_score ^ 1
@@ -162,34 +161,28 @@ num_cells <- ncol(activity_score)
 quiet(dir.create("regulon_id",showWarnings = F))
 pt_size <- get_point_size(num_cells)
 
-png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
-Plot.cluster2D(reduction.method = "umap",customized = T, pt_size = pt_size)
-quiet(dev.off())
+#png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_ct.png",sep = ""))
+#Plot.cluster2D(reduction.method = "umap",customized = T, pt_size = pt_size)
+#quiet(dev.off())
 
-
-png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))
-Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*1.3)
-quiet(dev.off())
-
-
-pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.cluster2D(reduction.method = "umap",customized = T)
-quiet(dev.off())
-
-pdf(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*3)
-quiet(dev.off())
-#emf(file=paste("regulon_id/overview_ct.emf",sep = ""),width=8,height = 6, emfPlus = FALSE)
-#Plot.cluster2D(reduction.method = "tsne",customized = T)
+if (!file.exists(paste("regulon_id/",id,".png",sep = ""))){
+  library(Seurat)
+  my.object <- readRDS("seurat_obj.rds")
+  
+  png(width=2000, height=1500,res = 300, file=paste("regulon_id/",id,".png",sep = ""))
+  print(Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*1.3))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/",id,".pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.regulon2D(cell.type=as.numeric(regulon_ct),regulon=as.numeric(regulon_id),customized = T,reduction.method="umap", pt_size = pt_size*3))
+  quiet(dev.off())
+  
+}
+#pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+#Plot.cluster2D(reduction.method = "umap",customized = T)
 #quiet(dev.off())
 
 
-png(width=2000, height=1500,res = 300, file=paste("regulon_id/overview_predict_ct.png",sep = ""))
-Plot.cluster2D(reduction.method = "umap",customized = F, pt_size = pt_size)
-quiet(dev.off())
-
-pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.cluster2D(reduction.method = "umap",customized = F)
-quiet(dev.off())
-
-
+#emf(file=paste("regulon_id/overview_ct.emf",sep = ""),width=8,height = 6, emfPlus = FALSE)
+#Plot.cluster2D(reduction.method = "tsne",customized = T)
+#quiet(dev.off())
