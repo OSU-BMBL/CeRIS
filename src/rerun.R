@@ -6,30 +6,45 @@ library(Polychrome)
 library(ggplot2)
 library(scales)
 library(Seurat)
+suppressPackageStartupMessages(library(jsonlite))
 
 args <- commandArgs(TRUE)
 jobid <- args[1] # job id
 
-jobid <- 2019102483152
+delim <- args[2] 
+
+if(is.na(delim)){
+  delim <- ','
+} else if(delim == 'tab'){
+  delim <- '\t'
+} else if(delim == 'space'){
+  delim <- ' '
+} else if(delim == 'semicolon'){
+  delim <- ';'
+}else {
+  delim <- ','
+}
+
+#jobid <- 20191102214257
+#
 wd <- paste("/var/www/html/CeRIS/data/",jobid,"/",sep="")
 setwd(wd)
 
 info_file <- read_lines("info.txt")
 
 label_file <- strsplit(info_file[grep("labelfile",info_file)],",")[[1]][2]
+if (is.na(label_file)){
+  label_file <- "1"
+}
+bic_inference <- gsub("[^0-9]","",strsplit(info_file[grep("bic_inference",info_file)],",")[[1]][2])
 
-
+if(bic_inference == "1") {
+  bic_inference <- "0" 
+}
 
 my.object <- readRDS("seurat_obj.rds")
 
-if (label_file == '1') {
-  system(paste("Rscript /var/www/html/CeRIS/program/ari_score.R", label_file,jobid, ", 0",sep=" "))
-  system(paste("/var/www/html/iris3/program/build_clustergrammar.sh", wd,jobid, "0",sep=" "), intern=T)
-} else {
-  system(paste("Rscript /var/www/html/CeRIS/program/ari_score.R", label_file,jobid, ", 2",sep=" "))
-  system(paste("/var/www/html/iris3/program/build_clustergrammar.sh", wd,jobid, "2",sep=" "), intern=T)
-  
-}
+system(paste("Rscript /var/www/html/CeRIS/program/ari_score.R", label_file,jobid, delim,bic_inference,sep=" "))
 
 system(paste("Rscript /var/www/html/iris3/program/prepare_bbc.R", jobid, "12",sep=" "), intern=T)
 
@@ -39,7 +54,14 @@ system(paste("Rscript /var/www/html/CeRIS/program/generate_rss_scatter.R", jobid
 
 system(paste("/var/www/html/iris3/program/get_atac_overlap.sh", wd,sep=" "), intern=T)
 
-cat("k_arg,20\n", file=paste("info.txt",sep=""),append = T)
+system(paste("Rscript /var/www/html/iris3/program/prepare_heatmap.R", wd,jobid, bic_inference,sep=" "), intern=T)
+
+system(paste("Rscript /var/www/html/CeRIS/program/get_alternative_regulon.R ",jobid,sep=" "), intern=T)
+
+system(paste("/var/www/html/iris3/program/build_clustergrammar.sh", wd,jobid, bic_inference,sep=" "), intern=T)
+
+
+cat("\nk_arg,20\n", file=paste("info.txt",sep=""),append = T)
 
 
 if (!file.exists(paste(jobid,"_marker_genes.json",sep=""))){
@@ -76,7 +98,7 @@ sort_column <- function(df) {
   return(order(split))
 }
 
-dir.create("regulon_id")
+dir.create("regulon_id",showWarnings = F)
 my.top <- my.top[,sort_column(my.top)]
 write.table(my.top,file = "cell_type_unique_marker.txt",quote = F,row.names = F,sep = "\t")
 
@@ -256,8 +278,9 @@ Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = F)
 quiet(dev.off())
 
 system(paste("rm ",jobid,".zip",sep=""))
-system(paste("zip -FSr ",wd,jobid," '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' '*_marker_genes.txt' 'cell_type_unique_marker.txt' '*_combine_regulon.txt'",sep=""))
+system(paste("zip -R ",wd,"/",jobid," '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' '*_marker_genes.txt' 'cell_type_unique_marker.txt' '*_combine_regulon.txt'",sep=""))
 
 quiet(system("chmod -R 777 ."))
 
 cat("\014")
+
