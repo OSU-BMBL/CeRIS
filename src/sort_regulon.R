@@ -227,39 +227,6 @@ cell_idx <- as.character(sort(label_data[,1]))
 exp_data <- exp_data[,cell_idx]
 
 
-#g1 <- c("Sf3b5","Sin3b","Srsf5","Stk17b","Thy1","Txnip","Uba52","Ubald2","Ywhae")
-##l1 <- c(3,4,6)
-#l1 <- c(1:9)
-#library(pheatmap)
-#library(RColorBrewer)
-#library(viridis)
-#
-#df1 <- exp_data[which(rownames(exp_data) %in% g1),]
-#label1 <- label_data[which(label_data[,2] %in% l1),]
-#df2 <- df1[,which(colnames(df1) %in% label1[,1])]
-#
-## Data frame with column annotations.
-#mat_col <- data.frame(group = label1[,2])
-#rownames(mat_col) <- colnames(df2)
-#
-## List with colors for each annotation.
-#mat_colors <- list(group = brewer.pal(length(l1), "Set1"))
-#names(mat_colors$group) <- unique(label1[,2])
-#
-#pheatmap(
-#  mat               = df2,
-#  color             = inferno(10),
-#  border_color      = NA,
-#  show_colnames     = FALSE,
-#  show_rownames     = T,
-#  annotation_col    = mat_col,
-#  annotation_colors = mat_colors,
-#  drop_levels       = TRUE,
-#  fontsize          = 14,
-#  main              = "Expression Heatmap",
-#  cluster_cols=F
-#)
-
 marker_data <- read.table("cell_type_unique_marker.txt",sep="\t",header = T)
 total_motif_list <- vector()
 total_gene_list <- vector()
@@ -278,6 +245,14 @@ rankings <- calc_ranking(exp_data)
 
 #total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test")
 total_ras <- calc_ras(expr = exp_data,genes=total_gene_list,method = "wmw_test",rankings = rankings)
+total_ras1 <- total_ras 
+
+# set Inf RAS to column max value
+for (j in 1:ncol(total_ras)) {
+  this_ras <- total_ras[which(total_ras[,j] < Inf),j]
+  total_ras[is.infinite(total_ras[,j]),j] <- max(this_ras)
+}
+
 
 #### bootstrap resampling to calculate p-value
 bootstrap_ras <- calc_bootstrap_ras(rankings=rankings,iteration=10000,regulon_size=20)
