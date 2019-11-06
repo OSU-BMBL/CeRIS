@@ -56,13 +56,13 @@ label_file
 load_test_data <- function(){
   rm(list = ls(all = TRUE))
   # 
-  # setwd("/var/www/html/CeRIS/data/20191024223952/")
-  # srcFile = "1k_hgmm_v3_filtered_feature_bc_matrix.h5"
-  srcFile = "Zeisel_expression.csv"
-  jobid <- "20191024223952"
+  # setwd("/var/www/html/CeRIS/data/20191020160119/")
+  # srcFile = "5k_pbmc_protein_v3_filtered_feature_bc_matrix.h5"
+  srcFile = "iris3_example_expression_matrix.csv"
+  jobid <- "20191020160119"
   delim <- ","
-  is_imputation <-0
-  label_file<-'Zeisel_cell_label.csv'
+  is_imputation <- 0
+  label_file<-'iris3_example_expression_label.csv'
   delimiter <- ','
   param_k<-0
   label_use_sc3 <- 2
@@ -309,7 +309,7 @@ my.imputated.data<-log1p(my.imputated.data)
 dim(my.imputated.data)
 dim(expFile)
 
-
+#my.imputated.data <- as.matrix(exp_data)
 my.object<-CreateSeuratObject(my.imputated.data)
 my.object<-SetAssayData(object = my.object,slot = "data",new.data = my.imputated.data,assay="RNA")
 
@@ -513,7 +513,7 @@ Plot.cluster2D <- function(reduction.method="umap",customized=T,pt_size=1,revers
     guides(colour = guide_legend(override.aes = list(size=5))) + 
     scale_colour_manual(name  ="Cell type:(Cells)",values  = color_array[1:length(tmp.celltype)],
                         breaks=tmp.celltype,
-                        labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")")) +
+                        labels=paste0(tmp.celltype,":(",as.character(summary(my.plot.all.source$Cell_type)),")")[1:length(tmp.celltype)]) +
     theme_classic() + 
     coord_fixed(ratio=1)
   return(p.cluster)
@@ -628,24 +628,43 @@ pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, hei
 Plot.cluster2D(reduction.method = "umap",customized = F, reverse_color = T)
 quiet(dev.off())
 
-if (label_use_sc3 =='1'){
+if (label_use_sc3 =='1' | label_use_sc3 =='2'){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   ## check if user's label has valid number of rows, if not just use predicted value
-  if (nrow(cell_info) == nrow(cell_label)){
-    original_cell_info <- as.factor(cell_info[,2])
-    cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
-    rownames(cell_info) <- cell_info[,1]
-    cell_info <- cell_info[,-1]
-  } 
+  original_cell_info <- as.factor(cell_info[,2])
+  cell_info[,2] <- as.factor(cell_info[,2])
+  rownames(cell_info) <- cell_info[,1]
+  cell_info <- cell_info[,-1]
+  
+  
+  my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
+  Idents(my.object)<-as.factor(my.object$Customized.idents)
+  png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
+  print(Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = F))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = F))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.cluster2D(reduction.method = "umap",customized = T))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.cluster2D(reduction.method = "umap",customized = F, reverse_color = T))
+  quiet(dev.off())
+  
 } 
+
 my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
 Idents(my.object)<-as.factor(my.object$Customized.idents)
 png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
-Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = T)
+Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = F)
 quiet(dev.off())
 
 pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = T)
+Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = F)
 quiet(dev.off())
 
 ## save top 10 marker plots
@@ -685,3 +704,4 @@ quiet(dev.off())
 pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
+
