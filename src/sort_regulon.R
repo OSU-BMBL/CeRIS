@@ -17,8 +17,8 @@ wd <- args[1] # filtered expression file name
 jobid <- args[2] # user job id
 # wd<-getwd()
 ####test
-# wd <- "/var/www/html/CeRIS/data/20191026133824"
-# jobid <-20191026133824 
+# wd <- "/var/www/html/CeRIS/data/2019110595153"
+# jobid <-2019110595153 
 # setwd(wd)
 
 quiet <- function(x) { 
@@ -223,7 +223,9 @@ exp_data <- as.matrix(exp_data)
 label_data <- read.table(paste(jobid,"_cell_label.txt",sep = ""),sep="\t",header = T)
 label_data <- label_data[order(label_data[,1]),]
 
+colnames(exp_data)
 cell_idx <- as.character(sort(label_data[,1]))
+
 exp_data <- exp_data[,cell_idx]
 
 
@@ -277,7 +279,6 @@ bootstrap_rss <- gather(bootstrap_rss,CT,RSS)
 # genes=x= gene_name_list[[1]]
 total_gene_index <- 1
 for (i in 1:total_ct) {
-  
   regulon_gene_name_handle <- file(paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""),"r")
   regulon_gene_name <- readLines(regulon_gene_name_handle)
   close(regulon_gene_name_handle)
@@ -297,7 +298,7 @@ for (i in 1:total_ct) {
   gene_id_list <- lapply(strsplit(regulon_gene_id,"\\t"), function(x){x[-1]})
   motif_list <- lapply(strsplit(regulon_motif,"\\t"), function(x){x[-1]})
   
-if (length(gene_name_list) > 0){
+  if (length(gene_name_list) > 0){
     ras <- total_ras[total_gene_index:(total_gene_index + length(gene_name_list) - 1),]
     if (length(motif_list) == 1) {
       ras <- t(as.matrix(ras))
@@ -336,7 +337,11 @@ if (length(gene_name_list) > 0){
       gene_id_list <- gene_id_list[rss_rank]
       motif_list <- motif_list[rss_rank]
       ras <- ras[rss_rank,]
-      originak_ras <- originak_ras[rss_rank,]
+      if (length(rss_rank) == 1){
+        originak_ras<- t(as.data.frame(originak_ras))
+      } else {
+        originak_ras <- originak_ras[rss_rank,]
+      }
       rss_list <- rss_list[rss_rank]
       
       
@@ -389,6 +394,7 @@ if (length(gene_name_list) > 0){
       this_motif_value <- cbind(regulon_tag,this_motif_value)
       regulon_rank_result <- rbind(regulon_rank_result,this_motif_value)
     }
+    
     rownames(originak_ras) <- regulon_rank_result[,1]
     write.table(as.data.frame(originak_ras),paste(jobid,"_CT_",i,"_bic.regulon_activity_score.txt",sep = ""),sep = "\t",col.names = NA,row.names = T,quote = F)
     
@@ -419,10 +425,10 @@ if (length(gene_name_list) > 0){
       cat("\n",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""),append = T)
     }
   } else {
-  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""))
-  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""))
-  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
-  cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""))
+    cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_symbol.txt",sep = ""))
+    cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_gene_id.txt",sep = ""))
+    cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_motif.txt",sep = ""))
+    cat("",file=paste(jobid,"_CT_",i,"_bic.regulon_rank.txt",sep = ""))
   }
 }
 tmp_list <- strsplit(total_motif_list,",")
