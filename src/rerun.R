@@ -25,8 +25,8 @@ if(is.na(delim)){
   delim <- ','
 }
 
-#jobid <- 20191102214257
-#
+#jobid <- 20191024223952
+#delim <- ','
 wd <- paste("/var/www/html/CeRIS/data/",jobid,"/",sep="")
 setwd(wd)
 
@@ -254,20 +254,6 @@ quiet(dev.off())
 pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
 Plot.cluster2D(reduction.method = "umap",customized = F, reverse_color = T)
 quiet(dev.off())
-#
-#if (label_use_sc3 =='1'){
-#  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
-#  ## check if user's label has valid number of rows, if not just use predicted value
-#  if (nrow(cell_info) == nrow(cell_label)){
-#    original_cell_info <- as.factor(cell_info[,2])
-#    cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
-#    rownames(cell_info) <- cell_info[,1]
-#    cell_info <- cell_info[,-1]
-#  } 
-#} 
-
-#my.object<-AddMetaData(my.object,cell_info,col.name = "Customized.idents")
-#Idents(my.object)<-as.factor(my.object$Customized.idents)
 
 png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
 Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = F)
@@ -277,6 +263,76 @@ pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, hei
 Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = F)
 quiet(dev.off())
 
+if (bic_inference =='2'){
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delim)
+  ## check if user's label has valid number of rows, if not just use predicted value
+  original_cell_info <- as.factor(cell_info[,2])
+  #cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
+  cell_info[,2] <- as.factor(cell_info[,2])
+  rownames(cell_info) <- cell_info[,1]
+  tmp_names <- cell_info[,1]
+  cell_info <- cell_info[,-1]
+  names(cell_info) <- tmp_names
+  my.object<-AddMetaData(my.object,as.factor(cell_info),col.name = "Customized.idents")
+  Idents(my.object)<-as.factor(my.object$Customized.idents)
+  table(as.factor(my.object$Customized.idents))
+  
+  png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
+  print(Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = F))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = F))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.cluster2D(reduction.method = "umap",customized = T))
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_predict_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.cluster2D(reduction.method = "umap",customized = F, reverse_color = T))
+  quiet(dev.off())
+} 
+
+if (label_use_sc3 =='1'){
+  cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delim)
+  ## check if user's label has valid number of rows, if not just use predicted value
+  original_cell_info <- as.factor(cell_info[,2])
+  #cell_info[,2] <- as.numeric(as.factor(cell_info[,2]))
+  cell_info[,2] <- as.factor(cell_info[,2])
+  rownames(cell_info) <- cell_info[,1]
+  tmp_names <- cell_info[,1]
+  cell_info <- cell_info[,-1]
+  names(cell_info) <- tmp_names
+  my.object<-AddMetaData(my.object,as.factor(cell_info),col.name = "Customized.idents")
+  Idents(my.object)<-as.factor(my.object$Customized.idents)
+  table(as.factor(my.object$Customized.idents))
+  png(paste("regulon_id/overview_provide_ct.png",sep = ""),width=2000, height=1500,res = 300)
+  Plot.cluster2D(reduction.method = "umap",customized = T,pt_size = pt_size, reverse_color = T)
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = T)
+  quiet(dev.off())
+} 
+
+library(slingshot)
+library(Seurat)
+library(SummarizedExperiment)
+suppressPackageStartupMessages(library(destiny))
+my.trajectory <- readRDS("trajectory_obj.rds")
+#my.object <- readRDS("seurat_obj.rds")
+
+png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+quiet(dev.off())
+
+pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+quiet(dev.off())
+
+
+################################################################################# trajectory
 system(paste("rm ",jobid,".zip",sep=""))
 system(paste("zip -R ",wd,"/",jobid," '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' '*_marker_genes.txt' 'cell_type_unique_marker.txt' '*_combine_regulon.txt'",sep=""))
 
