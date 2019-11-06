@@ -10,10 +10,15 @@ library(Seurat)
 args <- commandArgs(TRUE)
 jobid <- args[1] # job id
 
-jobid <- 20191026133824
-label_file <- "1"
+jobid <- 2019102483152
 wd <- paste("/var/www/html/CeRIS/data/",jobid,"/",sep="")
 setwd(wd)
+
+info_file <- read_lines("info.txt")
+
+label_file <- strsplit(info_file[grep("labelfile",info_file)],",")[[1]][2]
+
+
 
 my.object <- readRDS("seurat_obj.rds")
 
@@ -26,11 +31,15 @@ if (label_file == '1') {
   
 }
 
+system(paste("Rscript /var/www/html/iris3/program/prepare_bbc.R", jobid, "12",sep=" "), intern=T)
+
+system(paste("Rscript /var/www/html/iris3/program/sort_regulon.R",wd, jobid,sep=" "), intern=T)
+
 system(paste("Rscript /var/www/html/CeRIS/program/generate_rss_scatter.R", jobid,sep=" "), intern=T)
 
 system(paste("/var/www/html/iris3/program/get_atac_overlap.sh", wd,sep=" "), intern=T)
 
-
+cat("k_arg,20\n", file=paste("info.txt",sep=""),append = T)
 
 
 if (!file.exists(paste(jobid,"_marker_genes.json",sep=""))){
@@ -246,4 +255,9 @@ pdf(file = paste("regulon_id/overview_provide_ct.pdf",sep = ""), width = 16, hei
 Plot.cluster2D(reduction.method = "umap",customized = T, reverse_color = F)
 quiet(dev.off())
 
+system(paste("rm ",jobid,".zip",sep=""))
+system(paste("zip -FSr ",wd,jobid," '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' '*_marker_genes.txt' 'cell_type_unique_marker.txt' '*_combine_regulon.txt'",sep=""))
+
 quiet(system("chmod -R 777 ."))
+
+cat("\014")
