@@ -15,10 +15,10 @@ args <- commandArgs(TRUE)
 wd <- args[1]
 jobid <- args[2]
 label_use_sc3 <- args[3]
-#setwd("/var/www/html/CeRIS/data/20190913134923")
+#setwd("/var/www/html/CeRIS/data/20191101133117")
 #wd <- getwd()
-#jobid <-20190913134923
-#label_use_sc3 <- 2
+#jobid <-20191101133117
+#label_use_sc3 <- 0
 setwd(wd)
 getwd()
 workdir <- getwd()
@@ -190,7 +190,9 @@ for(i in 1: length(unique(label_data[,2]))){
   k=0
   gene_row <- unique(gene_row)
   file_heat_matrix <- heat_matrix[rownames(heat_matrix) %in% unique(gene_row),]
-  
+  if (nrow(file_heat_matrix) == 0) {
+    next
+  }
   if (label_use_sc3 == 0 ) {
     category <- paste("Predicted label:",paste("_",label_data[,2],"_",sep=""),sep = " ")
     file_heat_matrix <- rbind(category,file_heat_matrix)
