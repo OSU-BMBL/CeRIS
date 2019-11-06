@@ -16,7 +16,7 @@ args <- commandArgs(TRUE)
 jobid <- args[1] # user job id
 #wd<-getwd()
 ####test
-#jobid <-20191018130101   
+#jobid <- 20191018130101   
 label_use_sc3 <- 0
 
 dir.create("heatmap",showWarnings = F)
@@ -162,7 +162,9 @@ for (i in ct_seq) {
   num_regulons_in_this_ct <- length(which(unlist(lapply(total_rank,function(x){
     return(any(grepl(select_idx[i],x)))
   }))))
-  tmp <- paste(select_idx[i],seq(1:num_regulons_in_this_ct),sep="")
+  if (num_regulons_in_this_ct > 0) {
+    tmp <- paste(select_idx[i],seq(1:num_regulons_in_this_ct),sep="")
+  }
   select_idx_result <- c(select_idx_result,tmp)
 }
 
