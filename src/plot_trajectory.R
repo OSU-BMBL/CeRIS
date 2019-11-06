@@ -6,7 +6,7 @@ library(Polychrome)
 library(ggplot2)
 
 args <- commandArgs(TRUE) 
- #setwd("D:/IRIS3_data_test/CeRIS_Run/2.Yan/")
+#setwd("D:/IRIS3_data_test/CeRIS_Run/2.Yan/")
 #setwd("/var/www/html/CeRIS/data/20191020160119")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
@@ -246,11 +246,3 @@ if (!file.exists(paste("regulon_id/",id,".trajectory.png",sep = ""))){
   Plot.Regulon.Trajectory(cell.type = as.numeric(regulon_ct),regulon = as.numeric(regulon_id),start.cluster = NULL,end.cluster = NULL,customized = T)
 }
 quiet(dev.off())
-
-my.trajectory<-SingleCellExperiment(
-  assays = list(
-    counts = GetAssayData(object = my.object[['RNA']],slot="counts")
-  ), 
-  colData = Idents(my.object)
-)
-
