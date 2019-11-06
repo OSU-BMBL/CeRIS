@@ -5,12 +5,14 @@ library(seqinr)
 library(tidyverse)
 args <- commandArgs(TRUE)
 #setwd("/var/www/html/CeRIS/data/20191020160119")
-#srcDir <- getwd()
+#wd <- getwd()
 #jobid <-20191020160119 
 #motif_len <- 12
-srcDir <- args[1]
+jobid <- args[1]
 motif_len <- args[2]
-setwd(srcDir)
+
+wd <- paste("/var/www/html/CeRIS/data/",jobid,"/",sep="")
+setwd(wd)
 getwd()
 workdir <- getwd()
 alldir <- list.dirs(path = workdir)
