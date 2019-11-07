@@ -9,11 +9,11 @@ delim <- args[3] #label file delimiter
 label_use_sc3 <- 0 #default 0
 label_use_sc3 <- args[4] # 1 for have label use sc3, 2 for have label use label, 0 for no label use sc3
 #delim <- args[3]
-# setwd("D:/Users/flyku/Documents/IRIS3-data/test_regulon")
-# srcFile = "Zeisel_cell_label.csv"
-# jobid <- "20191024223952"
-# delim <- ","
-# label_use_sc3 <- 2
+
+# srcFile = "Seurat-cellInfo.txt"
+# jobid <- "20191003114503"
+# delim <- "\t"
+# label_use_sc3 <- 1
 if(delim == 'tab'){
   delim <- '\t'
 }
@@ -41,10 +41,11 @@ library(networkD3)
 library(tidyr)
 library(gdata)
 library(data.table)
+library(stringr)
 
 
 predict_cluster <- read.table(paste(jobid,"_sc3_label.txt",sep=""),header=T,sep='\t',check.names = FALSE)
-# srcFile <- 'iris3_example_expression_label.csv'
+# srcFile <- 'Zeisel_cell_label.csv'
 
 #2nd input
 #user_label <- read.delim(srcFile,header=T,sep=delim,check.names = FALSE)
@@ -79,7 +80,7 @@ if (label_use_sc3 == 2) {
   is_evaluation <- 'yes'
   #write.table(user_label_file,paste(jobid,"_sc3_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
   write.table(user_label, paste(jobid,"_cell_label.txt",sep = ""),sep = "\t", row.names = F,col.names = T,quote = F)
-  write.table(user_label_name, paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
+  write.table(str_replace(user_label_name," ","_"), paste(jobid,"_user_label_name.txt",sep = ""),sep = "\t", row.names = F,col.names = F,quote = F)
   write(paste("provide_label,",length(levels(as.factor(user_label_name))),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   write(paste("predict_label,",max(predict_cluster[,2]),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
   
