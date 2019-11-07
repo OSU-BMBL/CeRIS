@@ -429,6 +429,11 @@ Idents(my.object)<-as.factor(my.object$Customized.idents)
 ## get marker genes
 my.cluster<-as.character(sort(unique(as.numeric(Idents(my.object)))))
 my.marker<-FindAllMarkers(my.object,only.pos = T)
+
+mt <- my.marker[order(my.marker$p_val_adj), ]
+d <- by(mt, mt["cluster"], head, n=100)
+my.marker <- Reduce(rbind, d)
+
 #my.marker <- read.table(paste(jobid,"_marker_genes.txt",sep=""),header=T)
 my.top<-c()
 for( i in 1:length(my.cluster)){
