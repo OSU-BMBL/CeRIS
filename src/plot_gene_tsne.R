@@ -135,7 +135,7 @@ quiet <- function(x) {
 } 
 # point size function from test datasets
 x <- c(0,90,124,317,1000,2368,3005,4816,8298,50000,500000,5000000)
-y <- c(1,1,0.89,0.33,0.30,0.22,0.205,0.195,0.16,0.1,0.1,0.1)
+y <- c(1,1,0.89,0.33,0.30,0.25,0.235,0.205,0.18,0.1,0.1,0.1)
 get_point_size <- approxfun(x, y)
 
 setwd(srcDir)
@@ -144,23 +144,20 @@ setwd(srcDir)
 quiet(dir.create("regulon_id",showWarnings = F))
 
 
-png(paste("regulon_id/",gene_symbol,".umap.png",sep = ""),width=2000, height=1500,res = 300)
-if (!file.exists(paste("regulon_id/",gene_symbol,".umap.png",sep = ""))){
-  if(!exists("my.object")){
-    library(Seurat)
-    my.object <- readRDS("seurat_obj.rds")
-  }
-  num_cells <- ncol(my.object)
-  pt_size <- get_point_size(num_cells)*2
-  Plot.GeneUMAP(gene_symbol,pt_size = pt_size)
+if (!file.exists(paste("regulon_id/",gene_symbol,".umap.pdf",sep = ""))){
+  library(Seurat)
+  my.object <- readRDS("seurat_obj.rds")
+  pt_size <- get_point_size(ncol(my.object))
   
-  pdf(file = paste("regulon_id/",id,".umap.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
-  print(Plot.GeneUMAP(gene_symbol,pt_size = pt_size))
+  png(width=2000, height=1500,res = 300, file=paste("regulon_id/",gene_symbol,".umap.png",sep = ""))
+  print(Plot.GeneUMAP(gene_symbol,pt_size = pt_size * 1.2))
   quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/",gene_symbol,".umap.pdf",sep = ""), width = 16, height = 12,  pointsize = 12, bg = "white")
+  print(Plot.GeneUMAP(gene_symbol,pt_size = pt_size * 3))
+  quiet(dev.off())
+  
 }
-quiet(dev.off())
-
-
 #png(paste("regulon_id/overview_ct.png",sep = ""),width=2000, height=1500,res = 300)
 #if (!file.exists(paste("regulon_id/overview_ct.png",sep = ""))){
 #  if(!exists("my.object")){
