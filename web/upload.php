@@ -146,7 +146,24 @@ if (!empty($_FILES)) {
     $new_array['data'] = array_slice($new_array['data'], 0, 10);
     $new_array['index'] = array_slice($new_array['index'], 0, 10);
     echo json_encode($new_array);
-} else if ($json != "") {
+} else if ($_POST['filename'] == "clear") {
+    session_start();
+    $jobid = $_SESSION['jobid'];
+    if ($jobid == "") {
+        $jobid = date("YmdGis");
+    } else {
+    }
+    $_SESSION['jobid'] = $jobid;
+
+    #system("cp ./upload/CeRIS_example_gene_module.csv $workdir");
+    $expfile = '';
+    $_SESSION['expfile'] = $expfile;
+    $labelfile = '';
+    $_SESSION['labelfile'] = $labelfile;
+    $gene_module_file = '';
+    $_SESSION['gene_module_file'] = $gene_module_file;
+    
+}else if ($json != "") {
     $example = $_POST['filename'];
     session_start();
     $jobid = $_SESSION['jobid'];

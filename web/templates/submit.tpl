@@ -146,12 +146,25 @@ $(document).ready(function() {
         placement: 'top'
     });
     $('.dropdown-toggle').dropdown();
-
+	// clear uploaded files on refresh
+	$.ajax({
+            url: "upload.php",
+            type: 'POST',
+            data: {
+                'filename': 'clear'
+            },
+            dataType: 'json',
+            success: function(response) {},
+            error: function(e) {
+                console.log(e.message);
+            }
+        })
     dz_exp = $("#dropzone_exp").dropzone({
-        dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 files in your 10X output directory). <br> Compressed file accepted.",
+        dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 gz files in your 10X output directory). <br> Compressed format (gz,zip) accepted.",
         acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.zip,.h5,.hdf5,.mtx",
         url: "upload.php",
         maxFiles: 3,
+		parallelUploads: 3,
         maxFilesize: 5000,
         maxfilesexceeded: function(file) {
             this.removeFile(this.files[0]);
@@ -191,7 +204,7 @@ $(document).ready(function() {
         success: function(file, response) {
             $('#enable_labelfile').attr("disabled", false);
             response = JSON.parse(response);
-            console.log(response);
+            //console.log(response);
             addTable(response, 'label');
 
         }
@@ -214,7 +227,7 @@ $(document).ready(function() {
         success: function(file, response) {
             $('#enable_gene_module').attr("disabled", false);
             response = JSON.parse(response);
-            console.log(response);
+            //console.log(response);
             addTable(response, 'gene_module');
         }
     });
@@ -383,7 +396,7 @@ $(document).ready(function() {
 		<label class="form-check-label" for="species_select">Species:
 		 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Specify the species belongs to your gene expression matrix."> </span> 
 				</label>
-		<select class="selectpicker" id="species_arg" name="species_arg[]" multiple data-max-options="2">
+		<select class="selectpicker" id="species_arg" name="species_arg[]" title="Select species...">
   <option value="Human">Human (hg38)</option>
   <option value="Mouse">Mouse (mm10)</option>
   <!--<option value="Zebrafish">Zebrafish</option>
@@ -433,8 +446,8 @@ $(document).ready(function() {
 									<div class="col-md-2">
 										<select class="selectpicker" name="f_arg" data-width="auto">
 											<option>0.5</option>
-											<option>0.6</option>
-											<option data-subtext="Default" selected="selected">0.7</option>
+											<option data-subtext="Default" selected="selected">0.6</option>
+											<option>0.7</option>
 											<option>0.8</option>
 											<option>0.9</option>
 											<option>1.0</option>
@@ -451,9 +464,9 @@ $(document).ready(function() {
 										<select class="selectpicker" name="o_arg" data-width="auto">
 											<option>20</option>
 											<option>50</option>
-											<option>100</option>
+											<option data-subtext="Default" selected="selected">100</option>
 											<option>200</option>
-											<option data-subtext="Default" selected="selected">500</option>
+											<option>500</option>
 											<option>1000</option>
 										</select>
 									</div>
