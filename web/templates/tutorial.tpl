@@ -24,7 +24,7 @@ $(document).ready(function() {
 });
 if(window.location.hash == ""){
 console.log(window.location.hash);
- window.location.href = "http://bmbl.sdstate.edu/CeRIS/tutorial.php#1basics";
+ window.location.href = "https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics";
 }
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">

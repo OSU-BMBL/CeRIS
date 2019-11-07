@@ -49,7 +49,7 @@ $(document).ready(function() {
 });
 if(window.location.hash == ""){
 
- window.location.href = "http://bmbl.sdstate.edu/CeRIS/more.php#4FAQ";
+ window.location.href = "https://bmbl.bmi.osumc.edu/CeRIS/more.php#4FAQ";
 }
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">

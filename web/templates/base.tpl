@@ -51,8 +51,8 @@
                                 <li><a href="/CeRIS/submit.php">Submit</a></li>
                                 <li><a href="/CeRIS/tutorial.php#1basics">Tutorial</a></li>
 								<li><a href="/CeRIS/news.php#1version">What's new</a></li>
-								<li><a href="https://groups.google.com/forum/#!forum/CeRIS-discussion-board">Forum</a></li>
-								<li><a href="/CeRIS/more.php#4FAQ">More</a></li>
+								<li><a href="https://groups.google.com/forum/#!forum/bmbl-ceris">Forum</a></li>
+								<li><a href="/CeRIS/more.php#4FAQ">FAQ</a></li>
                             </ul>
                         </div>
                     </div>
