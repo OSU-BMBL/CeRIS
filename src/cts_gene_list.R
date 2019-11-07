@@ -341,7 +341,7 @@ dir.create(new_dir, showWarnings = FALSE)
         }
       }
       if(length(result) < 350 & length(result) > 3){
-        writeXStringSet(result, paste(new_dir,"/","bic",k,".txt.fa",sep=""),format = "fasta",width=1000)
+        writeXStringSet(result, paste(new_dir,"/","bic",k,".txt.fa",sep=""),format = "fasta",width=promoter_len)
         #write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt.fa",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
       }
     }
