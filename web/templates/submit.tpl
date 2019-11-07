@@ -1,6 +1,21 @@
 {{extends file="base.tpl"}} {{block name="extra_style"}} form div.fieldWrapper label { min-width: 5%; } {{/block}} {{block name="extra_js"}} {{/block}} {{block name="main"}}
 	<script src="assets/js/bootstrap-select.min.js"></script>
 <script>
+function use_fast_version(item) {
+$('#f_arg_id').selectpicker('val', '0.5')
+$('#o_arg_id').selectpicker('val', '100')
+$('#k_arg_id').selectpicker('val', '20')
+$('#promoter_arg_id').selectpicker('val', '500')
+$("#is_imputation").prop("checked", false)
+$("#is_c").prop("checked", false)
+
+}
+function use_slow_version(item) {
+$('#f_arg_id').selectpicker('val', '0.7')
+$('#o_arg_id').selectpicker('val', '500')
+$('#k_arg_id').selectpicker('val', '20')
+$('#promoter_arg_id').selectpicker('val', '1000')
+}
 function addPreviewTable(response, metadata = true, type) {
 
     // Define table
@@ -67,20 +82,20 @@ function addPreviewTable(response, metadata = true, type) {
             if (response['columns'][0].length != response['data'][0].length && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">WARNING: The number of cells in your first row(' + response['columns'][0].length + ') does not match the number in the other rows(' + response['data'][0].length + ').</span></label>'));
+                }).html('<span class="bold highlight">WARNING: The number of cells in your first row(' + response['columns'][0].length + ') seems does not match the number in the other rows(' + response['data'][0].length + ').</span></label>'));
             }
             percent_gene_num = response['gene_num'][0] > 1000 ? 1000 : response['gene_num'][0];
             percent = (1 - response['count_zero'][0] / (response['columns'][0].length * percent_gene_num)).toFixed(6);
-
+			/*
             if (percent > 0.85 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">WARNING: There are too many zeros or or unrecognized characters in your dataset (' + percent * 100 + '%), errors are likely to occur when you submit job to CeRIS.</span></label>'));
-            }
+                }).html('<span class="bold highlight">Note: There are many zeros or or unrecognized characters in your dataset header (' + percent * 100 + '%).</span></label>'));
+            }*/
             if (response['columns'][0].length < 40 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">WARNING: Your dataset has (' + response['columns'][0].length + ') cells, errors may occur when you submit to CeRIS. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
+                }).html('<span class="bold highlight">Note: Your dataset has (' + response['columns'][0].length + ') cells, errors may occur when you submit to CeRIS. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
                 document.getElementById("k_arg").value = 5;
             }
             var check_cell_name_start_with_number = function(array) {
@@ -101,7 +116,7 @@ function addPreviewTable(response, metadata = true, type) {
         case 'hdf':
             $('#preview_' + type).append($('<label>', {
                 'class': 'px-2 py-1'
-            }).html('<span class="bold highlight">NOTE: Word on HDF.... ' + response['type'][0] + '</span></label>'));
+            }).html('<br><span class="bold highlight">NOTE: Check advanced options for 10X parameter adjustment. ' + '</span></label>'));
             break;
 
     }
@@ -160,8 +175,8 @@ $(document).ready(function() {
             }
         })
     dz_exp = $("#dropzone_exp").dropzone({
-        dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 gz files in your 10X output directory). <br> Compressed format (gz,zip) accepted.",
-        acceptedFiles: ".txt,.csv,.tsv,.xls,.xlsx,.gz,.zip,.h5,.hdf5,.mtx",
+        dictDefaultMessage: "Drag or click upload your gene expression matrix, supported format: <br>1. Gene expression matrix (txt, tsv, csv). <br>2. HDF5 feature barcode batrix (hdf5).<br>3. Gene-barcode matrices (3 gzip files in your 10X output directory).",
+        acceptedFiles: ".txt,.csv,.tsv,.gz,.zip,.h5,.hdf5,.zip",
         url: "upload.php",
         maxFiles: 3,
 		parallelUploads: 3,
@@ -351,7 +366,7 @@ $(document).ready(function() {
 		<h2 class="text-center">Job Submission</h2>
 		<div class="form-group row">
 			<div class="form-check col-sm-12 ">
-				<label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A gene expression file with genes as rows and cells as columns. Users can provide normalized or non-normalized input file for the submission. Accept both txt, csv and tsv format. "> </span>
+				<label class="form-check-label" for="expfile">Upload gene expression file: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="A gene expression file with genes as rows and cells as columns. Users can provide normalized or non-normalized file (Read counts) for the submission. Accept txt, csv and tsv format for text gene expression matrix, 10X hdf5 or gene-barcode matrices. "> </span>
 				</label>
 			</div>
 			<div class="form-check col-sm-2  ">
@@ -361,11 +376,15 @@ $(document).ready(function() {
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/CeRIS_example_expression_matrix.csv" >Download example gene expression matrix</a>
+						<li><a class="dropdown-item" href="storage/Yan_2013_expression.csv" >Download example gene expression matrix (Yan et al, 2013)</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/CeRIS_example_hdf5.h5" >Download example HDF5 feature barcode matrix</a>
+						<li><a class="dropdown-item" href="storage/5k_pbmc_protein_v3_filtered_feature_bc_matrix.h5" >Download example HDF5 feature barcode matrix (10X 5K PMBCs)</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/CeRIS_example_10x_matrices.zip" >Download example gene-barcode matrices (3 files in 10X output)</a>
+						<li><a class="dropdown-item" href="storage/genes.tsv.gz" >Download example gene-barcode matrices (10X 2700 PMBCs) (genes.tsv.gz)</a>
+						</li>
+						<li><a class="dropdown-item" href="storage/barcodes.tsv.gz" >Download example gene-barcode matrices (10X 2700 PMBCs) (barcodes.tsv.gz)</a>
+						</li>
+						<li><a class="dropdown-item" href="storage/matrix.mtx.gz" >Download example gene-barcode matrices (10X 2700 PMBCs) (matrix.mtx.gz)</a>
 						</li>
 					</ul>
 				</div>
@@ -377,7 +396,7 @@ $(document).ready(function() {
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
 						</li>
-						<li><a class="dropdown-item" href="storage/CeRIS_example_expression_matrix.csv" >Download example gene expression file</a>
+						<li><a class="dropdown-item" href="storage/Yan_2013_expression.csv" >Download example gene expression file</a>
 						</li>
 					</ul>
 				</div>
@@ -419,14 +438,25 @@ $(document).ready(function() {
                      <a data-toggle="collapse" data-parent="#accordion2" href="#collapseThree2">Advanced options</a>
                   </h4>
 					</div>
+						
 					<div id="collapseThree2" class="panel-collapse collapse">
 						<div class="panel-body">
+						
+						<h4 class="font-italic text-left">Quick selections</h4>
+						<div class="form-group row">
+						<div class="form-check col-sm-2 ">
+							<button type="button" id="fast_version_btn" class="btn btn-default extra-button" data-toggle="collapse" onclick="use_fast_version(this);">Fast version</button><span class="glyphicon glyphicon-question-sign" data-container="body" data-toggle="tooltip" data-original-title=" This option uses  fast version. By setting f=0.5, k=20, o=100, disable imputation and dual strategy. This runs faster but generage less CTS-Rs."> </span> 
+						</div>
+						<div class="form-check col-sm-3 ">
+							<button type="button" id="fast_version_btn" class="btn btn-default extra-button" data-toggle="collapse" onclick="use_slow_version(this);">Slow version (Default)</button><span class="glyphicon glyphicon-question-sign" data-container="body" data-toggle="tooltip" data-original-title="(Default)This option uses  parameters in our publications. By setting f=0.7, k=20, o=500. Please also enable imputation if uploading 10X hdf5 or gene-barcodes matrices files, enable dual strategy if uploading C1 gene expression matrix text file. This runs slower but genreate more CTS-Rs."> </span> 
+						</div>
+					</div>
 						<h4 class="font-italic text-left">Pre-processing</h4>
 						<div class="form-group row">
 						<div class="form-check col-sm-12 ">
 							<input class="form-check-input" type="checkbox" name="is_imputation" id="is_imputation" value="1">
-							<label class="form-check-label" for="is_imputation">Enable imputation (Using <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2226-y" target="_blank"/>DrImpute</a>) (Recommendation: disable for C1 data, enable for 10X data) 
-							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The optional enable imputation."> </span> 
+							<label class="form-check-label" for="is_imputation">Enable imputation (Using <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2226-y" target="_blank"/>DrImpute</a>) 
+							 <span class="glyphicon glyphicon-question-sign" data-container="body" data-toggle="tooltip" data-original-title="Recommendation: disable for C1 data, enable for 10X hdf5 or gene-barcodes matrices files."> </span> 
 							</label>
 						</div>
 					</div>
@@ -434,20 +464,20 @@ $(document).ready(function() {
 							<div class="form-group">
 							<div class="row"><div class="form-check col-sm-12 ">
 							<input class="form-check-input" type="checkbox" name="is_c" id="is_c" value="1">
-							<label class="form-check-label" for="is_c">Enable dual strategy.(Recommendation: enable for C1 data, disable for 10X data) 
-							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Dual description."> </span> 
+							<label class="form-check-label" for="is_c">Enable dual strategy.
+							 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Core-Dual strategy is to identify biclusters and optimize relevant parameters. Recommendation: enable for C1 gene expression matrix dataset, disable for 10X hdf5 or gene-barcodes matrices files."> </span> 
 							</label>
 						</div></div>
 								<div class="row">
 									<div class="col-md-2">
-										<label for="ex1">Overlap rate: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. 0 means no overlap and 1 means complete overlap. Default is 0.5."> </span> 
+										<label for="ex1">Overlap rate: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Controls the level of overlaps between to-be-identified biclusters. A larger value means more overlap on gene modules. Default is 0.7."> </span> 
 										</label>
 									</div>
 									<div class="col-md-2">
-										<select class="selectpicker" name="f_arg" data-width="auto">
+										<select  id="f_arg_id" class="selectpicker" name="f_arg" data-width="auto">
 											<option>0.5</option>
-											<option data-subtext="Default" selected="selected">0.6</option>
-											<option>0.7</option>
+											<option>0.6</option>
+											<option data-subtext="Default" selected="selected">0.7</option>
 											<option>0.8</option>
 											<option>0.9</option>
 											<option>1.0</option>
@@ -457,16 +487,16 @@ $(document).ready(function() {
 								<br>
 								<div class="row">
 									<div class="col-md-2">
-										<label for="ex3">Max biclusters: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Max number of biclusters to output. Note: the output number will affect the prediction of bicluster, not merely a cutoff, and the output biclusters may be less than this number. Default is 100."> </span>
+										<label for="ex3">Max biclusters: <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Max number of biclusters to output. Note: the output number will affect the prediction of bicluster, not merely a cutoff, and the output biclusters may be less than this number. A smaller value (e.g 100) helps decrease running time. Default is 500. "> </span>
 										</label>
 									</div>
 									<div class="col-md-2">
-										<select class="selectpicker" name="o_arg" data-width="auto">
+										<select  id="o_arg_id" class="selectpicker" name="o_arg" data-width="auto">
 											<option>20</option>
 											<option>50</option>
-											<option data-subtext="Default" selected="selected">100</option>
+											<option>100</option>
 											<option>200</option>
-											<option>500</option>
+											<option data-subtext="Default" selected="selected">500</option>
 											<option>1000</option>
 										</select>
 									</div>
@@ -478,7 +508,7 @@ $(document).ready(function() {
 										</label>
 									</div>
 									<div class="col-md-2">
-										<select class="selectpicker" name="k_arg" data-width="auto">
+										<select id="k_arg_id" class="selectpicker" name="k_arg" data-width="auto">
 											<option>5</option>
 											<option>10</option>
 											<option>15</option>
@@ -527,7 +557,7 @@ $(document).ready(function() {
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 													<li><a id="load_label" class="dropdown-item" href="#dropzone_label">Load example file</a>
 													</li>
-													<li><a class="dropdown-item" href="/CeRIS/storage/CeRIS_example_label.csv" download>Download example cell label file</a>
+													<li><a class="dropdown-item" href="/CeRIS/storage/Yan_2013_label.csv" download>Download example cell label file</a>
 													</li>
 												</ul>
 											</div>
@@ -537,7 +567,7 @@ $(document).ready(function() {
 										</div>
 									</div>
 							</div>
-							<h4 class="font-italic text-left">Cell type source <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from SC3 or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
+							<h4 class="font-italic text-left">Cell type source <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Choose the resource of cell types, either predicted from Seurat or the ground truth labels provided in the uploaded cell label file. The CTS-biclusters are determined by performing the hypergeometric test between the cells in each bicluster and in each cell type."> </span></h4>
 							<div class="row">
 								<div class="form-check col-sm-2 ">
 									<input type="radio" value="1" id="enable_sc3" name="bicluster_inference" class="custom-control-input" checked="">
@@ -566,7 +596,7 @@ $(document).ready(function() {
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 													<!--<li><a id="load_gene_module" class="dropdown-item" href="#dropzone_label">Load example file</a>
 													</li>-->
-													<li><a class="dropdown-item" href="/CeRIS/storage/CeRIS_example_gene_module.csv" download>Download example gene module file</a>
+													<li><a class="dropdown-item" href="/CeRIS/storage/Yan_2013_example_gene_module.csv" download>Download example gene module file</a>
 													</li>
 												</ul>
 											</div>
@@ -600,8 +630,10 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 									<label for="ex2">Upstream promoter region:	
 									 <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The upstream length from a gene and its DNA sequence will be used for DNA motif prediction."> </span> 
 									</label>
-									<select class="selectpicker" name="promoter_arg" data-width="auto">
+									<select id="promoter_arg_id" class="selectpicker" name="promoter_arg" data-width="auto">
+										<option>250</option>
 										<option>500</option>
+										<option>750</option>
 										<option data-subtext="Default" selected="selected">1000</option>
 										<option>2000</option>
 									</select>
