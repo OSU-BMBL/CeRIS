@@ -186,7 +186,7 @@ if (isset($_POST['submit']))
 	}
 	}
 	$fp = fopen("$workdir/info.txt", 'w');
-	fwrite($fp,"is_load_exp,$is_load_exp\nc_arg,$c_arg\nf_arg,$f_arg\no_arg,$o_arg\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\ngene_module_file,$gene_module_file\nis_imputation,$is_imputation\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
+	fwrite($fp,"is_load_exp,$is_load_exp\nk_arg,$k_arg\nf_arg,$f_arg\no_arg,$o_arg\nlabel_use_sc3,$label_use_sc3\nexpfile,$expfile\nlabelfile,$labelfile\ngene_module_file,$gene_module_file\nis_imputation,$is_imputation\nis_c,$is_c\npromoter_arg,$promoter_arg\nif_allowSave,$if_allowSave\nbic_inference,$bic_inference");
 	fclose($fp);
 	$fp = fopen("$workdir2/qsub.sh", 'w');
 	if($if_allowSave != '0'){
@@ -227,7 +227,7 @@ Rscript /var/www/html/CeRIS/program/convert_meme.R \$wd \$motif_min_length
 wait
 cd \$wd\n
 find -name '*' -size 0 -delete\n
-Rscript /var/www/html/CeRIS/program/prepare_bbc.R \$wd \$motif_min_length\n
+Rscript /var/www/html/CeRIS/program/prepare_bbc.R \$jobid \$motif_min_length\n
 
 mkdir tomtom\n
 mkdir logo_tmp\n
@@ -249,7 +249,7 @@ mkdir json
 /var/www/html/CeRIS/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
 
 
-zip -R \$wd\$jobid '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' 'cell_type_unique_marker.txt'\n
+zip -R \$wd\$jobid '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' '*_marker_genes.txt' 'cell_type_unique_marker.txt' '*_combine_regulon.txt'\n
 perl /var/www/html/CeRIS/program/prepare_email.pl \$jobid\n
 echo 'finish'> done\n  
 chmod -R 777 .

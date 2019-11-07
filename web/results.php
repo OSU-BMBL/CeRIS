@@ -25,10 +25,24 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 	if ($param_file) {
 		while (($line = fgets($param_file)) !== false) {
 			$split_line = explode (",", $line);
-			if($split_line[0] == "c_arg"){
-				$c_arg = $split_line[1];
+			if($split_line[0] == "k_arg"){
+				$k_arg = $split_line[1];
 			} else if($split_line[0] == "f_arg"){
 				$f_arg = $split_line[1];
+			} else if($split_line[0] == "is_c"){
+				if( $split_line[1] == "-C") {
+					$is_c = "Yes";
+				} else{
+					$is_c = "No";
+				}
+			} else if($split_line[0] == "is_imputation"){
+				if( $split_line[1] == "1") {
+					$is_imputation = "Yes";
+				} else{
+					$is_imputation = "No";
+				}
+			} else if($split_line[0] == "promoter_arg"){
+				$promoter_arg = $split_line[1];
 			} else if($split_line[0] == "o_arg"){
 				$o_arg = $split_line[1];
 			} else if($split_line[0] == "motif_program"){
@@ -535,9 +549,12 @@ $smarty->assign('module_motif_result',$module_motif_result);
 $smarty->assign('big',$big);
 $smarty->assign('predict_label',$predict_label);
 $smarty->assign('provide_label',$provide_label);
-$smarty->assign('c_arg',$c_arg);
 $smarty->assign('f_arg',$f_arg);
+$smarty->assign('k_arg',$k_arg);
 $smarty->assign('o_arg',$o_arg);
+$smarty->assign('is_c',$is_c);
+$smarty->assign('is_imputation',$is_imputation);
+$smarty->assign('promoter_arg',$promoter_arg);
 $smarty->assign('ARI',$ARI);
 $smarty->assign('RI',$RI);
 $smarty->assign('JI',$JI);
@@ -570,7 +587,8 @@ $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
-#print_r($motif_rank_result);
+#print_r($main_species);
+
 $smarty->setCacheLifetime(3600000);
 $smarty->display('results.tpl');
 

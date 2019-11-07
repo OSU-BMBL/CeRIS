@@ -58,14 +58,16 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
                 "visible": false
 				},{
                 "targets": [7],
-                render: function (data, type, row, meta)
-					{	
-						var dat=new Array
-						if (type === 'display')
-						{
-							res=data.split(" ")
+                render: function (data, type, row, meta){	
+						var dat = new Array
+						if (type === 'display'){
+							res = data.split(" ")
 							for(i=0;i < res.length;i++) {
-								dat[i] = '<a  href="https://www.ensembl.org/id/' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								if (match_species == "Human") {
+								dat[i] = '<a  href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								} else if (match_species == "Mouse"){
+								dat[i] = '<a  href="http://www.informatics.jax.org/searchtool/Search.do?query=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								}
 							}
 						}
 						return dat
@@ -120,13 +122,14 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
                 "targets": [2],
                 render: function (data, type, row, meta){	
 						var dat=new Array
-						if (type === 'display')
-						{
-							
+						if (type === 'display'){
 							res=data.split(" ")
-							console.log(res)
-							for(i=0;i < res.length;i++) {
-								dat[i] = '<a  href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+							if (res[0] != "Not"){
+								for(i=0;i < res.length;i++) {
+									dat[i] = '<a  href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								}
+							} else {
+								dat = "Not found"
 							}
 						}
 						return dat
@@ -152,6 +155,24 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 				"bInfo" : false,
 				"aLengthMenu": [[ -1], [ "All"]],
 				"iDisplayLength": -1,
+				columnDefs: [{
+                "targets": [2],
+                render: function (data, type, row, meta){	
+						var dat=new Array
+						if (type === 'display'){
+							res=data.split(" ")
+							if (res[0] != "Not"){
+								for(i=0;i < res.length;i++) {
+									dat[i] = '<a  href="http://www.informatics.jax.org/searchtool/Search.do?query=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								}
+							}else {
+								dat = "Not found"
+							}
+						}
+						return dat
+					}
+				}
+				],
 		})
 			}
 		}
@@ -233,6 +254,25 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 				"bInfo" : false,
 				"aLengthMenu": [[ -1], [ "All"]],
 				"iDisplayLength": -1,
+				columnDefs: [{
+                "targets": [1],
+                render: function (data, type, row, meta){	
+						var dat=new Array
+						if (type === 'display')
+						{
+							res=data.split(" ")
+							for(i=0;i < res.length;i++) {
+								if (res[i] != "NA") {
+									dat[i] = '<a  href="http://www.informatics.jax.org/searchtool/Search.do?query=' +res[i]+ '" target="_blank">'+res[i] +'</a>'
+								} else {
+									dat[i] = res[i]
+								}
+							}
+						}
+						return dat
+					}
+				}
+				],
 		})
 			}
 		}
@@ -305,9 +345,9 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		dataType: 'json',
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
-		overview_filepath = "./data/"+jobid+"/regulon_id/overview_ct.pdf"
+		overview_filepath = "./data/"+jobid+"/regulon_id/overview_provde_ct.pdf"
 		regulon_score_filepath = "./data/"+jobid+"/regulon_id/"+ regulon_id +".pdf"
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
+		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
 
 		},
 	})
@@ -371,7 +411,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		success: function(response) {
 		document.getElementById(table_content_id).innerHTML = ''
 		let tmp = document.getElementById(table_id).innerHTML
-		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
+		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
 		},
 	})
 	document.getElementById(table_id).innerHTML = ""
@@ -395,7 +435,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true}
 	
 		//console.log(enrichr_info)
-          // defined globally - will improve
+        // defined globally - will improve
           send_to_Enrichr(enrichr_info)
     })
 	}	
@@ -560,7 +600,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 				extend:'csv',
 				title: {{$jobid}}+'_marker_genes'
 				}
-				],
+				]/*,
 			columnDefs: [
 				{
                 "targets": [1],
@@ -576,7 +616,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 						return dat
 					}
 				}
-				]
+				]*/
 		} )
 		
 		/*
@@ -681,7 +721,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 															<td style="padding: 0px;">{{$count_regulon_in_ct[ct_idx]}}</td>
                                                     </tr>
 													{{/section}}
-													<!--
+												<!--
 													{{foreach from=$provided_cell key=k item=v}}<td>{{$k}}</td> {{/foreach}}
 													{{if $label_use_sc3 == 'user\'s label'}}
 													<tr>
@@ -849,16 +889,13 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
                         <div class="panel-body">
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                    <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                    <p>Enable dual strategy: {{$is_c}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>Cell filtering: {{$is_cell_filter}}</p>
-                                </div>
-								<div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                    <p for="reportsList">Minimal cell width: {{$k_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Max biclusters: {{$o_arg}}</p>
@@ -866,13 +903,16 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Overlap rate: {{$f_arg}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
+                                </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Upstream promoter region: {{$promoter_arg}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
-                                <div class="form-group col-md-6 col-sm-6">
+                                <div class="form-group col-md-6 col-sm-6"> 
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
                             </div>
@@ -970,7 +1010,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 																		<li>
 																		<table class="table table-sm page_item{{$sec0+1}}" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0"><tbody>
 																		<tr><td colspan="2"> <div class='regulon-heading'> {{$regulon_result[$sec0][sec1][0]}}</div></td></tr>
-																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][5]|string_format:"%.8f"}} (p-value{{if $regulon_rank_result[$sec0][sec1][4]|string_format:"%.5f" == 0}}&lt;1.0e-4{{else}}: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.1e"}}{{/if}})</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td></tr>
+																		<tr><td class="gene-score">Regulon specificity score: {{$regulon_rank_result[$sec0][sec1][5]|string_format:"%.8f"}} (p-value{{if $regulon_rank_result[$sec0][sec1][4]|string_format:"%.5f" == 0}}&lt;1.0e-4{{else}}: {{$regulon_rank_result[$sec0][sec1][4]|string_format:"%.1e"}}{{/if}})</td><td class="gene-score">Number of genes: {{$regulon_result[$sec0][sec1]|@count-1}}</td><td class="gene-score">Number of marker genes: {{$regulon_rank_result[$sec0][sec1]|@count-6}}</td></tr>
                                                                         <tr><td class="gene-table">
                                                                             <div style="width:100%; font-size:14px;">
 																				<table class="table table-hover table-sm" ><tbody>
@@ -981,24 +1021,10 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 										  <tr><td>
 										  {{section name=marker_idx start=6 loop=$regulon_rank_result[$sec0][sec1]}}
 										  {{if !empty($regulon_rank_result[$sec0][sec1][marker_idx]) && $regulon_rank_result[$sec0][sec1][marker_idx]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{/section}}
-										  <!--
-										  {{if !empty($regulon_rank_result[$sec0][sec1][7]) && $regulon_rank_result[$sec0][sec1][7]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][8]) && $regulon_rank_result[$sec0][sec1][8]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][9]) && $regulon_rank_result[$sec0][sec1][9]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][10]) && $regulon_rank_result[$sec0][sec1][10]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][11]) && $regulon_rank_result[$sec0][sec1][11]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][12]) && $regulon_rank_result[$sec0][sec1][12]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][13]) && $regulon_rank_result[$sec0][sec1][13]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][14]) && $regulon_rank_result[$sec0][sec1][14]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][15]) && $regulon_rank_result[$sec0][sec1][15]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][16]) && $regulon_rank_result[$sec0][sec1][16]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][17]) && $regulon_rank_result[$sec0][sec1][17]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}}
-										  {{if !empty($regulon_rank_result[$sec0][sec1][18]) && $regulon_rank_result[$sec0][sec1][18]==$regulon_result[$sec0][sec1][sec2]}}<span class="glyphicon glyphicon-star"></span> {{/if}} 
-										  --></td><td><a  target="_blank" href= "https://www.genecards.org/cgi-bin/carddisp.pl?gene={{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
+										  {{/section}}</td><td><a target="_blank" href= "{{if $main_species|strpos:'Human'===0}}https://www.genecards.org/cgi-bin/carddisp.pl?gene={{elseif $main_species|strpos:'Mouse'===0}}http://www.informatics.jax.org/searchtool/Search.do?query={{/if}}{{$regulon_result[$sec0][sec1][sec2]}}">{{$regulon_result[$sec0][sec1][sec2]}}</a></td>							
                                          <td><a  target="_blank" href= "https://www.ensembl.org/id/{{$regulon_id_result[$sec0][sec1][sec2]}}">{{$regulon_id_result[$sec0][sec1][sec2]}}</a></td><td><button type="button" id="genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').show();show_gene_tsne(this);$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();"> Display
                                                         </button><button type="button" style="display:none;" id="gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}" class="btn btn-default gene-button" data-toggle="collapse" onclick="$('#genebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').show();$('#gene_hidebtn-{{$regulon_result[$sec0][sec1][0]}}_{{$regulon_result[$sec0][sec1][sec2]}}').hide();$('#gene-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide
-                                                        </button></td>{{/section}}</tr></tbody></table></div></td>
+                                                        </button><!----></td>{{/section}}</tr></tbody></table></div></td>
 																			<td rowspan="2" class="vert-aligned">
 														<button type="button" class="btn btn-default extra-button" data-toggle="collapse" id="{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#heatmap-{{$regulon_result[$sec0][sec1][0]}}').show();make_clust('data/{{$jobid}}/json/{{$regulon_result[$sec0][sec1][0]}}.json','#ci-{{$regulon_result[$sec0][sec1][0]}}');flag.push('#ci-{{$regulon_result[$sec0][sec1][0]}}');$('#hide-{{$regulon_result[$sec0][sec1][0]}}').show();$('#{{$regulon_result[$sec0][sec1][0]}}').hide();">Heatmap
                                                         </button><button style="display:none;" type="button" class="btn btn-default extra-button" data-toggle="collapse"  id="hide-{{$regulon_result[$sec0][sec1][0]}}" onclick="$('#ci-{{$regulon_result[$sec0][sec1][0]}}').removeAttr('style');$('#ci-{{$regulon_result[$sec0][sec1][0]}}').empty();$('#{{$regulon_result[$sec0][sec1][0]}}').show();$('#hide-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Heatmap
@@ -1015,10 +1041,10 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
                                                         </button>
 														{{assign var="this_tf" value=","|explode:$regulon_motif_result[$sec0][sec1][1]}}
 														{{assign var=motif_num_jaspar value="ct`$this_tf[0]`bic`$this_tf[1]`m`$this_tf[2]`"}}
-														<button type="button" id="dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_dorothea_table(this,'{{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:'/_.+/':""}}');$('#dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorothea-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >DoRothEA overlapped genes
+														<!--<button type="button" id="dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="show_dorothea_table(this,'{{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:'/_.+/':""}}');$('#dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorothea-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}').hide();" >DoRothEA overlapped genes
                                                         </button>
 														<button type="button" style="display:none;" id="dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#dorotheabtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#dorothea_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#dorothea-{{$regulon_result[$sec0][sec1][0]}}').hide();" >Hide DoRothEA overlapped genes
-                                                        </button>
+                                                        </button>-->
 														<button type="button" id="regulonbtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').show();show_regulon_table(this);$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').hide();">UMAP plot
                                                         </button>
                                                         <button type="button" style="display:none;" id="regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}" class="btn btn-default extra-button" data-toggle="collapse" onclick="$('#regulonbtn-{{$regulon_result[$sec0][sec1][0]}}').show();$('#regulon_hidebtn-{{$regulon_result[$sec0][sec1][0]}}').hide();$('#regulon-{{$regulon_result[$sec0][sec1][0]}}').hide();">Hide Regulon UMAP
@@ -1034,10 +1060,10 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 																				<a href="http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}" target="_blank"><img class="motif-logo lozad " data-src="http://hocomoco11.autosome.ru/final_bundle/hocomoco11/full/{{$main_species|upper}}/mono/logo_large/{{$tomtom_result.$motif_num_jaspar[0][1]}}_direct.png"/></a><p class="motif-score">p-value: {{$tomtom_result.$motif_num_jaspar[0][3]|string_format:"%.2e"}}</p><p class="motif-score">e-value: {{$tomtom_result.$motif_num_jaspar[0][4]|string_format:"%.2e"}}</p><p class="motif-score">q-value: {{$tomtom_result.$motif_num_jaspar[0][5]|string_format:"%.2e"}}</p></div>
 																					
 									<div class="col-md-9"> 
-									<input class="btn btn-default tf-button" type="button" value="TF-alternative regulon" onClick="window.open('/CeRIS/heatmap.php?jobid={{$jobid}}&file={{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}.json');"/><input class="btn btn-default tf-button" type="button" value="TF-details" onClick="window.open('http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}');"  /><input class="btn btn-default tf-button" type="button" value="Motif comparison" onClick="window.open('/CeRIS/data/{{$jobid}}/tomtom/ct{{$this_tf[0]}}bic{{$this_tf[1]}}m{{$this_tf[2]}}/tomtom.html');"  />
+									<input class="btn btn-default tf-button" type="button" value="TF-alternative regulon" onClick="window.open('/CeRIS/heatmap.php?jobid={{$jobid}}&file={{$tomtom_result.$motif_num_jaspar[0][1]|regex_replace:"/_.+/":""}}.json');"/><!--<input class="btn btn-default tf-button" type="button" value="TF-details" onClick="window.open('http://hocomoco11.autosome.ru/motif/{{$tomtom_result.$motif_num_jaspar[0][1]}}');"  /><input class="btn btn-default tf-button" type="button" value="Motif comparison" onClick="window.open('/CeRIS/data/{{$jobid}}/tomtom/ct{{$this_tf[0]}}bic{{$this_tf[1]}}m{{$this_tf[2]}}/tomtom.html');"  />-->
 									
 									<table id="tomtom_table" class="table table-hover tomtom_table table-sm" cellpadding="0" cellspacing="0" width="100%">
-									<thead><tr><td>Motif name</td><td>Motif logo</td><td>Motif p-value</td><td>Motif z-score</td><td>Motif details</td></tr></thead>
+									<thead><tr><td>Motif name</td><td>Motif logo</td><td>Motif p-value</td><td>Motif z-score</td><td>Motif details</td><td>Motif comparison</td></tr></thead>
 									<tbody>
 									{{section name=sec3  start=1 loop=$regulon_motif_result[$sec0][sec1]}}
 									{{assign var="this_motif" value=","|explode:$regulon_motif_result[$sec0][sec1][sec3]}}
@@ -1057,6 +1083,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 									{{/section}}
 									
 									<td><a href="motif_detail.php?jobid={{$jobid}}&ct={{$this_motif[0]}}&bic={{$this_motif[1]}}&id={{$this_motif[2]}}" target="_blank">Open
+                                    </a></td><td><a href="data/{{$jobid}}/tomtom/ct{{$this_motif[0]}}bic{{$this_motif[1]}}m{{$this_motif[2]}}/tomtom.html" target="_blank">Open
                                     </a></td></tr>
 									{{/section}}</tbody></table>  
 																				
@@ -1360,16 +1387,13 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					<strong>Your job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                    <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                    <p>Enable dual strategy: {{$is_c}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>Cell filtering: {{$is_cell_filter}}</p>
-                                </div>
-								<div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                    <p for="reportsList">Minimal cell width: {{$k_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Max biclusters: {{$o_arg}}</p>
@@ -1380,16 +1404,15 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Upstream promoter region: {{$promoter_arg}}</p>
+                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
-								
-                                
-                                
-
                             </div>
 					</div>
 					{{elseif $status==="error_bic"}}
@@ -1412,16 +1435,13 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					<strong>Your job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                    <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                    <p>Enable dual strategy: {{$is_c}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>Cell filtering: {{$is_cell_filter}}</p>
-                                </div>
-								<div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                    <p for="reportsList">Minimal cell width: {{$k_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Max biclusters: {{$o_arg}}</p>
@@ -1432,16 +1452,15 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Upstream promoter region: {{$promoter_arg}}</p>
+                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
-								
-                                
-                                
-
                             </div>
 					</div>
 										{{elseif $status==="error_num_cells"}}
@@ -1464,16 +1483,13 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					<strong>Your job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                    <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                    <p>Enable dual strategy: {{$is_c}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>Cell filtering: {{$is_cell_filter}}</p>
-                                </div>
-								<div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                    <p for="reportsList">Minimal cell width: {{$k_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Max biclusters: {{$o_arg}}</p>
@@ -1484,16 +1500,15 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Upstream promoter region: {{$promoter_arg}}</p>
+                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
-								
-                                
-                                
-
                             </div>
 					</div>
                     {{else}} {{block name="meta"}}
@@ -1516,16 +1531,13 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 							<strong>Job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Allow data storage in our database: {{$if_allowSave}}</p>
+                                    <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
-                                    <p>Gene filtering: {{$is_gene_filter}}</p>
+                                    <p>Enable dual strategy: {{$is_c}}</p>
                                 </div>
 								<div class="form-group col-md-6 col-sm-6">
-                                    <p>Cell filtering: {{$is_cell_filter}}</p>
-                                </div>
-								<div class="form-group col-md-6 col-sm-6">
-                                    <p for="reportsList">Consistency level: {{$c_arg}}</p>
+                                    <p for="reportsList">Minimal cell width: {{$k_arg}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p>Max biclusters: {{$o_arg}}</p>
@@ -1536,16 +1548,15 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 								<div class="form-group col-md-6 col-sm-6">
                                     <p>CTS-regulon prediction using {{$label_use_sc3}}</p>
                                 </div>
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Upstream promoter region: {{$promoter_arg}}</p>
+                                </div>
 								<div class="form-group col-md-6 col-sm-6"> 
                                     <p>Email: {{$email_line}}</p>
                                 </div>
                                 <div class="form-group col-md-6 col-sm-6"> 
                                     <p>Uploaded files: </p><p>{{$expfile_name}}</p><p>{{$labelfile_name}}</p><p>{{$gene_module_file_name}}</p>
                                 </div>
-								
-                                
-                                
-
                             </div>
                         </div>
                     </div>
@@ -1563,7 +1574,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
     <script src='assets/js/send_to_Enrichr.js'></script>
     <script src='assets/js/load_clustergram.js'></script>
     <script>
-color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
+color_array2=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", "#A30059",
 "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
 "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
 "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
@@ -1576,13 +1587,20 @@ color_array3=["#FFFF00", "#1CE6FF", "#FF34FF", "#FFE119", "#008941", "#006FA6", 
 "#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
 "#549E79", "#FFF69F", "#201625", "#CB7E98", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
 "#5B4534", "#FDE8DC", "#404E55", "#FAD09F", "#A4E804", "#f58231", "#324E72", "#402334"];
+
+color_array3=["#5A5156","#5A5156","#F6222E","#FE00FA","#16FF32","#3283FE","#FEAF16","#B00068","#1CFFCE","#90AD1C","#2ED9FF","#DEA0FD","#AA0DFE","#F8A19F","#325A9B","#C4451C","#1C8356","#85660D","#B10DA1","#FBE426","#1CBE4F","#FA0087","#FC1CBF","#F7E1A0","#C075A6","#782AB6","#AAF400","#BDCDFF","#822E1C",
+"#B5EFB5","#7ED7D1","#1C7F93","#D85FF7","#683B79","#66B0FF","#3B00FB"]
 {{section name=clust loop=$silh_trace}}
 var trace{{$silh_trace[clust]}} = {
   x: [{{section name=idx loop=$silh_x[{{$silh_trace[clust]}}]}} "{{$silh_x[{{$silh_trace[clust]}}][idx]}}",{{/section}}],
   y: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} "{{$silh_y[{{$silh_trace[clust]}}][idx]}}",{{/section}}],
   name: '{{$silh_trace[clust]}}',
   marker:{
-    color: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} color_array3[{{$silh_trace[clust]}}],{{/section}}]
+		{{if !empty($sankey_nodes)}} 
+    	color: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} color_array3[36-{{$silh_trace[clust]}}],{{/section}}]
+		{{else}}
+		color: [{{section name=idx loop=$silh_y[{{$silh_trace[clust]}}]}} color_array3[{{$silh_trace[clust]}}],{{/section}}]
+		{{/if}}
   },
   type: 'bar'
 };
@@ -1641,7 +1659,7 @@ var score_config = {
                 },
                 label: {{$sankey_nodes}},
                 //color: 'RdBu'
-				color:[{{section name=clust loop=$silh_trace}} color_array3[{{$silh_trace[clust]}}],{{/section}}{{for $clust= 0 to $sankey_nodes_count-1}} color_array3[64-{{$clust}}],{{/for}}]
+				color:[{{section name=clust loop=$silh_trace}} color_array3[36-{{$silh_trace[clust]}}],{{/section}}{{for $clust= 0 to $sankey_nodes_count-1}} color_array3[{{$clust}}+1],{{/for}}]
 				//{{$sankey_label_order[$clust]}}
             },
             link: {
