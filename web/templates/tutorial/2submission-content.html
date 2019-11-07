@@ -12,7 +12,7 @@
 			<br>	
 			<p><b>2.</b> Choose the species, single or dual. Note that, choose wrong species wil lead to low gene matching rate to the database and loss accuracy.
 			<br>
-			<p><b>3.</b> Find out more about the advanced options for IRIS3. </p>
+			<p><b>3.</b> Find out more about the advanced options for CeRIS. </p>
 			<br>
 			<p><b>4.</b> Check the box if you allow us to permanently store your data for our future CTS-R atlas construction. (Default: unselected)</p>
 			<br>
@@ -38,9 +38,9 @@
 		<h3 class="question">Advanced options</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/2.4advance.png">
-			<p> <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics&q=1"><b>Pre-processing</a></b></p>
+			<p> <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=1"><b>Pre-processing</a></b></p>
 			<br>
-			<p><a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics&q=2"><b>Biclustering parameters</a></b> control the output biclusters from QUBIC. </p>
+			<p><a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=2"><b>Biclustering parameters</a></b> control the output biclusters from QUBIC. </p>
 			<p>&emsp;<b><i>Consistency level</i></b> of a bicluster is defined as the minimum ratio between the number of columns, under which the component 
 			genes share the same regulatory signal, and the total number of columns in the bicluster. The default is 1.</p>
 			<p>&emsp;<b><i>Max biclusters</i></b> control the maximum number of to-be-identified biclusters. A larger value of o may significantly increase 
@@ -48,18 +48,18 @@
 			<p>&emsp;<b><i>Overlap level</i></b> controls the proportional level (from 0 to 1) of overlaps between the to-be-identified biclusters. 
 			0 means no overlap and 1 means complete overlap. The default value is 0.5.</p>
 			<br>
-			<p><a href="http://bmbl.sdstate.edu/iris3/tutorial.php#1basics&q=3">The number of clusters (k) in SC3</a></b></p>
-			<p>The backbone of SC3 includes a K-means algorithm for feature clustering. The value of k can greatly impact the cell type prediction result. The auto-estimation method was used in IRIS3 to infer k. However, it showed that the value could be over estimated (>20) for the data with more than thousands of cells. So that, users are suggested to provide a relatively reasonable and small k value for such data to have a better CTS-R result.</p>
+			<p><a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=3">The number of clusters (k) in Seurat</a></b></p>
+			<p>The backbone of Seurat includes a K-means algorithm for feature clustering. The value of k can greatly impact the cell type prediction result. The auto-estimation method was used in CeRIS to infer k. However, it showed that the value could be over estimated (>20) for the data with more than thousands of cells. So that, users are suggested to provide a relatively reasonable and small k value for such data to have a better CTS-R result.</p>
 			<br>
 			<p>Users can provide a cell label file with a "cell names" column matching the names in the expression file (optional), 
 			and the second column indicating the ground truth cell labels. Cell labels will be used in two ways: (i) assess the cell type
-			prediction results from SC3, and (ii) assign CTS-Rs. If no cell label file is uploaded, the pipeline will 
-			automatically use the predicted clusters from SC3 for the following regulon predictions. </p>
+			prediction results from Seurat, and (ii) assign CTS-Rs. If no cell label file is uploaded, the pipeline will 
+			automatically use the predicted clusters from Seurat for the following regulon predictions. </p>
 			<br>
-			<p>Users can choose to use either the prediction cell cluster result from SC3 or the ground truth cell types uploaded above 
+			<p>Users can choose to use either the prediction cell cluster result from Seurat or the ground truth cell types uploaded above 
 			for the following CTS-R prediction.</p>
 			<br>
-			<p>The "upload gene module" function allows users provide their own gene lists and get them analyzed by IRIS3. The uploaded file can includes single/multiple columns, and each column represents a gene module.</p>
+			<p>The "upload gene module" function allows users provide their own gene lists and get them analyzed by CeRIS. The uploaded file can includes single/multiple columns, and each column represents a gene module.</p>
 			<br>
 			<p>At last, users can choose to use either DMINDA or MEME to perform motif finding and comparison for the final CTS-R inferences. The upstream promoter region is open to users to deside the region for motif finding. The default value is 1000 bp. Wider range may cause require longer computational time.</p>
 			<br>

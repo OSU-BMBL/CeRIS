@@ -5,12 +5,12 @@
 
 		<div class="answer">
 			<br>
-			<p>We applied IRIS3 on a single-cell RNA-seq dataset consisting of 90 cells from human embryonic organs and 20,214 genes from 
-			<a href="https://www.nature.com/articles/nsmb.2660"><b>Yan, et al.</b></a>. Default parameters (c=1, o=100, f=0.5) were used for QUBIC biclustering; 
-			cell types were predicted using SC3 and evaluated by comparing with the ground-truth labels provided by the paper; CTS-Rs were inferenced using 
-			DMINDA based on the clustering result of SC3.</p>
+			<p>We applied CeRIS on a single-cell RNA-seq dataset consisting of 90 cells from human embryonic organs and 20,214 genes from 
+			<a href="https://www.nature.com/articles/nsmb.2660"><b>Yan, et al.</b></a>. Default parameters (k=20, o=500, f=0.7) were used for QUBIC biclustering; 
+			cell types were predicted using Seurat and evaluated by comparing with the ground-truth labels provided by the paper; CTS-Rs were inferenced using 
+			DMINDA based on the clustering result of Seurat.</p>
 			<br>
-			<p>This tutorial will guide you through the output page of IRIS3 in details.</p>
+			<p>This tutorial will guide you through the output page of CeRIS in details.</p>
 			<br>
 		</div>
 		<div class="clear"></div>
@@ -20,7 +20,7 @@
 		<div class="answer">
 			<img src="./assets/img/tutorial/3.1.1.png">
 			<p><b>1.</b> Your Job ID</p>
-			<p><b>2.</b> Click to download a zip file containing the result files. See <a href="http://bmbl.sdstate.edu/iris3/more.php#4FAQ&q=12"><b>here</b></a> for details. </p>
+			<p><b>2.</b> Click to download a zip file containing the result files. See <a href="https://bmbl.bmi.osumc.edu/CeRIS/more.php#4FAQ&q=12"><b>here</b></a> for details. </p>
 			<P><b>3. General results:</b> including: species, 
 			the number of original cells and genes, the number of removed (filtered) cells and genes as well as their filtering ratio, the number of provided cell type by users, the number of predicted cell types, the total number of predicted biclusters (gene modules), and the total number of identified CTS-Rs. </p>
 			<p>The table below shows the number of cells and CTS-R in each cell type. </p>
@@ -35,12 +35,12 @@
 		<h3 class="question">Cell type prediction results</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/3.1.3.png">
-			<p>1. A table showing the <a href="http://bmbl.sdstate.edu/iris3/more.php#4FAQ&q=3"><b>four Rand indexes</b></a> for the predicted cell type evaluations. </p>
+			<p>1. A table showing the <a href="https://bmbl.bmi.osumc.edu/CeRIS/more.php#4FAQ&q=3"><b>four Rand indexes</b></a> for the predicted cell type evaluations. </p>
 			<p><b>Note:</b> if ground-truth cell labels are not provided by the user, the table will be omitted.</p>
-			<p>2. A heatmap showing the consensus clustering result from SC3. Both predicted labels and user's labels (if provided) are indicated in the figure. The user can download
+			<p>2. A heatmap showing the consensus clustering result from Seurat. Both predicted labels and user's labels (if provided) are indicated in the figure. The user can download
 			an emf format file by clicking the topright button.</p>
 			<p>3. A bar plot showing the silhouette score that measures how similar each cell is to its type compared to other clusters. </p> 
-			<p>4. A Sankey plot showing the convergence and divergence of a two cell groups (ground truth versus SC3 prediction). 
+			<p>4. A Sankey plot showing the convergence and divergence of a two cell groups (ground truth versus Seurat prediction). 
 			The width of the arrows shown proportionally to the flow quantity.</p>
 			<p><b>Note:</b> if ground-truth cell labels are not provided by the user, the Sankey plot will be omitted.</p>
 			<br>
@@ -77,8 +77,8 @@
 			<p>6. Click to show the enrichment analysis result.</p>
 			<p>7. The gene composition of CTS-Rs. Genes included in a CTS-R are labeled as green. The genes can be 
 			sorted by each CTS-R by double-clicking the CTS-R name. Due to the space limit, at most 15 CTS-Rs are shown 
-			in the figure based on the <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=7"><b>rank of CTS-Rs</b></a></p>
-			<p>8. The <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=8"><b>log-normalized</b></a> gene expression heatmap for genes covered in CTS-Rs and all cells. 
+			in the figure based on the <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#4FAQ&q=7"><b>rank of CTS-Rs</b></a></p>
+			<p>8. The <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#4FAQ&q=8"><b>log-normalized</b></a> gene expression heatmap for genes covered in CTS-Rs and all cells. 
 			Genes can be sorted by double-clicking the gene names (sort cells by value from high to low), cell names (sort 
 			genes by value from high to low), or cell types (sort cells by cell type groups)</p>
 		</div>
@@ -116,7 +116,7 @@
 						<br>
 			<br>
 			<img src="./assets/img/tutorial/3.3.7.png">
-			<p>5. Performing <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=18"><b>ATAC-Seq peak enrichment</b></a> to find out how many genes in CT1S-R1 correspond to an open chromatin region (ATAC-Seq peak); </p>
+			<p>5. Performing <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#4FAQ&q=18"><b>ATAC-Seq peak enrichment</b></a> to find out how many genes in CT1S-R1 correspond to an open chromatin region (ATAC-Seq peak); </p>
 
 						<br>
 			<br>
@@ -125,7 +125,7 @@
 						<br>
 			<br>
 			<img src="./assets/img/tutorial/3.3.8.png">
-			<p>6. Identifying extra genes in Cell Type 1 but not CT1S-R1 using <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=19"><b>TAD data</b></a></p>
+			<p>6. Identifying extra genes in Cell Type 1 but not CT1S-R1 using <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#4FAQ&q=19"><b>TAD data</b></a></p>
 
 						<br>
 			<br>
@@ -143,9 +143,9 @@
 			<br>
 			<img src="./assets/img/tutorial/3.3.4.png">
 			<p>8. The corresponding motif is shown as an interactive logo. Multiple similar motifs may be displayed by motif comparison, 
-			and the most significant one is chosen as the main signature of the CTS-R and used for <a href="http://bmbl.sdstate.edu/iris3/tutorial.php#4FAQ&q=7"><b>CTS-R ranking</b></a>. 
+			and the most significant one is chosen as the main signature of the CTS-R and used for <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#4FAQ&q=7"><b>CTS-R ranking</b></a>. 
 			The result of motif finding can be accessed in a new page by clicking the motif logo. Please 
-			check the <a href="http://bmbl.sdstate.edu/DMINDA2/documentation.php"><b>DMINDA FAQ</b></a> for more information about motif result interpretation.</p>
+			check the <a href="https://bmbl.bmi.osumc.edu/DMINDA2/documentation.php"><b>DMINDA FAQ</b></a> for more information about motif result interpretation.</p>
 
 			<br>
 						<br>
