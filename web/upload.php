@@ -176,14 +176,14 @@ if (!empty($_FILES)) {
     if (!file_exists($workdir)) {
         mkdir($workdir);
     }
-    system("cp ./upload/CeRIS_example_expression_matrix.csv $workdir");
-    system("cp ./upload/CeRIS_example_label.csv $workdir");
+    system("cp ./upload/Yan_2013_expression.csv $workdir");
+    system("cp ./upload/Yan_2013_label.csv $workdir");
     #system("cp ./upload/CeRIS_example_gene_module.csv $workdir");
-    $expfile = 'CeRIS_example_expression_matrix.csv';
+    $expfile = 'Yan_2013_expression.csv';
     $_SESSION['expfile'] = $expfile;
-    $labelfile = 'CeRIS_example_label.csv';
+    $labelfile = 'Yan_2013_label.csv';
     $_SESSION['labelfile'] = $labelfile;
-    #$gene_module_file = 'CeRIS_example_gene_module.csv';
+    #$gene_module_file = 'Yan_2013_example_gene_module.csv';
     #$_SESSION['gene_module_file'] = $gene_module_file;
     
 }
