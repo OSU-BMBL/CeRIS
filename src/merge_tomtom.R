@@ -198,6 +198,8 @@ tmp_list <- unlist(sapply(tmp_list, function(x){
   }
 }))
 remove_motifs <- paste("tomtom/",list.files("tomtom")[!list.files("tomtom") %in% tmp_list],sep = "")
+remove_motifs <- remove_motifs[-grep("module",remove_motifs)]
 unlink(remove_motifs, recursive = TRUE)
+
 ## remove unused motifs
 
