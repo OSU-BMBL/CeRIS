@@ -388,8 +388,8 @@ foreach ($regulon_motif_file as $key=>$this_regulon_motif_file){
 	while (($line = fgetcsv($fp, 0, "\t")) !== FALSE) 
 		if ($line) {
 			$tmp =array_map('trim',$line);
-			if (count($tmp) > 5) {
-				$tmp = array_slice($tmp, 0, 5, true);
+			if (count($tmp) > 15) {
+				$tmp = array_slice($tmp, 0, 15, true);
 			}
 			$regulon_motif_result[$key][] = $tmp;
 			}
@@ -478,7 +478,7 @@ if(sizeof($module_gene_name_file)){
 	}
 	fclose($fp);
 	}
-	
+
 	foreach ($module_motif_file as $key=>$this_module_motif_file){
 	
 	$fp = fopen("$this_module_motif_file", 'r');
@@ -587,7 +587,7 @@ $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
-#print_r($main_species);
+#print_r($module_motif_result);
 
 $smarty->setCacheLifetime(3600000);
 $smarty->display('results.tpl');

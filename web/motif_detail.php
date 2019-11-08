@@ -5,18 +5,27 @@ require_once("lib/spyc.php");
 //require_once("lib/hmmer.php");
 $jobid=$_GET['jobid'];
 $ct=$_GET['ct'];
+$module=$_GET['module'];
 $bic=$_GET['bic'];
 $id=$_GET['id'];
 $from=$_GET['from'];
 $max=0;
 $DATAPATH="/var/www/html/CeRIS/data";
 $TOOLPATH="/var/www/html/CeRIS/program/dminda";
-   session_start();
+session_start();
+
 $motif_tmp_filename="ct".$ct."bic".$bic."m".$id;
-   
 $ct_path=$DATAPATH."/".$jobid."/".$jobid."_CT_".$ct."_bic/";
 $motif_background_filename=$ct_path."bic".$bic.".txt.fa";
 $tempnam =$ct_path."bic".$bic.".txt.fa.closures";
+print_r($module);
+if ($module != "") {
+	$motif_tmp_filename="module".$module."bic".$bic."m".$id;
+	$ct_path=$DATAPATH."/".$jobid."/".$jobid."_module_".$module."_bic/";
+	$motif_background_filename=$ct_path."bic".$bic.".txt.fa";
+	$tempnam =$ct_path."bic".$bic.".txt.fa.closures";
+}
+
 if(file_exists($tempnam)&& file_get_contents($tempnam)!="")
 {  
 
