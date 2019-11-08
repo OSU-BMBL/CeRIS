@@ -23,7 +23,7 @@ my $path = $ARGV[0];
 #print ">end\n";
 
 
-#my $path = "/home/www/html/CeRIS/data/20181222151846"; 
+#my $path = "/var/www/html/CeRIS/data/20191107110621"; 
 	my $out_name = "";
 	my $out_dir = $path."/logo_tmp/";
 	mkdir $out_dir;
@@ -45,7 +45,7 @@ while ( my $entry = readdir $DIR ) {
 	my $fullname =  $workdir.'/'.$filename;
 	my ($a)= $fullname =~ m/(?<=_CT_)\d+/g;
 	my ($b)= $fullname =~ m/(?<=\/bic)\d+/g;
-	
+
 		#my $regex_ct = qr/(?<=_CT_)\d+/p;
 		#my $subst = '';
 		#my $ct_result = $str =~ s/$regex_ct/$subst/r;
@@ -59,21 +59,29 @@ while ( my $entry = readdir $DIR ) {
 			while(my $row = <$fh>) {
 			
 			  next unless ($row =~ s/^>//);
+			  
 			  my ($motif, $seq) = (split ' ', $row)[0, 4];
+			  
 			  if($motif eq $motif_now) {
 			    $align .= $seq. "\n";
 			  } else {
 			    $motif_now = $motif;
 				my ($c)= $motif =~ m/(?<=Motif-)\d+/g;
-				$out_name = "ct".$a."bic".$b."m".$c;
+				if ( not defined $a) {
+					my ($a)= $fullname =~ m/(?<=_module_)\d+/g;		
+					$out_name = "module".$a."bic".$b."m".$c;
+				} else {
+					$out_name = "ct".$a."bic".$b."m".$c;
+				}
 			    $align .= ">".$out_name."\n";
 			    $align .= $seq."\n";
 				
 			  }
 			  
-			}	open(my $out, '>', $out_dir.$out_name.".b2a") or die "Could not open file '$filename' $!";
-				print $out $align;
-				close $out;
+			}	
+			open(FH, '>', $out_dir.$out_name.".b2a") or die "Could not open file '$filename' $!";
+				print FH $align;
+				close FH;
 				$align = "";
 			
 			

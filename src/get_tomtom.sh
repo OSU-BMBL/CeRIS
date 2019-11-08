@@ -1,7 +1,7 @@
 #!/bin/bash
 cores=8
 dir=$1
-mkdir tomtom
+#mkdir tomtom
 species=$(head -n 1 species_main.txt)
 files="$(find $dir -maxdepth 2 -name "*.meme" -print)"
 echo "$files"

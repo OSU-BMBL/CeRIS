@@ -12,9 +12,9 @@ jobid <- args[2]
 motif_length <- args[3]
 setwd(wd)
 getwd()
-#setwd("/var/www/html/CeRIS/data/20191018130143")
+#setwd("/var/www/html/CeRIS/data/20191107110621")
 #wd <- getwd()
-#jobid <-20191018130143 
+#jobid <-20191107110621 
 #motif_length <- 12
 sort_dir <- function(dir) {
   tmp <- sort(dir)
@@ -36,8 +36,7 @@ gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""))
 total_ct <- max(na.omit(as.numeric(stringr::str_match(list.files(path = wd), "_CT_(.*?)_bic")[,2])))
 
 module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
-count_num_regulon<-0
-regulon_idx_module <- 0
+
 #xml_text(motif_name)
 #i=260
 allfiles <- list.files(path = "tomtom",pattern = "tomtom.xml",recursive = T,full.names = T)
@@ -74,7 +73,9 @@ for (i in 1:length(unique(total_motif_name[,2]))) {
   total_tf_list <- append(list(tmp_list),total_tf_list)
 }
 total_motif_list <- vector()
-for (i in 1:total_ct) {
+regulon_idx_module <- 0
+count_num_regulon<-0
+for (i in 1:length(alldir)) {
   res_id <- paste(short_dir[i],".regulon_gene_id.txt",sep="")
   res_symbol<- paste(short_dir[i],".regulon_gene_symbol.txt",sep="")
   res_motif<- paste(short_dir[i],".regulon_motif.txt",sep="")
@@ -97,14 +98,20 @@ for (i in 1:total_ct) {
     if(module_type[i] == "module"){
       regulon_idx_module <- regulon_idx_module + 1
     }
-    #j=128
+    #j=25
     for (j in 1:length(total_tf_list)) {
       this_tf_name <- total_tf_list[[j]][1]
       motif_num <- as.character(total_tf_list[[j]][-1])
+      if(module_type[i] == "module"){
+        motif_num <- motif_num[grep("module",motif_num)]
+      }
       motif_num <- strsplit(gsub("[^0-9.-]+", " ", as.character(motif_num))," ")
       motif_num <- lapply(motif_num,function(x){
         tmp <- x[-1]
         if (tmp[1] == i){
+          result <- paste("bic",tmp[2],".txt.fa.closures-",tmp[3],sep = "")
+          return(result)
+        } else if(module_type[i] == "module" && tmp[1] == i-total_ct){
           result <- paste("bic",tmp[2],".txt.fa.closures-",tmp[3],sep = "")
           return(result)
         } else {
@@ -115,6 +122,9 @@ for (i in 1:total_ct) {
       #sequence_out_name <- paste("ct",i,"motif",j,".fa",sep = "")
       sequence_info <- character()
       genes_num <- vector()
+      if(length(motif_num) == 0 ){
+        motif_num <- list(NA)
+      }
       idx <- 1
       #k= 1
       for (k in 1:length(motif_num)) {

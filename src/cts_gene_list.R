@@ -61,11 +61,11 @@ getwd()
 expFile <- paste(jobid,"_filtered_expression.txt",sep="")
 label_file <- paste(jobid,"_cell_label.txt",sep = "")
 
-# jobid <-20190922103834
+# jobid <-20191107110621
 # wd <- paste("/var/www/html/CeRIS/data/",jobid,sep="")
-# gene_module_file <- '1'
-# delim_gene_module <- ','
-# promoter_len <- 1000
+# gene_module_file <- 'Yan_2013_example_gene_module.csv'
+# delim_gene_module <- 'tab'
+# promoter_len <- 250
 conds_file_handle <- file(paste(jobid,"_blocks.conds.txt",sep = ""),"r")
 conds_file <- readLines(conds_file_handle)
 close(conds_file_handle)
@@ -351,11 +351,36 @@ dir.create(new_dir, showWarnings = FALSE)
 write(paste("total_label,",nrow(cell_label),sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 write(paste("total_bic,",total_bic,sep=""),file=paste(jobid,"_info.txt",sep=""),append=TRUE)
 
-#if exist gene module file, save gene list to jobid_module_#.txt
-#if(length(gene_module_file) > 0 && !is.na(gene_module_file)){
-#  gene_module <- read.table(gene_module_file,header = F,sep = delim_gene_module)
-#  for (i in 1:ncol(gene_module)) {
-#    write.table(gene_module[,i],paste(jobid,"_module_",i,"_bic.txt",sep = ""),quote = F,col.names = F,row.names = F)
-#  }
-#}
+##if exist gene module file, save gene list to jobid_module_#.txt
+if(nchar(gene_module_file) > 1 && !is.na(gene_module_file)){
+  gene_module <- read.delim(gene_module_file,header = F,sep = delim_gene_module)
+  for (i in 1:ncol(gene_module)) {
+    #write.table(gene_module[,i],paste(jobid,"_module_",i,"_bic.txt",sep = ""),quote = F,col.names = F,row.names = F)
+    new_dir <- paste(wd,"/",jobid,"_module_",i,"_bic",sep="")
+    dir.create(new_dir, showWarnings = FALSE)
+    gene_bic <- list(gene_module[,i])
+    for (k in 1:length(gene_bic)) {
+      this_name <- paste("module",k,sep="")
+      this_genes <- gene_bic[[k]]
+      this_genes <- this_genes[!this_genes==""]
+      this_genes <- this_genes[!is.na(this_genes)]
+      
+      if(length(this_genes) > 0){
+        all_match <- select(main_db, keys = this_genes, columns = c("SYMBOL","ENSEMBL","ENTREZID"),keytype = "SYMBOL")
+        all_match <- all_match[!duplicated(all_match[,3]),]
+        all_match <- na.omit(all_match)
+        this_genes_id <- all_match[!duplicated(all_match[,3]),3]
+        this_grangelist <-  main_grangelist[which(names(main_grangelist) %in% this_genes_id)]
+        promoter_seqs <- getPromoterSeq(this_grangelist,main_bsgenome, upstream=promoter_len, downstream=0)
+        result <-  DNAStringSet(sapply(promoter_seqs, `[[`, 1)) 
+        names(result) <- all_match[match(names(result),all_match[,3]),2]
+        
+        if(length(result) < 500 & length(result) > 3){
+          writeXStringSet(result, paste(new_dir,"/","bic",k,".txt.fa",sep=""),format = "fasta",width=promoter_len)
+          #write.table(tmp, paste(new_dir,"/",colnames(tmp),".txt.fa",sep=""),sep="\t",quote = F ,col.names=FALSE,row.names=FALSE)
+        }
+      }
+    }
+  }
+}
 
