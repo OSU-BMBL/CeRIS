@@ -15,13 +15,12 @@ args <- commandArgs(TRUE)
 wd <- args[1]
 jobid <- args[2]
 label_use_sc3 <- args[3]
-#setwd("/var/www/html/CeRIS/data/20191101133117")
+#setwd("/var/www/html/CeRIS/data/20191107183349")
 #wd <- getwd()
-#jobid <-20191101133117
-#label_use_sc3 <- 0
+#jobid <-20191107183349
+#label_use_sc3 <- 2
 setwd(wd)
 getwd()
-workdir <- getwd()
 dir.create('heatmap',showWarnings = F)
 sort_dir <- function(dir) {
   tmp <- sort(dir)
@@ -38,8 +37,8 @@ BinMean <- function (vec, every, na.rm = FALSE) {
   x
 }
 
-all_regulon <- sort_dir(list.files(path = workdir,pattern = "._bic.regulon_gene_symbol.txt$"))
-all_label <- sort_dir(list.files(path = workdir,pattern = ".+cell_label.txt$")[1])
+all_regulon <- sort_dir(list.files(path = wd,pattern = "._bic.regulon_gene_symbol.txt$"))
+all_label <- sort_dir(list.files(path = wd,pattern = ".+cell_label.txt$")[1])
 label_data <- read.table(all_label,header = T)
 exp_data <- read.table(paste(jobid,"_filtered_expression.txt",sep = ""),stringsAsFactors = F,header = T,check.names = F,row.names = 1)
 #exp_data<- read.delim(paste(jobid,"_raw_expression.txt",sep = ""),check.names = FALSE, header=TRUE,row.names = 1)
@@ -67,7 +66,7 @@ if (ncol(exp_data) > 300) {
 exp_data <- small_exp_data
 label_data <- label_data[which(as.character(label_data[,1]) %in% colnames(exp_data)),]
 
-short_dir <- grep("*_bic$",list.dirs(path = workdir,full.names = F),value=T) 
+short_dir <- grep("*_bic$",list.dirs(path = wd,full.names = F),value=T) 
 short_dir <- sort_dir(short_dir)
 module_type <- sub(paste(".*",jobid,"_ *(.*?) *_.*",sep=""), "\\1", short_dir)
 
@@ -111,7 +110,7 @@ for (i in 1:length(all_regulon)) {
     for (j in 1:length(regulon_file)) {
       regulon_gene_symbol <- regulon_file[[j]][-1]
       regulon_gene_symbol <- regulon_gene_symbol[regulon_gene_symbol!=""]
-      if(length(regulon_gene_symbol)>100 | length(regulon_gene_symbol) <=1){
+      if(length(regulon_gene_symbol)>1000 | length(regulon_gene_symbol) <=1){
         next
       }
       regulon_heat_matrix <- subset(exp_data,rownames(exp_data) %in% regulon_gene_symbol)
