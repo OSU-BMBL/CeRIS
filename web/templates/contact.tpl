@@ -49,7 +49,7 @@ $(document).ready(function() {
 });
 if(window.location.hash == ""){
 
- window.location.href = "https://bmbl.bmi.osumc.edu/CeRIS/more.php#4FAQ";
+ window.location.href = "https://bmbl.bmi.osumc.edu/CeRIS/contact.php#1contact";
 }
 </script>
     <main role="main" style="min-height: calc(100vh - 182px);">
@@ -63,20 +63,9 @@ if(window.location.hash == ""){
 		  	<div id="menu">
 			<ul>
 				<li>
-					<a href="#4FAQ">
-						<span class="section">FAQ</span>
-					</a>
-					<div class="submenu" id="submenu-4FAQ"></div>
-				</li>
-				<li>
-					<a href="#5citation">
-						<span class="section">Citations</span>
-					</a>
-					<div class="submenu" id="submenu-5citation"></div>
-				</li>			
+					<div class="submenu" id="submenu-1contact"></div>
+				</li>				
 			</ul>
-			
-			
 		</div>
 		</div>
 <div class="col-md-9">

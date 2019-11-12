@@ -32,6 +32,8 @@
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="assets/css/responsive.css" rel="stylesheet">
     <script src="assets/js/modernizr-2.8.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=AM_CHTML"></script>
+    <script src="assets/js/ASCIIMathML.js"></script>
 
 
 	</head>
@@ -51,7 +53,7 @@
                                 <li><a href="/CeRIS/submit.php">Submit</a></li>
                                 <li><a href="/CeRIS/tutorial.php#1basics">Tutorial</a></li>
 								<li><a href="/CeRIS/news.php#1version">What's new</a></li>
-								<li><a href="https://groups.google.com/forum/#!forum/bmbl-ceris">Forum</a></li>
+								<li><a href="/CeRIS/contact.php#1contact">Contact</a></li>
 								<li><a href="/CeRIS/more.php#4FAQ">FAQ</a></li>
                             </ul>
                         </div>

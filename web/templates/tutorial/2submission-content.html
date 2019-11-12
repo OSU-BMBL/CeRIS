@@ -1,36 +1,29 @@
 
-<!-- saved from url=(0072)http://amp.pharm.mssm.edu/Enrichr/templates/help/background-content.html -->
 <html class="gr__amp_pharm_mssm_edu"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css" abt="234"></style></head><body data-gr-c-s-loaded="true"><div id="the-basics-content">
 	<h1>How to submit a job</h1>
 	<div class="qa">
 		<h3 class="question">General submission</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/2.1submit.png" style="width:100%" >
-			<br>
-			<p><b>1.</b> Upload your expression file by selecting or dragging the file from local to the decker box. 
-			Example data can be chosen or downloaded from the drop-down list button.</p>
-			<br>	
-			<p><b>2.</b> Choose the species, single or dual. Note that, choose wrong species wil lead to low gene matching rate to the database and loss accuracy.
-			<br>
-			<p><b>3.</b> Find out more about the advanced options for CeRIS. </p>
-			<br>
-			<p><b>4.</b> Check the box if you allow us to permanently store your data for our future CTS-R atlas construction. (Default: unselected)</p>
-			<br>
-			<p><b>5.</b> An email is not required to submit the job; however, we strongly suggest you provide your email 
+			
+			<p><b>1.</b> Example data can be chosen or downloaded from the drop-down selections.</p>
+				
+			<p><b>2.</b> Upload your expression file by selecting or dragging the file from local to the dropzone box. 
+			</p>
+			<p><b>3.</b> Choose the species. Either Human or Mouse. Note that, choosimh the wrong species may lead to low gene matching rate or occur errors. 
+			In some cases, you may need to wait and re-select the species untill your file finishes upload.
+			
+			<p><b>4.</b> An email is not required to submit the job; however, we strongly suggest you provide your email 
 			in order to receive notice once the job is completed.</p>
-						<br>
-			<p><b>6.</b> To submit a job, you have to have at least expression file uploaded and species chosen.
-			A confirmation page will pop up showing your JOBID which can be used to retrieve 
-			your result on the main page. Your job will typically be done in less than 1 hour, depending on the scale of the 
-			input expression data.</p>
+			
+			<p><b>5.</b> A preview of your data will show if you upload a text format file.</p>
+			<p><b>6.</b> The maximum number of upload files is 3, typically designed for your 10X genomics raw gene-barcodes matrix files. Note that do not unzip your files, otherwise our server will consider you uploading a text format gene expression file and will try to display the preview.</p>
+			
 			<p><b>Note:</b> If the user directly load the <b>example data</b> and leaving all settings as default, it will be directed to the example result page without waiting for the program running.</p> Users who download the example data and upload for a job run will be regarded as a new job submission.
-			<img src="./assets/img/tutorial/2.2conformation.png">
+			<img style="width:100%" src="./assets/img/tutorial/2.2conformation.png">
 			<br>
 			<br>
-			<br>
-			<br>
-			<br>
-			<p><b>7.</b> The "Example output" will show you the result page of the human embryonic stem cells dataset, without running the program. </p>
+			<p><b>7.</b> The "Example output" will show you the result page of the Mouse lung epithelial (Zeisel et al. 2015) dataset, without running the program. </p>
 			<br>
 		</div>
 	</div>
@@ -38,32 +31,19 @@
 		<h3 class="question">Advanced options</h3>
 		<div class="answer">
 			<img src="./assets/img/tutorial/2.4advance.png">
-			<p> <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=1"><b>Pre-processing</a></b></p>
 			<br>
-			<p><a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=2"><b>Biclustering parameters</a></b> control the output biclusters from QUBIC. </p>
-			<p>&emsp;<b><i>Consistency level</i></b> of a bicluster is defined as the minimum ratio between the number of columns, under which the component 
-			genes share the same regulatory signal, and the total number of columns in the bicluster. The default is 1.</p>
-			<p>&emsp;<b><i>Max biclusters</i></b> control the maximum number of to-be-identified biclusters. A larger value of o may significantly increase 
-			the running time and induce noise as more fragile biclusters generated. The default value is 100.</p>
-			<p>&emsp;<b><i>Overlap level</i></b> controls the proportional level (from 0 to 1) of overlaps between the to-be-identified biclusters. 
-			0 means no overlap and 1 means complete overlap. The default value is 0.5.</p>
-			<br>
-			<p><a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=3">The number of clusters (k) in Seurat</a></b></p>
-			<p>The backbone of Seurat includes a K-means algorithm for feature clustering. The value of k can greatly impact the cell type prediction result. The auto-estimation method was used in CeRIS to infer k. However, it showed that the value could be over estimated (>20) for the data with more than thousands of cells. So that, users are suggested to provide a relatively reasonable and small k value for such data to have a better CTS-R result.</p>
-			<br>
-			<p>Users can provide a cell label file with a "cell names" column matching the names in the expression file (optional), 
+			<p><b>1.</b> Quick selecting recommended parameter, either a set of parameters with less running time or using default parameters but longer running time.</p>
+			<p><b>2.</b> Select for imputation process (recommended for 10X Genomics data; very time-consuming).</p>
+			<p><b>3.</b> Control the output biclusters from QUBIC. <a href="https://bmbl.bmi.osumc.edu/CeRIS/tutorial.php#1basics&q=3"> <b>Details can be found here </b></a></p>
+			<p><b>4.</b> Users can provide a cell label file with a "cell names" column matching the names in the expression file (optional), 
 			and the second column indicating the ground truth cell labels. Cell labels will be used in two ways: (i) assess the cell type
-			prediction results from Seurat, and (ii) assign CTS-Rs. If no cell label file is uploaded, the pipeline will 
-			automatically use the predicted clusters from Seurat for the following regulon predictions. </p>
-			<br>
-			<p>Users can choose to use either the prediction cell cluster result from Seurat or the ground truth cell types uploaded above 
-			for the following CTS-R prediction.</p>
-			<br>
-			<p>The "upload gene module" function allows users provide their own gene lists and get them analyzed by CeRIS. The uploaded file can includes single/multiple columns, and each column represents a gene module.</p>
-			<br>
-			<p>At last, users can choose to use either DMINDA or MEME to perform motif finding and comparison for the final CTS-R inferences. The upstream promoter region is open to users to deside the region for motif finding. The default value is 1000 bp. Wider range may cause require longer computational time.</p>
-			<br>
-			<br>
+			prediction results from Seurat, and (ii) assign CTSRs. If no cell label file is uploaded, the pipeline will 
+			automatically use the predicted clusters from Seurat for the following regulon predictions.</p>
+			<p><b>5.</b> Users can choose to use either the prediction cell cluster result from Seurat or the ground truth cell types uploaded above 
+			for the following CTSR prediction.</p>
+			<p><b>6.</b> The "upload gene module" function allows users provide their own gene lists and get them analyzed by CeRIS. The uploaded file can includes single/multiple columns, and each column represents a gene module.</p>
+			<p><b>7.</b> The upstream promoter region is open to users to deside the region for motif finding. The default value is 1000 bp. Wider range may cause require longer computational time.</p>
+			
 		</div>
 	</div>
 </div></body></html>
