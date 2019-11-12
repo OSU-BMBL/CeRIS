@@ -10,7 +10,7 @@ $("#is_imputation").prop("checked", false)
 $("#is_c").prop("checked", false)
 
 }
-function use_slow_version(item) {
+function use_accurate_version(item) {
 $('#f_arg_id').selectpicker('val', '0.7')
 $('#o_arg_id').selectpicker('val', '500')
 $('#k_arg_id').selectpicker('val', '20')
@@ -221,7 +221,7 @@ $(document).ready(function() {
             response = JSON.parse(response);
             //console.log(response);
             addTable(response, 'label');
-
+			$("#enable_labelfile").prop("checked", true)
         }
     });
 
@@ -374,8 +374,8 @@ $(document).ready(function() {
 					<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-						<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
-						</li>
+						<!--<li><a id="load_exp" class="dropdown-item" href="#">Load example file</a>
+						</li>-->
 						<li><a class="dropdown-item" href="storage/Yan_2013_expression.csv" >Download example gene expression matrix (Yan et al, 2013)</a>
 						</li>
 						<li><a class="dropdown-item" href="storage/5k_pbmc_protein_v3_filtered_feature_bc_matrix.h5" >Download example HDF5 feature barcode matrix (10X 5K PMBCs)</a>
@@ -448,7 +448,7 @@ $(document).ready(function() {
 							<button type="button" id="fast_version_btn" class="btn btn-default extra-button" data-toggle="collapse" onclick="use_fast_version(this);">Fast version</button><span class="glyphicon glyphicon-question-sign" data-container="body" data-toggle="tooltip" data-original-title=" This option uses  fast version. By setting f=0.5, k=20, o=100, disable imputation and dual strategy. This runs faster but generage less CTS-Rs."> </span> 
 						</div>
 						<div class="form-check col-sm-3 ">
-							<button type="button" id="fast_version_btn" class="btn btn-default extra-button" data-toggle="collapse" onclick="use_slow_version(this);">Slow version (Default)</button><span class="glyphicon glyphicon-question-sign" data-container="body" data-toggle="tooltip" data-original-title="(Default)This option uses  parameters in our publications. By setting f=0.7, k=20, o=500. Please also enable imputation if uploading 10X hdf5 or gene-barcodes matrices files, enable dual strategy if uploading C1 gene expression matrix text file. This runs slower but genreate more CTS-Rs."> </span> 
+							<button type="button" id="fast_version_btn" class="btn btn-default extra-button" data-toggle="collapse" onclick="use_accurate_version(this);">Accurate version version (Default)</button><span class="glyphicon glyphicon-question-sign" data-container="body" data-toggle="tooltip" data-original-title="(Default)This option uses  parameters in our publications. By setting f=0.7, k=20, o=500. Please also enable imputation if uploading 10X hdf5 or gene-barcodes matrices files, enable dual strategy if uploading C1 gene expression matrix text file. This runs slower but genreate more CTS-Rs."> </span> 
 						</div>
 					</div>
 						<h4 class="font-italic text-left">Pre-processing</h4>
@@ -555,9 +555,9 @@ $(document).ready(function() {
 												<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border:1px solid #c9c9c9;border-radius:.25rem!important">Example <span class="caret"></span>
 												</button>
 												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-													<li><a id="load_label" class="dropdown-item" href="#dropzone_label">Load example file</a>
-													</li>
-													<li><a class="dropdown-item" href="/CeRIS/storage/Yan_2013_label.csv" download>Download example cell label file</a>
+													<!--<li><a id="load_label" class="dropdown-item" href="#dropzone_label">Load example file</a>
+													</li>-->
+													<li><a class="dropdown-item" href="/CeRIS/storage/Yan_2013_label.csv" download>Download example cell label file (Yan et al, 2013)</a>
 													</li>
 												</ul>
 											</div>
@@ -577,7 +577,7 @@ $(document).ready(function() {
 								</div>
 								<div class="col-sm-2">
 									<input type="radio" value="2" id="enable_labelfile" name="bicluster_inference" disabled="true" class="custom-control-input">
-									<label class="custom-control-label" for="enable_labelfile">Upload cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Enable this option by uploading your cell label file."> </span>
+									<label class="custom-control-label" for="enable_labelfile">Your uploaded cell label <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Enable this option by uploading your cell label file."> </span>
 									</label>
 								</div>
 								
