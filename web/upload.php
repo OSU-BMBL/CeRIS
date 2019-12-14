@@ -27,12 +27,8 @@ if (!empty($_FILES)) {
     }
     #check php.ini reach maximum upload size
     $temp_file = $_FILES['file']['tmp_name'];
-    $csv = file_get_contents($temp_file);
     $delim = detectDelimiter($temp_file);
-    $array = file($temp_file);
-	$file_info = new finfo(FILEINFO_MIME); // object oriented approach!
-	$mime_type = $file_info->buffer(file_get_contents($temp_file));  // e.g. gives "image/jpeg"
-	$mime_type = explode(";",$mime_type)[0];
+	$mime_type = mime_content_type($temp_file);
 	#echo($mime_type);
 	switch($mime_type) {
 	case "application/x-gzip":
@@ -57,8 +53,8 @@ if (!empty($_FILES)) {
 		#	$new_array[] = array_map('trim',$line_array);
 		#}
         
-        #100000000
-        if(filesize($temp_file) < 100000000){
+        #2000000000
+        if(filesize($temp_file) < 2000000000){
             $fp = fopen("$temp_file", 'r');
             if ($fp) {
                 $idx = 0;
@@ -169,7 +165,6 @@ if (!empty($_FILES)) {
     }
     $_SESSION['jobid'] = $jobid;
 
-    #system("cp ./upload/CeRIS_example_gene_module.csv $workdir");
     $expfile = '';
     $_SESSION['expfile'] = $expfile;
     $labelfile = '';
@@ -192,7 +187,6 @@ if (!empty($_FILES)) {
     }
     system("cp ./upload/Yan_2013_expression.csv $workdir");
     system("cp ./upload/Yan_2013_label.csv $workdir");
-    #system("cp ./upload/CeRIS_example_gene_module.csv $workdir");
     $expfile = 'Yan_2013_expression.csv';
     $_SESSION['expfile'] = $expfile;
     $labelfile = 'Yan_2013_label.csv';
