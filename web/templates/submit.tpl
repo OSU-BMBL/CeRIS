@@ -82,24 +82,24 @@ function addPreviewTable(response, metadata = true, type) {
                     'class': 'px-2 py-1'
                 }).html('<span class="highlight">ERROR: ' + err.message + ', please check your upload data format.</span></label>'));
             }
-
-            if (response['columns'][0].length != response['data'][0].length && type == 'exp') {
+			/*
+            if (response['cell_num'][0] != response['data'][0].length && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">WARNING: The number of cells in your first row(' + response['columns'][0].length + ') seems does not match the number in the other rows(' + response['data'][0].length + ').</span></label>'));
+                }).html('<span class="bold highlight">WARNING: The number of cells in your first row(' + response['cell_num'][0] + ') seems does not match the number in the other rows(' + response['data'][0].length + ').</span></label>'));
             }
             percent_gene_num = response['gene_num'][0] > 1000 ? 1000 : response['gene_num'][0];
-            percent = (1 - response['count_zero'][0] / (response['columns'][0].length * percent_gene_num)).toFixed(6);
-			/*
+            percent = (1 - response['count_zero'][0] / (response['cell_num'][0] * percent_gene_num)).toFixed(6);
+			
             if (percent > 0.85 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
                 }).html('<span class="bold highlight">Note: There are many zeros or or unrecognized characters in your dataset header (' + percent * 100 + '%).</span></label>'));
             }*/
-            if (response['columns'][0].length < 40 && type == 'exp') {
+            if (response['cell_num'][0] < 40 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">Note: Your dataset has (' + response['columns'][0].length + ') cells, errors may occur when you submit to CeRIS. It is recommended to have at least around 100 cells in your scRNA-seq experiment. </span></label>'))
+                }).html('<span class="bold highlight">Note: Your dataset has (' + response['cell_num'][0] + ') cells, due to the small number of cells, k parameter will be automatically adjusted to avoid possible errors, but errors may still occur on CeRIS. </span></label>'))
                 document.getElementById("k_arg").value = 5;
             }
             var check_cell_name_start_with_number = function(array) {
@@ -152,7 +152,7 @@ var addTable = function(dataset, type) {
 	if(dataset['type'][0] == 'text') {
 	    $('#intro_' + type).append($('<label>', {
         'class': 'px-2 py-1'
-		}).html('Your uploaded gene expression file contains <span class="highlight">' + dataset['columns'][0].length + ' cells</span> and <span class="highlight">' + dataset['gene_num'][0] + ' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
+		}).html('Your uploaded gene expression file contains <span class="highlight">' + dataset['cell_num'][0] + ' cells</span> and <span class="highlight">' + dataset['gene_num'][0] + ' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
 	} else if (dataset['type'][0] == 'hdf') {
 		$('#intro_' + type).append($('<label>', {
         'class': 'px-2 py-1'
@@ -669,7 +669,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
 			<!--<input type="hidden" id="k_arg" name="k_arg" value="18">-->
 			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/CeRIS/results.php?jobid=20191024223952';" />
-			<label id="hint_select_species"> </label>
+			<div class="row"><label id="hint_select_species"></label></div>
 
 		</div>
 		<div class="form-group">

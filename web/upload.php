@@ -61,6 +61,10 @@ if (!empty($_FILES)) {
                 $count_zero = 0;
                 while (($line = fgetcsv($fp, 0, "$delim")) !== FALSE) {
                     if ($line) {
+						$new_array['cell_num'][] = count($line) - 1;
+						if (count($line) > 16) {
+							$line = array_slice($line, 0, 15);
+						}
                         if ($idx == 0) {
                             $remove_first = array_shift($line);
                             $new_array['columns'][] = $line;
