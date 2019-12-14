@@ -17,7 +17,12 @@ $('#k_arg_id').selectpicker('val', '20')
 $('#promoter_arg_id').selectpicker('val', '1000')
 }
 function addPreviewTable(response, metadata = true, type) {
-
+	console.log(response['data'][0])
+	if (response['data'] > 10 && type == 'exp') {
+		$('#preview_' + type).append($('<label>', {
+			'class': 'px-2 py-1'
+		}).html('<span class="bold highlight">Note: Your dataset is uploaded, since the file is larger than 100MB ('+ (response['data'][0]/1000000).toFixed(2) +'MB), preview has been disabled. </span></label>'))
+	}
     // Define table
     var $table = $('<table>', {
         'class': 'table-striped w-100'
@@ -28,7 +33,6 @@ function addPreviewTable(response, metadata = true, type) {
     //label = metadata ? 'Gene' : 'Cell Label'
 	
     upload_type = response['type'][0];
-    console.log(upload_type);
     if (type == 'exp' && upload_type == 'text') {
         label = 'Gene'
         $table.find('tr').append($('<th>', {
@@ -73,8 +77,9 @@ function addPreviewTable(response, metadata = true, type) {
                 $('#loader_' + type).addClass('d-none');
                 $('#preview_' + type).append($table);
                 document.getElementById("is_load_" + type).value = 1;
+				
             } catch (err) {
-                $('#preview_' + type).append($('<label>', {
+				$('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
                 }).html('<span class="highlight">ERROR: ' + err.message + ', please check your upload data format.</span></label>'));
             }
@@ -112,6 +117,9 @@ function addPreviewTable(response, metadata = true, type) {
                     'class': 'px-2 py-1'
                 }).html('<span class="bold highlight">NOTE: Some of the cell names in your dataset start with numeric value, CeRIS will try to rename them in data pre-processing.  </span></label><br/>'));
             }
+			
+
+
             break;
         case 'hdf':
             $('#preview_' + type).append($('<label>', {
@@ -257,7 +265,7 @@ $(document).ready(function() {
         $('#submit_btn').attr("disabled", false);
         $('#loader_exp').html($('<div>', {
             'class': 'text-center medium regular py-5 border-grey rounded',
-            'style': "background-image: url(assets/img/expression_table_remove.jpg); background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"
+            'style': "background-size: 100% 100%;height:150px; background-size: 100% 100%;margin:10px 0 0 0;border:1px solid #c9c9c9;border-radius:.25rem!important"
         }).html($('<div>', {
             'class': 'dz-default dz-message',
             'style': 'margin:2em 0;font-weight:600;color:#00AA90'
@@ -402,7 +410,7 @@ $(document).ready(function() {
 				</div>
 			</div>-->
 			<div class="col-sm-12">
-				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-image: url(assets/img/expression_table_remove.jpg); background-size: 100% 100%;margin:10px 0 0 0;border:2px dashed #c9c9c9;border-radius:.25rem!important"></div>
+				<div id="dropzone_exp" class="dropzone border-grey rounded dz-clickable" style="background-size: 100% 100%;margin:10px 0 0 0;border:2px dashed #c9c9c9;border-radius:.25rem!important"></div>
 			<div id="loader_exp"></div>
 			<!--<div id="hint_upload" style="font-weight: 200;">Note: We accept gene symbols as row identifiers, automated identifier conversion currently in development.</div>-->
 			<div id="preview_exp"></div>
