@@ -336,7 +336,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading UMAP plot...</h3></div>'
+		$('#'+table_content_id).html('<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading regulon UMAP plot...</h3></div>')
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+table_content_id).offset().top-100
 			}, 500)
@@ -344,57 +344,54 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		data: {'id': regulon_id},
 		dataType: 'json',
 		success: function(response) {
-		document.getElementById(table_content_id).innerHTML = ''
 		overview_filepath = "./data/"+jobid+"/regulon_id/overview_provde_ct.pdf"
 		regulon_score_filepath = "./data/"+jobid+"/regulon_id/"+ regulon_id +".pdf"
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>'
-
+		$('#'+table_content_id).html("")
+		$('#'+table_id).html('<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by ' + regulon_id + ' Score</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+regulon_score_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.png" /></div>')
 		},
 	})
-	document.getElementById(table_id).innerHTML = ""
 	}
 	
 	function show_trajectory_table(item) {
 	
 	match_id = $(item).attr("id").match(/\d+/gm)
-	regulon_id = $(item).attr("id").substring(14)
+	trajectory_regulon_id = $(item).attr("id").substring(14)
 	ct_id= regulon_id.substring(
-    regulon_id.lastIndexOf("CT") + 2, 
-    regulon_id.lastIndexOf("S")
+    trajectory_regulon_id.lastIndexOf("CT") + 2, 
+    trajectory_regulon_id.lastIndexOf("S")
 	)
-	table_id = "trajectory-table-" + regulon_id
+	trajectory_id = "trajectory-table-" + trajectory_regulon_id
 	jobid = location.search.match(/\d+/gm)
-	table_content_id = "trajectory-table-content-" + regulon_id
-	table_jquery_id = "#" + table_content_id
+	trajectory_content_id = "trajectory-table-content-" + trajectory_regulon_id
+	trajectory_jquery_id = "#" + trajectory_content_id
 	$.ajax({
-		url: "prepare_trajectory.php?jobid=" + jobid + "&id=" + regulon_id,
+		url: "prepare_trajectory.php?jobid=" + jobid + "&id=" + trajectory_regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading trajectory plot...</h3></div>'
+		$('#'+trajectory_content_id).html('<div id="scroll_'+trajectory_content_id+'" class="col-sm-6"><h3>Loading trajectory plot...</h3></div>') 
 		$('html, body').animate({
-				scrollTop: $('#scroll_'+table_content_id).offset().top-100
+				scrollTop: $('#scroll_'+trajectory_content_id).offset().top-100
 			}, 500)
 		},
-		data: {'id': regulon_id},
+		data: {'id': trajectory_regulon_id},
 		dataType: 'json',
 		success: function(response) {
-		document.getElementById(table_content_id).innerHTML = ''
-		document.getElementById(table_id).innerHTML = '<div class="col-sm-6"><p>Trajectory Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p>Trajectory Plot Colored by ' + regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + regulon_id + '.trajectory.png" /></div>'
+		$('#'+trajectory_content_id).html("")
+		$('#'+trajectory_id).html('<div class="col-sm-6"><p>Trajectory Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p>Trajectory Plot Colored by ' + trajectory_regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + trajectory_regulon_id + '.trajectory.png" /></div>')
 		},
 	})
-	document.getElementById(table_id).innerHTML = ""
 	}
 	
 	function show_gene_tsne(item) {
-	regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
-	ct_id= regulon_id.substring(
-    regulon_id.lastIndexOf("CT") + 2, 
-    regulon_id.lastIndexOf("S")
+	gene_regulon_id = $(item).attr("id").substring($(item).attr("id").indexOf("-")+1,$(item).attr("id").indexOf("_"))
+	ct_id= gene_regulon_id.substring(
+    gene_regulon_id.lastIndexOf("CT") + 2, 
+    gene_regulon_id.lastIndexOf("S")
 	)
 	gene_symbol = $(item).attr("id").substring($(item).attr("id").lastIndexOf("_")+1)
-	table_id = "gene-tsne-" + regulon_id
+	table_id = "gene-tsne-" + gene_regulon_id
 	jobid = location.search.match(/\d+/gm)
-	table_content_id = "gene-tsne-content-" + regulon_id
+	table_content_id = "gene-tsne-content-" + gene_regulon_id
 	table_jquery_id = "#" + table_content_id
 	
 	$.ajax({
@@ -414,7 +411,6 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
 		},
 	})
-	document.getElementById(table_id).innerHTML = ""
 	}
 	
 	function get_gene_list(item){
@@ -428,14 +424,11 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
         var lines = txt.split("\n")
 		gene_idx = match_id[1] - 1
 		lines[gene_idx].split("\t").shift().replace(/\t /g, '\n')
-		//
 		gene_list = lines[gene_idx].split("\t")
 		gene_list.shift()
-		
 		var enrichr_info = {list: gene_list.join("\n"), description: 'Gene list send to '+$(item).attr("id") , popup: true}
-	
 		//console.log(enrichr_info)
-        // defined globally - will improve
+        //defined globally - will improve
           send_to_Enrichr(enrichr_info)
     })
 	}	
@@ -1038,11 +1031,6 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 																						</thead>
 																					</table>
 																					</div>
-																					<div id="dorothea-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
-																						<div id='dorothea-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block">
-																					</div>
-																					<table id="dorothea-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%"><thead><tr><th>TF</th><th>Gene</th><th>Score</th></tr></thead></table>
-																					</div>
 																					<div class="col-md-12" id="regulon-{{$regulon_result[$sec0][sec1][0]}}" style="display:none;">
                                                                                     <div id='regulon-table-{{$regulon_result[$sec0][sec1][0]}}' style="max-width:100%;display:block"></div>
                                                                                     <div id="regulon-table-content-{{$regulon_result[$sec0][sec1][0]}}" class="display" style="font-size:12px;width:100%">
@@ -1210,7 +1198,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					<div class="flatPanel panel-heading" style="padding: 20px 20px"><strong>Job ID: {{$jobid}}</strong></div>
                 <div class="panel-body">
 					<div style="text-align: left;">
-                        <p>Job ID nout found</p>
+                        <p>Job ID not found</p>
                     </div>
 					</div>
 					{{elseif $status==="error"}}

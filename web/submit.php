@@ -245,9 +245,9 @@ Rscript /var/www/html/CeRIS/program/sort_regulon.R \$wd \$jobid\n
 Rscript /var/www/html/CeRIS/program/prepare_heatmap.R \$wd \$jobid $label_use_sc3\n
 Rscript /var/www/html/CeRIS/program/get_alternative_regulon.R \$jobid\n
 Rscript /var/www/html/CeRIS/program/generate_rss_scatter.R \$jobid\n
+Rscript /var/www/html/CeRIS/program/process_tomtom_result.R \$jobid\n
 mkdir json
 /var/www/html/CeRIS/program/build_clustergrammar.sh \$wd \$jobid $label_use_sc3\n
-
 
 zip -R \$wd\$jobid '*.regulon_gene_id.txt' '*.regulon_gene_symbol.txt' '*.regulon_rank.txt' '*.regulon_activity_score.txt' '*_cell_label.txt' '*.blocks' '*_blocks.conds.txt' '*_blocks.gene.txt' '*_filtered_expression.txt' '*_gene_id_name.txt' '*_marker_genes.txt' 'cell_type_unique_marker.txt' '*_combine_regulon.txt'\n
 perl /var/www/html/CeRIS/program/prepare_email.pl \$jobid\n
