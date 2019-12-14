@@ -198,12 +198,11 @@ $(document).ready(function() {
 			$('#hint_select_species').html('<span class="bold highlight">Note: If submit button is still disabled after you uploaded dataset, try to deselect then select species again. </span>')
         },
         success: function(file, response) {
-            if ($('select[name=species_arg]').val()) {
+            if ($('#species_arg').selectpicker('val')) {
                 $('#submit_btn').attr("disabled", false);
             }
             exp_file_status = 1;
             response = JSON.parse(response);
-            console.log(this.getAcceptedFiles().length);
 			if (this.getAcceptedFiles().length <= 1){
             addTable(response, 'exp');
 			}
