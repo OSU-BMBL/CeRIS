@@ -17,11 +17,10 @@ $('#k_arg_id').selectpicker('val', '20')
 $('#promoter_arg_id').selectpicker('val', '1000')
 }
 function addPreviewTable(response, metadata = true, type) {
-	console.log(response['data'][0])
 	if (response['data'] > 10 && type == 'exp') {
 		$('#preview_' + type).append($('<label>', {
 			'class': 'px-2 py-1'
-		}).html('<span class="bold highlight">Note: Your dataset is uploaded, since the file is larger than 100MB ('+ (response['data'][0]/1000000).toFixed(2) +'MB), preview has been disabled. </span></label>'))
+		}).html('<span class="bold highlight">Note: Your dataset is uploaded, since the file is larger than 2000MB ('+ (response['data'][0]/1000000).toFixed(2) +'MB), preview has been disabled. </span></label>'))
 	}
     // Define table
     var $table = $('<table>', {
@@ -196,6 +195,7 @@ $(document).ready(function() {
         timeout: 1800000,
         sending: function(file, xhr, formData) {
             formData.append('filetype', 'dropzone_exp');
+			$('#hint_select_species').html('<span class="bold highlight">Note: If submit button is still disabled after you uploaded dataset, try to deselect then select species again. </span>')
         },
         success: function(file, response) {
             if ($('select[name=species_arg]').val()) {
@@ -670,6 +670,7 @@ CTS-regulon: A group of genes controlled by ONE motif under the same cell type. 
 			<input type="hidden" id="is_load_gene_module" name="is_load_gene_module" value="0">
 			<!--<input type="hidden" id="k_arg" name="k_arg" value="18">-->
 			<input class="btn btn-submit" type="button" value="Example output" onClick="javascript:location.href = '/CeRIS/results.php?jobid=20191024223952';" />
+			<label id="hint_select_species"> </label>
 
 		</div>
 		<div class="form-group">
