@@ -155,12 +155,15 @@ for (i in 1:length(alldir)) {
   }
   cat(">end", file=paste(alldir[i],".bbc.txt",sep=""),sep="\n",append = T)
   
-  
-  this_bic <- gsub(">bic","",motif_rank[,1])
-  this_bic <- gsub(".txt.fa.*","",this_bic)
-  this_id <- gsub(".*closures-","",motif_rank[,1])
-  motif_rank[,6] <- paste(i,this_bic,this_id,sep=",")
-  write.table(motif_rank[,c(6,4,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+  if (nrow(motif_rank) > 1) {
+    this_bic <- gsub(">bic","",motif_rank[,1])
+    this_bic <- gsub(".txt.fa.*","",this_bic)
+    this_id <- gsub(".*closures-","",motif_rank[,1])
+    motif_rank[,6] <- paste(i,this_bic,this_id,sep=",")
+    write.table(motif_rank[,c(6,4,2,3)],paste(alldir[i],".motif_rank.txt",sep=""),sep = "\t" ,quote=F,row.names = F,col.names = F)
+  } else {
+    cat("", file= paste(alldir[i],".motif_rank.txt",sep=""),sep="\n",append = T)
+  }
 }
 
 gene_id_name <- read.table(paste(jobid,"_gene_id_name.txt",sep=""),sep = "\t", header = T)
