@@ -27,7 +27,7 @@
                             <div class="col-md-7 col-lg-7 col-sm-7 col-xs-7">
                                 <div class="welcome-text">
                                     <h1>CeRIS</h1>
-                                    <p>Cell-type-specific Regulon Inference from Single-cell RNA-Seq</p>
+                                    <h3>Cell-type-specific Regulon Inference from Single-cell RNA-Seq</h3>
                                     <div class="home-button">
                                         <form method="POST" action="{{$URL}}" encType="multipart/form-data" id="needs-validation">
                                             <input type="text" name="jobid" id="jobid" placeholder="Search your job ID">
@@ -41,7 +41,7 @@
                     
 							 <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
                                 <div class="welcome-text">
-                                 <a href="assets/img/CeRIS_pipeline.png" target="_blank"><img src="assets/img/CeRIS_pipeline.png" style="height:500px;margin:auto;display:block"></a>
+                                 <a href="assets/img/overview.jpg" target="_blank"><img src="assets/img/overview.jpg" style="height:auto;margin:auto;display:block"></a>
                                                
                                 </div>
                             </div>
@@ -79,8 +79,8 @@
                             <i class="fa fa-rocket"></i>
                         </div>-->
                         <h3 class="box-title">News</h3>
-                                    <p>Posted: 3/25/2019</p>
-						<p> CeRIS now supports scRNA-Seq analysis for Zebrafish, Fruit Fly, Yeast, and Roundworm.</p>
+                                    <p>Posted: 11/10/2019</p>
+						<p> We are excited to present you the CeRIS server 1.0! Please feel free to contact us if you encounter any issues.</p>
             <p><a class="enroll-button" href="/CeRIS/news.php#1version" role="button">More changes</a></p>
                     </div>
                 </div>
