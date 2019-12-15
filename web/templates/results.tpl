@@ -1220,6 +1220,9 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					
 					<strong>Your job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Species: {{$main_species}}</p>
+                                </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
@@ -1268,6 +1271,9 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					
 					<strong>Your job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Species: {{$main_species}}</p>
+                                </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
@@ -1316,6 +1322,9 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 					
 					<strong>Your job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
+								<div class="form-group col-md-6 col-sm-6">
+                                    <p>Species: {{$main_species}}</p>
+                                </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>
@@ -1364,6 +1373,9 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 							
 							<strong>Job settings:</strong><br>
                             <div class="col-md-12 col-sm-12">
+							<div class="form-group col-md-6 col-sm-6">
+                                    <p for="reportsList">Species: {{$main_species}}</p>
+                                </div>
                                 <div class="form-group col-md-6 col-sm-6">
                                     <p for="reportsList">Enable imputation: {{$is_imputation}}</p>
                                 </div>

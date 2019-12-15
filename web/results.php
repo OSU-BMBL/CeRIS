@@ -92,6 +92,55 @@ $param_file = fopen("$DATAPATH/$jobid/info.txt", "r");
 }
 
 
+$info_file = fopen("$DATAPATH/$jobid/$jobid"."_info.txt", "r");
+$count_regulon_in_ct = array(); 
+if ($info_file) {
+    while (($line = fgets($info_file)) !== false) {
+        $split_line = explode (",", $line);
+		if($split_line[0] == "filter_gene_num"){
+			$filter_gene_num = $split_line[1];
+		} else if($split_line[0] == "filter_cell_num"){
+			$filter_cell_num = $split_line[1];
+		} else if($split_line[0] == "total_gene_num"){
+			$total_gene_num = $split_line[1];
+		}  else if($split_line[0] == "total_cell_num"){
+			$total_cell_num = $split_line[1];
+		} else if($split_line[0] == "filter_gene_rate"){
+			$filter_gene_rate = $split_line[1];
+		} else if($split_line[0] == "filter_cell_rate"){
+			$filter_cell_rate = $split_line[1];
+		} else if($split_line[0] == "total_label"){
+			$total_label = $split_line[1];
+		} else if($split_line[0] == "total_bic"){
+			$total_bic = $split_line[1];
+		} else if($split_line[0] == "total_ct"){
+			$total_ct = $split_line[1];
+		} else if($split_line[0] == "total_regulon"){
+			$total_regulon = $split_line[1];
+		} else if($split_line[0] == "is_evaluation"){
+			$is_evaluation = $split_line[1];
+		} else if($split_line[0] == "species"){
+			$species = $split_line[1];
+		} else if($split_line[0] == "main_species"){
+			$main_species = $split_line[1];
+		} else if($split_line[0] == "second_species"){
+			$second_species = $split_line[1];
+		} else if($split_line[0] == "provide_label"){
+			$provide_label = $split_line[1];
+		} else if($split_line[0] == "predict_label"){
+			$predict_label = $split_line[1];
+		}
+    }
+	
+	if ($species == $main_species) {
+		$main_species = "";
+	}
+    fclose($info_file);
+} else {
+	print_r("Info file not found");
+    // error opening the file.
+} 
+
 
 if (file_exists("$DATAPATH/$jobid/email.txt")){
 $email_file = fopen("$DATAPATH/$jobid/email.txt", "r");
@@ -223,53 +272,6 @@ if(sizeof($module_gene_name_file)){
 }
 
 
-$info_file = fopen("$DATAPATH/$jobid/$jobid"."_info.txt", "r");
-$count_regulon_in_ct = array(); 
-if ($info_file) {
-    while (($line = fgets($info_file)) !== false) {
-        $split_line = explode (",", $line);
-		if($split_line[0] == "filter_gene_num"){
-			$filter_gene_num = $split_line[1];
-		} else if($split_line[0] == "filter_cell_num"){
-			$filter_cell_num = $split_line[1];
-		} else if($split_line[0] == "total_gene_num"){
-			$total_gene_num = $split_line[1];
-		}  else if($split_line[0] == "total_cell_num"){
-			$total_cell_num = $split_line[1];
-		} else if($split_line[0] == "filter_gene_rate"){
-			$filter_gene_rate = $split_line[1];
-		} else if($split_line[0] == "filter_cell_rate"){
-			$filter_cell_rate = $split_line[1];
-		} else if($split_line[0] == "total_label"){
-			$total_label = $split_line[1];
-		} else if($split_line[0] == "total_bic"){
-			$total_bic = $split_line[1];
-		} else if($split_line[0] == "total_ct"){
-			$total_ct = $split_line[1];
-		} else if($split_line[0] == "total_regulon"){
-			$total_regulon = $split_line[1];
-		} else if($split_line[0] == "is_evaluation"){
-			$is_evaluation = $split_line[1];
-		} else if($split_line[0] == "species"){
-			$species = $split_line[1];
-		} else if($split_line[0] == "main_species"){
-			$main_species = $split_line[1];
-		} else if($split_line[0] == "second_species"){
-			$second_species = $split_line[1];
-		} else if($split_line[0] == "provide_label"){
-			$provide_label = $split_line[1];
-		} else if($split_line[0] == "predict_label"){
-			$predict_label = $split_line[1];
-		}
-    }
-	if ($species == $main_species) {
-		$main_species = "";
-	}
-    fclose($info_file);
-} else {
-	print_r("Info file not found");
-    // error opening the file.
-} 
 
 
 if (file_exists("$DATAPATH/$jobid/$jobid"."_silh.txt")){
@@ -481,14 +483,13 @@ function exception_handler($exception) {
 }
 
 set_exception_handler('exception_handler');
-}else if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1regulon_gene_id.txt") && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic/bic1.txt.fa.closures")) {
+}else if (file_exists($done_file) && file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_regulon_gene_id.txt") && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_bic/bic1.txt.fa.closures")) {
 	$status= "error_bic";
 }else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_cell_label.txt")) {
 	$status= "error_num_cells";
-}else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1regulon_gene_id.txt")) {
+}else if (file_exists($done_file) && !file_exists("$DATAPATH/$jobid/$jobid"."_CT_1_regulon_gene_id.txt")) {
 	$status= "error";
-}
-else if (!file_exists($tempnam)) {
+}else if (!file_exists($tempnam)) {
 	$status= "404";
 }else {
 	$status = "0";
@@ -563,7 +564,7 @@ $smarty->assign('sankey_value', $sankey_value);
 $smarty->assign('sankey_nodes', $sankey_nodes);
 $smarty->assign('sankey_label_order', $sankey_label_order);
 $smarty->assign('sankey_nodes_count', $sankey_nodes_count);
-#print_r($module_motif_result);
+
 
 $smarty->setCacheLifetime(3600000);
 $smarty->display('results.tpl');
