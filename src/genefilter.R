@@ -596,7 +596,7 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   par(mar=c(3.1, 3.1, 2.1, 5.1), xpd=TRUE)
   plot(reducedDims(tmp.trajectory.cluster)$DiffMap,
        col=alpha(my.classification.color[as.factor(tmp.trajectory.cluster$cell.label)],0.7),
-       pch=20,frame.plot = FALSE,
+       pch=20,frame.plot = FALSE,cex=(3/log(ncol(tmp.trajectory.cluster))),
        asp=1)
   #grid()
   tmp.color.cat<-cbind.data.frame(CellName=as.character(tmp.trajectory.cluster$cell.label),
@@ -607,12 +607,12 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   if(length(tmp.color.cat$CellName)>10){
     legend("topright",legend = tmp.color.cat$CellName,
            inset=c(0.1,0), ncol=2,
-           col = tmp.color.cat$Color,pch = 20,
-           cex=0.8,title="cluster",bty='n')
+           col = as.character(tmp.color.cat$Color),pch = 19,
+           cex=1.5,title="Cell type",bty='n')
   } else {legend("topright",legend = tmp.color.cat$CellName,
                  inset=c(0.1,0), ncol=1,
-                 col = tmp.color.cat$Color,pch = 20,
-                 cex=0.8,title="cluster",bty='n')}
+                 col = as.character(tmp.color.cat$Color),pch = 19,
+                 cex=1.5,title="Cell type",bty='n')}
   
   
   if(add.line==T){
@@ -622,6 +622,7 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
   }
   reset_par()
 }
+
 
 
 # point size function from test datasets

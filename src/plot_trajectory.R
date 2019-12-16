@@ -7,16 +7,16 @@ library(ggplot2)
 
 args <- commandArgs(TRUE) 
 #setwd("D:/IRIS3_data_test/CeRIS_Run/2.Yan/")
-#setwd("/var/www/html/CeRIS/data/20191020160119")
+#setwd("/var/www/html/CeRIS/data/2019121412746")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
-#jobid <- "20191024223952"
+#jobid <- "2019121412746"
 #########################################################################################
 # yuzhou test
 # setwd("/fs/project/PAS1475/Yuzhou_Chang/CeRIS/test_data/11.Klein/20190818121919/")
 #srcDir <- getwd()
 #id <-"CT1S-R1" 
-#jobid <- "20190818121919"
+#jobid <- "2019121412746"
 ##########################################################################################
 srcDir <- args[1]
 id <- args[2]
@@ -91,11 +91,11 @@ Plot.Cluster.Trajectory<-function(customized=T,add.line=TRUE,start.cluster=NULL,
     legend("topright",legend = tmp.color.cat$CellName,
            inset=c(0.1,0), ncol=2,
            col = as.character(tmp.color.cat$Color),pch = 19,
-           cex=1.5,title="cluster",bty='n')
+           cex=1.5,title="Cell type",bty='n')
   } else {legend("topright",legend = tmp.color.cat$CellName,
                  inset=c(0.1,0), ncol=1,
                  col = as.character(tmp.color.cat$Color),pch = 19,
-                 cex=1.5,title="cluster",bty='n')}
+                 cex=1.5,title="Cell type",bty='n')}
   
   
   if(add.line==T){
