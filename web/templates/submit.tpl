@@ -152,7 +152,7 @@ var addTable = function(dataset, type) {
 	if(dataset['type'][0] == 'text') {
 	    $('#intro_' + type).append($('<label>', {
         'class': 'px-2 py-1'
-		}).html('Your uploaded gene expression file contains <span class="highlight">' + dataset['cell_num'][0] + ' cells</span> and <span class="highlight">' + dataset['gene_num'][0] + ' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
+		}).html('Your uploaded gene expression file contains <span class="highlight">' + dataset['cell_num'][1] + ' cells</span> and <span class="highlight">' + dataset['gene_num'][0] + ' genes</span>. Check that the preview is correct, select the species then click submit button or upload additional files in the advanced options.</label>'))
 	} else if (dataset['type'][0] == 'hdf') {
 		$('#intro_' + type).append($('<label>', {
         'class': 'px-2 py-1'
