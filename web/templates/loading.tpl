@@ -335,7 +335,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		$('#'+table_content_id).html('<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading regulon UMAP plot...</h3></div>')
+		$('#'+table_content_id).html('<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading regulon UMAP plot <img src="static/images/busy.gif"></h3></div>')
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+table_content_id).offset().top-100
 			}, 500)
@@ -350,12 +350,12 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		},
 	})
 	}
-	
+
 	function show_trajectory_table(item) {
 	
 	match_id = $(item).attr("id").match(/\d+/gm)
 	trajectory_regulon_id = $(item).attr("id").substring(14)
-	ct_id= regulon_id.substring(
+	ct_id= trajectory_regulon_id.substring(
     trajectory_regulon_id.lastIndexOf("CT") + 2, 
     trajectory_regulon_id.lastIndexOf("S")
 	)
@@ -367,7 +367,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_trajectory.php?jobid=" + jobid + "&id=" + trajectory_regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		$('#'+trajectory_content_id).html('<div id="scroll_'+trajectory_content_id+'" class="col-sm-6"><h3>Loading trajectory plot...</h3></div>') 
+		$('#'+trajectory_content_id).html('<div id="scroll_'+trajectory_content_id+'" class="col-sm-6"><h3>Loading trajectory plot <img src="static/images/busy.gif"></h3></div>') 
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+trajectory_content_id).offset().top-100
 			}, 500)
@@ -375,8 +375,10 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		data: {'id': trajectory_regulon_id},
 		dataType: 'json',
 		success: function(response) {
+		overview_filepath = "./data/"+jobid+"/regulon_id/overview_ct.trajectory.pdf"
+		trajectory_score_filepath = "./data/"+jobid+"/regulon_id/"+ trajectory_regulon_id +".trajectory.pdf"
 		$('#'+trajectory_content_id).html("")
-		$('#'+trajectory_id).html('<div class="col-sm-6"><p>Trajectory Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p>Trajectory Plot Colored by ' + trajectory_regulon_id + ' Score</p><img src="./data/'+jobid+'/regulon_id/' + trajectory_regulon_id + '.trajectory.png" /></div>')
+		$('#'+trajectory_id).html('<div class="col-sm-6"><p>Trajectory Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_ct.trajectory.png" /></div><div class="col-sm-6"><p>Trajectory Plot Colored by ' + trajectory_regulon_id + ' Score</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+trajectory_score_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + trajectory_regulon_id + '.trajectory.png" /></div>')
 		},
 	})
 	}
@@ -397,7 +399,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_gene_tsne.php?jobid=" + jobid + "&id=" + gene_symbol,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading gene UMAP plot...</h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading gene UMAP plot <img src="static/images/busy.gif"></h3></div>'
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+table_content_id).offset().top-100
 			}, 500)
@@ -405,12 +407,15 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		data: {'id': gene_symbol},
 		dataType: 'json',
 		success: function(response) {
+		overview_filepath = "./data/"+jobid+"/regulon_id/overview_ct.pdf"
+		expression_filepath = "./data/"+jobid+"/regulon_id/"+ gene_symbol +".umap.pdf"
 		document.getElementById(table_content_id).innerHTML = ''
 		let tmp = document.getElementById(table_id).innerHTML
-		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
+		document.getElementById(table_id).innerHTML = tmp + '<div class="col-sm-6"><p>UMAP Plot Colored by Cell Types</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+overview_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/overview_provide_ct.png" /></div><div class="col-sm-6"><p>UMAP Plot Colored by Normalized '+ gene_symbol +' Gene Expression Value</p><input style="float:right; "class="btn btn-default" type="button" value="Download(PDF)" onClick="window.open(\''+expression_filepath+'\')" /><img src="./data/'+jobid+'/regulon_id/' + gene_symbol + '.umap.png" /></div>'
 		},
 	})
 	}
+	
 	
 	function get_gene_list(item){
 	match_id = $(item).attr("id").match(/\d+/gm)
