@@ -711,7 +711,7 @@ my.trajectory<-SingleCellExperiment(
   colData = Idents(my.object)
 )
 SummarizedExperiment::assays(my.trajectory)$norm<-GetAssayData(object = my.object,slot = "data")
-rm(my.object)
+
 dm<-DiffusionMap(t(as.matrix(SummarizedExperiment::assays(my.trajectory)$norm)))
 rd2 <- cbind(DC1 = dm$DC1, DC2 = dm$DC2)
 reducedDims(my.trajectory) <- SimpleList(DiffMap = rd2)
@@ -721,7 +721,7 @@ png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
-pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 10, height = 10,  pointsize = 14, bg = "white")
+pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 10, height = 10,  pointsize = 18, bg = "white")
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
