@@ -713,7 +713,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 															</td>
 															<td style="padding: 0px;">{{$provided_cell_value[ct_idx]}}</td>
 															{{else}}
-															<td style="padding: 0px;">{{count($silh_x[{{$silh_trace[ct_idx]}}])}}</td>
+															<td style="padding: 0px;">{{$predict_label_array[ct_idx]}}</td>
 															{{/if}}
 															<td style="padding: 0px;">{{$count_regulon_in_ct[ct_idx]}}</td>
                                                     </tr>
