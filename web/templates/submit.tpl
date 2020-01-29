@@ -99,7 +99,7 @@ function addPreviewTable(response, metadata = true, type) {
             if (response['cell_num'][0] < 40 && type == 'exp') {
                 $('#preview_' + type).append($('<label>', {
                     'class': 'px-2 py-1'
-                }).html('<span class="bold highlight">Note: Your dataset has (' + response['cell_num'][0] + ') cells, due to the small number of cells, k parameter will be automatically adjusted to avoid possible errors, but errors may still occur on CeRIS. </span></label>'))
+                }).html('<span class="bold highlight">WARNING: Your dataset has (' + response['cell_num'][0] + ') cells, due to the small number of cells, please specify a small k parameter below, but errors may still occur on CeRIS. </span></label>'))
                 document.getElementById("k_arg").value = 5;
             }
             var check_cell_name_start_with_number = function(array) {

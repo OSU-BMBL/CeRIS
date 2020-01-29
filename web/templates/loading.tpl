@@ -335,7 +335,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_regulon_tsne.php?jobid=" + jobid + "&id=" + regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		$('#'+table_content_id).html('<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading regulon UMAP plot <img src="static/images/busy.gif"></h3></div>')
+		$('#'+table_content_id).html('<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading regulon UMAP plot, this could take minutes on large dataset. <img src="static/images/busy.gif"></h3></div>')
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+table_content_id).offset().top-100
 			}, 500)
@@ -367,7 +367,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_trajectory.php?jobid=" + jobid + "&id=" + trajectory_regulon_id,
 		type: 'POST',
 		beforeSend: function(){
-		$('#'+trajectory_content_id).html('<div id="scroll_'+trajectory_content_id+'" class="col-sm-6"><h3>Loading trajectory plot <img src="static/images/busy.gif"></h3></div>') 
+		$('#'+trajectory_content_id).html('<div id="scroll_'+trajectory_content_id+'" class="col-sm-6"><h3>Loading trajectory plot, this could take minutes on large dataset. <img src="static/images/busy.gif"></h3></div>') 
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+trajectory_content_id).offset().top-100
 			}, 500)
@@ -399,7 +399,7 @@ if(document.getElementById("myTab").getBoundingClientRect().y == 10){
 		url: "prepare_gene_tsne.php?jobid=" + jobid + "&id=" + gene_symbol,
 		type: 'POST',
 		beforeSend: function(){
-		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading gene UMAP plot <img src="static/images/busy.gif"></h3></div>'
+		document.getElementById(table_content_id).innerHTML = '<div id="scroll_'+table_content_id+'" class="col-sm-6"><h3>Loading gene UMAP plot, this could take minutes on large dataset. <img src="static/images/busy.gif"></h3></div>'
 		$('html, body').animate({
 				scrollTop: $('#scroll_'+table_content_id).offset().top-100
 			}, 500)
