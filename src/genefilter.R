@@ -725,3 +725,13 @@ pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 10, 
 Plot.Cluster.Trajectory(customized= T,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
 quiet(dev.off())
 
+
+if (label_use_sc3 =='1' ){
+  png(paste("regulon_id/overview_ct.trajectory.png",sep = ""),width=2000, height=1500,res = 300)
+  Plot.Cluster.Trajectory(customized= F,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+  quiet(dev.off())
+  
+  pdf(file = paste("regulon_id/overview_ct.trajectory.pdf",sep = ""), width = 10, height = 10,  pointsize = 18, bg = "white")
+  Plot.Cluster.Trajectory(customized= F,start.cluster=NULL,add.line = T,end.cluster=NULL,show.constraints=T)
+  quiet(dev.off())
+} 
