@@ -20,10 +20,11 @@ user_label=jobid + '_user_label_name.txt'
 df=pd.read_csv(user_label, sep='\t', header=0)
 unique_array=df.iloc[:,0].unique()
 #df['num_unique'] = df.nunique(axis=1)
-#print(unique_array)
+
 #print(df.iloc[0,:].unique())
 
 net.load_file(filename)
+
 color_array=['#92896B','#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ff0000', '#000000']
 color_array1=["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
         "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
@@ -79,17 +80,25 @@ if use_user_label == '0' or use_user_label == '1':
     for i in range(len(color_array3)):
         label='Predicted label: _'+str(i+1)+'_'
         net.set_cat_color(axis='col', cat_index=1, cat_name=label, inst_color=color_array3[i])
-	
-if use_user_label == '2':
-	for j in range(len(unique_array)):
-		userlabel='User\'s label: _'+str(unique_array[j]).replace(" ", "_")+'_'
-		net.set_cat_color(axis='col', cat_index=1, cat_name=userlabel, inst_color=color_array3[j])
-        
-if use_user_label == '2':        
+		
+if outname[0:1] != 'CT' and use_user_label == '2': 
     for i in range(len(color_array3)):
         label='Predicted label: _'+str(i+1)+'_'
-        net.set_cat_color(axis='col', cat_index=2, cat_name=label, inst_color=color_array3[34-i])
-     
+        net.set_cat_color(axis='col', cat_index=1, cat_name=label, inst_color=color_array3[i])
+				
+if outname[0:1] == 'CT' or outname[0:1] == 'mo':
+	if use_user_label == '2':
+		for j in range(len(unique_array)):
+			userlabel='User\'s label: _'+str(unique_array[j]).replace(" ", "_")+'_'
+			net.set_cat_color(axis='col', cat_index=1, cat_name=userlabel, inst_color=color_array3[j])
+			
+if outname[0:1] == 'CT' or outname[0:1] == 'mo':    
+	if use_user_label == '2':        
+		for i in range(len(color_array3)):
+			label='Predicted label: _'+str(i+1)+'_'
+			net.set_cat_color(axis='col', cat_index=2, cat_name=label, inst_color=color_array3[34-i])
+
+
 net.cluster(dist_type='cos', enrichrgram=True, run_clustering=False)
 # write jsons for front-end visualizations
 out = wd + 'json/' + outname + '.json'

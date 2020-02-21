@@ -364,7 +364,7 @@ if (label_file == 0 | label_file==1){
   cell_info <- read.table(label_file,check.names = FALSE, header=TRUE,sep = delimiter)
   cell_info[,2] <- as.factor(cell_info[,2])
 }
-
+rm(exp_data)
 my.object<-FindVariableFeatures(my.object,selection.method = "vst",nfeatures = 5000)
 
 # before PCA, scale data to eliminate extreme value affect.
@@ -420,7 +420,7 @@ if (ncol(my.object) > 500) {
   silh_out <- silh_out[small_cell_idx,]
 } 
 write.table(silh_out,paste(jobid,"_silh.txt",sep=""),sep = ",",quote = F,col.names = F,row.names = F)
-
+rm(dist.matrix)
 #write.table(cell_label,paste(jobid,"_cell_label.txt",sep = ""),quote = F,row.names = F,sep = "\t")
 
 if (label_use_sc3 =='2'){
